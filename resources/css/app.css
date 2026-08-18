@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+@font-face {
+    font-family: "Vazirmatn";
+    src: url("../fonts/vazirmatn/webfonts/Vazirmatn[wght].woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+[x-cloak] {
+    display: none !important;
+}
+:root {
+    --livora-ink: #181715;
+    --livora-charcoal: #24221f;
+
+    --livora-cream: #f3efe8;
+    --livora-white: #faf9f6;
+
+    --livora-sand: #d8d0c4;
+    --livora-stone: #a79f93;
+
+    --livora-accent: #9a7658;
+    --livora-accent-dark: #76583f;
+
+    --livora-border: #d6d0c7;
+}
+
+html {
+    font-family: "Vazirmatn", sans-serif;
+    background-color: var(--livora-cream);
+    color: var(--livora-ink);
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background-color: var(--livora-cream);
+    color: var(--livora-ink);
+    font-family: "Vazirmatn", sans-serif;
+}
+
+button,
+input,
+textarea,
+select {
+    font: inherit;
+}
