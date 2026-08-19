@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Checkout\PlaceOrderRequest;
 use App\Models\Cart;
 use App\Models\Order;
-use App\Models\Payment;
 use App\Services\Installments\InstallmentPlanService;
 use App\Services\Payments\PaymentService;
 use Illuminate\Http\RedirectResponse;
@@ -198,30 +197,30 @@ class CheckoutController extends Controller
              * The actual gateway will be selected
              * later on the payment page.
              */
-            Payment::create([
-                'order_id' =>
-                    $order->id,
-
-                'user_id' =>
-                    Auth::id(),
-
-                'gateway' =>
-                    'pending',
-
-                'amount' =>
-                    $total,
-
-                'status' =>
-                    'pending',
-
-                'metadata' => [
-                    'payment_method' =>
-                        'pending',
-
-                    'order_number' =>
-                        $order->order_number,
-                ],
-            ]);
+//            Payment::create([
+//                'order_id' =>
+//                    $order->id,
+//
+//                'user_id' =>
+//                    Auth::id(),
+//
+//                'gateway' =>
+//                    'pending',
+//
+//                'amount' =>
+//                    $total,
+//
+//                'status' =>
+//                    'pending',
+//
+//                'metadata' => [
+//                    'payment_method' =>
+//                        'pending',
+//
+//                    'order_number' =>
+//                        $order->order_number,
+//                ],
+//            ]);
 
             return $order;
         });

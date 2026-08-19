@@ -1,9 +1,13 @@
+{{-- =========================================================
+     META
+========================================================= --}}
+
 <meta charset="UTF-8">
 
 <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0"
->
+/>
 
 <meta
     name="csrf-token"
@@ -11,29 +15,64 @@
 >
 
 <meta
-    name="description"
-    content="@yield('meta_description', 'Livora Admin Panel')"
->
+    name="theme-color"
+    content="#1c1b19"
+/>
+
+
+{{-- =========================================================
+     SEO
+========================================================= --}}
 
 <title>
-    @hasSection('title')
-        @yield('title') | {{ config('app.name', 'Livora') }}
-    @else
-        {{ config('app.name', 'Livora') }} Admin
-    @endif
+    @yield('title', 'داشبورد مدیریت') | LIVORA
 </title>
 
-{{-- Favicon --}}
+<meta
+    name="description"
+    content="@yield(
+        'meta_description',
+        'پنل مدیریت فروشگاه LIVORA'
+    )"
+/>
+
+
+{{-- =========================================================
+     FONTS
+========================================================= --}}
+
 <link
-    rel="icon"
-    type="image/png"
-    href="{{ asset('favicon.png') }}"
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
 >
 
-{{-- Vite --}}
+<link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+>
+
+<link
+    href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet"
+>
+
+
+{{-- =========================================================
+     VITE
+========================================================= --}}
+
 @vite([
+'resources/css/app.css',
 'resources/css/admin.css',
 'resources/js/app.js',
 ])
+
+
+{{-- =========================================================
+     PAGE SPECIFIC
+========================================================= --}}
+
+@stack('styles')
 
 @stack('head')

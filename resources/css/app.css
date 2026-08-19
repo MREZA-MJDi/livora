@@ -1,49 +1,790 @@
 @import "tailwindcss";
 
+/* =========================================================
+   LIVORA FONT
+   ========================================================= */
+
 @font-face {
     font-family: "Vazirmatn";
-    src: url("../fonts/vazirmatn/webfonts/Vazirmatn[wght].woff2") format("woff2");
+    src: url("../fonts/vazirmatn/webfonts/Vazirmatn[wght].woff2")
+    format("woff2");
+
     font-weight: 100 900;
     font-style: normal;
     font-display: swap;
 }
 
-[x-cloak] {
-    display: none !important;
-}
+
+/* =========================================================
+   LIVORA DESIGN TOKENS
+   ========================================================= */
+
 :root {
+
+    /* Brand */
     --livora-ink: #181715;
     --livora-charcoal: #24221f;
 
+    /* Surfaces */
     --livora-cream: #f3efe8;
     --livora-white: #faf9f6;
+    --livora-surface: #eee8df;
 
+    /* Warm neutrals */
     --livora-sand: #d8d0c4;
     --livora-stone: #a79f93;
 
+    /* Accent */
     --livora-accent: #9a7658;
     --livora-accent-dark: #76583f;
+    --livora-accent-soft: #ede2d7;
 
+    /* Borders */
     --livora-border: #d6d0c7;
+    --livora-border-dark: #bbb2a6;
+
+    /* States */
+    --livora-success: #15803d;
+    --livora-success-soft: #ecfdf3;
+
+    --livora-warning: #b45309;
+    --livora-warning-soft: #fff7ed;
+
+    --livora-danger: #b91c1c;
+    --livora-danger-soft: #fef2f2;
+
+    --livora-info: #0369a1;
+    --livora-info-soft: #f0f9ff;
+
+    /* Shadows */
+    --livora-shadow-sm:
+        0 4px 14px rgba(24, 23, 21, 0.05);
+
+    --livora-shadow-md:
+        0 12px 35px rgba(24, 23, 21, 0.08);
+
+    --livora-shadow-lg:
+        0 25px 70px rgba(24, 23, 21, 0.12);
+
+    /* Radius */
+    --livora-radius-sm: 0.75rem;
+    --livora-radius-md: 1rem;
+    --livora-radius-lg: 1.5rem;
+    --livora-radius-xl: 2rem;
+
+    /* Motion */
+    --livora-duration-fast: 180ms;
+    --livora-duration: 300ms;
+    --livora-duration-slow: 650ms;
+
+    /* Container */
+    --livora-container: 1440px;
 }
 
+
+/* =========================================================
+   BASE
+   ========================================================= */
+
 html {
-    font-family: "Vazirmatn", sans-serif;
-    background-color: var(--livora-cream);
+    min-height: 100%;
+    background: var(--livora-cream);
     color: var(--livora-ink);
+
+    font-family: "Vazirmatn", sans-serif;
+
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    scroll-behavior: smooth;
 }
 
 body {
     margin: 0;
     min-height: 100vh;
-    background-color: var(--livora-cream);
+
+    background:
+        radial-gradient(
+            circle at top left,
+            rgba(154, 118, 88, 0.035),
+            transparent 30rem
+        ),
+        var(--livora-cream);
+
     color: var(--livora-ink);
+
     font-family: "Vazirmatn", sans-serif;
+
+    overflow-x: hidden;
 }
+
+
+/* =========================================================
+   GLOBAL ELEMENTS
+   ========================================================= */
 
 button,
 input,
 textarea,
 select {
     font: inherit;
+}
+
+button,
+a,
+input,
+textarea,
+select {
+    -webkit-tap-highlight-color: transparent;
+}
+
+button {
+    cursor: pointer;
+}
+
+button:disabled {
+    cursor: not-allowed;
+}
+
+img,
+svg {
+    display: block;
+}
+
+img {
+    max-width: 100%;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 0;
+}
+
+::selection {
+    background: var(--livora-accent);
+    color: white;
+}
+
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color:
+        var(--livora-stone)
+        transparent;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--livora-stone);
+    border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--livora-accent);
+}
+
+
+/* =========================================================
+   FOCUS
+   ========================================================= */
+
+:focus {
+    outline: none;
+}
+
+:focus-visible {
+    outline: 2px solid var(--livora-accent);
+    outline-offset: 3px;
+}
+
+
+/* =========================================================
+   ALPINE
+   ========================================================= */
+
+[x-cloak] {
+    display: none !important;
+}
+
+
+/* =========================================================
+   CONTAINER
+   ========================================================= */
+
+.livora-container {
+    width: min(
+        100%,
+        var(--livora-container)
+    );
+
+    margin-inline: auto;
+
+    padding-inline: 1rem;
+}
+
+@media (min-width: 640px) {
+    .livora-container {
+        padding-inline: 1.5rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .livora-container {
+        padding-inline: 2rem;
+    }
+}
+
+
+/* =========================================================
+   GLOBAL CARD
+   ========================================================= */
+
+.livora-card {
+    background: var(--livora-white);
+    border: 1px solid var(--livora-border);
+    border-radius: var(--livora-radius-xl);
+
+    box-shadow: var(--livora-shadow-sm);
+
+    transition:
+        transform var(--livora-duration),
+        box-shadow var(--livora-duration),
+        border-color var(--livora-duration);
+}
+
+.livora-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--livora-border-dark);
+    box-shadow: var(--livora-shadow-md);
+}
+
+
+/* =========================================================
+   IMAGE SYSTEM
+   ========================================================= */
+
+.livora-image {
+    overflow: hidden;
+    background: var(--livora-surface);
+    border-radius: var(--livora-radius-xl);
+}
+
+.livora-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+
+    transition:
+        transform var(--livora-duration-slow)
+        cubic-bezier(0.22, 1, 0.36, 1),
+        opacity var(--livora-duration);
+}
+
+.livora-image:hover img {
+    transform: scale(1.04);
+}
+
+
+/* =========================================================
+   BUTTON SYSTEM
+   ========================================================= */
+
+.livora-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+
+    min-height: 3rem;
+
+    padding-inline: 1.25rem;
+
+    border: 1px solid transparent;
+    border-radius: 1rem;
+
+    font-size: 0.875rem;
+    font-weight: 600;
+
+    transition:
+        transform var(--livora-duration-fast),
+        background-color var(--livora-duration-fast),
+        border-color var(--livora-duration-fast),
+        color var(--livora-duration-fast),
+        box-shadow var(--livora-duration-fast);
+
+    user-select: none;
+}
+
+.livora-button:hover {
+    transform: translateY(-1px);
+}
+
+.livora-button:active {
+    transform: translateY(0);
+}
+
+.livora-button-primary {
+    background: var(--livora-ink);
+    color: white;
+}
+
+.livora-button-primary:hover {
+    background: var(--livora-accent);
+}
+
+.livora-button-secondary {
+    background: var(--livora-white);
+    color: var(--livora-ink);
+    border-color: var(--livora-border);
+}
+
+.livora-button-secondary:hover {
+    border-color: var(--livora-ink);
+    background: var(--livora-surface);
+}
+
+
+/* =========================================================
+   FORM SYSTEM
+   ========================================================= */
+
+.admin-label {
+    display: block;
+
+    margin-bottom: 0.5rem;
+
+    color: var(--livora-ink);
+
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.admin-input,
+.admin-select,
+.admin-textarea {
+    width: 100%;
+
+    border: 1px solid var(--livora-border);
+    border-radius: 1rem;
+
+    background: var(--livora-white);
+    color: var(--livora-ink);
+
+    font-size: 0.875rem;
+
+    outline: none;
+
+    transition:
+        border-color var(--livora-duration-fast),
+        box-shadow var(--livora-duration-fast),
+        background-color var(--livora-duration-fast);
+}
+
+.admin-input,
+.admin-select {
+    min-height: 3rem;
+    padding: 0.75rem 1rem;
+}
+
+.admin-textarea {
+    min-height: 8rem;
+    padding: 0.9rem 1rem;
+    resize: vertical;
+}
+
+.admin-input::placeholder,
+.admin-textarea::placeholder {
+    color: var(--livora-stone);
+}
+
+.admin-input:hover,
+.admin-select:hover,
+.admin-textarea:hover {
+    border-color: var(--livora-border-dark);
+}
+
+.admin-input:focus,
+.admin-select:focus,
+.admin-textarea:focus {
+    border-color: var(--livora-ink);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(24, 23, 21, 0.05);
+}
+
+.admin-input:disabled,
+.admin-select:disabled,
+.admin-textarea:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+    background: var(--livora-surface);
+}
+
+.admin-checkbox {
+    accent-color: var(--livora-ink);
+}
+
+
+/* =========================================================
+   ADMIN BUTTON HELPERS
+   ========================================================= */
+
+.admin-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+
+    min-height: 3rem;
+
+    padding-inline: 1.25rem;
+
+    border-radius: 1rem;
+
+    font-size: 0.875rem;
+    font-weight: 600;
+
+    transition:
+        transform var(--livora-duration-fast),
+        background-color var(--livora-duration-fast),
+        border-color var(--livora-duration-fast),
+        color var(--livora-duration-fast);
+}
+
+.admin-btn:hover {
+    transform: translateY(-1px);
+}
+
+.admin-btn-primary {
+    background: var(--livora-ink);
+    color: white;
+}
+
+.admin-btn-primary:hover {
+    background: var(--livora-accent);
+}
+
+.admin-btn-secondary {
+    border: 1px solid var(--livora-border);
+    background: var(--livora-white);
+    color: var(--livora-ink);
+}
+
+.admin-btn-secondary:hover {
+    border-color: var(--livora-ink);
+    background: var(--livora-surface);
+}
+
+
+/* =========================================================
+   ADMIN CARD
+   ========================================================= */
+
+.admin-card {
+    border: 1px solid var(--livora-border);
+    border-radius: var(--livora-radius-xl);
+
+    background: var(--livora-white);
+
+    box-shadow: var(--livora-shadow-sm);
+}
+
+
+/* =========================================================
+   PRODUCT PRICE
+   ========================================================= */
+
+.product-price {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.product-price__discount {
+    width: fit-content;
+
+    padding: 0.3rem 0.65rem;
+
+    border-radius: 999px;
+
+    background: var(--livora-danger-soft);
+    color: var(--livora-danger);
+
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.product-price__main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.product-price__compare {
+    color: var(--livora-stone);
+
+    font-size: 0.78rem;
+
+    text-decoration: line-through;
+}
+
+.product-price__current {
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
+}
+
+.product-price__current strong {
+    color: var(--livora-ink);
+
+    font-size: 1.4rem;
+    font-weight: 800;
+
+    letter-spacing: -0.03em;
+}
+
+.product-price__current > span {
+    color: var(--livora-stone);
+
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+
+.product-price__installment {
+    margin-top: 0.35rem;
+
+    padding: 0.85rem;
+
+    border:
+        1px solid
+        rgba(154, 118, 88, 0.18);
+
+    border-radius: 1rem;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(154, 118, 88, 0.08),
+            rgba(154, 118, 88, 0.025)
+        );
+}
+
+.product-price__installment-header {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+
+    color: var(--livora-accent-dark);
+
+    font-size: 0.76rem;
+    font-weight: 800;
+}
+
+.product-price__installment-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 1.2rem;
+    height: 1.2rem;
+
+    border-radius: 50%;
+
+    background: var(--livora-accent);
+    color: white;
+
+    font-size: 0.62rem;
+}
+
+.product-price__installment-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+
+    margin-top: 0.7rem;
+}
+
+.product-price__installment-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+
+    color: #5e5a54;
+
+    font-size: 0.7rem;
+}
+
+.product-price__installment-row strong {
+    color: var(--livora-ink);
+    font-weight: 800;
+}
+
+.product-price__installment-note {
+    margin-top: 0.65rem;
+    padding-top: 0.6rem;
+
+    border-top:
+        1px solid
+        rgba(154, 118, 88, 0.12);
+
+    color: var(--livora-stone);
+
+    font-size: 0.67rem;
+    line-height: 1.8;
+}
+
+
+/* =========================================================
+   PAGE TRANSITION
+   ========================================================= */
+
+.livora-page-enter {
+    animation:
+        livora-fade-up
+        500ms
+        cubic-bezier(0.22, 1, 0.36, 1)
+        both;
+}
+
+@keyframes livora-fade-up {
+
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* =========================================================
+   SHIMMER / SKELETON
+   ========================================================= */
+
+.livora-skeleton {
+    position: relative;
+    overflow: hidden;
+
+    background: var(--livora-surface);
+}
+
+.livora-skeleton::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    transform: translateX(-100%);
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.45),
+            transparent
+        );
+
+    animation:
+        livora-shimmer
+        1.6s
+        infinite;
+}
+
+@keyframes livora-shimmer {
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+
+/* =========================================================
+   TEXT UTILITIES
+   ========================================================= */
+
+.livora-eyebrow {
+    font-size: 0.625rem;
+    font-weight: 600;
+
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+
+    color: var(--livora-accent);
+}
+
+.livora-muted {
+    color: var(--livora-stone);
+}
+
+.livora-heading {
+    color: var(--livora-ink);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+}
+
+
+/* =========================================================
+   SAFE AREA / MOBILE
+   ========================================================= */
+
+@media (max-width: 640px) {
+
+    html {
+        font-size: 15px;
+    }
+
+    .product-price__current strong {
+        font-size: 1.15rem;
+    }
+
+    .livora-button {
+        min-height: 2.9rem;
+    }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+
+        transition-duration: 0.01ms !important;
+    }
 }

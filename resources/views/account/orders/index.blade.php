@@ -2,109 +2,307 @@
 
 @section('title', 'سفارش‌های من | LIVORA')
 
+@section(
+    'description',
+    'مشاهده و مدیریت سفارش‌های شما در LIVORA.'
+)
+
+@push('seo')
+    <meta name="robots" content="noindex,nofollow,noarchive">
+@endpush
+
 @section('content')
 
-    <x-layout.container>
+    @php
+        $statusLabels = [
+            'pending' => 'در انتظار بررسی',
+            'processing' => 'در حال پردازش',
+            'shipped' => 'ارسال شده',
+            'delivered' => 'تحویل شده',
+            'cancelled' => 'لغو شده',
+        ];
 
-        <div class="py-10">
+        $statusVariants = [
+            'pending' => 'warning',
+            'processing' => 'warning',
+            'shipped' => 'info',
+            'delivered' => 'success',
+            'cancelled' => 'danger',
+        ];
 
-            <h1 class="text-3xl font-semibold">
-                سفارش‌های من
-            </h1>
+        $paymentLabels = [
+            'pending' => 'در انتظار پرداخت',
+            'paid' => 'پرداخت شده',
+            'failed' => 'ناموفق',
+            'refunded' => 'بازپرداخت شده',
+        ];
 
-            <div class="mt-8 space-y-5">
+        $paymentVariants = [
+            'pending' => 'warning',
+            'paid' => 'success',
+            'failed' => 'danger',
+            'refunded' => 'info',
+        ];
+    @endphp
 
-                @forelse($orders as $order)
+    <div class="min-h-[70vh] bg-[var(--livora-cream)]">
 
-                    <article class="rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)]">
+        <section class="border-b border-[var(--livora-border)] bg-[var(--livora-white)]">
+            <x-layout.container>
 
-                        <div class="flex flex-col gap-4 border-b border-[var(--livora-border)] p-5 sm:flex-row sm:items-center sm:justify-between">
+                <div class="py-8 sm:py-12">
 
-                            <div>
-                                <p class="text-xs text-[var(--livora-stone)]">
-                                    شماره سفارش
-                                </p>
+                    <nav class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--livora-stone)]">
+                        <a
+                            href="{{ route('home') }}"
+                            class="transition hover:text-[var(--livora-ink)]"
+                        >
+                            خانه
+                        </a>
 
-                                <p class="mt-1 font-semibold">
-                                    {{ $order->order_number }}
-                                </p>
-                            </div>
+                        <span>/</span>
 
-                            <x-ui.badge
-                                :variant="$order->status === 'delivered' ? 'success' : 'warning'"
-                            >
-                                {{ $order->status }}
-                            </x-ui.badge>
+                        <a
+                            href="{{ route('account.index') }}"
+                            class="transition hover:text-[var(--livora-ink)]"
+                        >
+                            حساب کاربری
+                        </a>
 
+                        <span>/</span>
+
+                        <span class="text-[var(--livora-ink)]">
+                        سفارش‌ها
+                    </span>
+                    </nav>
+
+                    <div class="mt-7 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+
+                        <div>
+                            <p class="text-[10px] uppercase tracking-[0.22em] text-[var(--livora-accent)]">
+                                MY ORDERS
+                            </p>
+
+                            <h1 class="mt-3 text-4xl font-semibold tracking-tight">
+                                سفارش‌های من
+                            </h1>
+
+                            <p class="mt-3 text-sm leading-8 text-[var(--livora-stone)]">
+                                تاریخچه سفارش‌ها، وضعیت پرداخت و جزئیات هر خرید را اینجا ببین.
+                            </p>
                         </div>
 
+                        <a
+                            href="{{ route('shop.index') }}"
+                            class="inline-flex w-fit items-center rounded-2xl bg-[var(--livora-ink)] px-5 py-3.5 text-sm font-medium text-white transition hover:bg-[var(--livora-accent)]"
+                        >
+                            خرید جدید
+                        </a>
 
-                        <div class="grid gap-5 p-5 sm:grid-cols-3">
+                    </div>
 
-                            <div>
-                                <p class="text-xs text-[var(--livora-stone)]">
-                                    تاریخ
-                                </p>
+                </div>
 
-                                <p class="mt-2 text-sm">
-                                    {{ $order->created_at->format('Y/m/d') }}
-                                </p>
+            </x-layout.container>
+        </section>
+
+
+        <section>
+            <x-layout.container>
+
+                @if($orders->isEmpty())
+
+                    <div class="py-20 sm:py-28">
+
+                        <div class="mx-auto max-w-xl text-center">
+
+                            <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-[1.75rem] bg-[var(--livora-white)] text-[var(--livora-stone)]">
+                                —
                             </div>
 
-                            <div>
-                                <p class="text-xs text-[var(--livora-stone)]">
-                                    محصولات
-                                </p>
+                            <p class="mt-7 text-[10px] uppercase tracking-[0.22em] text-[var(--livora-accent)]">
+                                NO ORDERS
+                            </p>
 
-                                <p class="mt-2 text-sm">
-                                    {{ $order->items->sum('quantity') }}
-                                </p>
-                            </div>
+                            <h2 class="mt-3 text-3xl font-semibold">
+                                هنوز سفارشی ثبت نکرده‌ای
+                            </h2>
 
-                            <div>
-                                <p class="text-xs text-[var(--livora-stone)]">
-                                    مبلغ
-                                </p>
-
-                                <p class="mt-2 text-sm font-semibold">
-                                    {{ number_format((float) $order->total) }}
-                                    تومان
-                                </p>
-                            </div>
-
-                        </div>
-
-
-                        <div class="border-t border-[var(--livora-border)] p-5">
+                            <p class="mx-auto mt-4 max-w-md text-sm leading-8 text-[var(--livora-stone)]">
+                                اولین انتخابت را از مجموعه LIVORA پیدا کن.
+                            </p>
 
                             <a
-                                href="{{ route('account.orders.show', $order) }}"
-                                class="text-sm font-medium text-[var(--livora-accent)]"
+                                href="{{ route('shop.index') }}"
+                                class="mt-8 inline-flex rounded-2xl bg-[var(--livora-ink)] px-7 py-4 text-sm font-medium text-white transition hover:bg-[var(--livora-accent)]"
                             >
-                                مشاهده جزئیات
+                                ورود به فروشگاه
                             </a>
 
                         </div>
 
-                    </article>
-
-                @empty
-
-                    <div class="py-20 text-center text-sm text-[var(--livora-stone)]">
-                        سفارشی پیدا نشد.
                     </div>
 
-                @endforelse
+                @else
 
-            </div>
+                    <div class="py-8 sm:py-10">
+
+                        <div class="space-y-4">
+
+                            @foreach($orders as $order)
+
+                                <article class="overflow-hidden rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)]">
+
+                                    <a
+                                        href="{{ route('account.orders.show', $order) }}"
+                                        class="block p-5 transition hover:bg-[var(--livora-surface)] sm:p-7"
+                                    >
+
+                                        <div class="flex flex-col gap-6">
+
+                                            {{-- Header --}}
+                                            <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+
+                                                <div>
+
+                                                    <div class="flex flex-wrap items-center gap-2">
+
+                                                    <span class="text-sm font-semibold">
+                                                        {{ $order->order_number }}
+                                                    </span>
+
+                                                        <x-ui.badge
+                                                            :variant="$statusVariants[$order->status] ?? 'warning'"
+                                                        >
+                                                            {{ $statusLabels[$order->status] ?? $order->status }}
+                                                        </x-ui.badge>
+
+                                                    </div>
+
+                                                    <p class="mt-2 text-[11px] text-[var(--livora-stone)]">
+                                                        {{ optional($order->created_at)->format('Y/m/d') }}
+                                                    </p>
+
+                                                </div>
+
+                                                <div class="text-right">
+
+                                                    <p class="text-lg font-semibold">
+                                                        {{ number_format((float) $order->total) }}
+                                                        <span class="text-[10px] font-normal text-[var(--livora-stone)]">
+                                                        تومان
+                                                    </span>
+                                                    </p>
+
+                                                    <div class="mt-2">
+                                                        <x-ui.badge
+                                                            :variant="$paymentVariants[$order->payment_status] ?? 'warning'"
+                                                        >
+                                                            {{ $paymentLabels[$order->payment_status] ?? $order->payment_status }}
+                                                        </x-ui.badge>
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
 
 
-            <div class="mt-10">
-                {{ $orders->links() }}
-            </div>
+                                            {{-- Meta --}}
+                                            <div class="flex flex-wrap gap-2 text-[11px]">
 
-        </div>
+                                            <span class="rounded-full border border-[var(--livora-border)] px-3 py-1.5 text-[var(--livora-stone)]">
+                                                {{ number_format($order->items->count()) }}
+                                                محصول
+                                            </span>
 
-    </x-layout.container>
+                                                @if($order->payment_method === 'installment')
+
+                                                    <span class="rounded-full border border-[var(--livora-border)] bg-[var(--livora-surface)] px-3 py-1.5 text-[var(--livora-accent)]">
+                                                    خرید اقساطی
+                                                </span>
+
+                                                @endif
+
+                                                @if($order->payment_provider)
+
+                                                    <span class="rounded-full border border-[var(--livora-border)] px-3 py-1.5 text-[var(--livora-stone)]">
+                                                    {{ $order->payment_provider }}
+                                                </span>
+
+                                                @endif
+
+                                            </div>
+
+
+                                            {{-- Preview Items --}}
+                                            @if($order->items->isNotEmpty())
+
+                                                <div class="flex gap-3 overflow-x-auto pb-1">
+
+                                                    @foreach($order->items->take(4) as $item)
+
+                                                        <div class="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-[var(--livora-surface)]">
+
+                                                            @if($item->product?->images?->first()?->url)
+
+                                                                <img
+                                                                    src="{{ $item->product->images->first()->url }}"
+                                                                    alt="{{ $item->product_name }}"
+                                                                    class="h-full w-full object-cover"
+                                                                    loading="lazy"
+                                                                >
+
+                                                            @else
+
+                                                                <div class="flex h-full w-full items-center justify-center text-[9px] tracking-wider text-[var(--livora-stone)]">
+                                                                    LIVORA
+                                                                </div>
+
+                                                            @endif
+
+                                                        </div>
+
+                                                    @endforeach
+
+                                                </div>
+
+                                            @endif
+
+
+                                            {{-- Footer --}}
+                                            <div class="flex items-center justify-between border-t border-[var(--livora-border)] pt-5">
+
+                                            <span class="text-xs text-[var(--livora-stone)]">
+                                                مشاهده جزئیات سفارش
+                                            </span>
+
+                                                <span class="text-[var(--livora-ink)] transition-transform group-hover:-translate-x-1">
+                                                ←
+                                            </span>
+
+                                            </div>
+
+                                        </div>
+
+                                    </a>
+
+                                </article>
+
+                            @endforeach
+
+                        </div>
+
+                        <div class="mt-8">
+                            {{ $orders->withQueryString()->links() }}
+                        </div>
+
+                    </div>
+
+                @endif
+
+            </x-layout.container>
+        </section>
+
+    </div>
 
 @endsection

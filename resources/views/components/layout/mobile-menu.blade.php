@@ -1,149 +1,335 @@
 <div
     x-show="mobileOpen"
     x-cloak
-    x-transition:enter="transition ease-out duration-200"
-    x-transition:enter-start="opacity-0 -translate-y-2"
-    x-transition:enter-end="opacity-100 translate-y-0"
-    x-transition:leave="transition ease-in duration-150"
-    x-transition:leave-start="opacity-100 translate-y-0"
-    x-transition:leave-end="opacity-0 -translate-y-2"
-    class="border-b border-[var(--livora-border)] bg-[var(--livora-cream)] lg:hidden"
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0"
+    x-transition:enter-end="opacity-100"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="opacity-100"
+    x-transition:leave-end="opacity-0"
+    class="fixed inset-0 z-[60] lg:hidden"
 >
+    {{-- Backdrop --}}
+    <button
+        type="button"
+        aria-label="بستن منو"
+        @click="mobileOpen = false"
+        class="absolute inset-0 bg-black/30 backdrop-blur-sm"
+    ></button>
 
-    <x-layout.container>
+    {{-- Panel --}}
+    <div
+        x-show="mobileOpen"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="translate-x-full"
+        x-transition:enter-end="translate-x-0"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="translate-x-0"
+        x-transition:leave-end="translate-x-full"
+        class="absolute right-0 top-0 flex h-full w-[88%] max-w-md flex-col bg-[var(--livora-cream)] shadow-2xl"
+    >
 
-        <div class="space-y-1 py-5">
+        {{-- Header --}}
+        <div class="flex h-[76px] items-center justify-between border-b border-[var(--livora-border)] bg-[var(--livora-white)] px-5">
 
             <a
                 href="{{ route('home') }}"
                 @click="mobileOpen = false"
-                class="block rounded-xl px-4 py-3 text-sm text-[var(--livora-ink)] transition hover:bg-[var(--livora-white)] hover:text-[var(--livora-accent)]"
+                class="text-xl font-semibold tracking-[0.22em] text-[var(--livora-ink)]"
             >
-                خانه
+                LIVORA
             </a>
 
-            <a
-                href="{{ route('shop.index') }}"
+            <button
+                type="button"
+                aria-label="بستن منو"
                 @click="mobileOpen = false"
-                class="block rounded-xl px-4 py-3 text-sm text-[var(--livora-ink)] transition hover:bg-[var(--livora-white)] hover:text-[var(--livora-accent)]"
+                class="flex h-10 w-10 items-center justify-center rounded-full text-[var(--livora-ink)] transition hover:bg-[var(--livora-surface)]"
             >
-                فروشگاه
-            </a>
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="h-5 w-5"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M6 18 18 6M6 6l12 12"
+                    />
+                </svg>
+            </button>
 
-            <a
-                href="{{ route('categories.index') }}"
-                @click="mobileOpen = false"
-                class="block rounded-xl px-4 py-3 text-sm text-[var(--livora-ink)] transition hover:bg-[var(--livora-white)] hover:text-[var(--livora-accent)]"
+        </div>
+
+
+        {{-- Content --}}
+        <div class="flex-1 overflow-y-auto px-5 py-6">
+
+            {{-- Search --}}
+            <button
+                type="button"
+                @click="
+                    mobileOpen = false;
+                    searchOpen = true;
+
+                    $nextTick(() => {
+                        $refs.searchInput?.focus();
+                    });
+                "
+                class="flex w-full items-center gap-3 rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] px-4 py-4 text-right"
             >
-                دسته‌بندی‌ها
-            </a>
 
-            <a
-                href="{{ route('about') }}"
-                @click="mobileOpen = false"
-                class="block rounded-xl px-4 py-3 text-sm text-[var(--livora-ink)] transition hover:bg-[var(--livora-white)] hover:text-[var(--livora-accent)]"
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="h-5 w-5 shrink-0 text-[var(--livora-stone)]"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="m21 21-4.35-4.35m1.35-5.4a6.75 6.75 0 1 1-13.5 0 6.75 6.75 0 0 1 13.5 0Z"
+                    />
+                </svg>
+
+                <span class="text-sm text-[var(--livora-stone)]">
+                    جستجوی محصول، دسته‌بندی...
+                </span>
+
+            </button>
+
+
+            {{-- Main Navigation --}}
+            <nav
+                aria-label="منوی موبایل"
+                class="mt-7"
             >
-                درباره ما
-            </a>
 
-            <a
-                href="{{ route('contact') }}"
-                @click="mobileOpen = false"
-                class="block rounded-xl px-4 py-3 text-sm text-[var(--livora-ink)] transition hover:bg-[var(--livora-white)] hover:text-[var(--livora-accent)]"
-            >
-                تماس
-            </a>
+                <p class="px-2 text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--livora-accent)]">
+                    DISCOVER
+                </p>
 
-
-            <div class="mt-3 border-t border-[var(--livora-border)] pt-3">
-
-                @auth
-
-                    @if(auth()->user()->isAdmin())
-
-                        <a
-                            href="{{ route('admin.dashboard') }}"
-                            @click="mobileOpen = false"
-                            class="block rounded-xl px-4 py-3 text-sm text-[var(--livora-ink)] transition hover:bg-[var(--livora-white)] hover:text-[var(--livora-accent)]"
-                        >
-                            پنل مدیریت
-                        </a>
-
-                    @elseif(auth()->user()->isCustomer())
-
-                        <a
-                            href="{{ route('account.index') }}"
-                            @click="mobileOpen = false"
-                            class="block rounded-xl px-4 py-3 text-sm text-[var(--livora-ink)] transition hover:bg-[var(--livora-white)] hover:text-[var(--livora-accent)]"
-                        >
-                            حساب کاربری
-                        </a>
-
-                        <a
-                            href="{{ route('account.wishlist.index') }}"
-                            @click="mobileOpen = false"
-                            class="block rounded-xl px-4 py-3 text-sm text-[var(--livora-ink)] transition hover:bg-[var(--livora-white)] hover:text-[var(--livora-accent)]"
-                        >
-                            علاقه‌مندی‌ها
-                        </a>
-
-                    @endif
-
-                @else
+                <div class="mt-3 divide-y divide-[var(--livora-border)] rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)]">
 
                     <a
-                        href="{{ route('login') }}"
+                        href="{{ route('home') }}"
                         @click="mobileOpen = false"
-                        class="block rounded-xl px-4 py-3 text-sm text-[var(--livora-ink)] transition hover:bg-[var(--livora-white)] hover:text-[var(--livora-accent)]"
+                        class="flex items-center justify-between px-4 py-4 text-sm font-medium"
                     >
-                        ورود
+                        <span>خانه</span>
+                        <span class="text-[var(--livora-stone)]">←</span>
                     </a>
 
                     <a
-                        href="{{ route('register') }}"
+                        href="{{ route('shop.index') }}"
                         @click="mobileOpen = false"
-                        class="block rounded-xl px-4 py-3 text-sm text-[var(--livora-ink)] transition hover:bg-[var(--livora-white)] hover:text-[var(--livora-accent)]"
+                        class="flex items-center justify-between px-4 py-4 text-sm font-medium"
                     >
-                        ثبت‌نام
+                        <span>فروشگاه</span>
+                        <span class="text-[var(--livora-stone)]">←</span>
                     </a>
 
-                @endauth
+                    <a
+                        href="{{ route('categories.index') }}"
+                        @click="mobileOpen = false"
+                        class="flex items-center justify-between px-4 py-4 text-sm font-medium"
+                    >
+                        <span>دسته‌بندی‌ها</span>
+                        <span class="text-[var(--livora-stone)]">←</span>
+                    </a>
+
+                    <a
+                        href="{{ route('about') }}"
+                        @click="mobileOpen = false"
+                        class="flex items-center justify-between px-4 py-4 text-sm font-medium"
+                    >
+                        <span>درباره LIVORA</span>
+                        <span class="text-[var(--livora-stone)]">←</span>
+                    </a>
+
+                    <a
+                        href="{{ route('contact') }}"
+                        @click="mobileOpen = false"
+                        class="flex items-center justify-between px-4 py-4 text-sm font-medium"
+                    >
+                        <span>تماس با ما</span>
+                        <span class="text-[var(--livora-stone)]">←</span>
+                    </a>
+
+                </div>
+
+            </nav>
 
 
-                @php
-                    $cartCount = 0;
+            {{-- Customer --}}
+            <div class="mt-8">
 
-                    if (auth()->check() && auth()->user()->isCustomer()) {
-                        $cart = auth()->user()->activeCart;
+                <p class="px-2 text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--livora-accent)]">
+                    MY LIVORA
+                </p>
 
-                        if ($cart) {
-                            $cartCount = $cart->itemCount();
-                        }
-                    }
-                @endphp
+                <div class="mt-3 grid grid-cols-2 gap-3">
+
+                    <a
+                        href="{{ route('cart.index') }}"
+                        @click="mobileOpen = false"
+                        class="rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-4"
+                    >
+
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--livora-surface)] text-xs font-semibold">
+                            01
+                        </div>
+
+                        <p class="mt-4 text-sm font-semibold">
+                            سبد خرید
+                        </p>
+
+                        <p class="mt-1 text-[11px] text-[var(--livora-stone)]">
+                            محصولات انتخاب‌شده
+                        </p>
+
+                    </a>
+
+
+                    @auth
+
+                        @if(auth()->user()->isCustomer())
+
+                            <a
+                                href="{{ route('account.index') }}"
+                                @click="mobileOpen = false"
+                                class="rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-4"
+                            >
+
+                                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--livora-surface)] text-xs font-semibold">
+                                    02
+                                </div>
+
+                                <p class="mt-4 text-sm font-semibold">
+                                    حساب من
+                                </p>
+
+                                <p class="mt-1 text-[11px] text-[var(--livora-stone)]">
+                                    سفارش‌ها و علاقه‌مندی‌ها
+                                </p>
+
+                            </a>
+
+                        @else
+
+                            <a
+                                href="{{ route('admin.dashboard') }}"
+                                @click="mobileOpen = false"
+                                class="rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-4"
+                            >
+
+                                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--livora-surface)] text-xs font-semibold">
+                                    02
+                                </div>
+
+                                <p class="mt-4 text-sm font-semibold">
+                                    پنل مدیریت
+                                </p>
+
+                                <p class="mt-1 text-[11px] text-[var(--livora-stone)]">
+                                    مدیریت فروشگاه
+                                </p>
+
+                            </a>
+
+                        @endif
+
+                    @else
+
+                        <a
+                            href="{{ route('login') }}"
+                            @click="mobileOpen = false"
+                            class="rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-4"
+                        >
+
+                            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--livora-surface)] text-xs font-semibold">
+                                02
+                            </div>
+
+                            <p class="mt-4 text-sm font-semibold">
+                                ورود
+                            </p>
+
+                            <p class="mt-1 text-[11px] text-[var(--livora-stone)]">
+                                ورود به حساب
+                            </p>
+
+                        </a>
+
+                    @endauth
+
+                </div>
+
+            </div>
+
+
+            {{-- Installment Highlight --}}
+            <div class="mt-8 rounded-3xl bg-[var(--livora-ink)] p-5 text-white">
+
+                <p class="text-[10px] uppercase tracking-[0.18em] text-white/40">
+                    FLEXIBLE PAYMENT
+                </p>
+
+                <h2 class="mt-3 text-lg font-semibold">
+                    بعضی انتخاب‌ها را می‌توانی اقساطی بخری.
+                </h2>
+
+                <p class="mt-2 text-xs leading-7 text-white/50">
+                    شرایط پیش‌پرداخت و برنامه چک هر محصول در صفحه خودش نمایش داده می‌شود.
+                </p>
 
                 <a
-                    href="{{ route('cart.index') }}"
+                    href="{{ route('shop.index') }}"
                     @click="mobileOpen = false"
-                    class="flex items-center justify-between rounded-xl px-4 py-3 text-sm text-[var(--livora-ink)] transition hover:bg-[var(--livora-white)] hover:text-[var(--livora-accent)]"
+                    class="mt-5 inline-flex rounded-2xl bg-white px-5 py-3 text-xs font-medium text-[var(--livora-ink)]"
                 >
-                    <span>
-                        سبد خرید
-                    </span>
-
-                    @if($cartCount > 0)
-
-                        <span class="rounded-full bg-[var(--livora-accent)] px-2 py-0.5 text-[10px] font-semibold text-white">
-                            {{ $cartCount }}
-                        </span>
-
-                    @endif
+                    مشاهده محصولات
                 </a>
 
             </div>
 
         </div>
 
-    </x-layout.container>
+
+        {{-- Footer --}}
+        <div class="border-t border-[var(--livora-border)] bg-[var(--livora-white)] p-5">
+
+            <div class="flex items-center justify-between gap-4">
+
+                <div>
+
+                    <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-stone)]">
+                        LIVORA
+                    </p>
+
+                    <p class="mt-1 text-[11px] text-[var(--livora-stone)]">
+                        Furniture & Living
+                    </p>
+
+                </div>
+
+                <a
+                    href="{{ route('contact') }}"
+                    @click="mobileOpen = false"
+                    class="text-xs font-medium text-[var(--livora-ink)]"
+                >
+                    تماس با ما
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>

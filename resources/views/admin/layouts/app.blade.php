@@ -1,47 +1,129 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
-
+<html
+    lang="fa"
+    dir="rtl"
+    class="h-full"
+>
 <head>
-    @include('admin.layouts.partials.head')
+
+    @include(
+        'admin.layouts.partials.head'
+    )
+
 </head>
+<body
+    class="min-h-full bg-[var(--admin-bg)] text-[var(--admin-text)] antialiased"
+>
+@include(
+    'admin.layouts.partials.scripts'
+)
+<div
+    x-data="{
+        sidebarOpen: false,
+        userMenuOpen: false,
+        notificationOpen: false
+    }"
+    class="admin-shell min-h-screen"
+>
 
-<body class="min-h-screen">
+    {{-- =========================================================
+         MOBILE SIDEBAR BACKDROP
+    ========================================================== --}}
+    <div
+        x-show="sidebarOpen"
+        x-cloak
+        x-transition.opacity
+        class="fixed inset-0 z-40 bg-black/35 backdrop-blur-sm lg:hidden"
+        @click="sidebarOpen = false"
+    ></div>
 
-<div class="admin-shell">
 
-    {{-- Sidebar --}}
+    {{-- =========================================================
+         SIDEBAR
+    ========================================================== --}}
     @include('admin.layouts.partials.sidebar')
 
-    {{-- Main Area --}}
-    <div class="lg:pr-72">
 
-        {{-- Navbar --}}
+    {{-- =========================================================
+         MAIN AREA
+    ========================================================== --}}
+    <div class="flex min-h-screen flex-col lg:mr-[260px]">
+
+        {{-- =====================================================
+             NAVBAR
+        ====================================================== --}}
         @include('admin.layouts.partials.navbar')
 
-        <main class="admin-main min-h-[calc(100vh-4rem)] p-4 sm:p-6 lg:p-8">
 
-            {{-- Breadcrumbs --}}
-            @include('admin.layouts.partials.breadcrumbs')
+        {{-- =====================================================
+             CONTENT
+        ====================================================== --}}
+        <main
+            class="admin-main flex-1 px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8"
+        >
 
-            {{-- Flash Messages --}}
-            @include('admin.layouts.partials.flash-messages')
+            <div
+                class="admin-content admin-page-enter"
+            >
 
-            {{-- Page Content --}}
-            @yield('content')
+                {{-- Breadcrumbs --}}
+                @includeIf(
+                    'admin.layouts.partials.breadcrumbs'
+                )
+
+
+                {{-- Flash Messages --}}
+                @includeIf(
+                    'admin.layouts.partials.flash-messages'
+                )
+
+
+                {{-- Page Content --}}
+                @yield('content')
+
+            </div>
 
         </main>
 
-        {{-- Footer --}}
-        @include('admin.layouts.partials.footer')
+
+        {{-- =====================================================
+             FOOTER
+        ====================================================== --}}
+        @includeIf(
+            'admin.layouts.partials.footer'
+        )
+
+    </div>
+
+
+    {{-- =========================================================
+         GLOBAL LOADING
+    ========================================================== --}}
+    <div
+        x-data="{ loading: false }"
+        x-on:livewire:navigating.window="loading = true"
+        x-on:livewire:navigated.window="loading = false"
+    >
+
+        <div
+            x-show="loading"
+            x-cloak
+            class="fixed inset-x-0 top-0 z-[200] h-0.5 bg-[var(--admin-accent)]"
+        ></div>
 
     </div>
 
 </div>
 
-{{-- Scripts --}}
-@include('admin.layouts.partials.scripts')
 
+{{-- =========================================================
+     SCRIPTS
+========================================================== --}}
 @stack('scripts')
+
+@includeIf(
+    'admin.layouts.partials.scripts'
+)
 
 </body>
 </html>

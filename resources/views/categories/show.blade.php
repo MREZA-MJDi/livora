@@ -1,112 +1,402 @@
 @extends('layouts.app')
 
-@section('title', $category->name . ' | LIVORA')
+@section(
+    'title',
+    $category->name . ' | خرید مبلمان و محصولات خانه | LIVORA'
+)
 
-@section('description', $category->description ?: 'محصولات ' . $category->name . ' در LIVORA')
+@section(
+    'description',
+    $category->meta_description
+        ?? ('مشاهده و خرید محصولات دسته‌بندی ' . $category->name . ' در LIVORA؛ بررسی قیمت، مشخصات و شرایط خرید اقساطی.')
+)
+
+@section(
+    'canonical',
+    route('categories.show', $category->slug)
+)
+
+@push('seo')
+
+    <meta
+        property="og:type"
+        content="website"
+    >
+
+    <meta
+        property="og:title"
+        content="{{ $category->name }} | LIVORA"
+    >
+
+    <meta
+        property="og:description"
+        content="{{ $category->meta_description ?? ('محصولات ' . $category->name . ' در LIVORA') }}"
+    >
+
+    <meta
+        property="og:url"
+        content="{{ route('categories.show', $category->slug) }}"
+    >
+
+    @if($category->image)
+        <meta
+            property="og:image"
+            content="{{ $category->image }}"
+        >
+    @endif
+
+    <meta
+        name="twitter:card"
+        content="summary_large_image"
+    >
+
+    <meta
+        name="twitter:title"
+        content="{{ $category->name }} | LIVORA"
+    >
+
+    <meta
+        name="twitter:description"
+        content="{{ $category->meta_description ?? ('محصولات ' . $category->name . ' در LIVORA') }}"
+    >
+
+    @if($category->image)
+        <meta
+            name="twitter:image"
+            content="{{ $category->image }}"
+        >
+    @endif
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        "name": @json($category->name),
+        "url": @json(route('categories.show', $category->slug)),
+        "description": @json(
+            $category->meta_description
+            ?? ('محصولات ' . $category->name . ' در LIVORA')
+        )
+        }
+</script>
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "خانه",
+                "item": @json(route('home'))
+        },
+        {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "دسته‌بندی‌ها",
+            "item": @json(route('categories.index'))
+        },
+        {
+            "@type": "ListItem",
+            "position": 3,
+            "name": @json($category->name),
+                "item": @json(route('categories.show', $category->slug))
+        }
+    ]
+}
+</script>
+
+@endpush
 
 @section('content')
 
-    <section class="border-b border-[var(--livora-border)]">
-        <x-layout.container>
+    <div class="bg-[var(--livora-cream)]">
 
-            <div class="py-10 sm:py-14">
+        {{-- =========================================================
+             CATEGORY HERO
+        ========================================================== --}}
+        <section class="border-b border-[var(--livora-border)] bg-[var(--livora-white)]">
 
-                <div class="text-sm text-[var(--livora-stone)]">
-                    <a href="{{ route('home') }}">
-                        خانه
-                    </a>
+            <x-layout.container>
 
-                    <span class="mx-2">/</span>
+                <div class="py-8 sm:py-12">
 
-                    <a href="{{ route('categories.index') }}">
-                        دسته‌بندی‌ها
-                    </a>
+                    {{-- Breadcrumb --}}
+                    <nav
+                        aria-label="breadcrumb"
+                        class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--livora-stone)]"
+                    >
 
-                    <span class="mx-2">/</span>
+                        <a
+                            href="{{ route('home') }}"
+                            class="transition hover:text-[var(--livora-ink)]"
+                        >
+                            خانه
+                        </a>
 
-                    <span class="text-[var(--livora-ink)]">
+                        <span>/</span>
+
+                        <a
+                            href="{{ route('categories.index') }}"
+                            class="transition hover:text-[var(--livora-ink)]"
+                        >
+                            دسته‌بندی‌ها
+                        </a>
+
+                        <span>/</span>
+
+                        <span class="text-[var(--livora-ink)]">
                         {{ $category->name }}
                     </span>
+
+                    </nav>
+
+                    <div class="mt-8 grid items-end gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
+
+                        <div class="max-w-3xl">
+
+                            <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--livora-accent)]">
+                                COLLECTION
+                            </p>
+
+                            <h1 class="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
+                                {{ $category->name }}
+                            </h1>
+
+                            @if($category->description)
+
+                                <div class="mt-5 max-w-2xl text-sm leading-8 text-[var(--livora-stone)]">
+                                    {{ $category->description }}
+                                </div>
+
+                            @else
+
+                                <p class="mt-5 max-w-2xl text-sm leading-8 text-[var(--livora-stone)]">
+                                    مجموعه محصولات {{ $category->name }} را بررسی کنید؛
+                                    قیمت، مشخصات، موجودی و شرایط خرید اقساطی محصولات را مشاهده کنید.
+                                </p>
+
+                            @endif
+
+                            <div class="mt-7 flex flex-wrap items-center gap-3">
+
+                            <span class="rounded-full border border-[var(--livora-border)] px-4 py-2 text-[11px] text-[var(--livora-stone)]">
+                                {{ number_format($products->total()) }}
+                                محصول
+                            </span>
+
+                                <a
+                                    href="{{ route('shop.index', ['category' => $category->id]) }}"
+                                    class="rounded-full bg-[var(--livora-ink)] px-4 py-2 text-[11px] font-medium text-white transition hover:bg-[var(--livora-accent)]"
+                                >
+                                    مشاهده همه محصولات
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                        {{-- Category image --}}
+                        <div class="overflow-hidden rounded-[2rem] bg-[var(--livora-surface)]">
+
+                            @if($category->image)
+
+                                <img
+                                    src="{{ $category->image }}"
+                                    alt="{{ $category->name }}"
+                                    class="aspect-[4/3] h-full w-full object-cover transition duration-700 hover:scale-[1.03]"
+                                >
+
+                            @else
+
+                                <div class="flex aspect-[4/3] items-center justify-center">
+                                <span class="text-xs tracking-[0.2em] text-[var(--livora-stone)]">
+                                    LIVORA
+                                </span>
+                                </div>
+
+                            @endif
+
+                        </div>
+
+                    </div>
+
                 </div>
 
-                <h1 class="mt-5 text-3xl font-semibold text-[var(--livora-ink)] sm:text-4xl">
-                    {{ $category->name }}
-                </h1>
+            </x-layout.container>
 
-                @if($category->description)
-                    <p class="mt-3 max-w-2xl text-sm leading-7 text-[var(--livora-stone)]">
-                        {{ $category->description }}
-                    </p>
-                @endif
-
-            </div>
-
-        </x-layout.container>
-    </section>
+        </section>
 
 
-    <section>
-        <x-layout.container>
+        {{-- =========================================================
+             PRODUCTS
+        ========================================================== --}}
+        <section>
 
-            <div class="py-10 lg:py-14">
+            <x-layout.container>
 
-                @if($products->count())
+                <div class="py-10 sm:py-14">
 
-                    <div class="mb-8 flex items-center justify-between gap-4">
+                    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
 
-                        <p class="text-sm text-[var(--livora-stone)]">
-                            {{ $products->total() }} محصول
-                        </p>
+                        <div>
+
+                            <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--livora-accent)]">
+                                PRODUCTS
+                            </p>
+
+                            <h2 class="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
+                                محصولات این مجموعه
+                            </h2>
+
+                        </div>
 
                         <a
                             href="{{ route('shop.index') }}"
                             class="text-sm font-medium text-[var(--livora-accent)]"
                         >
-                            مشاهده فروشگاه
+                            بازگشت به فروشگاه
+                            <span class="mr-1">←</span>
                         </a>
 
                     </div>
 
 
-                    <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                    @if($products->isNotEmpty())
 
-                        @foreach($products as $product)
+                        <div class="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-2 xl:grid-cols-4">
 
-                            <x-product.card
-                                :product="$product"
-                            />
+                            @foreach($products as $product)
 
-                        @endforeach
+                                <x-product.card
+                                    :product="$product"
+                                />
+
+                            @endforeach
+
+                        </div>
+
+                        <div class="mt-14">
+                            {{ $products->withQueryString()->links() }}
+                        </div>
+
+                    @else
+
+                        <div class="mt-8 rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] px-6 py-24 text-center">
+
+                            <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--livora-surface)] text-sm text-[var(--livora-stone)]">
+                                —
+                            </div>
+
+                            <h2 class="mt-6 text-2xl font-semibold">
+                                محصولی در این دسته پیدا نشد
+                            </h2>
+
+                            <p class="mx-auto mt-3 max-w-md text-sm leading-7 text-[var(--livora-stone)]">
+                                در حال حاضر محصولی در این مجموعه قرار نگرفته است.
+                                می‌توانید سایر دسته‌بندی‌ها را بررسی کنید.
+                            </p>
+
+                            <a
+                                href="{{ route('categories.index') }}"
+                                class="mt-7 inline-flex rounded-2xl bg-[var(--livora-ink)] px-6 py-3.5 text-sm font-medium text-white transition hover:bg-[var(--livora-accent)]"
+                            >
+                                مشاهده دسته‌بندی‌ها
+                            </a>
+
+                        </div>
+
+                    @endif
+
+                </div>
+
+            </x-layout.container>
+
+        </section>
+
+
+        {{-- =========================================================
+             CATEGORY SEO CONTENT
+        ========================================================== --}}
+        <section class="border-t border-[var(--livora-border)] bg-[var(--livora-white)]">
+
+            <x-layout.container>
+
+                <div class="max-w-4xl py-14 sm:py-18">
+
+                    <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--livora-accent)]">
+                        ABOUT THIS COLLECTION
+                    </p>
+
+                    <h2 class="mt-4 text-2xl font-semibold tracking-tight sm:text-3xl">
+                        راهنمای انتخاب {{ $category->name }}
+                    </h2>
+
+                    <div class="mt-5 space-y-4 text-sm leading-8 text-[var(--livora-stone)]">
+
+                        @if($category->description)
+
+                            <p>
+                                {{ $category->description }}
+                            </p>
+
+                        @endif
+
+                        <p>
+                            هنگام انتخاب محصول از این مجموعه، علاوه بر ظاهر،
+                            به ابعاد فضا، متریال، رنگ، کاربرد و هماهنگی آن با سایر عناصر خانه توجه کنید.
+                            LIVORA تلاش می‌کند اطلاعات موردنیاز برای یک انتخاب آگاهانه را
+                            در صفحه هر محصول در اختیار شما قرار دهد.
+                        </p>
 
                     </div>
 
+                </div>
 
-                    <div class="mt-12">
-                        {{ $products->links() }}
-                    </div>
+            </x-layout.container>
 
-                @else
+        </section>
 
-                    <div class="py-20 text-center">
 
-                        <h2 class="text-xl font-semibold text-[var(--livora-ink)]">
-                            محصولی در این دسته‌بندی وجود ندارد
+        {{-- =========================================================
+             FINAL CTA
+        ========================================================== --}}
+        <section class="border-t border-[var(--livora-border)] bg-[var(--livora-surface)]">
+
+            <x-layout.container>
+
+                <div class="flex flex-col gap-6 py-12 sm:flex-row sm:items-center sm:justify-between sm:py-16">
+
+                    <div>
+
+                        <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--livora-accent)]">
+                            LIVORA
+                        </p>
+
+                        <h2 class="mt-2 text-2xl font-semibold">
+                            هنوز انتخابت را پیدا نکردی؟
                         </h2>
 
-                        <a
-                            href="{{ route('shop.index') }}"
-                            class="mt-6 inline-flex rounded-xl bg-[var(--livora-ink)] px-6 py-3 text-sm font-medium text-white"
-                        >
-                            بازگشت به فروشگاه
-                        </a>
+                        <p class="mt-2 text-sm leading-7 text-[var(--livora-stone)]">
+                            مجموعه کامل فروشگاه را بررسی کن.
+                        </p>
 
                     </div>
 
-                @endif
+                    <a
+                        href="{{ route('shop.index') }}"
+                        class="inline-flex w-fit rounded-2xl bg-[var(--livora-ink)] px-6 py-3.5 text-sm font-medium text-white transition hover:bg-[var(--livora-accent)]"
+                    >
+                        مشاهده فروشگاه
+                    </a>
 
-            </div>
+                </div>
 
-        </x-layout.container>
-    </section>
+            </x-layout.container>
+
+        </section>
+
+    </div>
 
 @endsection

@@ -1,140 +1,325 @@
-<footer class="border-t border-[var(--livora-border)] bg-[var(--livora-ink)] text-[var(--livora-cream)]">
-    <div class="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+<footer class="border-t border-white/10 bg-[var(--livora-ink)] text-[var(--livora-cream)]">
 
-        <div class="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
+    <x-layout.container>
+
+        {{-- =========================================================
+             MAIN FOOTER
+        ========================================================== --}}
+        <div class="grid gap-12 py-14 sm:py-16 lg:grid-cols-[1.25fr_0.75fr_0.75fr_1fr] lg:py-20">
 
             {{-- Brand --}}
-            <div class="lg:col-span-1">
+            <div class="max-w-md">
+
                 <a
-                    href="{{ url('/') }}"
-                    class="inline-block text-2xl font-semibold tracking-[0.18em] text-[var(--livora-cream)]"
+                    href="{{ route('home') }}"
+                    aria-label="LIVORA"
+                    class="inline-flex items-center"
                 >
-                    LIVORA
+                    <span class="text-2xl font-semibold tracking-[0.24em] text-white transition hover:text-[var(--livora-cream)]">
+                        LIVORA
+                    </span>
                 </a>
 
-                <p class="mt-5 max-w-xs text-sm leading-7 text-[var(--livora-stone)]">
-                    تجربه‌ای متفاوت از مبلمان و سبک زندگی؛
-                    طراحی‌شده برای فضاهایی که قرار است ماندگار باشند.
+                <p class="mt-6 max-w-sm text-sm leading-8 text-white/50">
+                    مبلمان و عناصر خانه برای فضاهایی که قرار است
+                    شخصیت داشته باشند و سال‌ها ماندگار بمانند.
                 </p>
+
+                <div class="mt-7 flex flex-wrap gap-2">
+
+                    <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[10px] text-white/50">
+                        Furniture
+                    </span>
+
+                    <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[10px] text-white/50">
+                        Living
+                    </span>
+
+                    <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[10px] text-white/50">
+                        Installment
+                    </span>
+
+                </div>
+
             </div>
+
 
             {{-- Shop --}}
             <div>
-                <h3 class="text-sm font-semibold text-[var(--livora-cream)]">
-                    فروشگاه
-                </h3>
 
-                <div class="mt-5 flex flex-col gap-3">
+                <p class="text-[10px] font-medium uppercase tracking-[0.2em] text-white/40">
+                    SHOP
+                </p>
+
+                <nav
+                    aria-label="لینک‌های فروشگاه"
+                    class="mt-5 flex flex-col gap-3"
+                >
+
                     <a
-                        href="{{ url('/shop') }}"
-                        class="text-sm text-[var(--livora-stone)] transition-colors duration-300 hover:text-[var(--livora-cream)]"
+                        href="{{ route('shop.index') }}"
+                        class="text-sm text-white/55 transition hover:text-white"
                     >
                         همه محصولات
                     </a>
 
                     <a
-                        href="#"
-                        class="text-sm text-[var(--livora-stone)] transition-colors duration-300 hover:text-[var(--livora-cream)]"
+                        href="{{ route('categories.index') }}"
+                        class="text-sm text-white/55 transition hover:text-white"
                     >
-                        مبلمان
+                        دسته‌بندی‌ها
                     </a>
 
                     <a
-                        href="#"
-                        class="text-sm text-[var(--livora-stone)] transition-colors duration-300 hover:text-[var(--livora-cream)]"
+                        href="{{ route('shop.index', ['sort' => 'newest']) }}"
+                        class="text-sm text-white/55 transition hover:text-white"
                     >
-                        میز و صندلی
+                        تازه‌ها
                     </a>
 
                     <a
-                        href="#"
-                        class="text-sm text-[var(--livora-stone)] transition-colors duration-300 hover:text-[var(--livora-cream)]"
+                        href="{{ route('shop.index') }}"
+                        class="text-sm text-white/55 transition hover:text-white"
                     >
-                        دکوراسیون
+                        محصولات منتخب
                     </a>
-                </div>
+
+                    <a
+                        href="{{ route('cart.index') }}"
+                        class="text-sm text-white/55 transition hover:text-white"
+                    >
+                        سبد خرید
+                    </a>
+
+                </nav>
+
             </div>
+
 
             {{-- Customer --}}
             <div>
-                <h3 class="text-sm font-semibold text-[var(--livora-cream)]">
-                    خدمات مشتریان
-                </h3>
 
-                <div class="mt-5 flex flex-col gap-3">
+                <p class="text-[10px] font-medium uppercase tracking-[0.2em] text-white/40">
+                    CUSTOMER
+                </p>
+
+                <nav
+                    aria-label="لینک‌های مشتریان"
+                    class="mt-5 flex flex-col gap-3"
+                >
+
+                    @auth
+
+                        @if(auth()->user()->isCustomer())
+
+                            <a
+                                href="{{ route('account.index') }}"
+                                class="text-sm text-white/55 transition hover:text-white"
+                            >
+                                حساب کاربری
+                            </a>
+
+                            <a
+                                href="{{ route('account.orders.index') }}"
+                                class="text-sm text-white/55 transition hover:text-white"
+                            >
+                                سفارش‌های من
+                            </a>
+
+                            <a
+                                href="{{ route('account.wishlist.index') }}"
+                                class="text-sm text-white/55 transition hover:text-white"
+                            >
+                                علاقه‌مندی‌ها
+                            </a>
+
+                            <a
+                                href="{{ route('account.addresses.index') }}"
+                                class="text-sm text-white/55 transition hover:text-white"
+                            >
+                                آدرس‌ها
+                            </a>
+
+                        @elseif(auth()->user()->isAdmin())
+
+                            <a
+                                href="{{ route('admin.dashboard') }}"
+                                class="text-sm text-white/55 transition hover:text-white"
+                            >
+                                پنل مدیریت
+                            </a>
+
+                        @endif
+
+                    @else
+
+                        <a
+                            href="{{ route('login') }}"
+                            class="text-sm text-white/55 transition hover:text-white"
+                        >
+                            ورود
+                        </a>
+
+                        <a
+                            href="{{ route('register') }}"
+                            class="text-sm text-white/55 transition hover:text-white"
+                        >
+                            ثبت‌نام
+                        </a>
+
+                    @endauth
+
                     <a
-                        href="#"
-                        class="text-sm text-[var(--livora-stone)] transition-colors duration-300 hover:text-[var(--livora-cream)]"
+                        href="{{ route('contact') }}"
+                        class="text-sm text-white/55 transition hover:text-white"
                     >
-                        پیگیری سفارش
+                        تماس با ما
                     </a>
 
-                    <a
-                        href="#"
-                        class="text-sm text-[var(--livora-stone)] transition-colors duration-300 hover:text-[var(--livora-cream)]"
-                    >
-                        شرایط ارسال
-                    </a>
+                </nav>
 
-                    <a
-                        href="#"
-                        class="text-sm text-[var(--livora-stone)] transition-colors duration-300 hover:text-[var(--livora-cream)]"
-                    >
-                        بازگشت کالا
-                    </a>
-
-                    <a
-                        href="#"
-                        class="text-sm text-[var(--livora-stone)] transition-colors duration-300 hover:text-[var(--livora-cream)]"
-                    >
-                        سوالات متداول
-                    </a>
-                </div>
             </div>
 
-            {{-- Contact --}}
+
+            {{-- Contact / Newsletter --}}
             <div>
-                <h3 class="text-sm font-semibold text-[var(--livora-cream)]">
-                    ارتباط با ما
-                </h3>
+
+                <p class="text-[10px] font-medium uppercase tracking-[0.2em] text-white/40">
+                    CONTACT
+                </p>
 
                 <div class="mt-5 space-y-4">
 
                     <a
-                        href="tel:+980000000000"
-                        class="block text-sm text-[var(--livora-stone)] transition-colors duration-300 hover:text-[var(--livora-cream)]"
+                        href="tel:{{ config('app.contact.phone') }}"
+                        class="block break-all text-sm text-white/55 transition hover:text-white"
                     >
-                        +98 00 000 0000
+                        {{ config('app.contact.phone', '+98 00 000 0000') }}
                     </a>
 
                     <a
-                        href="mailto:hello@livora.ir"
-                        class="block text-sm text-[var(--livora-stone)] transition-colors duration-300 hover:text-[var(--livora-cream)]"
+                        href="mailto:{{ config('app.contact.email') }}"
+                        class="block break-all text-sm text-white/55 transition hover:text-white"
                     >
-                        hello@livora.ir
+                        {{ config('app.contact.email', 'hello@livora.ir') }}
                     </a>
 
-                    <p class="text-sm leading-7 text-[var(--livora-stone)]">
-                        تهران، ایران
+                    <p class="text-sm leading-7 text-white/45">
+                        {{ config('app.contact.address', 'تهران، ایران') }}
                     </p>
 
                 </div>
+
+
+                {{-- Contact CTA --}}
+                <a
+                    href="{{ route('contact') }}"
+                    class="mt-6 inline-flex items-center rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-xs font-medium text-white transition hover:border-white/20 hover:bg-white/10"
+                >
+                    ارتباط با LIVORA
+                    <span class="mr-2">←</span>
+                </a>
+
             </div>
 
         </div>
 
-        {{-- Bottom --}}
-        <div class="mt-12 flex flex-col gap-4 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
 
-            <p class="text-xs text-[var(--livora-stone)]">
-                © {{ date('Y') }} LIVORA. تمامی حقوق محفوظ است.
-            </p>
+        {{-- =========================================================
+             TRUST STRIP
+        ========================================================== --}}
+        <div class="grid border-t border-white/10 sm:grid-cols-3">
 
-            <div class="flex items-center gap-5">
+            <div class="border-b border-white/10 py-5 sm:border-b-0 sm:border-l sm:px-6 sm:py-6">
+
+                <p class="text-[10px] uppercase tracking-[0.18em] text-white/35">
+                    PAYMENT
+                </p>
+
+                <p class="mt-2 text-xs leading-6 text-white/50">
+                    مسیر پرداخت متناسب با سفارش و روش انتخابی مدیریت می‌شود.
+                </p>
+
+            </div>
+
+            <div class="border-b border-white/10 py-5 sm:border-b-0 sm:px-6 sm:py-6">
+
+                <p class="text-[10px] uppercase tracking-[0.18em] text-white/35">
+                    INSTALLMENT
+                </p>
+
+                <p class="mt-2 text-xs leading-6 text-white/50">
+                    برای محصولات دارای شرایط اقساط، پیش‌پرداخت و برنامه تسویه شفاف نمایش داده می‌شود.
+                </p>
+
+            </div>
+
+            <div class="py-5 sm:px-6 sm:py-6">
+
+                <p class="text-[10px] uppercase tracking-[0.18em] text-white/35">
+                    SUPPORT
+                </p>
+
+                <p class="mt-2 text-xs leading-6 text-white/50">
+                    برای راهنمایی درباره محصول، سفارش یا پرداخت با ما در تماس باشید.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        {{-- =========================================================
+             BOTTOM
+        ========================================================== --}}
+        <div class="flex flex-col gap-5 border-t border-white/10 py-6 sm:flex-row sm:items-center sm:justify-between">
+
+            <div>
+
+                <p class="text-xs text-white/40">
+                    © {{ date('Y') }} LIVORA.
+                    تمامی حقوق محفوظ است.
+                </p>
+
+            </div>
+
+
+            <div class="flex flex-wrap items-center gap-4 sm:gap-6">
+
+                <a
+                    href="{{ route('about') }}"
+                    class="text-xs text-white/40 transition hover:text-white"
+                >
+                    درباره ما
+                </a>
+
+                <a
+                    href="{{ route('contact') }}"
+                    class="text-xs text-white/40 transition hover:text-white"
+                >
+                    تماس
+                </a>
+
+                @auth
+
+                    @if(auth()->user()->isCustomer())
+
+                        <a
+                            href="{{ route('account.index') }}"
+                            class="text-xs text-white/40 transition hover:text-white"
+                        >
+                            حساب من
+                        </a>
+
+                    @endif
+
+                @endauth
+
+                {{-- Social --}}
                 <a
                     href="#"
                     aria-label="Instagram"
-                    class="text-[var(--livora-stone)] transition-colors duration-300 hover:text-[var(--livora-cream)]"
+                    class="text-xs text-white/40 transition hover:text-white"
                 >
                     Instagram
                 </a>
@@ -142,13 +327,15 @@
                 <a
                     href="#"
                     aria-label="Telegram"
-                    class="text-[var(--livora-stone)] transition-colors duration-300 hover:text-[var(--livora-cream)]"
+                    class="text-xs text-white/40 transition hover:text-white"
                 >
                     Telegram
                 </a>
+
             </div>
 
         </div>
 
-    </div>
+    </x-layout.container>
+
 </footer>

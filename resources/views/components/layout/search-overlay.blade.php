@@ -1,57 +1,62 @@
 <div
     x-show="searchOpen"
     x-cloak
-    x-transition:enter="transition ease-out duration-200"
+    x-transition:enter="transition ease-out duration-300"
     x-transition:enter-start="opacity-0"
     x-transition:enter-end="opacity-100"
-    x-transition:leave="transition ease-in duration-150"
+    x-transition:leave="transition ease-in duration-200"
     x-transition:leave-start="opacity-100"
     x-transition:leave-end="opacity-0"
-    class="fixed inset-0 z-[100] bg-[var(--livora-ink)]/40 backdrop-blur-sm"
+    class="fixed inset-0 z-[70]"
 >
 
     {{-- Backdrop --}}
-    <div
-        class="absolute inset-0"
+    <button
+        type="button"
+        aria-label="بستن جستجو"
         @click="searchOpen = false"
-    ></div>
+        class="absolute inset-0 bg-black/40 backdrop-blur-md"
+    ></button>
 
 
     {{-- Search Panel --}}
     <div
         x-show="searchOpen"
-        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter="transition ease-out duration-300"
         x-transition:enter-start="-translate-y-4 opacity-0"
         x-transition:enter-end="translate-y-0 opacity-100"
-        x-transition:leave="transition ease-in duration-150"
+        x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="translate-y-0 opacity-100"
         x-transition:leave-end="-translate-y-4 opacity-0"
-        class="relative z-10 w-full border-b border-[var(--livora-border)] bg-[var(--livora-cream)] shadow-2xl"
+        class="relative mx-auto w-full max-w-4xl overflow-hidden rounded-b-[2rem] bg-[var(--livora-cream)] shadow-2xl"
     >
 
-        <x-layout.container>
+        {{-- Header --}}
+        <div class="border-b border-[var(--livora-border)] bg-[var(--livora-white)]">
 
-            <div class="py-6">
+            <x-layout.container>
 
-                <div class="flex items-center justify-between gap-4">
+                <div class="flex h-[76px] items-center justify-between gap-4">
 
                     <div>
-                        <p class="text-xs font-medium tracking-[0.12em] text-[var(--livora-accent)]">
+
+                        <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--livora-accent)]">
                             LIVORA SEARCH
                         </p>
 
-                        <h2 class="mt-1 text-lg font-semibold text-[var(--livora-ink)]">
-                            جستجو در محصولات
-                        </h2>
-                    </div>
+                        <p class="mt-1 text-xs text-[var(--livora-stone)]">
+                            محصول، دسته‌بندی یا عبارت موردنظر را جستجو کنید.
+                        </p>
 
+                    </div>
 
                     <button
                         type="button"
                         aria-label="بستن جستجو"
                         @click="searchOpen = false"
-                        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[var(--livora-ink)] transition hover:bg-[var(--livora-white)] hover:text-[var(--livora-accent)]"
+                        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[var(--livora-ink)] transition hover:bg-[var(--livora-surface)]"
                     >
+
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -66,70 +71,203 @@
                                 d="M6 18 18 6M6 6l12 12"
                             />
                         </svg>
+
                     </button>
 
                 </div>
 
+            </x-layout.container>
+
+        </div>
+
+
+        {{-- Search Form --}}
+        <x-layout.container>
+
+            <div class="py-7 sm:py-9">
 
                 <form
                     action="{{ route('shop.index') }}"
                     method="GET"
-                    class="relative mt-6"
-                    @submit="searchOpen = false"
+                    class="relative"
                 >
+
+                    <label
+                        for="global-search"
+                        class="sr-only"
+                    >
+                        جستجو
+                    </label>
 
                     <input
                         x-ref="searchInput"
-                        type="text"
+                        id="global-search"
                         name="search"
+                        type="search"
                         value="{{ request('search') }}"
-                        placeholder="نام محصول، SKU یا توضیحات..."
                         autocomplete="off"
-                        class="w-full rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] px-5 py-4 pl-14 text-sm text-[var(--livora-ink)] outline-none transition focus:border-[var(--livora-accent)] focus:ring-2 focus:ring-[var(--livora-accent)]/10"
+                        placeholder="مثلاً: مبل راحتی، میز ناهارخوری، مبل چستر..."
+                        class="w-full rounded-[1.5rem] border border-[var(--livora-border)] bg-[var(--livora-white)] px-14 py-5 text-sm text-[var(--livora-ink)] outline-none transition placeholder:text-[var(--livora-stone)] focus:border-[var(--livora-ink)]"
                     >
 
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="pointer-events-none absolute right-5 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--livora-stone)]"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="m21 21-4.35-4.35m1.35-5.4a6.75 6.75 0 1 1-13.5 0 6.75 6.75 0 0 1 13.5 0Z"
+                        />
+                    </svg>
 
                     <button
                         type="submit"
-                        aria-label="جستجو"
-                        class="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full text-[var(--livora-ink)] transition hover:bg-[var(--livora-cream)] hover:text-[var(--livora-accent)]"
+                        class="absolute left-2 top-1/2 -translate-y-1/2 rounded-2xl bg-[var(--livora-ink)] px-5 py-3 text-xs font-medium text-white transition hover:bg-[var(--livora-accent)]"
                     >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            class="h-5 w-5"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="m21 21-4.35-4.35m1.35-5.4a6.75 6.75 0 1 1-13.5 0 6.75 6.75 0 0 1 13.5 0Z"
-                            />
-                        </svg>
+                        جستجو
                     </button>
 
                 </form>
 
 
-                <div class="mt-4 flex flex-wrap items-center gap-2 text-xs text-[var(--livora-stone)]">
+                {{-- Quick Links --}}
+                <div class="mt-8">
 
-                    <span>
-                        جستجو بر اساس:
-                    </span>
+                    <div class="flex items-center justify-between gap-4">
 
-                    <span class="rounded-full border border-[var(--livora-border)] px-3 py-1">
-                        نام محصول
-                    </span>
+                        <div>
 
-                    <span class="rounded-full border border-[var(--livora-border)] px-3 py-1">
-                        SKU
-                    </span>
+                            <p class="text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--livora-accent)]">
+                                QUICK DISCOVER
+                            </p>
 
-                    <span class="rounded-full border border-[var(--livora-border)] px-3 py-1">
-                        توضیحات
-                    </span>
+                            <p class="mt-1 text-xs text-[var(--livora-stone)]">
+                                جستجو را از دسته‌بندی‌های محبوب شروع کنید.
+                            </p>
+
+                        </div>
+
+                        <a
+                            href="{{ route('categories.index') }}"
+                            @click="searchOpen = false"
+                            class="text-xs font-medium text-[var(--livora-accent)]"
+                        >
+                            همه دسته‌بندی‌ها
+                        </a>
+
+                    </div>
+
+
+                    <div class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+
+                        <a
+                            href="{{ route('shop.index', ['search' => 'مبل']) }}"
+                            @click="searchOpen = false"
+                            class="rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-4 transition hover:border-[var(--livora-ink)]"
+                        >
+
+                            <p class="text-sm font-medium">
+                                مبل
+                            </p>
+
+                            <p class="mt-1 text-[11px] text-[var(--livora-stone)]">
+                                Sofa
+                            </p>
+
+                        </a>
+
+
+                        <a
+                            href="{{ route('shop.index', ['search' => 'میز']) }}"
+                            @click="searchOpen = false"
+                            class="rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-4 transition hover:border-[var(--livora-ink)]"
+                        >
+
+                            <p class="text-sm font-medium">
+                                میز
+                            </p>
+
+                            <p class="mt-1 text-[11px] text-[var(--livora-stone)]">
+                                Tables
+                            </p>
+
+                        </a>
+
+
+                        <a
+                            href="{{ route('shop.index', ['search' => 'صندلی']) }}"
+                            @click="searchOpen = false"
+                            class="rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-4 transition hover:border-[var(--livora-ink)]"
+                        >
+
+                            <p class="text-sm font-medium">
+                                صندلی
+                            </p>
+
+                            <p class="mt-1 text-[11px] text-[var(--livora-stone)]">
+                                Chairs
+                            </p>
+
+                        </a>
+
+
+                        <a
+                            href="{{ route('shop.index', ['search' => 'تخت']) }}"
+                            @click="searchOpen = false"
+                            class="rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-4 transition hover:border-[var(--livora-ink)]"
+                        >
+
+                            <p class="text-sm font-medium">
+                                تخت
+                            </p>
+
+                            <p class="mt-1 text-[11px] text-[var(--livora-stone)]">
+                                Bedroom
+                            </p>
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+
+                {{-- SEO / Discovery Hint --}}
+                <div class="mt-8 rounded-3xl bg-[var(--livora-ink)] p-5 text-white sm:p-6">
+
+                    <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+
+                        <div>
+
+                            <p class="text-[10px] uppercase tracking-[0.2em] text-white/40">
+                                FIND YOUR SPACE
+                            </p>
+
+                            <h2 class="mt-3 text-lg font-semibold">
+                                دنبال چه سبکی هستی؟
+                            </h2>
+
+                            <p class="mt-2 max-w-xl text-xs leading-7 text-white/50">
+                                عبارت‌هایی مثل «مبل مدرن»، «مبل چستر»،
+                                «مبل راحتی» یا نام مدل را جستجو کن.
+                            </p>
+
+                        </div>
+
+                        <a
+                            href="{{ route('shop.index') }}"
+                            @click="searchOpen = false"
+                            class="inline-flex w-fit shrink-0 rounded-2xl bg-white px-5 py-3 text-xs font-medium text-[var(--livora-ink)] transition hover:bg-[var(--livora-cream)]"
+                        >
+                            مشاهده فروشگاه
+                        </a>
+
+                    </div>
 
                 </div>
 

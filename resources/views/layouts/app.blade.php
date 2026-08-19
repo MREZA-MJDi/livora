@@ -2,7 +2,6 @@
 <html lang="fa" dir="rtl">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta
@@ -10,14 +9,30 @@
         content="width=device-width, initial-scale=1.0"
     >
 
+    <title>
+        @yield('title', 'LIVORA')
+    </title>
+
     <meta
         name="description"
         content="@yield('description', 'LIVORA — Furniture & Living')"
     >
 
-    <title>
-        @yield('title', 'LIVORA')
-    </title>
+    @hasSection('keywords')
+        <meta
+            name="keywords"
+            content="@yield('keywords')"
+        >
+    @endif
+
+    @hasSection('canonical')
+        <link
+            rel="canonical"
+            href="@yield('canonical')"
+        >
+    @endif
+
+    @stack('seo')
 
     @vite([
     'resources/css/app.css',
@@ -25,7 +40,6 @@
     ])
 
     @stack('styles')
-
 </head>
 
 <body class="min-h-screen antialiased">
@@ -33,55 +47,30 @@
 <div
     id="app"
     x-data="{
-            mobileOpen: false,
-            searchOpen: false,
-            filterOpen: false
-        }"
+        mobileOpen: false,
+        searchOpen: false,
+        filterOpen: false
+    }"
     class="min-h-screen"
 >
 
-    {{-- ==================================================
-        GLOBAL NAVIGATION
-    =================================================== --}}
     <x-layout.navbar />
 
-
-    {{-- ==================================================
-        MOBILE NAVIGATION
-    =================================================== --}}
     <x-layout.mobile-menu />
 
-
-    {{-- ==================================================
-        SEARCH OVERLAY
-    =================================================== --}}
     <x-layout.search-overlay />
 
-
-    {{-- ==================================================
-        SHOP FILTER DRAWER
-    =================================================== --}}
     <x-shop.filter-drawer />
 
-
-    {{-- ==================================================
-        MAIN CONTENT
-    =================================================== --}}
     <main>
         @yield('content')
     </main>
 
-
-    {{-- ==================================================
-        GLOBAL FOOTER
-    =================================================== --}}
     <x-layout.footer />
 
 </div>
 
-
 @stack('scripts')
 
 </body>
-
 </html>

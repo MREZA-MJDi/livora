@@ -1,261 +1,130 @@
+{{-- =========================================================
+     GLOBAL ADMIN SCRIPTS
+========================================================= --}}
+
+@vite([
+'resources/js/app.js'
+])
+
+
+{{-- =========================================================
+     FLASH MESSAGE AUTO DISMISS
+========================================================= --}}
+
 <script>
     document.addEventListener('DOMContentLoaded', () => {
 
-        /*
-        |--------------------------------------------------------------------------
-        | Mobile Sidebar
-        |--------------------------------------------------------------------------
-        */
+        document
+            .querySelectorAll('[data-auto-dismiss]')
+            .forEach((element) => {
 
-        const sidebar = document.getElementById('admin-sidebar');
-        const sidebarButton = document.getElementById('admin-mobile-menu-button');
-        const sidebarOverlay = document.getElementById('admin-sidebar-overlay');
+                const delay =
+                    Number(
+                        element.dataset.autoDismiss
+                    ) || 4000;
 
-        const openSidebar = () => {
-            if (!sidebar || !sidebarOverlay) {
-                return;
-            }
+                setTimeout(() => {
 
-            sidebar.classList.remove('translate-x-full');
-            sidebarOverlay.classList.remove('hidden');
+                    element.style.opacity = '0';
 
-            if (sidebarButton) {
-                sidebarButton.setAttribute('aria-expanded', 'true');
-            }
+                    element.style.transform =
+                        'translateY(-4px)';
 
-            document.body.classList.add('overflow-hidden');
-        };
+                    element.style.transition =
+                        'opacity 250ms ease, transform 250ms ease';
 
+                    setTimeout(() => {
+                        element.remove();
+                    }, 250);
 
-        const closeSidebar = () => {
-            if (!sidebar || !sidebarOverlay) {
-                return;
-            }
-
-            sidebar.classList.add('translate-x-full');
-            sidebarOverlay.classList.add('hidden');
-
-            if (sidebarButton) {
-                sidebarButton.setAttribute('aria-expanded', 'false');
-            }
-
-            document.body.classList.remove('overflow-hidden');
-        };
-
-
-        if (sidebarButton) {
-            sidebarButton.addEventListener('click', (event) => {
-
-                event.stopPropagation();
-
-                if (sidebar.classList.contains('translate-x-full')) {
-                    openSidebar();
-                } else {
-                    closeSidebar();
-                }
-
-            });
-        }
-
-
-        if (sidebarOverlay) {
-            sidebarOverlay.addEventListener('click', () => {
-                closeSidebar();
-            });
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Close Sidebar After Clicking Navigation Link On Mobile
-        |--------------------------------------------------------------------------
-        */
-
-        if (sidebar) {
-
-            const sidebarLinks = sidebar.querySelectorAll('a');
-
-            sidebarLinks.forEach((link) => {
-
-                link.addEventListener('click', () => {
-
-                    if (window.innerWidth < 1024) {
-                        closeSidebar();
-                    }
-
-                });
+                }, delay);
 
             });
 
+    });
+</script>
+
+
+{{-- =========================================================
+     CONFIRM ACTIONS
+========================================================= --}}
+
+<script>
+    document.addEventListener('click', (event) => {
+
+        const element =
+            event.target.closest('[data-confirm]');
+
+        if (!element) {
+            return;
         }
 
+        const message =
+            element.dataset.confirm;
 
-        /*
-        |--------------------------------------------------------------------------
-        | Handle Resize
-        |--------------------------------------------------------------------------
-        */
-
-        window.addEventListener('resize', () => {
-
-            if (window.innerWidth >= 1024) {
-                closeSidebar();
-            }
-
-        });
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Admin User Dropdown
-        |--------------------------------------------------------------------------
-        */
-
-        const userButton = document.getElementById('admin-user-menu-button');
-        const userMenu = document.getElementById('admin-user-menu');
-
-
-        const openUserMenu = () => {
-
-            if (!userMenu || !userButton) {
-                return;
-            }
-
-            userMenu.classList.remove('hidden');
-
-            userButton.setAttribute(
-                'aria-expanded',
-                'true'
-            );
-
-        };
-
-
-        const closeUserMenu = () => {
-
-            if (!userMenu || !userButton) {
-                return;
-            }
-
-            userMenu.classList.add('hidden');
-
-            userButton.setAttribute(
-                'aria-expanded',
-                'false'
-            );
-
-        };
-
-
-        const toggleUserMenu = () => {
-
-            if (!userMenu || !userButton) {
-                return;
-            }
-
-            if (userMenu.classList.contains('hidden')) {
-                openUserMenu();
-            } else {
-                closeUserMenu();
-            }
-
-        };
-
-
-        if (userButton) {
-
-            userButton.addEventListener('click', (event) => {
-
-                event.stopPropagation();
-
-                toggleUserMenu();
-
-            });
-
-        }
-
-
-        if (userMenu) {
-
-            userMenu.addEventListener('click', (event) => {
-                event.stopPropagation();
-            });
-
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Close Dropdown On Outside Click
-        |--------------------------------------------------------------------------
-        */
-
-        document.addEventListener('click', () => {
-            closeUserMenu();
-        });
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Escape Key
-        |--------------------------------------------------------------------------
-        */
-
-        document.addEventListener('keydown', (event) => {
-
-            if (event.key !== 'Escape') {
-                return;
-            }
-
-            closeUserMenu();
-            closeSidebar();
-
-        });
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Prevent Body Scroll When Mobile Sidebar Is Open
-        |--------------------------------------------------------------------------
-        */
-
-        const observer = new MutationObserver(() => {
-
-            if (!sidebar) {
-                return;
-            }
-
-            if (
-                window.innerWidth < 1024 &&
-                !sidebar.classList.contains('translate-x-full')
-            ) {
-                document.body.classList.add('overflow-hidden');
-            } else {
-                document.body.classList.remove('overflow-hidden');
-            }
-
-        });
-
-
-        if (sidebar) {
-
-            observer.observe(sidebar, {
-                attributes: true,
-                attributeFilter: ['class']
-            });
-
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Initial State
-        |--------------------------------------------------------------------------
-        */
-
-        if (window.innerWidth < 1024) {
-            closeSidebar();
+        if (
+            message
+            && !window.confirm(message)
+        ) {
+            event.preventDefault();
         }
 
     });
 </script>
+
+
+{{-- =========================================================
+     NUMBER FORMAT
+========================================================= --}}
+
+<script>
+    window.LivoraAdmin = {
+
+        formatNumber(value) {
+
+            return new Intl.NumberFormat(
+                'fa-IR'
+            ).format(
+                Number(value) || 0
+            );
+
+        },
+
+        formatPrice(value) {
+
+            return new Intl.NumberFormat(
+                'fa-IR'
+            ).format(
+                Number(value) || 0
+            ) + ' تومان';
+
+        }
+
+    };
+</script>
+
+
+{{-- =========================================================
+     ESCAPE MODALS / DROPDOWNS
+========================================================= --}}
+
+<script>
+    document.addEventListener('keydown', (event) => {
+
+        if (event.key !== 'Escape') {
+            return;
+        }
+
+        window.dispatchEvent(
+            new CustomEvent('admin:escape')
+        );
+
+    });
+</script>
+
+
+{{-- =========================================================
+     PAGE SPECIFIC SCRIPTS
+========================================================= --}}
+
+@stack('scripts')

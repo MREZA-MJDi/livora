@@ -1,72 +1,280 @@
 @props([
-'current' => 1,
-'total' => 1,
+'paginator' => null,
 ])
 
-@if($total > 1)
+@php
+    /*
+    |--------------------------------------------------------------------------
+    | Resolve paginator
+    |--------------------------------------------------------------------------
+    |
+    | Supports:
+    | - Explicit paginator prop
+    | - $paginator variable
+    | - Laravel paginator instances passed directly
+    |
+    */
+
+    $pagination = $paginator ?? ($paginator ?? null);
+
+    if (! $pagination) {
+        return;
+    }
+
+    $currentPage = $pagination->currentPage();
+    $lastPage = $pagination->lastPage();
+    $total = $pagination->total();
+    $perPage = $pagination->perPage();
+
+    $from = $pagination->firstItem();
+    $to = $pagination->lastItem();
+
+    $window = 2;
+
+    $pages = [];
+
+    /*
+     |--------------------------------------------------------------------------
+     | Build compact page list
+     |--------------------------------------------------------------------------
+     */
+
+    if ($lastPage <= 7) {
+
+        for ($page = 1; $page <= $lastPage; $page++) {
+            $pages[] = $page;
+        }
+
+    } else {
+
+        $pages[] = 1;
+
+        $start = max(
+            2,
+            $currentPage - $window
+        );
+
+        $end = min(
+            $lastPage - 1,
+            $currentPage + $window
+        );
+
+        if ($start > 2) {
+            $pages[] = '...';
+        }
+
+        for ($page = $start; $page <= $end; $page++) {
+            $pages[] = $page;
+        }
+
+        if ($end < $lastPage - 1) {
+            $pages[] = '...';
+        }
+
+        $pages[] = $lastPage;
+    }
+@endphp
+
+@if($pagination->hasPages())
+
     <nav
-        class="flex items-center justify-center gap-2"
-        aria-label="صفحه‌بندی"
+        aria-label="صفحه‌بندی محصولات"
+        class="mt-10"
+        dir="rtl"
     >
 
-        {{-- Previous --}}
-        <a
-            href="#"
-            class="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--livora-border)] bg-[var(--livora-white)] text-[var(--livora-stone)] transition-all duration-300 hover:border-[var(--livora-accent)] hover:text-[var(--livora-accent)]"
-            aria-label="صفحه قبل"
-        >
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="h-4 w-4"
-            >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M15.75 19.5 8.25 12l7.5-7.5"
-                />
-            </svg>
-        </a>
+        <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
 
-        {{-- Pages --}}
-        @for($page = 1; $page <= $total; $page++)
-            <a
-                href="#"
-                class="flex h-10 min-w-10 items-center justify-center rounded-xl border px-3 text-sm font-medium transition-all duration-300
-                    {{ $page === $current
-                        ? 'border-[var(--livora-ink)] bg-[var(--livora-ink)] text-white'
-                        : 'border-[var(--livora-border)] bg-[var(--livora-white)] text-[var(--livora-ink)] hover:border-[var(--livora-accent)] hover:text-[var(--livora-accent)]'
-                    }}"
-                aria-current="{{ $page === $current ? 'page' : 'false' }}"
-            >
-                {{ $page }}
-            </a>
-        @endfor
+            {{-- =====================================================
+                 Result Summary
+            ====================================================== --}}
+            @if($from && $to)
 
-        {{-- Next --}}
-        <a
-            href="#"
-            class="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--livora-border)] bg-[var(--livora-white)] text-[var(--livora-stone)] transition-all duration-300 hover:border-[var(--livora-accent)] hover:text-[var(--livora-accent)]"
-            aria-label="صفحه بعد"
-        >
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="h-4 w-4"
-            >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="m8.25 4.5 7.5 7.5-7.5 7.5"
-                />
-            </svg>
-        </a>
+                <p class="text-[11px] text-[var(--livora-stone)]">
+
+                    نمایش
+                    <span class="font-medium text-[var(--livora-ink)]">
+                        {{ number_format($from) }}
+                    </span>
+
+                    تا
+
+                    <span class="font-medium text-[var(--livora-ink)]">
+                        {{ number_format($to) }}
+                    </span>
+
+                    از
+
+                    <span class="font-medium text-[var(--livora-ink)]">
+                        {{ number_format($total) }}
+                    </span>
+
+                    محصول
+
+                </p>
+
+            @endif
+
+
+            {{-- =====================================================
+                 Pagination
+            ====================================================== --}}
+            <div class="flex items-center gap-2">
+
+                {{-- Previous --}}
+                @if($pagination->onFirstPage())
+
+                    <span
+                        aria-disabled="true"
+                        aria-label="صفحه قبلی"
+                        class="flex h-10 w-10 cursor-not-allowed items-center justify-center rounded-xl border border-[var(--livora-border)] bg-[var(--livora-surface)] text-[var(--livora-stone)] opacity-40"
+                    >
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.5"
+                            stroke="currentColor"
+                            class="h-4 w-4"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="m15.75 19.5-7.5-7.5 7.5-7.5"
+                            />
+                        </svg>
+
+                    </span>
+
+                @else
+
+                    <a
+                        href="{{ $pagination->previousPageUrl() }}"
+                        rel="prev"
+                        aria-label="صفحه قبلی"
+                        class="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--livora-border)] bg-[var(--livora-white)] text-[var(--livora-ink)] transition hover:border-[var(--livora-ink)] hover:bg-[var(--livora-surface)]"
+                    >
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.5"
+                            stroke="currentColor"
+                            class="h-4 w-4"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="m15.75 19.5-7.5-7.5 7.5-7.5"
+                            />
+                        </svg>
+
+                    </a>
+
+                @endif
+
+
+                {{-- Pages --}}
+                <div class="flex items-center gap-1">
+
+                    @foreach($pages as $page)
+
+                        @if($page === '...')
+
+                            <span
+                                aria-hidden="true"
+                                class="flex h-10 min-w-10 items-center justify-center rounded-xl px-2 text-xs text-[var(--livora-stone)]"
+                            >
+                                …
+                            </span>
+
+                        @elseif($page === $currentPage)
+
+                            <span
+                                aria-current="page"
+                                aria-label="صفحه {{ $page }}"
+                                class="flex h-10 min-w-10 items-center justify-center rounded-xl bg-[var(--livora-ink)] px-3 text-xs font-semibold text-white"
+                            >
+                                {{ number_format($page) }}
+                            </span>
+
+                        @else
+
+                            <a
+                                href="{{ $pagination->url($page) }}"
+                                aria-label="صفحه {{ $page }}"
+                                class="flex h-10 min-w-10 items-center justify-center rounded-xl border border-transparent px-3 text-xs font-medium text-[var(--livora-stone)] transition hover:border-[var(--livora-border)] hover:bg-[var(--livora-white)] hover:text-[var(--livora-ink)]"
+                            >
+                                {{ number_format($page) }}
+                            </a>
+
+                        @endif
+
+                    @endforeach
+
+                </div>
+
+
+                {{-- Next --}}
+                @if($pagination->hasMorePages())
+
+                    <a
+                        href="{{ $pagination->nextPageUrl() }}"
+                        rel="next"
+                        aria-label="صفحه بعدی"
+                        class="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--livora-border)] bg-[var(--livora-white)] text-[var(--livora-ink)] transition hover:border-[var(--livora-ink)] hover:bg-[var(--livora-surface)]"
+                    >
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.5"
+                            stroke="currentColor"
+                            class="h-4 w-4"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="m8.25 4.5 7.5 7.5 7.5 7.5"
+                            />
+                        </svg>
+
+                    </a>
+
+                @else
+
+                    <span
+                        aria-disabled="true"
+                        aria-label="صفحه بعدی"
+                        class="flex h-10 w-10 cursor-not-allowed items-center justify-center rounded-xl border border-[var(--livora-border)] bg-[var(--livora-surface)] text-[var(--livora-stone)] opacity-40"
+                    >
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.5"
+                            stroke="currentColor"
+                            class="h-4 w-4"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="m8.25 4.5 7.5 7.5 7.5 7.5"
+                            />
+                        </svg>
+
+                    </span>
+
+                @endif
+
+            </div>
+
+        </div>
 
     </nav>
+
 @endif

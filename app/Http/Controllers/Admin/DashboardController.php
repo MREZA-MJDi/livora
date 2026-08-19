@@ -3,6 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Product;
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Support\Collection;
 
 class DashboardController extends Controller
 {
@@ -11,6 +17,336 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        return view('admin.dashboard.index');
+        /*
+        |--------------------------------------------------------------------------
+        | Global Statistics
+        |--------------------------------------------------------------------------
+        */
+
+        $totalProducts = Product::query()->count();
+
+        $activeProducts = Product::query()
+            ->where('status', 'active')
+            ->count();
+
+        $lowStockProducts = Product::query()
+            ->where('stock', '>', 0)
+            ->where('stock', '<=', 5)
+            ->count();
+
+        $outOfStockProducts = Product::query()
+            ->where('stock', 0)
+            ->count();
+
+        $totalCustomers = User::query()
+            ->where('role', 'customer')
+            ->count();
+
+        $totalOrders = Order::query()->count();
+
+        $pendingOrders = Order::query()
+            ->whereIn('status', [
+                'pending',
+                'processing',
+            ])
+            ->count();
+
+        $paidOrders = Order::query()
+            ->where('payment_status', 'paid')
+            ->count();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Revenue
+        |--------------------------------------------------------------------------
+        |
+        | Only successfully paid orders are counted as revenue.
+        |
+        */
+
+        $totalRevenue = Order::query()
+            ->where('payment_status', 'paid')
+            ->sum('total');
+
+        $currentMonthRevenue = Order::query()
+            ->where('payment_status', 'paid')
+            ->whereBetween('created_at', [
+                now()->startOfMonth(),
+                now()->endOfMonth(),
+            ])
+            ->sum('total');
+
+        $currentMonthOrders = Order::query()
+            ->whereBetween('created_at', [
+                now()->startOfMonth(),
+                now()->endOfMonth(),
+            ])
+            ->count();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Previous Month Comparison
+        |--------------------------------------------------------------------------
+        */
+
+        $previousMonthRevenue = Order::query()
+            ->where('payment_status', 'paid')
+            ->whereBetween('created_at', [
+                now()->subMonth()->startOfMonth(),
+                now()->subMonth()->endOfMonth(),
+            ])
+            ->sum('total');
+
+        $revenueGrowthPercent = 0;
+
+        if ((float) $previousMonthRevenue > 0) {
+            $revenueGrowthPercent = round(
+                (
+                    (
+                        (float) $currentMonthRevenue
+                        - (float) $previousMonthRevenue
+                    )
+                    / (float) $previousMonthRevenue
+                ) * 100,
+                1
+            );
+        } elseif ((float) $currentMonthRevenue > 0) {
+            $revenueGrowthPercent = 100;
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Six Month Revenue Chart
+        |--------------------------------------------------------------------------
+        */
+
+        $monthlyRevenue = $this->getMonthlyRevenue();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Order Status Distribution
+        |--------------------------------------------------------------------------
+        */
+
+        $orderStatus = [
+            'pending' => Order::query()
+                ->where('status', 'pending')
+                ->count(),
+
+            'processing' => Order::query()
+                ->where('status', 'processing')
+                ->count(),
+
+            'shipped' => Order::query()
+                ->where('status', 'shipped')
+                ->count(),
+
+            'delivered' => Order::query()
+                ->where('status', 'delivered')
+                ->count(),
+
+            'cancelled' => Order::query()
+                ->where('status', 'cancelled')
+                ->count(),
+        ];
+
+        /*
+        |--------------------------------------------------------------------------
+        | Top Products
+        |--------------------------------------------------------------------------
+        */
+
+        $topProducts = $this->getTopProducts();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Installment Orders
+        |--------------------------------------------------------------------------
+        */
+
+        $installmentOrders = Order::query()
+            ->where('payment_method', 'installment')
+            ->count();
+
+        $installmentPaidOrders = Order::query()
+            ->where('payment_method', 'installment')
+            ->where('payment_status', 'paid')
+            ->count();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Recent Orders
+        |--------------------------------------------------------------------------
+        */
+
+        $recentOrders = Order::query()
+            ->with([
+                'user',
+            ])
+            ->latest()
+            ->limit(6)
+            ->get();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Recent Customers
+        |--------------------------------------------------------------------------
+        */
+
+        $recentCustomers = User::query()
+            ->where('role', 'customer')
+            ->latest()
+            ->limit(5)
+            ->get();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Product Inventory
+        |--------------------------------------------------------------------------
+        */
+
+        $featuredProductsCount = Product::query()
+            ->where('is_featured', true)
+            ->count();
+
+        $newProductsCount = Product::query()
+            ->where('is_new', true)
+            ->count();
+
+        $installmentProductsCount = Product::query()
+            ->where('installment_enabled', true)
+            ->count();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Average Order Value
+        |--------------------------------------------------------------------------
+        */
+
+        $averageOrderValue = Order::query()
+            ->where('payment_status', 'paid')
+            ->avg('total');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Return View
+        |--------------------------------------------------------------------------
+        */
+
+        return view('admin.dashboard.index', [
+            'totalProducts' => $totalProducts,
+            'activeProducts' => $activeProducts,
+            'lowStockProducts' => $lowStockProducts,
+            'outOfStockProducts' => $outOfStockProducts,
+
+            'totalCustomers' => $totalCustomers,
+
+            'totalOrders' => $totalOrders,
+            'pendingOrders' => $pendingOrders,
+            'paidOrders' => $paidOrders,
+
+            'totalRevenue' => $totalRevenue,
+            'currentMonthRevenue' => $currentMonthRevenue,
+            'currentMonthOrders' => $currentMonthOrders,
+            'previousMonthRevenue' => $previousMonthRevenue,
+            'revenueGrowthPercent' => $revenueGrowthPercent,
+            'averageOrderValue' => $averageOrderValue,
+
+            'monthlyRevenue' => $monthlyRevenue,
+
+            'orderStatus' => $orderStatus,
+
+            'topProducts' => $topProducts,
+
+            'installmentOrders' => $installmentOrders,
+            'installmentPaidOrders' => $installmentPaidOrders,
+
+            'recentOrders' => $recentOrders,
+            'recentCustomers' => $recentCustomers,
+
+            'featuredProductsCount' => $featuredProductsCount,
+            'newProductsCount' => $newProductsCount,
+            'installmentProductsCount' => $installmentProductsCount,
+        ]);
+    }
+
+    /**
+     * Get revenue for the latest six months.
+     */
+    protected function getMonthlyRevenue(): Collection
+    {
+        $months = collect();
+
+        for ($i = 5; $i >= 0; $i--) {
+            $date = now()
+                ->copy()
+                ->subMonths($i);
+
+            $revenue = Order::query()
+                ->where('payment_status', 'paid')
+                ->whereBetween('created_at', [
+                    $date->copy()->startOfMonth(),
+                    $date->copy()->endOfMonth(),
+                ])
+                ->sum('total');
+
+            $orders = Order::query()
+                ->where('payment_status', 'paid')
+                ->whereBetween('created_at', [
+                    $date->copy()->startOfMonth(),
+                    $date->copy()->endOfMonth(),
+                ])
+                ->count();
+
+            $months->push([
+                'key' => $date->format('Y-m'),
+                'label' => $date->locale('fa')->translatedFormat('M'),
+                'full_label' => $date->locale('fa')->translatedFormat('F Y'),
+                'revenue' => (float) $revenue,
+                'orders' => $orders,
+            ]);
+        }
+
+        return $months;
+    }
+
+    /**
+     * Get best selling products from paid orders.
+     */
+    protected function getTopProducts(): Collection
+    {
+        return OrderItem::query()
+            ->with([
+                'product.images',
+            ])
+            ->whereHas(
+                'order',
+                fn ($query) => $query->where(
+                    'payment_status',
+                    'paid'
+                )
+            )
+            ->selectRaw(
+                'product_id,
+                 product_name,
+                 SUM(quantity) as sold_quantity,
+                 SUM(total) as revenue'
+            )
+            ->groupBy(
+                'product_id',
+                'product_name'
+            )
+            ->orderByDesc('sold_quantity')
+            ->limit(5)
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'product_id' => $item->product_id,
+                    'name' => $item->product_name,
+                    'quantity' => (int) $item->sold_quantity,
+                    'revenue' => (float) $item->revenue,
+                    'image' => $item->product?->images?->first()?->url,
+                ];
+            });
     }
 }
