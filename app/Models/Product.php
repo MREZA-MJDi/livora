@@ -28,6 +28,15 @@ class Product extends Model
         'is_new',
         'meta_title',
         'meta_description',
+
+        /*
+         * Internal installment settings
+         */
+        'installment_enabled',
+        'installment_cash_percent',
+        'installment_remainder_method',
+        'installment_cheque_count',
+        'installment_interval_months',
     ];
 
     protected function casts(): array
@@ -36,8 +45,17 @@ class Product extends Model
             'price' => 'decimal:2',
             'compare_at_price' => 'decimal:2',
             'stock' => 'integer',
+
             'is_featured' => 'boolean',
             'is_new' => 'boolean',
+
+            /*
+             * Internal installment settings
+             */
+            'installment_enabled' => 'boolean',
+            'installment_cash_percent' => 'integer',
+            'installment_cheque_count' => 'integer',
+            'installment_interval_months' => 'integer',
         ];
     }
 
@@ -92,7 +110,10 @@ class Product extends Model
         }
 
         return (int) round(
-            ((float) $this->compare_at_price - (float) $this->price)
+            (
+                (float) $this->compare_at_price
+                - (float) $this->price
+            )
             / (float) $this->compare_at_price
             * 100
         );

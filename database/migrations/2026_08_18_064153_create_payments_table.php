@@ -6,27 +6,82 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
 
+            /*
+             |--------------------------------------------------------------------------
+             | Relations
+             |--------------------------------------------------------------------------
+             */
+
             $table->foreignId('order_id')
-                ->constrained()
+                ->constrained('orders')
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();
 
             $table->foreignId('user_id')
                 ->nullable()
-                ->constrained()
+                ->constrained('users')
                 ->nullOnDelete();
 
-            $table->string('gateway')->default('pending');
+            /*
+             |--------------------------------------------------------------------------
+             | Payment Gateway
+             |--------------------------------------------------------------------------
+             |
+             | Example:
+             | digipay
+             | snappay
+             | torobpay
+             |
+             */
 
-            $table->string('authority')->nullable()->unique();
-            $table->string('transaction_id')->nullable()->unique();
+            $table->string('gateway');
 
-            $table->decimal('amount', 15, 2);
+            /*
+             |--------------------------------------------------------------------------
+             | Gateway References
+             |--------------------------------------------------------------------------
+             |
+             | authority:
+             | Provider-side payment/request reference.
+             |
+             | transaction_id:
+             | Final provider transaction/reference ID.
+             |
+             */
+
+            $table->string('authority')
+                ->nullable()
+                ->unique();
+
+            $table->string('transaction_id')
+                ->nullable()
+                ->unique();
+
+            /*
+             |--------------------------------------------------------------------------
+             | Financial
+             |--------------------------------------------------------------------------
+             */
+
+            $table->decimal(
+                'amount',
+                15,
+                2
+            );
+
+            /*
+             |--------------------------------------------------------------------------
+             | Payment Status
+             |--------------------------------------------------------------------------
+             */
 
             $table->enum('status', [
                 'pending',
@@ -37,17 +92,62 @@ return new class extends Migration
                 'refunded',
             ])->default('pending');
 
-            $table->timestamp('paid_at')->nullable();
+            /*
+             |--------------------------------------------------------------------------
+             | Payment Completion
+             |--------------------------------------------------------------------------
+             */
 
-            $table->json('metadata')->nullable();
+            $table->timestamp('paid_at')
+                ->nullable();
+
+            /*
+             |--------------------------------------------------------------------------
+             | Gateway / Internal Metadata
+             |--------------------------------------------------------------------------
+             |
+             | Stores normalized provider responses, callback data,
+             | error information and other non-critical details.
+             |
+             */
+
+            $table->json('metadata')
+                ->nullable();
+
+            /*
+             |--------------------------------------------------------------------------
+             | Timestamps
+             |--------------------------------------------------------------------------
+             */
 
             $table->timestamps();
 
-            $table->index(['order_id', 'status']);
-            $table->index(['user_id', 'status']);
+            /*
+             |--------------------------------------------------------------------------
+             | Indexes
+             |--------------------------------------------------------------------------
+             */
+
+            $table->index([
+                'order_id',
+                'status',
+            ]);
+
+            $table->index([
+                'user_id',
+                'status',
+            ]);
+
+            $table->index([
+                'gateway',
+                'status',
+            ]);
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('payments');

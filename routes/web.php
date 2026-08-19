@@ -155,14 +155,89 @@ Route::middleware(['auth', 'customer'])
             ->name('checkout.')
             ->group(function () {
 
-                Route::get('/', [CheckoutController::class, 'index'])
-                    ->name('index');
+                /*
+                |--------------------------------------------------------------------------
+                | Checkout Page
+                |--------------------------------------------------------------------------
+                */
 
-                Route::post('/', [CheckoutController::class, 'placeOrder'])
-                    ->name('place');
+                Route::get(
+                    '/',
+                    [CheckoutController::class, 'index']
+                )->name('index');
 
-                Route::get('/payment/{order}', [CheckoutController::class, 'payment'])
-                    ->name('payment');
+
+                /*
+                |--------------------------------------------------------------------------
+                | Create Order
+                |--------------------------------------------------------------------------
+                */
+
+                Route::post(
+                    '/',
+                    [CheckoutController::class, 'placeOrder']
+                )->name('place');
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Payment Selection
+                |--------------------------------------------------------------------------
+                */
+
+                Route::get(
+                    '/payment/{order}',
+                    [CheckoutController::class, 'payment']
+                )->name('payment');
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | External Installment Gateways
+                |--------------------------------------------------------------------------
+                |
+                | DigiPay
+                | SnapPay
+                | TorobPay
+                |
+                */
+
+                Route::post(
+                    '/payment/{order}/installment',
+                    [CheckoutController::class, 'startInstallmentPayment']
+                )->name('payment.installment');
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Livora Internal Installment
+                |--------------------------------------------------------------------------
+                |
+                | Example:
+                | 50% cash + remaining amount by cheque.
+                |
+                */
+
+                Route::post(
+                    '/payment/{order}/livora-installment',
+                    [CheckoutController::class, 'startInternalInstallment']
+                )->name('payment.livora-installment');
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | External Payment Callback
+                |--------------------------------------------------------------------------
+                |
+                | Provider redirects the customer back to Livora.
+                |
+                */
+
+                Route::match(
+                    ['GET', 'POST'],
+                    '/payment/callback/{gateway}',
+                    [CheckoutController::class, 'paymentCallback']
+                )->name('payment.callback');
             });
 
 
@@ -182,8 +257,10 @@ Route::middleware(['auth', 'customer'])
                 |--------------------------------------------------------------------------
                 */
 
-                Route::get('/', [AccountController::class, 'index'])
-                    ->name('index');
+                Route::get(
+                    '/',
+                    [AccountController::class, 'index']
+                )->name('index');
 
 
                 /*
@@ -192,8 +269,10 @@ Route::middleware(['auth', 'customer'])
                 |--------------------------------------------------------------------------
                 */
 
-                Route::put('/profile', [AccountController::class, 'updateProfile'])
-                    ->name('profile.update');
+                Route::put(
+                    '/profile',
+                    [AccountController::class, 'updateProfile']
+                )->name('profile.update');
 
 
                 /*
@@ -202,20 +281,30 @@ Route::middleware(['auth', 'customer'])
                 |--------------------------------------------------------------------------
                 */
 
-                Route::get('/addresses', [AccountController::class, 'addresses'])
-                    ->name('addresses.index');
+                Route::get(
+                    '/addresses',
+                    [AccountController::class, 'addresses']
+                )->name('addresses.index');
 
-                Route::post('/addresses', [AccountController::class, 'storeAddress'])
-                    ->name('addresses.store');
+                Route::post(
+                    '/addresses',
+                    [AccountController::class, 'storeAddress']
+                )->name('addresses.store');
 
-                Route::put('/addresses/{address}', [AccountController::class, 'updateAddress'])
-                    ->name('addresses.update');
+                Route::put(
+                    '/addresses/{address}',
+                    [AccountController::class, 'updateAddress']
+                )->name('addresses.update');
 
-                Route::delete('/addresses/{address}', [AccountController::class, 'deleteAddress'])
-                    ->name('addresses.destroy');
+                Route::delete(
+                    '/addresses/{address}',
+                    [AccountController::class, 'deleteAddress']
+                )->name('addresses.destroy');
 
-                Route::patch('/addresses/{address}/default', [AccountController::class, 'setDefaultAddress'])
-                    ->name('addresses.default');
+                Route::patch(
+                    '/addresses/{address}/default',
+                    [AccountController::class, 'setDefaultAddress']
+                )->name('addresses.default');
 
 
                 /*
@@ -224,11 +313,15 @@ Route::middleware(['auth', 'customer'])
                 |--------------------------------------------------------------------------
                 */
 
-                Route::get('/orders', [OrderController::class, 'index'])
-                    ->name('orders.index');
+                Route::get(
+                    '/orders',
+                    [OrderController::class, 'index']
+                )->name('orders.index');
 
-                Route::get('/orders/{order}', [OrderController::class, 'show'])
-                    ->name('orders.show');
+                Route::get(
+                    '/orders/{order}',
+                    [OrderController::class, 'show']
+                )->name('orders.show');
 
 
                 /*
@@ -237,14 +330,20 @@ Route::middleware(['auth', 'customer'])
                 |--------------------------------------------------------------------------
                 */
 
-                Route::get('/wishlist', [WishlistController::class, 'index'])
-                    ->name('wishlist.index');
+                Route::get(
+                    '/wishlist',
+                    [WishlistController::class, 'index']
+                )->name('wishlist.index');
 
-                Route::post('/wishlist/{product}', [WishlistController::class, 'store'])
-                    ->name('wishlist.store');
+                Route::post(
+                    '/wishlist/{product}',
+                    [WishlistController::class, 'store']
+                )->name('wishlist.store');
 
-                Route::delete('/wishlist/{product}', [WishlistController::class, 'destroy'])
-                    ->name('wishlist.destroy');
+                Route::delete(
+                    '/wishlist/{product}',
+                    [WishlistController::class, 'destroy']
+                )->name('wishlist.destroy');
             });
     });
 
@@ -271,8 +370,10 @@ Route::middleware(['auth', 'admin'])
         |--------------------------------------------------------------------------
         */
 
-        Route::get('/', [AdminDashboardController::class, 'index'])
-            ->name('dashboard');
+        Route::get(
+            '/',
+            [AdminDashboardController::class, 'index']
+        )->name('dashboard');
 
 
         /*
@@ -281,7 +382,10 @@ Route::middleware(['auth', 'admin'])
         |--------------------------------------------------------------------------
         */
 
-        Route::resource('categories', AdminCategoryController::class);
+        Route::resource(
+            'categories',
+            AdminCategoryController::class
+        );
 
 
         /*
@@ -290,7 +394,10 @@ Route::middleware(['auth', 'admin'])
         |--------------------------------------------------------------------------
         */
 
-        Route::resource('products', AdminProductController::class);
+        Route::resource(
+            'products',
+            AdminProductController::class
+        );
 
 
         /*
@@ -299,7 +406,10 @@ Route::middleware(['auth', 'admin'])
         |--------------------------------------------------------------------------
         */
 
-        Route::resource('product-images', AdminProductImageController::class);
+        Route::resource(
+            'product-images',
+            AdminProductImageController::class
+        );
 
 
         /*
@@ -308,7 +418,10 @@ Route::middleware(['auth', 'admin'])
         |--------------------------------------------------------------------------
         */
 
-        Route::resource('product-variants', AdminProductVariantController::class);
+        Route::resource(
+            'product-variants',
+            AdminProductVariantController::class
+        );
 
 
         /*
@@ -317,11 +430,15 @@ Route::middleware(['auth', 'admin'])
         |--------------------------------------------------------------------------
         */
 
-        Route::get('orders', [AdminOrderController::class, 'index'])
-            ->name('orders.index');
+        Route::get(
+            'orders',
+            [AdminOrderController::class, 'index']
+        )->name('orders.index');
 
-        Route::get('orders/{order}', [AdminOrderController::class, 'show'])
-            ->name('orders.show');
+        Route::get(
+            'orders/{order}',
+            [AdminOrderController::class, 'show']
+        )->name('orders.show');
 
         Route::patch(
             'orders/{order}/status',
@@ -335,11 +452,15 @@ Route::middleware(['auth', 'admin'])
         |--------------------------------------------------------------------------
         */
 
-        Route::get('customers', [AdminCustomerController::class, 'index'])
-            ->name('customers.index');
+        Route::get(
+            'customers',
+            [AdminCustomerController::class, 'index']
+        )->name('customers.index');
 
-        Route::get('customers/{customer}', [AdminCustomerController::class, 'show'])
-            ->name('customers.show');
+        Route::get(
+            'customers/{customer}',
+            [AdminCustomerController::class, 'show']
+        )->name('customers.show');
 
         Route::get(
             'customers/{customer}/edit',

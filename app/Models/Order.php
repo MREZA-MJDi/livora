@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+
 class Order extends Model
 {
     use HasFactory;
@@ -14,22 +15,41 @@ class Order extends Model
     protected $fillable = [
         'user_id',
         'order_number',
+
         'status',
         'payment_status',
+
+        'payment_method',
+        'payment_provider',
+
         'subtotal',
         'shipping_cost',
         'discount',
         'total',
+
         'first_name',
         'last_name',
         'phone',
         'email',
+
         'province',
         'city',
         'address',
         'postal_code',
         'unit',
+
         'notes',
+
+        /*
+         * Internal installment snapshot
+         */
+        'installment_enabled',
+        'installment_cash_percent',
+        'installment_cash_amount',
+        'installment_deferred_amount',
+        'installment_remainder_method',
+        'installment_cheque_count',
+        'installment_interval_months',
     ];
 
     protected function casts(): array
@@ -39,8 +59,24 @@ class Order extends Model
             'shipping_cost' => 'decimal:2',
             'discount' => 'decimal:2',
             'total' => 'decimal:2',
+
+            'installment_enabled' => 'boolean',
+
+            'installment_cash_percent' => 'integer',
+
+            'installment_cash_amount' => 'decimal:2',
+            'installment_deferred_amount' => 'decimal:2',
+
+            'installment_cheque_count' => 'integer',
+            'installment_interval_months' => 'integer',
         ];
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Relationships
+    |--------------------------------------------------------------------------
+    */
 
     public function user(): BelongsTo
     {
@@ -52,9 +88,34 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function latestPayment(): HasOne
+    {
+        return $this->hasOne(Payment::class)
+            ->latestOfMany();
+    }
+
+    public function installments(): HasMany
+    {
+        return $this->hasMany(OrderInstallment::class)
+            ->orderBy('sequence');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Accessors
+    |--------------------------------------------------------------------------
+    */
+
     public function getFullNameAttribute(): string
     {
-        return trim($this->first_name . ' ' . $this->last_name);
+        return trim(
+            $this->first_name . ' ' . $this->last_name
+        );
     }
 
     public function getFullAddressAttribute(): string
@@ -65,36 +126,81 @@ class Order extends Model
             $this->address,
         ];
 
-        if ($this->unit !== null && $this->unit !== '') {
+        if (
+            $this->unit !== null
+            && $this->unit !== ''
+        ) {
             $parts[] = 'واحد ' . $this->unit;
         }
 
-        return implode('، ', array_filter($parts));
+        return implode(
+            '، ',
+            array_filter($parts)
+        );
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Payment Helpers
+    |--------------------------------------------------------------------------
+    */
+
+    public function isPaid(): bool
+    {
+        return $this->payment_status === 'paid';
+    }
+
+    public function isInstallment(): bool
+    {
+        return $this->payment_method === 'installment';
+    }
+
+    public function isInternalInstallment(): bool
+    {
+        return $this->isInstallment()
+            && $this->payment_provider === 'livora';
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Query Scopes
+    |--------------------------------------------------------------------------
+    */
 
     public function scopeProcessing($query)
     {
-        return $query->where('status', 'processing');
+        return $query->where(
+            'status',
+            'processing'
+        );
     }
 
     public function scopePaid($query)
     {
-        return $query->where('payment_status', 'paid');
+        return $query->where(
+            'payment_status',
+            'paid'
+        );
     }
 
-    /**
-     * @return HasMany
-     */
-    public function payments(): HasMany
+    public function scopeInstallment($query)
     {
-        return $this->hasMany(Payment::class);
+        return $query->where(
+            'payment_method',
+            'installment'
+        );
     }
 
-    /**
-     * @return HasOne
-     */
-    public function latestPayment(): HasOne
+    public function scopeInternalInstallment($query)
     {
-        return $this->hasOne(Payment::class)->latestOfMany();
+        return $query
+            ->where(
+                'payment_method',
+                'installment'
+            )
+            ->where(
+                'payment_provider',
+                'livora'
+            );
     }
 }
