@@ -26,14 +26,19 @@
     >
 
     <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "CollectionPage",
-        "name": "فروشگاه مبلمان LIVORA",
-        "description": "مجموعه محصولات مبلمان و لوازم خانه LIVORA",
-        "url": "{{ route('shop.index') }}"
+{
+    "@@context": "https://schema.org",
+    "@@type": "WebSite",
+    "name": "LIVORA",
+    "url": @json(url('/')),
+    "potentialAction": {
+        "@@type": "SearchAction",
+        "target": @json(url('/shop') . '?search={search_term_string}'),
+        "query-input": "required name=search_term_string"
     }
-    </script>
+}
+</script>
+
 @endpush
 
 @section('content')

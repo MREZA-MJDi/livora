@@ -47,15 +47,27 @@
     >
 
     <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "ContactPage",
-        "name": "تماس با LIVORA",
-        "url": @json(route('contact')),
-        "description": "راه‌های ارتباطی و پشتیبانی LIVORA"
+{
+    "@@context": "https://schema.org",
+    "@@type": "WebSite",
+    "name": "LIVORA",
+    "url": @json(url('/')),
+    "potentialAction": {
+        "@@type": "SearchAction",
+        "target": @json(url('/shop') . '?search={search_term_string}'),
+        "query-input": "required name=search_term_string"
     }
-    </script>
+}
+</script>
 
+{{--    <script type="application/ld+json">--}}
+{{--{--}}
+{{--    "@@context": "https://schema.org",--}}
+{{--    "@@type": "Organization",--}}
+{{--    "name": "LIVORA",--}}
+{{--    "url": @json(url('/'))--}}
+{{--        }--}}
+{{--</script>--}}
 @endpush
 
 @section('content')

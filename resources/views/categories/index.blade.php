@@ -1,123 +1,202 @@
 @extends('layouts.app')
 
-@section('title', 'دسته‌بندی‌ها | LIVORA')
+@section('title', 'دسته‌بندی محصولات | LIVORA')
 
-@section('description', 'دسته‌بندی محصولات LIVORA')
+@section(
+    'description',
+    'دسته‌بندی‌های مختلف مبلمان و لوازم خانه در LIVORA را ببینید و محصول مناسب فضای خود را پیدا کنید.'
+)
+
+@section('canonical', route('categories.index'))
+
+@push('seo')
+    <meta
+        name="robots"
+        content="index,follow"
+    >
+
+    <meta
+        property="og:type"
+        content="website"
+    >
+
+    <meta
+        property="og:title"
+        content="دسته‌بندی محصولات | LIVORA"
+    >
+
+    <meta
+        property="og:description"
+        content="دسته‌بندی‌های مختلف مبلمان و لوازم خانه در LIVORA."
+    >
+
+    <meta
+        property="og:url"
+        content="{{ route('categories.index') }}"
+    >
+@endpush
 
 @section('content')
 
-    <section class="border-b border-[var(--livora-border)]">
-        <x-layout.container>
+    <div class="overflow-hidden bg-[var(--livora-cream)]">
 
-            <div class="py-10 sm:py-14">
+        {{-- HERO --}}
+        <section class="border-b border-[var(--livora-border)] bg-[var(--livora-white)]">
 
-                <p class="text-xs font-medium uppercase tracking-[0.2em] text-[var(--livora-accent)]">
-                    LIVORA COLLECTION
-                </p>
+            <x-layout.container>
 
-                <h1 class="mt-3 text-3xl font-semibold text-[var(--livora-ink)] sm:text-4xl">
-                    دسته‌بندی‌ها
-                </h1>
+                <div class="py-10 sm:py-16 lg:py-20">
 
-                <p class="mt-3 max-w-xl text-sm leading-7 text-[var(--livora-stone)]">
-                    مجموعه‌های LIVORA را بر اساس نوع محصول کشف کنید.
-                </p>
+                    <nav
+                        aria-label="breadcrumb"
+                        class="flex items-center gap-2 text-[11px] text-[var(--livora-stone)]"
+                    >
+                        <a
+                            href="{{ route('home') }}"
+                            class="transition hover:text-[var(--livora-ink)]"
+                        >
+                            خانه
+                        </a>
 
-            </div>
+                        <span>/</span>
 
-        </x-layout.container>
-    </section>
+                        <span class="text-[var(--livora-ink)]">
+                        دسته‌بندی‌ها
+                    </span>
+                    </nav>
+
+                    <div class="mt-10 max-w-3xl">
+
+                        <p class="text-[10px] font-medium uppercase tracking-[0.24em] text-[var(--livora-accent)]">
+                            SHOP BY CATEGORY
+                        </p>
+
+                        <h1 class="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
+                            فضای مناسب خودت را پیدا کن.
+                        </h1>
+
+                        <p class="mt-5 max-w-2xl text-sm leading-8 text-[var(--livora-stone)] sm:text-base">
+                            از مبلمان و نشیمن تا میز، صندلی و سایر عناصر خانه؛
+                            مجموعه‌های LIVORA را بر اساس فضای موردنظر بررسی کن.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </x-layout.container>
+
+        </section>
 
 
-    <section>
-        <x-layout.container>
+        {{-- CATEGORIES --}}
+        <section>
 
-            <div class="py-10 lg:py-14">
+            <x-layout.container>
 
-                @if($categories->count())
+                @if($categories->isNotEmpty())
 
-                    <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                    <div class="py-10 sm:py-14 lg:py-16">
 
-                        @foreach($categories as $category)
+                        <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 
-                            <a
-                                href="{{ route('categories.show', $category) }}"
-                                class="group overflow-hidden rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)]"
-                            >
+                            @foreach($categories as $category)
 
-                                <div class="aspect-[4/3] overflow-hidden bg-[var(--livora-cream)]">
+                                <x-shop.category-card
+                                    :name="$category->name"
+                                    :image="$category->image"
+                                    :href="route('categories.show', $category->slug)"
+                                    :count="$category->products_count"
+                                />
 
-                                    @if($category->image)
+                            @endforeach
 
-                                        <img
-                                            src="{{ asset('storage/' . ltrim($category->image, '/')) }}"
-                                            alt="{{ $category->name }}"
-                                            loading="lazy"
-                                            class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                        >
+                        </div>
 
-                                    @else
+                        @if(method_exists($categories, 'hasPages') && $categories->hasPages())
 
-                                        <div class="flex h-full items-center justify-center text-sm text-[var(--livora-stone)]">
-                                            {{ $category->name }}
-                                        </div>
+                            <div class="mt-10">
+                                {{ $categories->withQueryString()->links() }}
+                            </div>
 
-                                    @endif
-
-                                </div>
-
-                                <div class="flex items-center justify-between gap-4 p-5">
-
-                                    <div>
-
-                                        <h2 class="text-lg font-semibold text-[var(--livora-ink)]">
-                                            {{ $category->name }}
-                                        </h2>
-
-                                        <p class="mt-1 text-xs text-[var(--livora-stone)]">
-                                            {{ $category->products_count }} محصول
-                                        </p>
-
-                                    </div>
-
-                                    <span class="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--livora-border)] transition-all duration-300 group-hover:border-[var(--livora-accent)] group-hover:bg-[var(--livora-accent)] group-hover:text-white">
-
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke-width="1.5"
-                                            stroke="currentColor"
-                                            class="h-4 w-4"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                                            />
-                                        </svg>
-
-                                    </span>
-
-                                </div>
-
-                            </a>
-
-                        @endforeach
+                        @endif
 
                     </div>
 
                 @else
 
-                    <div class="py-20 text-center text-sm text-[var(--livora-stone)]">
-                        دسته‌بندی‌ای برای نمایش وجود ندارد.
+                    <div class="py-24 text-center">
+
+                        <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-[1.75rem] bg-[var(--livora-white)]">
+                        <span class="text-xs tracking-[0.2em] text-[var(--livora-stone)]">
+                            LV
+                        </span>
+                        </div>
+
+                        <p class="mt-7 text-[10px] uppercase tracking-[0.22em] text-[var(--livora-accent)]">
+                            EMPTY
+                        </p>
+
+                        <h2 class="mt-3 text-3xl font-semibold">
+                            هنوز دسته‌بندی‌ای وجود ندارد.
+                        </h2>
+
+                        <p class="mx-auto mt-4 max-w-md text-sm leading-8 text-[var(--livora-stone)]">
+                            دسته‌بندی‌های فروشگاه به‌زودی در این بخش نمایش داده می‌شوند.
+                        </p>
+
+                        <a
+                            href="{{ route('shop.index') }}"
+                            class="mt-8 inline-flex rounded-2xl bg-[var(--livora-ink)] px-7 py-4 text-sm font-medium text-white transition hover:bg-[var(--livora-accent)]"
+                        >
+                            مشاهده فروشگاه
+                        </a>
+
                     </div>
 
                 @endif
 
-            </div>
+            </x-layout.container>
 
-        </x-layout.container>
-    </section>
+        </section>
+
+
+        {{-- CTA --}}
+        <section class="border-t border-[var(--livora-border)] bg-[var(--livora-surface)]">
+
+            <x-layout.container>
+
+                <div class="flex flex-col gap-6 py-12 sm:flex-row sm:items-center sm:justify-between sm:py-16">
+
+                    <div>
+
+                        <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--livora-accent)]">
+                            LIVORA
+                        </p>
+
+                        <h2 class="mt-2 text-2xl font-semibold">
+                            چیزی که دنبالش هستی، شاید همین‌جا باشد.
+                        </h2>
+
+                        <p class="mt-2 text-sm leading-7 text-[var(--livora-stone)]">
+                            همه محصولات را هم می‌توانی یکجا بررسی کنی.
+                        </p>
+
+                    </div>
+
+                    <a
+                        href="{{ route('shop.index') }}"
+                        class="inline-flex w-fit rounded-2xl bg-[var(--livora-ink)] px-6 py-4 text-sm font-medium text-white transition hover:bg-[var(--livora-accent)]"
+                    >
+                        ورود به فروشگاه
+                    </a>
+
+                </div>
+
+            </x-layout.container>
+
+        </section>
+
+    </div>
 
 @endsection

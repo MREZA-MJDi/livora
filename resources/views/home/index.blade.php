@@ -45,27 +45,26 @@
         name="twitter:description"
         content="کشف مجموعه منتخب LIVORA برای فضاهایی که قرار است شخصیت داشته باشند."
     >
-
     <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        "name": "LIVORA",
-        "url": @json(url('/')),
-        "potentialAction": {
-            "@type": "SearchAction",
-            "target": @json(url('/shop') . '?search={search_term_string}'),
-            "query-input": "required name=search_term_string"
-        }
+{
+    "@@context": "https://schema.org",
+    "@@type": "WebSite",
+    "name": "LIVORA",
+    "url": @json(url('/')),
+    "potentialAction": {
+        "@@type": "SearchAction",
+        "target": @json(url('/shop') . '?search={search_term_string}'),
+        "query-input": "required name=search_term_string"
     }
-    </script>
+}
+</script>
 
     <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        "name": "LIVORA",
-        "url": @json(url('/'))
+{
+    "@@context": "https://schema.org",
+    "@@type": "Organization",
+    "name": "LIVORA",
+    "url": @json(url('/'))
         }
 </script>
 
