@@ -10,16 +10,37 @@
 @section('canonical', url('/'))
 
 @push('seo')
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="LIVORA | مبلمان و لوازم خانه">
+
+    <meta
+        property="og:type"
+        content="website"
+    >
+
+    <meta
+        property="og:title"
+        content="LIVORA | مبلمان و لوازم خانه"
+    >
+
     <meta
         property="og:description"
         content="کشف مجموعه منتخب LIVORA برای فضاهایی که قرار است شخصیت داشته باشند."
     >
-    <meta property="og:url" content="{{ url('/') }}">
 
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="LIVORA | مبلمان و لوازم خانه">
+    <meta
+        property="og:url"
+        content="{{ url('/') }}"
+    >
+
+    <meta
+        name="twitter:card"
+        content="summary_large_image"
+    >
+
+    <meta
+        name="twitter:title"
+        content="LIVORA | مبلمان و لوازم خانه"
+    >
+
     <meta
         name="twitter:description"
         content="کشف مجموعه منتخب LIVORA برای فضاهایی که قرار است شخصیت داشته باشند."
@@ -30,10 +51,10 @@
         "@context": "https://schema.org",
         "@type": "WebSite",
         "name": "LIVORA",
-        "url": "{{ url('/') }}",
+        "url": @json(url('/')),
         "potentialAction": {
             "@type": "SearchAction",
-            "target": "{{ url('/shop') }}?search={search_term_string}",
+            "target": @json(url('/shop') . '?search={search_term_string}'),
             "query-input": "required name=search_term_string"
         }
     }
@@ -44,18 +65,30 @@
         "@context": "https://schema.org",
         "@type": "Organization",
         "name": "LIVORA",
-        "url": "{{ url('/') }}"
-    }
-    </script>
+        "url": @json(url('/'))
+        }
+</script>
+
 @endpush
+
 
 @section('content')
 
     @php
+
+        /*
+        |--------------------------------------------------------------------------
+        | Homepage Data
+        |--------------------------------------------------------------------------
+        */
+
         $heroProduct = $featuredProducts->first();
 
         $featuredWithoutHero = $featuredProducts
-            ->when($heroProduct, fn ($items) => $items->skip(1));
+            ->when(
+                $heroProduct,
+                fn ($items) => $items->skip(1)
+            );
 
         $installmentProducts = $featuredProducts
             ->filter(
@@ -64,41 +97,61 @@
             )
             ->take(4);
 
-        $heroImage = $heroProduct?->images?->first()?->url;
+        $heroImage =
+            $heroProduct?->images?->first()?->url;
+
     @endphp
 
+
     <div class="overflow-hidden bg-[var(--livora-cream)]">
+
 
         {{-- =========================================================
              HERO
         ========================================================== --}}
+
         <section class="relative">
 
             <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
 
                 <div class="grid min-h-[calc(100vh-76px)] grid-cols-1 gap-8 py-5 lg:grid-cols-[0.92fr_1.08fr] lg:py-7">
 
-                    {{-- Hero Content --}}
+
+                    {{-- =================================================
+                         HERO CONTENT
+                    ================================================== --}}
+
                     <div class="relative flex flex-col justify-center rounded-[2rem] bg-[var(--livora-surface)] px-7 py-12 sm:px-10 lg:px-14 lg:py-16">
 
                         <div class="max-w-xl">
 
                             <div class="flex items-center gap-3 text-[10px] font-medium uppercase tracking-[0.24em] text-[var(--livora-accent)]">
+
                                 <span class="h-px w-8 bg-[var(--livora-accent)]"></span>
+
                                 Furniture & Living
+
                             </div>
 
+
                             <h1 class="mt-7 text-5xl font-semibold leading-[1.05] tracking-tight text-[var(--livora-ink)] sm:text-6xl xl:text-7xl">
+
                                 خانه‌ای که
+
                                 <span class="block text-[var(--livora-accent)]">
-                                    شبیه توست.
-                                </span>
+                                شبیه توست.
+                            </span>
+
                             </h1>
 
+
                             <p class="mt-7 max-w-lg text-sm leading-8 text-[var(--livora-stone)] sm:text-base">
+
                                 مجموعه‌ای منتخب از مبلمان و عناصر خانه برای ساختن فضایی
                                 گرم، ماندگار و دقیق؛ از انتخاب اول تا آخرین جزئیات.
+
                             </p>
+
 
                             <div class="mt-9 flex flex-col gap-3 sm:flex-row">
 
@@ -120,51 +173,72 @@
 
                         </div>
 
+
+                        {{-- Hero Stats --}}
+
                         <div class="mt-12 grid max-w-xl grid-cols-3 gap-3">
 
                             <div class="rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-4">
+
                                 <p class="text-[10px] uppercase tracking-[0.16em] text-[var(--livora-stone)]">
                                     Quality
                                 </p>
+
                                 <p class="mt-2 text-sm font-semibold">
                                     انتخاب‌شده
                                 </p>
+
                             </div>
 
+
                             <div class="rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-4">
+
                                 <p class="text-[10px] uppercase tracking-[0.16em] text-[var(--livora-stone)]">
                                     Payment
                                 </p>
+
                                 <p class="mt-2 text-sm font-semibold">
                                     اقساطی
                                 </p>
+
                             </div>
 
+
                             <div class="rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-4">
+
                                 <p class="text-[10px] uppercase tracking-[0.16em] text-[var(--livora-stone)]">
                                     Service
                                 </p>
+
                                 <p class="mt-2 text-sm font-semibold">
                                     همراه شما
                                 </p>
+
                             </div>
 
                         </div>
 
                     </div>
 
-                    {{-- Hero Image --}}
+
+                    {{-- =================================================
+                         HERO IMAGE
+                    ================================================== --}}
+
                     <div class="relative overflow-hidden rounded-[2rem] bg-[var(--livora-white)]">
 
                         @if($heroImage)
 
                             <img
                                 src="{{ $heroImage }}"
-                                alt="{{ $heroProduct?->name }}"
+                                alt="{{ $heroProduct?->name ?? 'LIVORA' }}"
                                 class="h-full min-h-[520px] w-full object-cover lg:min-h-full"
                             >
 
                             <div class="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent"></div>
+
+
+                            {{-- Hero Product Info --}}
 
                             <div class="absolute bottom-5 left-5 right-5 sm:bottom-7 sm:left-7 sm:right-7">
 
@@ -180,10 +254,13 @@
 
                                     <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
 
-                                        <span class="text-sm text-white/80">
-                                            {{ number_format((float) $heroProduct->price) }}
-                                            تومان
-                                        </span>
+                                    <span class="text-sm text-white/80">
+
+                                        {{ number_format((float) $heroProduct->price) }}
+
+                                        تومان
+
+                                    </span>
 
                                         <a
                                             href="{{ route('product.show', $heroProduct->slug) }}"
@@ -201,9 +278,11 @@
                         @else
 
                             <div class="flex h-full min-h-[520px] items-center justify-center bg-[var(--livora-surface)]">
-                                <span class="text-sm tracking-[0.2em] text-[var(--livora-stone)]">
-                                    LIVORA
-                                </span>
+
+                            <span class="text-sm tracking-[0.2em] text-[var(--livora-stone)]">
+                                LIVORA
+                            </span>
+
                             </div>
 
                         @endif
@@ -220,11 +299,13 @@
         {{-- =========================================================
              CATEGORY DISCOVERY
         ========================================================== --}}
+
         <section class="border-t border-[var(--livora-border)] bg-[var(--livora-white)]">
 
             <x-layout.container>
 
                 <div class="py-16 sm:py-20">
+
 
                     <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
 
@@ -239,21 +320,29 @@
                             </h2>
 
                             <p class="mt-4 max-w-xl text-sm leading-8 text-[var(--livora-stone)]">
+
                                 از نشیمن و اتاق خواب تا میز ناهارخوری و جزئیات کوچک‌تر،
                                 دسته‌بندی مناسب فضای خودتان را پیدا کنید.
+
                             </p>
 
                         </div>
+
 
                         <a
                             href="{{ route('categories.index') }}"
                             class="inline-flex items-center text-sm font-medium text-[var(--livora-accent)]"
                         >
                             همه دسته‌بندی‌ها
-                            <span class="mr-2">←</span>
+
+                            <span class="mr-2">
+                            ←
+                        </span>
+
                         </a>
 
                     </div>
+
 
                     <div class="mt-9 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 
@@ -284,6 +373,7 @@
         {{-- =========================================================
              FEATURED COLLECTION
         ========================================================== --}}
+
         <section class="border-t border-[var(--livora-border)]">
 
             <x-layout.container>
@@ -308,15 +398,21 @@
 
                         </div>
 
+
                         <a
                             href="{{ route('shop.index') }}"
                             class="inline-flex items-center text-sm font-medium text-[var(--livora-accent)]"
                         >
                             مشاهده همه محصولات
-                            <span class="mr-2">←</span>
+
+                            <span class="mr-2">
+                            ←
+                        </span>
+
                         </a>
 
                     </div>
+
 
                     @if($featuredWithoutHero->isNotEmpty())
 
@@ -335,9 +431,11 @@
                     @else
 
                         <div class="mt-10 rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-surface)] p-10 text-center">
+
                             <p class="text-sm text-[var(--livora-stone)]">
                                 محصولات منتخب به‌زودی اینجا نمایش داده می‌شوند.
                             </p>
+
                         </div>
 
                     @endif
@@ -350,8 +448,9 @@
 
 
         {{-- =========================================================
-             INSTALLMENT
+             INSTALLMENT HERO
         ========================================================== --}}
+
         <section class="border-t border-[var(--livora-border)] bg-[var(--livora-ink)] text-white">
 
             <x-layout.container>
@@ -360,6 +459,7 @@
 
                     <div class="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
 
+
                         <div>
 
                             <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-white/45">
@@ -367,17 +467,24 @@
                             </p>
 
                             <h2 class="mt-4 max-w-xl text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
+
                                 خانه‌تان را انتخاب کنید.
+
                                 <span class="block text-white/50">
-                                    پرداختش را برنامه‌ریزی کنید.
-                                </span>
+                                پرداختش را برنامه‌ریزی کنید.
+                            </span>
+
                             </h2>
 
+
                             <p class="mt-6 max-w-xl text-sm leading-8 text-white/60">
+
                                 بعضی از محصولات Livora می‌توانند با شرایط اقساطی
                                 تعریف‌شده توسط فروشگاه خریداری شوند؛
                                 پیش‌پرداخت، تعداد چک و فاصله سررسید از قبل مشخص است.
+
                             </p>
+
 
                             <a
                                 href="{{ route('shop.index') }}"
@@ -388,12 +495,14 @@
 
                         </div>
 
+
                         <div class="grid grid-cols-2 gap-3">
 
                             <div class="rounded-3xl border border-white/10 bg-white/5 p-5 sm:p-6">
-                                <span class="text-[10px] uppercase tracking-[0.18em] text-white/40">
-                                    Today
-                                </span>
+
+                            <span class="text-[10px] uppercase tracking-[0.18em] text-white/40">
+                                Today
+                            </span>
 
                                 <p class="mt-4 text-2xl font-semibold">
                                     50%
@@ -402,12 +511,15 @@
                                 <p class="mt-2 text-xs leading-6 text-white/45">
                                     پیش‌پرداخت نمونه
                                 </p>
+
                             </div>
 
+
                             <div class="rounded-3xl border border-white/10 bg-white/5 p-5 sm:p-6">
-                                <span class="text-[10px] uppercase tracking-[0.18em] text-white/40">
-                                    Cheques
-                                </span>
+
+                            <span class="text-[10px] uppercase tracking-[0.18em] text-white/40">
+                                Cheques
+                            </span>
 
                                 <p class="mt-4 text-2xl font-semibold">
                                     2+
@@ -416,13 +528,16 @@
                                 <p class="mt-2 text-xs leading-6 text-white/45">
                                     قابل تنظیم توسط فروشگاه
                                 </p>
+
                             </div>
+
 
                             <div class="col-span-2 rounded-3xl border border-white/10 bg-white/[0.07] p-5 sm:p-6">
 
                                 <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
                                     <div>
+
                                         <p class="text-sm font-semibold">
                                             شرایط هر محصول متفاوت است
                                         </p>
@@ -430,11 +545,12 @@
                                         <p class="mt-2 text-xs leading-6 text-white/45">
                                             درصد پیش‌پرداخت و برنامه تسویه را در صفحه محصول ببینید.
                                         </p>
+
                                     </div>
 
                                     <span class="inline-flex w-fit rounded-full border border-white/10 px-4 py-2 text-[11px] text-white/60">
-                                        Transparent pricing
-                                    </span>
+                                    Transparent pricing
+                                </span>
 
                                 </div>
 
@@ -454,6 +570,7 @@
         {{-- =========================================================
              INSTALLMENT PRODUCT PICKS
         ========================================================== --}}
+
         @if($installmentProducts->isNotEmpty())
 
             <section class="border-t border-[var(--livora-border)] bg-[var(--livora-white)]">
@@ -480,6 +597,7 @@
 
                             </div>
 
+
                             <a
                                 href="{{ route('shop.index') }}"
                                 class="text-sm font-medium text-[var(--livora-accent)]"
@@ -488,6 +606,7 @@
                             </a>
 
                         </div>
+
 
                         <div class="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
 
@@ -513,6 +632,7 @@
         {{-- =========================================================
              NEW ARRIVALS
         ========================================================== --}}
+
         <section class="border-t border-[var(--livora-border)]">
 
             <x-layout.container>
@@ -537,6 +657,7 @@
 
                         </div>
 
+
                         <a
                             href="{{ route('shop.index', ['sort' => 'newest']) }}"
                             class="text-sm font-medium text-[var(--livora-accent)]"
@@ -545,6 +666,7 @@
                         </a>
 
                     </div>
+
 
                     @if($newProducts->isNotEmpty())
 
@@ -563,9 +685,11 @@
                     @else
 
                         <div class="mt-10 rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-surface)] p-10 text-center">
+
                             <p class="text-sm text-[var(--livora-stone)]">
                                 محصولات جدید به‌زودی اضافه می‌شوند.
                             </p>
+
                         </div>
 
                     @endif
@@ -578,8 +702,9 @@
 
 
         {{-- =========================================================
-             INSPIRATION / EDITORIAL
+             INSPIRATION
         ========================================================== --}}
+
         <section class="border-t border-[var(--livora-border)] bg-[var(--livora-surface)]">
 
             <x-layout.container>
@@ -588,6 +713,7 @@
 
                     <div class="grid items-end gap-8 lg:grid-cols-[0.85fr_1.15fr]">
 
+
                         <div>
 
                             <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--livora-accent)]">
@@ -595,34 +721,47 @@
                             </p>
 
                             <h2 class="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
+
                                 فقط مبلمان نیست.
+
                                 <span class="block text-[var(--livora-accent)]">
-                                    سبک زندگی است.
-                                </span>
+                                سبک زندگی است.
+                            </span>
+
                             </h2>
 
+
                             <p class="mt-5 max-w-lg text-sm leading-8 text-[var(--livora-stone)]">
+
                                 برای انتخاب بهتر، فقط قیمت کافی نیست؛
                                 از اندازه‌گیری فضا و انتخاب رنگ تا ترکیب متریال،
                                 تصمیم‌های درست را ساده‌تر می‌کنیم.
+
                             </p>
+
 
                             <a
                                 href="{{ route('about') }}"
                                 class="mt-7 inline-flex items-center text-sm font-medium text-[var(--livora-ink)]"
                             >
                                 درباره LIVORA
-                                <span class="mr-2">←</span>
+
+                                <span class="mr-2">
+                                ←
+                            </span>
+
                             </a>
 
                         </div>
 
+
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
 
                             <article class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-5">
-                                <span class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
-                                    01
-                                </span>
+
+                            <span class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                                01
+                            </span>
 
                                 <h3 class="mt-8 text-base font-semibold">
                                     اندازه‌گیری درست
@@ -631,12 +770,15 @@
                                 <p class="mt-3 text-xs leading-7 text-[var(--livora-stone)]">
                                     قبل از انتخاب، ابعاد فضا و مسیر ورود محصول را بررسی کنید.
                                 </p>
+
                             </article>
 
+
                             <article class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-5">
-                                <span class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
-                                    02
-                                </span>
+
+                            <span class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                                02
+                            </span>
 
                                 <h3 class="mt-8 text-base font-semibold">
                                     متریال و رنگ
@@ -645,12 +787,15 @@
                                 <p class="mt-3 text-xs leading-7 text-[var(--livora-stone)]">
                                     محصولی انتخاب کنید که با نور، رنگ و شخصیت فضای شما هماهنگ باشد.
                                 </p>
+
                             </article>
 
+
                             <article class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-5">
-                                <span class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
-                                    03
-                                </span>
+
+                            <span class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                                03
+                            </span>
 
                                 <h3 class="mt-8 text-base font-semibold">
                                     خرید آگاهانه
@@ -659,6 +804,7 @@
                                 <p class="mt-3 text-xs leading-7 text-[var(--livora-stone)]">
                                     قیمت، شرایط اقساط، مشخصات و خدمات را کنار هم مقایسه کنید.
                                 </p>
+
                             </article>
 
                         </div>
@@ -675,11 +821,13 @@
         {{-- =========================================================
              TRUST
         ========================================================== --}}
+
         <section class="border-t border-[var(--livora-border)] bg-[var(--livora-white)]">
 
             <x-layout.container>
 
                 <div class="grid grid-cols-1 divide-y divide-[var(--livora-border)] py-4 sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4">
+
 
                     <div class="px-2 py-8 sm:px-8">
 
@@ -697,6 +845,7 @@
 
                     </div>
 
+
                     <div class="px-2 py-8 sm:px-8">
 
                         <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-stone)]">
@@ -713,6 +862,7 @@
 
                     </div>
 
+
                     <div class="px-2 py-8 sm:px-8">
 
                         <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-stone)]">
@@ -728,6 +878,7 @@
                         </p>
 
                     </div>
+
 
                     <div class="px-2 py-8 sm:px-8">
 
@@ -755,6 +906,7 @@
         {{-- =========================================================
              FINAL CTA
         ========================================================== --}}
+
         <section class="border-t border-[var(--livora-border)]">
 
             <x-layout.container>

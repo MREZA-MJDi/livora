@@ -225,7 +225,7 @@
 
                 {{-- Media --}}
                 <a
-                    href="{{ route('admin.media.index') }}"
+                    href="#"
                     @class([
                         'group flex items-center gap-3 rounded-2xl px-3 py-3 text-xs font-medium transition',
                         'bg-[var(--admin-accent-soft)] text-[var(--admin-accent-dark)]' => request()->routeIs('admin.media.*'),
