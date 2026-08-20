@@ -162,80 +162,27 @@
 
     {{-- Product Schema --}}
     <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "Product",
-        "name": @json($product->name),
-        "description": @json($pageDescription),
-        "sku": @json($product->sku),
-        "url": @json(route('product.show', $product->slug)),
-        "brand": {
-            "@type": "Brand",
-            "name": "LIVORA"
-        },
-
-        @if($mainImage)
-            "image": [
-@json($mainImage)
-            ],
-@endif
-
-        "offers": {
-            "@type": "Offer",
-            "url": @json(route('product.show', $product->slug)),
-            "priceCurrency": "IRR",
-            "price": @json((string) ((float) $product->price)),
-            "availability": @json($availability),
-            "itemCondition": "https://schema.org/NewCondition"
-        }
+{
+    "@@context": "https://schema.org",
+    "@@type": "WebSite",
+    "name": "LIVORA",
+    "url": @json(url('/')),
+    "potentialAction": {
+        "@@type": "SearchAction",
+        "target": @json(url('/shop') . '?search={search_term_string}'),
+        "query-input": "required name=search_term_string"
     }
-    </script>
+}
+</script>
 
-    {{-- Breadcrumb Schema --}}
     <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-            {
-                "@type": "ListItem",
-                "position": 1,
-                "name": "خانه",
-                "item": @json(route('home'))
-        },
-        {
-            "@type": "ListItem",
-            "position": 2,
-            "name": "فروشگاه",
-            "item": @json(route('shop.index'))
+{
+    "@@context": "https://schema.org",
+    "@@type": "Organization",
+    "name": "LIVORA",
+    "url": @json(url('/'))
         }
-
-@if($product->category)
-            ,
-            {
-                "@type": "ListItem",
-                "position": 3,
-                "name": @json($product->category->name),
-                "item": @json(route('categories.show', $product->category->slug))
-            },
-            {
-                "@type": "ListItem",
-                "position": 4,
-                "name": @json($product->name),
-                "item": @json(route('product.show', $product->slug))
-            }
-            @else
-            ,
-            {
-                "@type": "ListItem",
-                "position": 3,
-                "name": @json($product->name),
-                "item": @json(route('product.show', $product->slug))
-            }
-            @endif
-        ]
-    }
-    </script>
+</script>
 
 @endpush
 

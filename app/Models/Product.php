@@ -39,6 +39,15 @@ class Product extends Model
         'installment_interval_months',
     ];
 
+    /**
+     * @return HasMany
+     */
+    public function wishlists()
+    {
+        return $this->hasMany(
+            Wishlist::class
+        );
+    }
     protected function casts(): array
     {
         return [

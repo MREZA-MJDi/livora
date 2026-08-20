@@ -989,7 +989,7 @@
 
 
                                     <a
-                                        href="{{ route('shop.index') }}"
+                                        href="{{ route('checkout.index') }}"
                                         class="mt-3 flex w-full items-center justify-center rounded-2xl border border-[var(--livora-border)] px-6 py-3.5 text-sm font-medium text-[var(--livora-ink)] transition hover:border-[var(--livora-ink)]"
                                     >
                                         ادامه خرید

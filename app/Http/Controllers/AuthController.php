@@ -140,12 +140,7 @@ class AuthController extends Controller
         $request->session()->regenerate();
 
         $this->mergeGuestCartIntoUserCart($request);
-        dd([
-            'id' => $request->user()->id,
-            'email' => $request->user()->email,
-            'role' => $request->user()->role,
-            'is_admin' => $request->user()->isAdmin(),
-        ]);
+
 
         if ($request->user()->isAdmin()) {
             return redirect()

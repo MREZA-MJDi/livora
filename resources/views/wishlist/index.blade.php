@@ -201,7 +201,7 @@
                                     @if($item->product)
 
                                         <form
-                                            action="{{ route('wishlist.destroy', $product) }}"
+                                            action="{{ route('account.wishlist.destroy', $product) }}"
                                             method="POST"
                                             class="absolute right-3 top-3 z-20"
                                         >

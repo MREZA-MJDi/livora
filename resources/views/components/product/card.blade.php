@@ -115,7 +115,7 @@
             @if(auth()->user()->isCustomer())
 
                 <form
-                    action="{{ route('wishlist.store', $product) }}"
+                    action="{{ route('account.wishlist.store', $product) }}"
                     method="POST"
                     class="absolute bottom-3 right-3 opacity-0 transition duration-300 group-hover:opacity-100"
                 >

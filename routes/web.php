@@ -268,6 +268,10 @@ Route::middleware(['auth', 'customer'])
                 | Profile
                 |--------------------------------------------------------------------------
                 */
+                Route::get(
+                    '/profile',
+                    [AccountController::class, 'editProfile']
+                )->name('profile.edit');
 
                 Route::put(
                     '/profile',

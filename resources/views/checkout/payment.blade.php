@@ -1,115 +1,186 @@
 @extends('layouts.app')
 
-@section('title', 'پرداخت سفارش ' . $order->order_number . ' | LIVORA')
+@section(
+    'title',
+    'انتخاب روش پرداخت | ' . $order->order_number . ' | LIVORA'
+)
 
 @section(
     'description',
-    'انتخاب روش پرداخت و بررسی شرایط خرید سفارش ' . $order->order_number . ' در LIVORA.'
+    'انتخاب روش پرداخت سفارش در LIVORA؛ پرداخت آنلاین یا خرید اقساطی با شرایط مشخص.'
 )
+
+@section(
+    'canonical',
+    route('checkout.payment', $order)
+)
+
+@push('seo')
+
+    <meta
+        name="robots"
+        content="noindex,nofollow"
+    >
+
+@endpush
+
 
 @section('content')
 
     @php
+
         /*
-         |--------------------------------------------------------------------------
-         | Order / Installment Data
-         |--------------------------------------------------------------------------
-         */
+        |--------------------------------------------------------------------------
+        | Gateway Configuration
+        |--------------------------------------------------------------------------
+        */
 
-        $order->loadMissing([
-            'items.product.images',
-            'installments',
-        ]);
+        $gateways = [
+            [
+                'key' => 'digipay',
+                'name' => 'DigiPay',
+                'fa_name' => 'دیجی‌پی',
+                'description' => 'پرداخت از طریق درگاه دیجی‌پی',
+                'enabled' => (bool) config('payment.digipay.enabled', false),
+                'badge' => 'DIGIPAY',
+            ],
 
-        $installmentAvailable = $order->items->isNotEmpty()
-            && $order->items->every(
-                fn ($item) =>
-                    $item->product
-                    && $item->product->installment_enabled
+            [
+                'key' => 'snappay',
+                'name' => 'SnappPay',
+                'fa_name' => 'اسنپ‌پی',
+                'description' => 'پرداخت از طریق درگاه اسنپ‌پی',
+                'enabled' => (bool) config('payment.snappay.enabled', false),
+                'badge' => 'SNAPPAY',
+            ],
+
+            [
+                'key' => 'torobpay',
+                'name' => 'TorobPay',
+                'fa_name' => 'ترب‌پی',
+                'description' => 'پرداخت از طریق درگاه ترب‌پی',
+                'enabled' => (bool) config('payment.torobpay.enabled', false),
+                'badge' => 'TOROBPAY',
+            ],
+        ];
+
+        $enabledGateways = collect($gateways)
+            ->where('enabled', true)
+            ->values();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Order Totals
+        |--------------------------------------------------------------------------
+        */
+
+        $orderTotal = (float) $order->total;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Existing Installment Plan
+        |--------------------------------------------------------------------------
+        */
+
+        $hasInstallmentPlan =
+            (bool) $order->installment_enabled
+            && $order->installments
+                ->isNotEmpty();
+
+        $cashInstallment =
+            $order->installments
+                ->firstWhere('type', 'cash');
+
+        $chequeInstallments =
+            $order->installments
+                ->where('type', 'cheque')
+                ->values();
+
+        $cashPercent =
+            (int) (
+                $order->installment_cash_percent
+                ?? 0
             );
 
-        $installmentProduct = $order->items
-            ->first()?->product;
+        $cashAmount =
+            $cashInstallment
+                ? (float) $cashInstallment->amount
+                : null;
 
-        $cashPercent = $installmentAvailable
-            ? (int) ($installmentProduct?->installment_cash_percent ?? 0)
-            : 0;
-
-        $chequeCount = $installmentAvailable
-            ? (int) ($installmentProduct?->installment_cheque_count ?? 0)
-            : 0;
-
-        $intervalMonths = $installmentAvailable
-            ? (int) ($installmentProduct?->installment_interval_months ?? 0)
-            : 0;
-
-        $total = (float) $order->total;
-
-        $cashAmount = $installmentAvailable && $cashPercent > 0
-            ? round(
-                $total * ($cashPercent / 100),
-                2
-            )
-            : 0;
-
-        $deferredAmount = $installmentAvailable
-            ? round(
-                $total - $cashAmount,
-                2
-            )
-            : 0;
-
-        $chequeAmounts = [];
-
-        if (
-            $installmentAvailable
-            && $chequeCount > 0
-            && $deferredAmount > 0
-        ) {
-            $baseAmount = round(
-                $deferredAmount / $chequeCount,
-                2
+        $deferredAmount =
+            (float) (
+                $order->installment_deferred_amount
+                ?? 0
             );
 
-            $distributed = 0;
+        $chequeCount =
+            $chequeInstallments->count();
 
-            for ($i = 1; $i <= $chequeCount; $i++) {
-                if ($i === $chequeCount) {
-                    $amount = round(
-                        $deferredAmount - $distributed,
-                        2
-                    );
-                } else {
-                    $amount = $baseAmount;
-                }
+        $intervalMonths =
+            (int) (
+                $order->installment_interval_months
+                ?? 0
+            );
 
-                $chequeAmounts[] = $amount;
-                $distributed = round(
-                    $distributed + $amount,
-                    2
-                );
-            }
-        }
 
-        $hasInternalPlan = $order->installments->isNotEmpty();
+        /*
+        |--------------------------------------------------------------------------
+        | Payment Status
+        |--------------------------------------------------------------------------
+        */
 
-        $paymentStatusLabel = match ($order->payment_status) {
-            'paid' => 'پرداخت شده',
-            'failed' => 'ناموفق',
-            'refunded' => 'مرجوع شده',
-            default => 'در انتظار پرداخت',
-        };
+        $isPaid =
+            $order->payment_status === 'paid';
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Current Payment
+        |--------------------------------------------------------------------------
+        */
+
+        $latestPayment =
+            $order->latestPayment;
+
+
     @endphp
 
-    <div class="bg-[var(--livora-surface)]">
 
-        {{-- Checkout Header --}}
+    <div
+        x-data="{
+        selected: null,
+        installmentOpen: {{ $hasInstallmentPlan ? 'true' : 'false' }},
+
+        selectOnline(gateway) {
+            this.selected = gateway;
+            this.installmentOpen = false;
+        },
+
+        selectInstallment() {
+            this.selected = 'livora-installment';
+            this.installmentOpen = true;
+        }
+    }"
+        class="overflow-hidden bg-[var(--livora-cream)]"
+    >
+
+
+        {{-- =========================================================
+             HEADER
+        ========================================================== --}}
+
         <section class="border-b border-[var(--livora-border)] bg-[var(--livora-white)]">
+
             <x-layout.container>
 
-                <div class="py-8 sm:py-10">
+                <div class="py-8 sm:py-12">
 
-                    <div class="flex flex-wrap items-center gap-2 text-xs text-[var(--livora-stone)]">
+                    <nav
+                        aria-label="breadcrumb"
+                        class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--livora-stone)]"
+                    >
 
                         <a
                             href="{{ route('home') }}"
@@ -129,34 +200,29 @@
 
                         <span>/</span>
 
-                        <a
-                            href="{{ route('checkout.index') }}"
-                            class="transition hover:text-[var(--livora-ink)]"
-                        >
-                            اطلاعات سفارش
-                        </a>
-
-                        <span>/</span>
-
                         <span class="text-[var(--livora-ink)]">
                         پرداخت
                     </span>
 
-                    </div>
+                    </nav>
 
-                    <div class="mt-6 max-w-2xl">
 
-                        <p class="text-[11px] font-medium uppercase tracking-[0.22em] text-[var(--livora-accent)]">
-                            CHECKOUT
+                    <div class="mt-8 max-w-3xl">
+
+                        <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--livora-accent)]">
+                            PAYMENT
                         </p>
 
-                        <h1 class="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-                            انتخاب روش پرداخت
+                        <h1 class="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
+                            روش پرداخت را انتخاب کنید.
                         </h1>
 
-                        <p class="mt-3 text-sm leading-8 text-[var(--livora-stone)]">
-                            سفارش شما آماده پرداخت است. روش مناسب را انتخاب کنید
-                            و قبل از ادامه، مبلغ و شرایط را بررسی کنید.
+                        <p class="mt-4 text-sm leading-8 text-[var(--livora-stone)]">
+                            سفارش
+                            <span class="font-medium text-[var(--livora-ink)]">
+                            {{ $order->order_number }}
+                        </span>
+                            برای پرداخت آماده است.
                         </p>
 
                     </div>
@@ -164,555 +230,408 @@
                 </div>
 
             </x-layout.container>
+
         </section>
 
-        {{-- Main --}}
-        <section>
-            <x-layout.container>
 
-                <div class="grid grid-cols-1 gap-6 py-8 lg:grid-cols-[minmax(0,1fr)_380px] lg:py-10">
+        {{-- =========================================================
+             MAIN
+        ========================================================== --}}
 
-                    {{-- LEFT --}}
-                    <div class="space-y-6">
+        <x-layout.container>
 
-                        {{-- Flash Messages --}}
-                        @if(session('success'))
-                            <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm leading-7 text-emerald-800">
-                                {{ session('success') }}
-                            </div>
-                        @endif
+            <div class="grid gap-6 py-8 sm:py-10 lg:grid-cols-[1fr_380px] lg:py-14">
 
-                        @if(session('error'))
-                            <div class="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm leading-7 text-red-800">
-                                {{ session('error') }}
-                            </div>
-                        @endif
 
-                        {{-- Order Info --}}
-                        <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-6 sm:p-8">
+                {{-- =================================================
+                     PAYMENT METHODS
+                ================================================== --}}
 
-                            <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                <div class="space-y-5">
+
+
+                    {{-- Success --}}
+                    @if(session('success'))
+
+                        <div class="rounded-3xl border border-emerald-200 bg-emerald-50 p-5">
+
+                            <div class="flex items-start gap-3">
+
+                            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white">
+                                ✓
+                            </span>
 
                                 <div>
 
-                                    <p class="text-[11px] uppercase tracking-[0.18em] text-[var(--livora-stone)]">
-                                        ORDER
+                                    <p class="text-sm font-semibold text-emerald-800">
+                                        {{ session('success') }}
                                     </p>
 
-                                    <h2 class="mt-2 text-lg font-semibold">
-                                        {{ $order->order_number }}
-                                    </h2>
-
-                                    <p class="mt-1 text-xs text-[var(--livora-stone)]">
-                                        ثبت سفارش با موفقیت انجام شده است.
+                                    <p class="mt-1 text-xs leading-6 text-emerald-700">
+                                        می‌توانید روش پرداخت مناسب سفارش خود را انتخاب کنید.
                                     </p>
 
-                                </div>
-
-                                <div class="inline-flex w-fit rounded-full border border-[var(--livora-border)] px-4 py-2 text-xs text-[var(--livora-stone)]">
-                                    {{ $paymentStatusLabel }}
                                 </div>
 
                             </div>
 
                         </div>
 
-                        {{-- Products --}}
-                        <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-6 sm:p-8">
+                    @endif
 
-                            <div class="mb-6">
 
-                                <p class="text-[11px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
-                                    ORDER ITEMS
-                                </p>
+                    {{-- Error --}}
+                    @if(session('error'))
 
-                                <h2 class="mt-2 text-xl font-semibold">
-                                    محصولات سفارش
-                                </h2>
+                        <div class="rounded-3xl border border-red-200 bg-red-50 p-5">
 
-                            </div>
+                            <div class="flex items-start gap-3">
 
-                            <div class="divide-y divide-[var(--livora-border)]">
+                            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-600 text-white">
+                                !
+                            </span>
 
-                                @foreach($order->items as $item)
+                                <div>
 
-                                    <div class="flex gap-4 py-5 first:pt-0 last:pb-0">
+                                    <p class="text-sm font-semibold text-red-800">
+                                        {{ session('error') }}
+                                    </p>
 
-                                        {{-- Image --}}
-                                        <div class="h-20 w-20 shrink-0 overflow-hidden rounded-2xl bg-[var(--livora-surface)] sm:h-24 sm:w-24">
-
-                                            @if($item->product?->images?->first()?->url)
-
-                                                <img
-                                                    src="{{ $item->product->images->first()->url }}"
-                                                    alt="{{ $item->product_name }}"
-                                                    class="h-full w-full object-cover"
-                                                >
-
-                                            @else
-
-                                                <div class="flex h-full w-full items-center justify-center text-[10px] tracking-wider text-[var(--livora-stone)]">
-                                                    LIVORA
-                                                </div>
-
-                                            @endif
-
-                                        </div>
-
-                                        {{-- Info --}}
-                                        <div class="min-w-0 flex-1">
-
-                                            <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-
-                                                <div>
-
-                                                    <h3 class="text-sm font-semibold">
-                                                        {{ $item->product_name }}
-                                                    </h3>
-
-                                                    <p class="mt-1 text-xs text-[var(--livora-stone)]">
-                                                        تعداد:
-                                                        {{ number_format($item->quantity) }}
-                                                    </p>
-
-                                                    @if($item->sku)
-
-                                                        <p class="mt-1 text-[11px] text-[var(--livora-stone)]">
-                                                            SKU:
-                                                            {{ $item->sku }}
-                                                        </p>
-
-                                                    @endif
-
-                                                </div>
-
-                                                <div class="text-right">
-
-                                                    <p class="text-sm font-semibold">
-                                                        {{ number_format((float) $item->total) }}
-                                                    </p>
-
-                                                    <p class="mt-1 text-[11px] text-[var(--livora-stone)]">
-                                                        تومان
-                                                    </p>
-
-                                                </div>
-
-                                            </div>
-
-                                        </div>
-
-                                    </div>
-
-                                @endforeach
+                                </div>
 
                             </div>
 
                         </div>
 
-                        {{-- Payment Method --}}
-                        <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-6 sm:p-8">
+                    @endif
 
-                            <div class="mb-6">
 
-                                <p class="text-[11px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
-                                    PAYMENT METHOD
+                    {{-- =================================================
+                         ONLINE PAYMENT
+                    ================================================== --}}
+
+                    <section class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-5 sm:p-7">
+
+                        <div class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+
+                            <div>
+
+                                <p class="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                                    ONLINE PAYMENT
                                 </p>
 
-                                <h2 class="mt-2 text-xl font-semibold">
-                                    نحوه پرداخت را انتخاب کنید
+                                <h2 class="mt-3 text-2xl font-semibold tracking-tight">
+                                    پرداخت آنلاین
                                 </h2>
 
                                 <p class="mt-2 text-xs leading-7 text-[var(--livora-stone)]">
-                                    شرایط خرید اقساطی دقیقاً بر اساس تنظیمات محصول محاسبه می‌شود.
+                                    یکی از درگاه‌های فعال را انتخاب کنید.
                                 </p>
 
                             </div>
 
-                            <div
-                                x-data="{
-                                method: '{{ $installmentAvailable ? 'installment' : 'online' }}',
-                                gateway: ''
-                            }"
-                                class="space-y-4"
-                            >
+                            <span class="w-fit rounded-full border border-[var(--livora-border)] bg-[var(--livora-surface)] px-3 py-1.5 text-[10px] text-[var(--livora-stone)]">
+                            مبلغ کامل سفارش
+                        </span>
 
-                                {{-- ONLINE --}}
-                                <label class="block cursor-pointer">
+                        </div>
+
+
+                        <div class="mt-7 grid gap-3 md:grid-cols-3">
+
+                            @foreach($gateways as $gateway)
+
+                                <div
+                                    x-data
+                                    @click="{{ $gateway['enabled'] ? "selectOnline('{$gateway['key']}')" : '' }}"
+                                    @class([
+                                        'relative rounded-3xl border p-5 transition duration-300',
+                                        'cursor-pointer' => $gateway['enabled'],
+                                        'cursor-not-allowed opacity-50' => ! $gateway['enabled'],
+                                        'border-[var(--livora-ink)] bg-[var(--livora-surface)] shadow-sm'
+                                            => $gateway['enabled'],
+                                        'border-[var(--livora-border)] bg-[var(--livora-white)]'
+                                            => ! $gateway['enabled'],
+                                    ])
+                                    :class="
+                                    selected === '{{ $gateway['key'] }}'
+                                        ? 'ring-2 ring-[var(--livora-accent)] ring-offset-2'
+                                        : ''
+                                "
+                                >
+
+                                    <div class="flex items-start justify-between gap-3">
+
+                                        {{-- Logo --}}
+                                        <div
+                                            class="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--livora-ink)] text-[9px] font-bold tracking-[0.08em] text-white"
+                                        >
+                                            {{ $gateway['badge'] }}
+                                        </div>
+
+
+                                        {{-- Radio --}}
+                                        <div
+                                            class="flex h-5 w-5 items-center justify-center rounded-full border"
+                                            :class="
+                                            selected === '{{ $gateway['key'] }}'
+                                                ? 'border-[var(--livora-ink)] bg-[var(--livora-ink)]'
+                                                : 'border-[var(--livora-border)]'
+                                        "
+                                        >
+                                        <span
+                                            x-show="selected === '{{ $gateway['key'] }}'"
+                                            class="h-2 w-2 rounded-full bg-white"
+                                        ></span>
+                                        </div>
+
+                                    </div>
+
+
+                                    <p class="mt-6 text-sm font-semibold">
+                                        {{ $gateway['fa_name'] }}
+                                    </p>
+
+                                    <p class="mt-2 text-[11px] leading-6 text-[var(--livora-stone)]">
+                                        {{ $gateway['description'] }}
+                                    </p>
+
+
+                                    @if($gateway['enabled'])
+
+                                        <span class="mt-4 inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-[9px] font-medium text-emerald-700">
+                                        فعال
+                                    </span>
+
+                                    @else
+
+                                        <span class="mt-4 inline-flex rounded-full bg-[var(--livora-surface)] px-2.5 py-1 text-[9px] text-[var(--livora-stone)]">
+                                        به‌زودی
+                                    </span>
+
+                                    @endif
+
+                                </div>
+
+                            @endforeach
+
+                        </div>
+
+
+                        @if($enabledGateways->isNotEmpty())
+
+                            <div class="mt-6">
+
+                                <form
+                                    method="POST"
+                                    action="{{ route('checkout.payment.installment', $order) }}"
+                                    x-ref="onlineForm"
+                                >
+
+                                    @csrf
 
                                     <input
-                                        type="radio"
-                                        name="payment_method_preview"
-                                        value="online"
-                                        x-model="method"
-                                        class="peer sr-only"
+                                        type="hidden"
+                                        name="gateway"
+                                        :value="selected"
                                     >
 
-                                    <div class="rounded-3xl border border-[var(--livora-border)] p-5 transition peer-checked:border-[var(--livora-ink)] peer-checked:bg-[var(--livora-surface)]">
 
-                                        <div class="flex items-start gap-4">
-
-                                            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[var(--livora-ink)] text-sm font-semibold text-white">
-                                                01
-                                            </div>
-
-                                            <div class="min-w-0 flex-1">
-
-                                                <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-
-                                                    <div>
-
-                                                        <h3 class="text-sm font-semibold">
-                                                            پرداخت کامل آنلاین
-                                                        </h3>
-
-                                                        <p class="mt-1 text-xs leading-6 text-[var(--livora-stone)]">
-                                                            کل مبلغ سفارش را به‌صورت آنلاین پرداخت کنید.
-                                                        </p>
-
-                                                    </div>
-
-                                                    <p class="text-sm font-semibold">
-                                                        {{ number_format($total) }}
-                                                        تومان
-                                                    </p>
-
-                                                </div>
-
-                                                <div class="mt-4 flex flex-wrap gap-2 text-[11px] text-[var(--livora-stone)]">
-
-                                                <span class="rounded-full border border-[var(--livora-border)] px-3 py-1.5">
-                                                    پرداخت یکجا
-                                                </span>
-
-                                                    <span class="rounded-full border border-[var(--livora-border)] px-3 py-1.5">
-                                                    بدون چک
-                                                </span>
-
-                                                </div>
-
-                                            </div>
-
-                                        </div>
-
-                                    </div>
-
-                                </label>
-
-                                {{-- INSTALLMENT --}}
-                                @if($installmentAvailable)
-
-                                    <label class="block cursor-pointer">
-
-                                        <input
-                                            type="radio"
-                                            name="payment_method_preview"
-                                            value="installment"
-                                            x-model="method"
-                                            class="peer sr-only"
-                                        >
-
-                                        <div class="rounded-3xl border border-[var(--livora-border)] p-5 transition peer-checked:border-[var(--livora-ink)] peer-checked:bg-[var(--livora-surface)]">
-
-                                            <div class="flex items-start gap-4">
-
-                                                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[var(--livora-accent)] text-sm font-semibold text-white">
-                                                    02
-                                                </div>
-
-                                                <div class="min-w-0 flex-1">
-
-                                                    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-
-                                                        <div>
-
-                                                            <h3 class="text-sm font-semibold">
-                                                                خرید اقساطی
-                                                            </h3>
-
-                                                            <p class="mt-1 text-xs leading-6 text-[var(--livora-stone)]">
-                                                                بخشی از مبلغ را امروز پرداخت کنید و باقی‌مانده را طبق برنامه تسویه کنید.
-                                                            </p>
-
-                                                        </div>
-
-                                                        <span class="rounded-full border border-[var(--livora-border)] px-3 py-1.5 text-[11px] text-[var(--livora-stone)]">
-                                                        {{ $cashPercent }}٪ پیش‌پرداخت
-                                                    </span>
-
-                                                    </div>
-
-                                                    {{-- Installment Summary --}}
-                                                    <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
-
-                                                        <div class="rounded-2xl bg-[var(--livora-surface)] p-4">
-
-                                                            <p class="text-[11px] text-[var(--livora-stone)]">
-                                                                امروز
-                                                            </p>
-
-                                                            <p class="mt-2 text-base font-bold">
-                                                                {{ number_format($cashAmount) }}
-                                                                تومان
-                                                            </p>
-
-                                                            <p class="mt-1 text-[11px] text-[var(--livora-stone)]">
-                                                                پیش‌پرداخت
-                                                            </p>
-
-                                                        </div>
-
-                                                        <div class="rounded-2xl bg-[var(--livora-surface)] p-4">
-
-                                                            <p class="text-[11px] text-[var(--livora-stone)]">
-                                                                باقی‌مانده
-                                                            </p>
-
-                                                            <p class="mt-2 text-base font-bold">
-                                                                {{ number_format($deferredAmount) }}
-                                                                تومان
-                                                            </p>
-
-                                                            <p class="mt-1 text-[11px] text-[var(--livora-stone)]">
-                                                                {{ number_format($chequeCount) }} فقره چک
-                                                            </p>
-
-                                                        </div>
-
-                                                        <div class="rounded-2xl bg-[var(--livora-surface)] p-4">
-
-                                                            <p class="text-[11px] text-[var(--livora-stone)]">
-                                                                فاصله سررسید
-                                                            </p>
-
-                                                            <p class="mt-2 text-base font-bold">
-                                                                {{ number_format($intervalMonths) }}
-                                                                ماه
-                                                            </p>
-
-                                                            <p class="mt-1 text-[11px] text-[var(--livora-stone)]">
-                                                                بین چک‌ها
-                                                            </p>
-
-                                                        </div>
-
-                                                    </div>
-
-                                                    {{-- Cheque Schedule --}}
-                                                    @if(count($chequeAmounts))
-
-                                                        <div class="mt-5 rounded-2xl border border-[var(--livora-border)] p-4">
-
-                                                            <div class="flex items-center justify-between">
-
-                                                                <div>
-
-                                                                    <p class="text-sm font-semibold">
-                                                                        برنامه تسویه
-                                                                    </p>
-
-                                                                    <p class="mt-1 text-[11px] text-[var(--livora-stone)]">
-                                                                        سررسیدها بر اساس تنظیمات محصول محاسبه شده‌اند.
-                                                                    </p>
-
-                                                                </div>
-
-                                                                <span class="text-[11px] text-[var(--livora-stone)]">
-                                                                {{ number_format(count($chequeAmounts)) }} چک
-                                                            </span>
-
-                                                            </div>
-
-                                                            <div class="mt-4 space-y-2">
-
-                                                                @foreach($chequeAmounts as $index => $amount)
-
-                                                                    <div class="flex items-center justify-between gap-4 rounded-xl bg-[var(--livora-surface)] px-4 py-3">
-
-                                                                        <div>
-
-                                                                            <p class="text-xs font-medium">
-                                                                                چک {{ number_format($index + 1) }}
-                                                                            </p>
-
-                                                                            <p class="mt-1 text-[11px] text-[var(--livora-stone)]">
-                                                                                {{ number_format(($index + 1) * $intervalMonths) }}
-                                                                                ماه بعد
-                                                                            </p>
-
-                                                                        </div>
-
-                                                                        <p class="text-sm font-semibold">
-                                                                            {{ number_format($amount) }}
-                                                                            تومان
-                                                                        </p>
-
-                                                                    </div>
-
-                                                                @endforeach
-
-                                                            </div>
-
-                                                        </div>
-
-                                                    @endif
-
-                                                </div>
-
-                                            </div>
-
-                                        </div>
-
-                                    </label>
-
-                                @endif
-
-                                {{-- EXTERNAL GATEWAYS --}}
-                                @if($installmentAvailable)
-
-                                    <div
-                                        x-show="method === 'installment'"
-                                        x-cloak
-                                        class="mt-5 rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-surface)] p-5"
+                                    <button
+                                        type="submit"
+                                        @click="
+                                        if (
+                                            !['digipay', 'snappay', 'torobpay'].includes(selected)
+                                        ) {
+                                            $event.preventDefault();
+                                        }
+                                    "
+                                        :disabled="!['digipay', 'snappay', 'torobpay'].includes(selected)"
+                                        class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[var(--livora-ink)] px-6 py-4 text-sm font-medium text-white transition hover:bg-[var(--livora-accent)] disabled:cursor-not-allowed disabled:opacity-40"
                                     >
 
-                                        <div class="mb-5">
+                                    <span>
+                                        ادامه به درگاه
+                                    </span>
 
-                                            <p class="text-sm font-semibold">
-                                                سرویس پرداخت اقساطی
-                                            </p>
+                                        <span class="text-white/60">
+                                        ←
+                                    </span>
 
-                                            <p class="mt-1 text-xs leading-6 text-[var(--livora-stone)]">
-                                                یکی از سرویس‌های موجود را انتخاب کنید.
-                                                در محیط تست ممکن است هنوز به API واقعی متصل نباشد.
-                                            </p>
+                                    </button>
 
-                                        </div>
+                                </form>
 
-                                        <form
-                                            action="{{ route('checkout.payment.installment', $order) }}"
-                                            method="POST"
-                                            class="space-y-4"
-                                        >
+                            </div>
 
-                                            @csrf
+                        @else
 
-                                            <div class="grid grid-cols-1 gap-3 md:grid-cols-3">
+                            <div class="mt-6 rounded-2xl bg-[var(--livora-surface)] p-4">
 
-                                                <label class="cursor-pointer">
+                                <p class="text-xs leading-7 text-[var(--livora-stone)]">
+                                    در حال حاضر هیچ درگاه آنلاینی فعال نیست.
+                                </p>
 
-                                                    <input
-                                                        type="radio"
-                                                        name="gateway"
-                                                        value="digipay"
-                                                        x-model="gateway"
-                                                        class="peer sr-only"
-                                                        required
-                                                    >
+                            </div>
 
-                                                    <div class="rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-4 transition peer-checked:border-[var(--livora-ink)] peer-checked:bg-[var(--livora-ink)] peer-checked:text-white">
+                        @endif
 
-                                                        <p class="text-sm font-semibold">
-                                                            DigiPay
-                                                        </p>
+                    </section>
 
-                                                        <p class="mt-1 text-[11px] opacity-60">
-                                                            اقساطی
-                                                        </p>
 
-                                                    </div>
+                    {{-- =================================================
+                         LIVORA INSTALLMENT
+                    ================================================== --}}
 
-                                                </label>
+                    <section
+                        class="overflow-hidden rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-ink)] text-white"
+                    >
 
-                                                <label class="cursor-pointer">
+                        <div class="p-5 sm:p-7">
 
-                                                    <input
-                                                        type="radio"
-                                                        name="gateway"
-                                                        value="snappay"
-                                                        x-model="gateway"
-                                                        class="peer sr-only"
-                                                    >
+                            <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
 
-                                                    <div class="rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-4 transition peer-checked:border-[var(--livora-ink)] peer-checked:bg-[var(--livora-ink)] peer-checked:text-white">
+                                <div>
 
-                                                        <p class="text-sm font-semibold">
-                                                            SnapPay
-                                                        </p>
+                                    <p class="text-[10px] font-medium uppercase tracking-[0.2em] text-white/40">
+                                        LIVORA INSTALLMENT
+                                    </p>
 
-                                                        <p class="mt-1 text-[11px] opacity-60">
-                                                            اقساطی
-                                                        </p>
+                                    <h2 class="mt-3 text-2xl font-semibold">
+                                        خرید اقساطی با چک
+                                    </h2>
 
-                                                    </div>
+                                    <p class="mt-3 max-w-xl text-xs leading-7 text-white/50">
+                                        بخشی از مبلغ را نقد پرداخت کنید و باقی‌مانده را طبق برنامه چک تسویه کنید.
+                                        شرایط این طرح از تنظیمات محصولات سفارش محاسبه می‌شود.
+                                    </p>
 
-                                                </label>
+                                </div>
 
-                                                <label class="cursor-pointer">
 
-                                                    <input
-                                                        type="radio"
-                                                        name="gateway"
-                                                        value="torobpay"
-                                                        x-model="gateway"
-                                                        class="peer sr-only"
-                                                    >
+                                @if($hasInstallmentPlan)
 
-                                                    <div class="rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-4 transition peer-checked:border-[var(--livora-ink)] peer-checked:bg-[var(--livora-ink)] peer-checked:text-white">
+                                    <span class="w-fit rounded-full bg-white/10 px-3 py-1.5 text-[10px] text-white/60">
+                                    طرح آماده است
+                                </span>
 
-                                                        <p class="text-sm font-semibold">
-                                                            TorobPay
-                                                        </p>
+                                @else
 
-                                                        <p class="mt-1 text-[11px] opacity-60">
-                                                            اقساطی
-                                                        </p>
-
-                                                    </div>
-
-                                                </label>
-
-                                            </div>
-
-                                            <button
-                                                type="submit"
-                                                class="w-full rounded-2xl bg-[var(--livora-ink)] px-6 py-4 text-sm font-medium text-white transition hover:bg-[var(--livora-accent)]"
-                                            >
-                                                انتخاب سرویس و ادامه
-                                            </button>
-
-                                        </form>
-
-                                    </div>
+                                    <button
+                                        type="button"
+                                        @click="selectInstallment()"
+                                        class="w-fit rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[10px] text-white/70 transition hover:bg-white/10"
+                                    >
+                                        انتخاب خرید اقساطی
+                                    </button>
 
                                 @endif
 
                             </div>
 
-                        </div>
 
-                        {{-- Internal Livora --}}
-                        @if($installmentAvailable)
+                            {{-- Plan --}}
+                            @if($hasInstallmentPlan)
 
-                            <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-6 sm:p-8">
+                                <div class="mt-8 grid gap-3 sm:grid-cols-3">
 
-                                <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                                    <div class="rounded-3xl border border-white/10 bg-white/[0.06] p-5">
 
-                                    <div>
-
-                                        <p class="text-[11px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
-                                            LIVORA PLAN
+                                        <p class="text-[10px] uppercase tracking-[0.15em] text-white/35">
+                                            CASH
                                         </p>
 
-                                        <h2 class="mt-2 text-xl font-semibold">
-                                            ثبت برنامه اقساط داخلی
-                                        </h2>
+                                        <p class="mt-3 text-2xl font-semibold">
+                                            {{ number_format($cashAmount) }}
+                                        </p>
 
-                                        <p class="mt-2 max-w-2xl text-xs leading-7 text-[var(--livora-stone)]">
-                                            برای محیط تست می‌توان برنامه اقساط داخلی Livora را بدون اتصال به Provider خارجی ثبت کرد.
+                                        <p class="mt-1 text-[10px] text-white/45">
+                                            تومان · {{ $cashPercent }}٪ پیش‌پرداخت
                                         </p>
 
                                     </div>
+
+
+                                    <div class="rounded-3xl border border-white/10 bg-white/[0.06] p-5">
+
+                                        <p class="text-[10px] uppercase tracking-[0.15em] text-white/35">
+                                            CHEQUES
+                                        </p>
+
+                                        <p class="mt-3 text-2xl font-semibold">
+                                            {{ number_format($chequeCount) }}
+                                        </p>
+
+                                        <p class="mt-1 text-[10px] text-white/45">
+                                            فقره چک
+                                        </p>
+
+                                    </div>
+
+
+                                    <div class="rounded-3xl border border-white/10 bg-white/[0.06] p-5">
+
+                                        <p class="text-[10px] uppercase tracking-[0.15em] text-white/35">
+                                            INTERVAL
+                                        </p>
+
+                                        <p class="mt-3 text-2xl font-semibold">
+                                            {{ number_format($intervalMonths) }}
+                                        </p>
+
+                                        <p class="mt-1 text-[10px] text-white/45">
+                                            ماه فاصله سررسید
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+
+                                {{-- Cheques --}}
+                                <div class="mt-4 grid gap-3 sm:grid-cols-2">
+
+                                    @foreach($chequeInstallments as $installment)
+
+                                        <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+
+                                            <div class="flex items-center justify-between gap-3">
+
+                                            <span class="text-[10px] text-white/40">
+                                                چک {{ $installment->sequence - 1 }}
+                                            </span>
+
+                                                <span class="text-[10px] text-white/40">
+                                                سررسید
+                                            </span>
+
+                                            </div>
+
+                                            <div class="mt-3 flex items-center justify-between gap-3">
+
+                                                <strong class="text-sm">
+                                                    {{ number_format((float) $installment->amount) }}
+                                                    تومان
+                                                </strong>
+
+                                                <span class="rounded-full bg-white/10 px-2.5 py-1 text-[9px] text-white/60">
+                                                {{ $installment->due_date
+                                                    ? \Carbon\Carbon::parse($installment->due_date)->format('Y/m/d')
+                                                    : 'بدون تاریخ'
+                                                }}
+                                            </span>
+
+                                            </div>
+
+                                        </div>
+
+                                    @endforeach
+
+                                </div>
+
+
+                                {{-- Continue installment --}}
+                                <div class="mt-6">
 
                                     <form
                                         action="{{ route('checkout.payment.livora-installment', $order) }}"
@@ -723,179 +642,227 @@
 
                                         <button
                                             type="submit"
-                                            class="inline-flex w-full items-center justify-center rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] px-5 py-3.5 text-sm font-medium transition hover:border-[var(--livora-ink)] hover:bg-[var(--livora-surface)] sm:w-auto"
+                                            class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-6 py-4 text-sm font-medium text-[var(--livora-ink)] transition hover:bg-[var(--livora-cream)]"
                                         >
-                                            ثبت برنامه داخلی
+                                        <span>
+                                            ادامه فرآیند خرید اقساطی
+                                        </span>
+
+                                            <span>
+                                            ←
+                                        </span>
                                         </button>
 
                                     </form>
 
                                 </div>
 
-                                @if($hasInternalPlan)
+                            @else
 
-                                    <div class="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm leading-7 text-emerald-800">
-                                        برنامه اقساط داخلی این سفارش قبلاً ثبت شده است.
-                                    </div>
+                                <div class="mt-7 rounded-3xl border border-white/10 bg-white/[0.05] p-5">
 
-                                @endif
+                                    <div class="flex items-start gap-4">
 
-                            </div>
+                                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10">
+                                            ✓
+                                        </div>
 
-                        @endif
+                                        <div>
 
-                    </div>
+                                            <p class="text-sm font-semibold">
+                                                شرایط اقساطی را قبل از ثبت نهایی ببینید.
+                                            </p>
 
-                    {{-- RIGHT SIDEBAR --}}
-                    <aside class="lg:sticky lg:top-8 lg:self-start">
+                                            <p class="mt-2 text-xs leading-7 text-white/45">
+                                                پس از انتخاب خرید اقساطی، سیستم شرایط محصولات سفارش را بررسی
+                                                و درصد پیش‌پرداخت، مبلغ چک‌ها و سررسیدها را ایجاد می‌کند.
+                                            </p>
 
-                        <div class="overflow-hidden rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-ink)] text-white">
-
-                            <div class="p-6 sm:p-7">
-
-                                <p class="text-[11px] uppercase tracking-[0.18em] text-white/45">
-                                    ORDER TOTAL
-                                </p>
-
-                                <p class="mt-3 text-3xl font-semibold tracking-tight">
-                                    {{ number_format($total) }}
-                                    <span class="text-sm font-normal text-white/50">
-                                    تومان
-                                </span>
-                                </p>
-
-                                <div class="my-6 h-px bg-white/10"></div>
-
-                                <div class="space-y-4 text-sm">
-
-                                    <div class="flex items-center justify-between gap-4">
-
-                                    <span class="text-white/55">
-                                        جمع محصولات
-                                    </span>
-
-                                        <span>
-                                        {{ number_format((float) $order->subtotal) }}
-                                    </span>
-
-                                    </div>
-
-                                    <div class="flex items-center justify-between gap-4">
-
-                                    <span class="text-white/55">
-                                        هزینه ارسال
-                                    </span>
-
-                                        <span>
-                                        {{ number_format((float) $order->shipping_cost) }}
-                                    </span>
-
-                                    </div>
-
-                                    <div class="flex items-center justify-between gap-4">
-
-                                    <span class="text-white/55">
-                                        تخفیف
-                                    </span>
-
-                                        <span>
-                                        {{ number_format((float) $order->discount) }}
-                                    </span>
+                                        </div>
 
                                     </div>
 
                                 </div>
 
-                            </div>
 
-                            @if($installmentAvailable)
+                                <form
+                                    action="{{ route('checkout.payment.livora-installment', $order) }}"
+                                    method="POST"
+                                    class="mt-5"
+                                >
 
-                                <div class="border-t border-white/10 bg-white/5 p-6 sm:p-7">
+                                    @csrf
 
-                                    <p class="text-[11px] uppercase tracking-[0.18em] text-white/45">
-                                        INSTALLMENT
-                                    </p>
+                                    <button
+                                        type="submit"
+                                        class="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-6 py-4 text-sm font-medium text-white transition hover:bg-white/15"
+                                    >
+                                        محاسبه و ایجاد طرح اقساطی
+                                    </button>
 
-                                    <p class="mt-2 text-sm text-white/70">
-                                        {{ $cashPercent }}٪ پیش‌پرداخت
-                                    </p>
-
-                                    <p class="mt-3 text-xl font-semibold">
-                                        {{ number_format($cashAmount) }}
-                                        تومان
-                                    </p>
-
-                                    <p class="mt-2 text-xs leading-6 text-white/45">
-                                        سپس
-                                        {{ number_format($chequeCount) }}
-                                        فقره چک
-                                        @if($intervalMonths)
-                                            با فاصله {{ number_format($intervalMonths) }} ماه
-                                        @endif
-                                    </p>
-
-                                </div>
+                                </form>
 
                             @endif
 
                         </div>
 
-                        {{-- Trust / Info --}}
-                        <div class="mt-4 rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-5">
+                    </section>
 
-                            <div class="space-y-4">
+                </div>
 
-                                <div class="flex gap-3">
 
-                                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--livora-surface)] text-xs font-semibold">
-                                    01
-                                </span>
+                {{-- =================================================
+                     ORDER SUMMARY
+                ================================================== --}}
 
-                                    <div>
-                                        <p class="text-xs font-semibold">
-                                            مبلغ نهایی سفارش
+                <aside class="lg:sticky lg:top-24 lg:self-start">
+
+                    <div class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-5 sm:p-7">
+
+                        <div class="flex items-center justify-between gap-4">
+
+                            <div>
+
+                                <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                                    ORDER SUMMARY
+                                </p>
+
+                                <h2 class="mt-2 text-lg font-semibold">
+                                    خلاصه سفارش
+                                </h2>
+
+                            </div>
+
+                            <span class="rounded-full bg-[var(--livora-surface)] px-3 py-1.5 text-[10px] text-[var(--livora-stone)]">
+                            {{ $order->order_number }}
+                        </span>
+
+                        </div>
+
+
+                        {{-- Items --}}
+                        <div class="mt-7 space-y-3">
+
+                            @foreach($order->items as $item)
+
+                                @php
+                                    $itemImage =
+                                        $item->product?->images?->first()?->url;
+                                @endphp
+
+                                <div class="flex gap-3 rounded-2xl bg-[var(--livora-surface)] p-3">
+
+                                    <div class="h-16 w-14 shrink-0 overflow-hidden rounded-xl bg-[var(--livora-white)]">
+
+                                        @if($itemImage)
+
+                                            <img
+                                                src="{{ $itemImage }}"
+                                                alt="{{ $item->product_name }}"
+                                                class="h-full w-full object-cover"
+                                            >
+
+                                        @else
+
+                                            <div class="flex h-full w-full items-center justify-center text-[8px] tracking-widest text-[var(--livora-stone)]">
+                                                LV
+                                            </div>
+
+                                        @endif
+
+                                    </div>
+
+
+                                    <div class="min-w-0 flex-1">
+
+                                        <p class="truncate text-xs font-semibold">
+                                            {{ $item->product_name }}
                                         </p>
 
-                                        <p class="mt-1 text-[11px] leading-6 text-[var(--livora-stone)]">
-                                            مبلغ پرداختی از اطلاعات داخلی سفارش محاسبه می‌شود.
+                                        <p class="mt-1 text-[10px] text-[var(--livora-stone)]">
+                                            تعداد:
+                                            {{ number_format($item->quantity) }}
                                         </p>
+
+                                        <p class="mt-2 text-[11px] font-semibold">
+                                            {{ number_format((float) $item->total) }}
+                                            تومان
+                                        </p>
+
                                     </div>
 
                                 </div>
 
-                                <div class="flex gap-3">
+                            @endforeach
 
-                                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--livora-surface)] text-xs font-semibold">
-                                    02
+                        </div>
+
+
+                        {{-- Total --}}
+                        <div class="mt-6 space-y-3 border-t border-[var(--livora-border)] pt-5">
+
+                            <div class="flex items-center justify-between gap-4 text-xs">
+
+                            <span class="text-[var(--livora-stone)]">
+                                مبلغ سفارش
+                            </span>
+
+                                <span class="font-medium">
+                                {{ number_format((float) $order->subtotal) }}
+                                تومان
+                            </span>
+
+                            </div>
+
+
+                            <div class="flex items-center justify-between gap-4 text-xs">
+
+                            <span class="text-[var(--livora-stone)]">
+                                ارسال
+                            </span>
+
+                                <span class="font-medium">
+                                {{ number_format((float) $order->shipping_cost) }}
+                                تومان
+                            </span>
+
+                            </div>
+
+
+                            @if((float) $order->discount > 0)
+
+                                <div class="flex items-center justify-between gap-4 text-xs">
+
+                                <span class="text-[var(--livora-stone)]">
+                                    تخفیف
                                 </span>
 
-                                    <div>
-                                        <p class="text-xs font-semibold">
-                                            شرایط اقساط
-                                        </p>
-
-                                        <p class="mt-1 text-[11px] leading-6 text-[var(--livora-stone)]">
-                                            شرایط اقساط از تنظیمات ثبت‌شده برای محصولات سفارش گرفته می‌شود.
-                                        </p>
-                                    </div>
+                                    <span class="font-medium text-emerald-600">
+                                    -
+                                    {{ number_format((float) $order->discount) }}
+                                    تومان
+                                </span>
 
                                 </div>
 
-                                <div class="flex gap-3">
+                            @endif
 
-                                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--livora-surface)] text-xs font-semibold">
-                                    03
-                                </span>
 
-                                    <div>
-                                        <p class="text-xs font-semibold">
-                                            امنیت پرداخت
-                                        </p>
+                            <div class="flex items-end justify-between gap-4 border-t border-[var(--livora-border)] pt-4">
 
-                                        <p class="mt-1 text-[11px] leading-6 text-[var(--livora-stone)]">
-                                            درگاه نهایی از طریق سرویس پرداخت انتخاب‌شده مدیریت می‌شود.
-                                        </p>
-                                    </div>
+                            <span class="text-sm font-semibold">
+                                مبلغ نهایی
+                            </span>
+
+                                <div class="text-left">
+
+                                    <p class="text-2xl font-bold tracking-tight">
+                                        {{ number_format($orderTotal) }}
+                                    </p>
+
+                                    <p class="mt-1 text-[10px] text-[var(--livora-stone)]">
+                                        تومان
+                                    </p>
 
                                 </div>
 
@@ -903,12 +870,68 @@
 
                         </div>
 
-                    </aside>
 
-                </div>
+                        {{-- Installment Summary --}}
+                        @if($hasInstallmentPlan)
 
-            </x-layout.container>
-        </section>
+                            <div class="mt-5 rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-surface)] p-4">
+
+                                <p class="text-[10px] uppercase tracking-[0.16em] text-[var(--livora-accent)]">
+                                    INSTALLMENT SUMMARY
+                                </p>
+
+                                <div class="mt-4 flex items-center justify-between gap-3">
+
+                                <span class="text-xs text-[var(--livora-stone)]">
+                                    امروز
+                                </span>
+
+                                    <strong class="text-sm">
+                                        {{ number_format($cashAmount) }}
+                                        تومان
+                                    </strong>
+
+                                </div>
+
+                                <div class="mt-3 flex items-center justify-between gap-3">
+
+                                <span class="text-xs text-[var(--livora-stone)]">
+                                    باقی‌مانده
+                                </span>
+
+                                    <strong class="text-sm">
+                                        {{ number_format($deferredAmount) }}
+                                        تومان
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        @endif
+
+
+                        {{-- Security --}}
+                        <div class="mt-5 flex items-start gap-3 rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-4">
+
+                        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[var(--livora-surface)] text-[10px]">
+                            ✓
+                        </span>
+
+                            <p class="text-[10px] leading-6 text-[var(--livora-stone)]">
+                                مبلغ پرداخت از اطلاعات ثبت‌شده سفارش محاسبه می‌شود و
+                                مبلغ ارسالی از سمت مرورگر مبنای پرداخت نیست.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </aside>
+
+            </div>
+
+        </x-layout.container>
 
     </div>
 

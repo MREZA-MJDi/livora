@@ -68,43 +68,26 @@
     @endif
 
     <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "CollectionPage",
-        "name": @json($category->name),
-        "url": @json(route('categories.show', $category->slug)),
-        "description": @json(
-            $category->meta_description
-            ?? ('محصولات ' . $category->name . ' در LIVORA')
-        )
-        }
+{
+    "@@context": "https://schema.org",
+    "@@type": "WebSite",
+    "name": "LIVORA",
+    "url": @json(url('/')),
+    "potentialAction": {
+        "@@type": "SearchAction",
+        "target": @json(url('/shop') . '?search={search_term_string}'),
+        "query-input": "required name=search_term_string"
+    }
+}
 </script>
 
     <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-            {
-                "@type": "ListItem",
-                "position": 1,
-                "name": "خانه",
-                "item": @json(route('home'))
-        },
-        {
-            "@type": "ListItem",
-            "position": 2,
-            "name": "دسته‌بندی‌ها",
-            "item": @json(route('categories.index'))
-        },
-        {
-            "@type": "ListItem",
-            "position": 3,
-            "name": @json($category->name),
-                "item": @json(route('categories.show', $category->slug))
+{
+    "@@context": "https://schema.org",
+    "@@type": "Organization",
+    "name": "LIVORA",
+    "url": @json(url('/'))
         }
-    ]
-}
 </script>
 
 @endpush
