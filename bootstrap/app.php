@@ -1,10 +1,13 @@
 <?php
 
+use App\Http\Middleware\AdminMiddleware;
+use App\Http\Middleware\CustomerMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+
 
 return Application::configure(
     basePath: dirname(__DIR__)
@@ -18,7 +21,17 @@ return Application::configure(
     ->withMiddleware(function (
         Middleware $middleware
     ) {
-        //
+
+        /*
+        |--------------------------------------------------------------------------
+        | Middleware Aliases
+        |--------------------------------------------------------------------------
+        */
+
+        $middleware->alias([
+            'admin' => AdminMiddleware::class,
+            'customer' => CustomerMiddleware::class,
+        ]);
     })
 
     ->withExceptions(function (
@@ -27,7 +40,7 @@ return Application::configure(
 
         /*
         |--------------------------------------------------------------------------
-        | JSON / AJAX Errors
+        | JSON / AJAX
         |--------------------------------------------------------------------------
         */
 
@@ -41,7 +54,6 @@ return Application::configure(
 
             return response()->json([
                 'success' => false,
-
                 'message' => app()->isProduction()
                     ? 'در پردازش درخواست مشکلی پیش آمد. لطفاً دوباره تلاش کنید.'
                     : $e->getMessage(),
@@ -63,34 +75,23 @@ return Application::configure(
                 return null;
             }
 
-            return match ($e->getStatusCode()) {
-
-                403 => response()->view(
-                    'errors.403',
-                    [],
-                    403
-                ),
-
-                404 => response()->view(
-                    'errors.404',
-                    [],
-                    404
-                ),
-
-                419 => response()->view(
-                    'errors.419',
-                    [],
-                    419
-                ),
-
-                422 => response()->view(
-                    'errors.422',
-                    [],
-                    422
-                ),
-
+            $view = match ($e->getStatusCode()) {
+                403 => 'errors.403',
+                404 => 'errors.404',
+                419 => 'errors.419',
+                422 => 'errors.422',
                 default => null,
             };
+
+            if ($view === null) {
+                return null;
+            }
+
+            return response()->view(
+                $view,
+                [],
+                $e->getStatusCode()
+            );
         });
 
 
@@ -115,12 +116,9 @@ return Application::configure(
 
             return response()->view(
                 'errors.500',
-                [
-                    'exception' => null,
-                ],
+                [],
                 500
             );
         });
-
     })
     ->create();

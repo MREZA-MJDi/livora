@@ -13,6 +13,12 @@ class ShopController extends Controller
     {
         $filters = $request->validated();
 
+        /*
+        |--------------------------------------------------------------------------
+        | Product Query
+        |--------------------------------------------------------------------------
+        */
+
         $query = Product::query()
             ->with([
                 'category',
@@ -20,7 +26,13 @@ class ShopController extends Controller
             ])
             ->active();
 
-        if (! empty($filters['category'])) {
+        /*
+        |--------------------------------------------------------------------------
+        | Category Filter - SLUG BASED
+        |--------------------------------------------------------------------------
+        */
+
+        if (!empty($filters['category'])) {
             $query->whereHas('category', function ($categoryQuery) use ($filters) {
                 $categoryQuery
                     ->where('slug', $filters['category'])
@@ -28,7 +40,13 @@ class ShopController extends Controller
             });
         }
 
-        if (! empty($filters['search'])) {
+        /*
+        |--------------------------------------------------------------------------
+        | Search
+        |--------------------------------------------------------------------------
+        */
+
+        if (!empty($filters['search'])) {
             $search = trim($filters['search']);
 
             $query->where(function ($productQuery) use ($search) {
@@ -39,6 +57,12 @@ class ShopController extends Controller
                     ->orWhere('description', 'like', "%{$search}%");
             });
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Minimum Price
+        |--------------------------------------------------------------------------
+        */
 
         if (
             isset($filters['min_price']) &&
@@ -51,6 +75,12 @@ class ShopController extends Controller
             );
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | Maximum Price
+        |--------------------------------------------------------------------------
+        */
+
         if (
             isset($filters['max_price']) &&
             $filters['max_price'] !== null
@@ -62,21 +92,52 @@ class ShopController extends Controller
             );
         }
 
-        if (! empty($filters['in_stock'])) {
+        /*
+        |--------------------------------------------------------------------------
+        | Stock Filter
+        |--------------------------------------------------------------------------
+        */
+
+        if (!empty($filters['in_stock'])) {
             $query->inStock();
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | Sorting
+        |--------------------------------------------------------------------------
+        */
+
         match ($filters['sort'] ?? 'newest') {
+
             'price_asc' => $query->orderBy('price'),
+
             'price_desc' => $query->orderByDesc('price'),
+
             'name_asc' => $query->orderBy('name'),
-            'popular' => $query->orderByDesc('is_featured')->latest(),
+
+            'popular' => $query
+                ->orderByDesc('is_featured')
+                ->latest(),
+
             default => $query->latest(),
         };
+
+        /*
+        |--------------------------------------------------------------------------
+        | Pagination
+        |--------------------------------------------------------------------------
+        */
 
         $products = $query
             ->paginate(12)
             ->withQueryString();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Categories
+        |--------------------------------------------------------------------------
+        */
 
         $categories = Category::query()
             ->active()
@@ -85,6 +146,12 @@ class ShopController extends Controller
             ])
             ->orderBy('sort_order')
             ->get();
+
+        /*
+        |--------------------------------------------------------------------------
+        | View
+        |--------------------------------------------------------------------------
+        */
 
         return view('shop.index', [
             'products' => $products,

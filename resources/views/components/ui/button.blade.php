@@ -8,37 +8,107 @@
 ])
 
 @php
+
+    /*
+    |--------------------------------------------------------------------------
+    | Button Variants
+    |--------------------------------------------------------------------------
+    */
+
     $variants = [
+
         'primary' => [
-            'base' => 'bg-[var(--livora-ink)] text-white border-[var(--livora-ink)] hover:bg-[var(--livora-accent)] hover:border-[var(--livora-accent)]',
+            'base' => '
+                !bg-[var(--livora-ink)]
+                !text-white
+                !border-[var(--livora-ink)]
+                hover:!bg-[var(--livora-accent)]
+                hover:!text-white
+                hover:!border-[var(--livora-accent)]
+            ',
+            'hover' => 'hover:-translate-y-0.5 hover:shadow-md',
         ],
 
         'secondary' => [
-            'base' => 'bg-[var(--livora-white)] text-[var(--livora-ink)] border-[var(--livora-border)] hover:border-[var(--livora-ink)] hover:bg-[var(--livora-surface)]',
+            'base' => '
+                !bg-[var(--livora-white)]
+                !text-[var(--livora-ink)]
+                !border-[var(--livora-border)]
+                hover:!bg-[var(--livora-surface)]
+                hover:!text-[var(--livora-ink)]
+                hover:!border-[var(--livora-ink)]
+            ',
+            'hover' => 'hover:-translate-y-0.5 hover:shadow-sm',
         ],
 
         'ghost' => [
-            'base' => 'bg-transparent text-[var(--livora-ink)] border-transparent hover:bg-[var(--livora-surface)]',
+            'base' => '
+                !bg-transparent
+                !text-[var(--livora-ink)]
+                !border-transparent
+                hover:!bg-[var(--livora-surface)]
+                hover:!text-[var(--livora-ink)]
+            ',
+            'hover' => 'hover:-translate-y-0.5',
         ],
 
         'dark' => [
-            'base' => 'bg-black text-white border-black hover:bg-[var(--livora-accent)] hover:border-[var(--livora-accent)]',
+            'base' => '
+                !bg-black
+                !text-white
+                !border-black
+                hover:!bg-[var(--livora-accent)]
+                hover:!text-white
+                hover:!border-[var(--livora-accent)]
+            ',
+            'hover' => 'hover:-translate-y-0.5 hover:shadow-md',
         ],
 
         'danger' => [
-            'base' => 'bg-red-600 text-white border-red-600 hover:bg-red-700 hover:border-red-700',
+            'base' => '
+                !bg-red-600
+                !text-white
+                !border-red-600
+                hover:!bg-red-700
+                hover:!text-white
+                hover:!border-red-700
+            ',
+            'hover' => 'hover:-translate-y-0.5 hover:shadow-md',
         ],
 
         'success' => [
-            'base' => 'bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700 hover:border-emerald-700',
+            'base' => '
+                !bg-emerald-600
+                !text-white
+                !border-emerald-600
+                hover:!bg-emerald-700
+                hover:!text-white
+                hover:!border-emerald-700
+            ',
+            'hover' => 'hover:-translate-y-0.5 hover:shadow-md',
         ],
 
         'link' => [
-            'base' => 'border-transparent bg-transparent text-[var(--livora-accent)] hover:text-[var(--livora-ink)]',
+            'base' => '
+                !border-transparent
+                !bg-transparent
+                !text-[var(--livora-accent)]
+                hover:!text-[var(--livora-ink)]
+            ',
+            'hover' => 'hover:underline underline-offset-4',
         ],
+
     ];
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Button Sizes
+    |--------------------------------------------------------------------------
+    */
+
     $sizes = [
+
         'xs' => [
             'base' => 'min-h-9 rounded-xl px-3 text-[11px]',
             'icon' => 'h-4 w-4',
@@ -63,31 +133,86 @@
             'base' => 'min-h-16 rounded-3xl px-8 text-base',
             'icon' => 'h-5 w-5',
         ],
+
     ];
 
-    $selectedVariant =
-        $variants[$variant]
-        ?? $variants['primary'];
 
-    $selectedSize =
-        $sizes[$size]
-        ?? $sizes['md'];
+    /*
+    |--------------------------------------------------------------------------
+    | Resolve Variant / Size
+    |--------------------------------------------------------------------------
+    */
 
-    $classes =
-        'inline-flex w-fit items-center justify-center gap-2 border font-medium ' .
-        'transition-all duration-300 ease-out ' .
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--livora-accent)] focus-visible:ring-offset-2 ' .
-        'disabled:cursor-not-allowed disabled:opacity-40 ' .
-        $selectedVariant['base'] . ' ' .
-        $selectedSize['base'];
+    $selectedVariant = $variants[$variant] ?? $variants['primary'];
+
+    $selectedSize = $sizes[$size] ?? $sizes['md'];
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Base Classes
+    |--------------------------------------------------------------------------
+    */
+
+    $classes = implode(' ', [
+
+        // Layout
+        'inline-flex',
+        'w-fit',
+        'shrink-0',
+        'items-center',
+        'justify-center',
+        'gap-2',
+
+        // Typography
+        'font-medium',
+        'leading-none',
+        'whitespace-nowrap',
+        'select-none',
+
+        // Border
+        'border',
+
+        // Motion
+        'transition-all',
+        'duration-300',
+        'ease-out',
+        'transform-gpu',
+        'motion-reduce:transition-none',
+        'motion-reduce:transform-none',
+
+        // Interaction
+        'focus:outline-none',
+        'focus-visible:ring-2',
+        'focus-visible:ring-[var(--livora-accent)]',
+        'focus-visible:ring-offset-2',
+
+        // Active
+        'active:translate-y-0',
+        'active:scale-[0.98]',
+
+        // Disabled
+        'disabled:cursor-not-allowed',
+        'disabled:pointer-events-none',
+        'disabled:opacity-50',
+
+        // Variant
+        $selectedVariant['base'],
+        $selectedVariant['hover'],
+
+        // Size
+        $selectedSize['base'],
+    ]);
+
 @endphp
+
 
 @if($href && ! $disabled)
 
     <a
         href="{{ $href }}"
         {{ $attributes->merge([
-            'class' => $classes
+            'class' => $classes,
         ]) }}
     >
 
@@ -99,7 +224,7 @@
                 viewBox="0 0 24 24"
                 stroke-width="1.8"
                 stroke="currentColor"
-                class="{{ $selectedSize['icon'] }} animate-spin"
+                class="{{ $selectedSize['icon'] }} shrink-0 animate-spin"
                 aria-hidden="true"
             >
                 <path
@@ -111,7 +236,10 @@
 
         @endif
 
-        {{ $slot }}
+
+        <span class="inline-flex items-center justify-center">
+            {{ $slot }}
+        </span>
 
     </a>
 
@@ -119,12 +247,12 @@
 
     <button
         type="{{ $type }}"
-        @disabled($disabled)
+        @disabled($disabled || $loading)
         @if($loading)
         aria-busy="true"
         @endif
         {{ $attributes->merge([
-            'class' => $classes
+            'class' => $classes,
         ]) }}
     >
 
@@ -136,7 +264,7 @@
                 viewBox="0 0 24 24"
                 stroke-width="1.8"
                 stroke="currentColor"
-                class="{{ $selectedSize['icon'] }} animate-spin"
+                class="{{ $selectedSize['icon'] }} shrink-0 animate-spin"
                 aria-hidden="true"
             >
                 <path
@@ -148,7 +276,10 @@
 
         @endif
 
-        {{ $slot }}
+
+        <span class="inline-flex items-center justify-center">
+            {{ $slot }}
+        </span>
 
     </button>
 

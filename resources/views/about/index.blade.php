@@ -131,11 +131,10 @@
 
                             <a
                                 href="{{ route('shop.index') }}"
-                                class="mt-7 inline-flex items-center rounded-2xl bg-[var(--livora-ink)] px-6 py-4 text-sm font-medium text-white transition hover:bg-[var(--livora-accent)]"
+                                class="mt-7 inline-flex items-center rounded-2xl bg-[var(--livora-ink)] px-6 py-4 text-sm font-medium !text-white transition-colors duration-300 hover:bg-[var(--livora-accent)] hover:!text-white"
                             >
                                 کشف مجموعه LIVORA
                             </a>
-
                         </div>
 
                     </div>

@@ -4,6 +4,7 @@ namespace App\Services\Payments;
 
 use App\Models\Order;
 use App\Models\Payment;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 use Throwable;
@@ -16,18 +17,13 @@ class PaymentService
     }
 
     /**
-     * Start an external installment payment.
+     * Start an external gateway payment.
      *
-     * This method is only responsible for:
+     * IMPORTANT:
+     * External gateway payments are "online" payments.
      *
-     * Order
-     *   ↓
-     * Local Payment
-     *   ↓
-     * External Gateway
-     *
-     * Internal Livora installment plans are handled by
-     * InstallmentPlanService.
+     * Livora internal cheque-based installment plans are handled
+     * separately by InstallmentPlanService.
      */
     public function startInstallmentPayment(
         Order $order,
@@ -37,105 +33,118 @@ class PaymentService
 
         $gateway = $this->normalizeGateway($gateway);
 
-        /*
-         * Resolve gateway first.
-         *
-         * This also guarantees that the requested gateway
-         * is actually supported by our PaymentManager.
-         */
-        $gatewayService = $this->paymentManager->driver($gateway);
+        $gatewayService = $this->paymentManager->driver(
+            $gateway
+        );
 
-        /*
-         * Always use our own order total.
-         *
-         * Never trust an amount from the frontend.
-         */
         $amount = $this->normalizeAmount(
             $order->total
         );
 
+        if ($amount <= 0) {
+            throw new RuntimeException(
+                'مبلغ سفارش معتبر نیست.'
+            );
+        }
+
         /*
-         * Create local payment record before
-         * communicating with the external provider.
-         */
-        $payment = DB::transaction(
-            function () use (
-                $order,
-                $gateway,
-                $amount
+        |--------------------------------------------------------------------------
+        | Create local payment attempt
+        |--------------------------------------------------------------------------
+        */
+
+        $payment = DB::transaction(function () use (
+            $order,
+            $gateway,
+            $amount
+        ) {
+            /*
+             * Lock the order so two parallel requests cannot
+             * create conflicting payment state.
+             */
+            $lockedOrder = Order::query()
+                ->whereKey($order->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if (
+                $lockedOrder->payment_status === 'paid'
             ) {
-                $payment = Payment::create([
-                    'order_id' =>
-                        $order->id,
-
-                    'user_id' =>
-                        $order->user_id,
-
-                    'gateway' =>
-                        $gateway,
-
-                    'amount' =>
-                        $amount,
-
-                    'status' =>
-                        'pending',
-
-                    'metadata' => [
-                        'payment_method' =>
-                            'installment',
-
-                        'order_number' =>
-                            $order->order_number,
-                    ],
-                ]);
-
-                $order->update([
-                    'payment_method' =>
-                        'installment',
-
-                    'payment_provider' =>
-                        $gateway,
-
-                    'payment_status' =>
-                        'pending',
-                ]);
-
-                return $payment;
+                throw new RuntimeException(
+                    'این سفارش قبلاً پرداخت شده است.'
+                );
             }
-        );
+
+            /*
+             * External provider = online.
+             *
+             * Do NOT store "installment" here.
+             * "installment" is reserved for Livora's own
+             * cheque-based installment flow.
+             */
+            $lockedOrder->update([
+                'payment_method' => 'online',
+                'payment_provider' => $gateway,
+                'payment_status' => 'pending',
+            ]);
+
+            return Payment::create([
+                'order_id' => $lockedOrder->id,
+
+                'user_id' => $lockedOrder->user_id,
+
+                'gateway' => $gateway,
+
+                'amount' => $amount,
+
+                'status' => 'pending',
+
+                'metadata' => [
+                    'payment_method' => 'online',
+
+                    'payment_flow' => 'external_gateway',
+
+                    'order_number' =>
+                        $lockedOrder->order_number,
+
+                    'created_at' =>
+                        now()->toISOString(),
+                ],
+            ]);
+        });
+
+        /*
+        |--------------------------------------------------------------------------
+        | Communicate with gateway
+        |--------------------------------------------------------------------------
+        */
 
         try {
             $result = $gatewayService->createPayment(
-                $order,
-                $payment
+                $order->fresh(),
+                $payment->fresh()
             );
 
-            if (! ($result['success'] ?? false)) {
+            if (!($result['success'] ?? false)) {
                 $this->markPaymentAsFailed(
                     $payment,
                     $result['message']
                     ?? 'Payment initialization failed.',
                     [
-                        'gateway' =>
-                            $gateway,
-
-                        'response' =>
-                            $result,
+                        'gateway' => $gateway,
+                        'response' => $result,
                     ]
                 );
 
                 return [
-                    'success' =>
-                        false,
+                    'success' => false,
 
                     'payment' =>
                         $payment->fresh(),
 
-                    'gateway' =>
-                        $gateway,
+                    'gateway' => $gateway,
 
-                    'redirect_url' =>
-                        null,
+                    'redirect_url' => null,
 
                     'message' =>
                         $result['message']
@@ -146,28 +155,60 @@ class PaymentService
                 ];
             }
 
+            $payment = $payment->fresh();
+
             $this->markPaymentAsInitiated(
                 $payment,
                 $result
             );
 
+            $payment = $payment->fresh();
+
+            $redirectUrl =
+                $result['payment_url']
+                ?? null;
+
+            if (
+                blank($redirectUrl)
+            ) {
+                $this->markPaymentAsFailed(
+                    $payment,
+                    'Gateway did not return a valid payment URL.',
+                    [
+                        'gateway' => $gateway,
+                        'response' => $result,
+                    ]
+                );
+
+                return [
+                    'success' => false,
+
+                    'payment' =>
+                        $payment->fresh(),
+
+                    'gateway' => $gateway,
+
+                    'redirect_url' => null,
+
+                    'message' =>
+                        'درگاه پرداخت لینک انتقال معتبری برنگرداند.',
+
+                    'data' =>
+                        $result['data'] ?? [],
+                ];
+            }
+
             return [
-                'success' =>
-                    true,
+                'success' => true,
 
-                'payment' =>
-                    $payment->fresh(),
+                'payment' => $payment,
 
-                'gateway' =>
-                    $gateway,
+                'gateway' => $gateway,
 
-                'redirect_url' =>
-                    $result['payment_url']
-                    ?? null,
+                'redirect_url' => $redirectUrl,
 
                 'message' =>
-                    $result['message']
-                    ?? null,
+                    $result['message'] ?? null,
 
                 'data' =>
                     $result['data'] ?? [],
@@ -177,7 +218,7 @@ class PaymentService
 
             $this->markPaymentAsFailed(
                 $payment,
-                $e->getMessage(),
+                'Gateway communication failed.',
                 [
                     'exception' =>
                         $e::class,
@@ -185,72 +226,71 @@ class PaymentService
             );
 
             return [
-                'success' =>
-                    false,
+                'success' => false,
 
                 'payment' =>
                     $payment->fresh(),
 
-                'gateway' =>
-                    $gateway,
+                'gateway' => $gateway,
 
-                'redirect_url' =>
-                    null,
+                'redirect_url' => null,
 
                 'message' =>
-                    'خطا در اتصال به درگاه پرداخت.',
+                    'خطایی هنگام اتصال به درگاه پرداخت رخ داد. لطفاً دوباره تلاش کنید.',
 
-                'data' =>
-                    [],
+                'data' => [],
             ];
         }
     }
 
     /**
-     * Handle a normalized gateway callback.
+     * Handle normalized external gateway callback.
      */
     public function handleCallback(
         string $gateway,
         array $callbackData
     ): array {
-        $gateway = $this->normalizeGateway($gateway);
-
-        $gatewayService = $this->paymentManager->driver(
+        $gateway = $this->normalizeGateway(
             $gateway
         );
 
-        $payment = $this->findPaymentFromCallback(
-            $gateway,
-            $callbackData
-        );
+        $gatewayService =
+            $this->paymentManager->driver(
+                $gateway
+            );
 
-        if (! $payment) {
+        $payment =
+            $this->findPaymentFromCallback(
+                $gateway,
+                $callbackData
+            );
+
+        if (!$payment) {
             return [
-                'success' =>
-                    false,
+                'success' => false,
 
-                'order_id' =>
-                    null,
+                'order_id' => null,
 
-                'payment_id' =>
-                    null,
+                'payment_id' => null,
+
+                'transaction_id' => null,
 
                 'message' =>
-                    'Payment record could not be identified.',
+                    'رکورد پرداخت مربوط به این درخواست پیدا نشد.',
 
-                'data' =>
-                    $callbackData,
+                'data' => [],
             ];
         }
 
         /*
-         * Idempotency:
-         * Don't verify an already-paid payment again.
-         */
+        |--------------------------------------------------------------------------
+        | Idempotency
+        |--------------------------------------------------------------------------
+        */
+
         if ($payment->isPaid()) {
             return [
-                'success' =>
-                    true,
+                'success' => true,
 
                 'order_id' =>
                     $payment->order_id,
@@ -262,25 +302,21 @@ class PaymentService
                     $payment->transaction_id,
 
                 'message' =>
-                    'Payment was already completed.',
+                    'این پرداخت قبلاً با موفقیت ثبت شده است.',
 
                 'data' => [
-                    'already_paid' =>
-                        true,
+                    'already_paid' => true,
                 ],
             ];
         }
 
         try {
-            /*
-             * Gateway is responsible for translating its own
-             * callback format into our normalized result.
-             */
-            $result = $gatewayService->verifyPayment(
-                $payment
-            );
+            $result =
+                $gatewayService->verifyPayment(
+                    $payment
+                );
 
-            if (! ($result['success'] ?? false)) {
+            if (!($result['success'] ?? false)) {
                 $this->markPaymentAsFailed(
                     $payment,
                     $result['message']
@@ -295,8 +331,7 @@ class PaymentService
                 );
 
                 return [
-                    'success' =>
-                        false,
+                    'success' => false,
 
                     'order_id' =>
                         $payment->order_id,
@@ -304,9 +339,11 @@ class PaymentService
                     'payment_id' =>
                         $payment->id,
 
+                    'transaction_id' =>
+                        $payment->transaction_id,
+
                     'message' =>
-                        $result['message']
-                        ?? 'Payment verification failed.',
+                        'پرداخت تأیید نشد. در صورت کسر وجه، وضعیت تراکنش بررسی خواهد شد.',
 
                     'data' =>
                         $result['data'] ?? [],
@@ -314,8 +351,11 @@ class PaymentService
             }
 
             /*
-             * Never trust a successful gateway response blindly.
-             */
+            |--------------------------------------------------------------------------
+            | Amount validation
+            |--------------------------------------------------------------------------
+            */
+
             $this->validateVerifiedAmount(
                 $payment,
                 $result
@@ -338,8 +378,7 @@ class PaymentService
                 $payment->fresh();
 
             return [
-                'success' =>
-                    true,
+                'success' => true,
 
                 'order_id' =>
                     $freshPayment->order_id,
@@ -351,18 +390,33 @@ class PaymentService
                     $freshPayment->transaction_id,
 
                 'message' =>
-                    $result['message']
-                    ?? 'Payment verified successfully.',
+                    'پرداخت با موفقیت تأیید شد.',
 
                 'data' =>
                     $result['data'] ?? [],
             ];
-        } catch (Throwable $e) {
+        } catch (RuntimeException $e) {
             report($e);
 
+            /*
+             * Important:
+             * If verification reached a business/security
+             * mismatch, payment must not be marked as paid.
+             */
+            $this->markPaymentAsFailed(
+                $payment,
+                $e->getMessage(),
+                [
+                    'callback' =>
+                        $callbackData,
+
+                    'verification_error' =>
+                        $e::class,
+                ]
+            );
+
             return [
-                'success' =>
-                    false,
+                'success' => false,
 
                 'order_id' =>
                     $payment->order_id,
@@ -370,11 +424,33 @@ class PaymentService
                 'payment_id' =>
                     $payment->id,
 
-                'message' =>
-                    'خطا در تأیید پرداخت.',
+                'transaction_id' =>
+                    $payment->transaction_id,
 
-                'data' =>
-                    [],
+                'message' =>
+                    'اطلاعات پرداخت با سفارش مطابقت ندارد.',
+
+                'data' => [],
+            ];
+        } catch (Throwable $e) {
+            report($e);
+
+            return [
+                'success' => false,
+
+                'order_id' =>
+                    $payment->order_id,
+
+                'payment_id' =>
+                    $payment->id,
+
+                'transaction_id' =>
+                    $payment->transaction_id,
+
+                'message' =>
+                    'خطایی هنگام تأیید پرداخت رخ داد.',
+
+                'data' => [],
             ];
         }
     }
@@ -387,11 +463,9 @@ class PaymentService
     ): array {
         if ($payment->isPaid()) {
             return [
-                'success' =>
-                    true,
+                'success' => true,
 
-                'payment' =>
-                    $payment,
+                'payment' => $payment,
 
                 'order' =>
                     $payment->order,
@@ -401,9 +475,10 @@ class PaymentService
             ];
         }
 
-        $gateway = $this->normalizeGateway(
-            $payment->gateway
-        );
+        $gateway =
+            $this->normalizeGateway(
+                $payment->gateway
+            );
 
         try {
             $gatewayService =
@@ -416,7 +491,7 @@ class PaymentService
                     $payment
                 );
 
-            if (! ($result['success'] ?? false)) {
+            if (!($result['success'] ?? false)) {
                 $this->markPaymentAsFailed(
                     $payment,
                     $result['message']
@@ -428,8 +503,7 @@ class PaymentService
                 );
 
                 return [
-                    'success' =>
-                        false,
+                    'success' => false,
 
                     'payment' =>
                         $payment->fresh(),
@@ -459,8 +533,7 @@ class PaymentService
             );
 
             return [
-                'success' =>
-                    true,
+                'success' => true,
 
                 'payment' =>
                     $payment->fresh(),
@@ -472,12 +545,20 @@ class PaymentService
                     $result['message']
                     ?? 'Payment verified successfully.',
             ];
-        } catch (Throwable $e) {
+        } catch (RuntimeException $e) {
             report($e);
 
+            $this->markPaymentAsFailed(
+                $payment,
+                $e->getMessage(),
+                [
+                    'verification_error' =>
+                        $e::class,
+                ]
+            );
+
             return [
-                'success' =>
-                    false,
+                'success' => false,
 
                 'payment' =>
                     $payment->fresh(),
@@ -486,13 +567,28 @@ class PaymentService
                     $payment->order?->fresh(),
 
                 'message' =>
-                    'خطا در تأیید پرداخت.',
+                    'اطلاعات پرداخت معتبر نیست.',
+            ];
+        } catch (Throwable $e) {
+            report($e);
+
+            return [
+                'success' => false,
+
+                'payment' =>
+                    $payment->fresh(),
+
+                'order' =>
+                    $payment->order?->fresh(),
+
+                'message' =>
+                    'خطایی در تأیید پرداخت رخ داد.',
             ];
         }
     }
 
     /**
-     * Get payment status from the gateway.
+     * Get payment status from gateway.
      */
     public function getStatus(
         Payment $payment
@@ -515,17 +611,14 @@ class PaymentService
             report($e);
 
             return [
-                'success' =>
-                    false,
+                'success' => false,
 
-                'status' =>
-                    'unknown',
+                'status' => 'unknown',
 
                 'message' =>
-                    'Unable to fetch payment status.',
+                    'امکان دریافت وضعیت پرداخت وجود ندارد.',
 
-                'data' =>
-                    [],
+                'data' => [],
             ];
         }
     }
@@ -538,11 +631,21 @@ class PaymentService
     ): array {
         if ($payment->isPaid()) {
             return [
-                'success' =>
-                    false,
+                'success' => false,
 
                 'message' =>
-                    'Paid payments cannot be cancelled.',
+                    'پرداخت موفق را نمی‌توان لغو کرد.',
+            ];
+        }
+
+        if (
+            $payment->status === 'cancelled'
+        ) {
+            return [
+                'success' => true,
+
+                'message' =>
+                    'این پرداخت قبلاً لغو شده است.',
             ];
         }
 
@@ -563,19 +666,47 @@ class PaymentService
                 );
 
             if ($result['success'] ?? false) {
-                $payment->update([
-                    'status' =>
-                        'cancelled',
+                DB::transaction(
+                    function () use (
+                        $payment,
+                        $result
+                    ) {
+                        $lockedPayment =
+                            Payment::query()
+                                ->whereKey(
+                                    $payment->id
+                                )
+                                ->lockForUpdate()
+                                ->firstOrFail();
 
-                    'metadata' =>
-                        array_merge(
-                            $payment->metadata ?? [],
-                            [
-                                'cancel_response' =>
-                                    $result,
-                            ]
-                        ),
-                ]);
+                        if (
+                            $lockedPayment->status === 'paid'
+                        ) {
+                            return;
+                        }
+
+                        $lockedPayment->update([
+                            'status' =>
+                                'cancelled',
+
+                            'metadata' =>
+                                array_merge(
+                                    $lockedPayment->metadata ?? [],
+                                    [
+                                        'cancel_response' =>
+                                            $result,
+
+                                        'cancelled_at' =>
+                                            now()->toISOString(),
+                                    ]
+                                ),
+                        ]);
+
+                        $this->syncOrderPaymentStatus(
+                            $lockedPayment->order
+                        );
+                    }
+                );
             }
 
             return $result;
@@ -583,14 +714,12 @@ class PaymentService
             report($e);
 
             return [
-                'success' =>
-                    false,
+                'success' => false,
 
                 'message' =>
-                    'Payment cancellation failed.',
+                    'لغو پرداخت انجام نشد.',
 
-                'data' =>
-                    [],
+                'data' => [],
             ];
         }
     }
@@ -603,11 +732,10 @@ class PaymentService
     ): array {
         if (! $payment->isPaid()) {
             return [
-                'success' =>
-                    false,
+                'success' => false,
 
                 'message' =>
-                    'Only paid payments can be refunded.',
+                    'فقط پرداخت موفق قابل استرداد است.',
             ];
         }
 
@@ -633,29 +761,40 @@ class PaymentService
                         $payment,
                         $result
                     ) {
-                        $payment->update([
+                        $lockedPayment =
+                            Payment::query()
+                                ->whereKey(
+                                    $payment->id
+                                )
+                                ->lockForUpdate()
+                                ->firstOrFail();
+
+                        if (
+                            $lockedPayment->status !== 'paid'
+                        ) {
+                            return;
+                        }
+
+                        $lockedPayment->update([
                             'status' =>
                                 'refunded',
 
                             'metadata' =>
                                 array_merge(
-                                    $payment->metadata ?? [],
+                                    $lockedPayment->metadata ?? [],
                                     [
                                         'refund_response' =>
                                             $result,
+
+                                        'refunded_at' =>
+                                            now()->toISOString(),
                                     ]
                                 ),
                         ]);
 
-                        $order =
-                            $payment->order;
-
-                        if ($order) {
-                            $order->update([
-                                'payment_status' =>
-                                    'refunded',
-                            ]);
-                        }
+                        $this->syncOrderPaymentStatus(
+                            $lockedPayment->order
+                        );
                     }
                 );
             }
@@ -665,14 +804,12 @@ class PaymentService
             report($e);
 
             return [
-                'success' =>
-                    false,
+                'success' => false,
 
                 'message' =>
-                    'Payment refund failed.',
+                    'استرداد وجه انجام نشد.',
 
-                'data' =>
-                    [],
+                'data' => [],
             ];
         }
     }
@@ -684,27 +821,54 @@ class PaymentService
         Payment $payment,
         array $result
     ): void {
-        $payment->update([
-            'status' =>
-                'initiated',
+        DB::transaction(
+            function () use (
+                $payment,
+                $result
+            ) {
+                $lockedPayment =
+                    Payment::query()
+                        ->whereKey(
+                            $payment->id
+                        )
+                        ->lockForUpdate()
+                        ->firstOrFail();
 
-            'authority' =>
-                $result['authority']
-                ?? null,
+                /*
+                 * Never change a paid payment back to initiated.
+                 */
+                if (
+                    $lockedPayment->status === 'paid'
+                ) {
+                    return;
+                }
 
-            'transaction_id' =>
-                $result['transaction_id']
-                ?? null,
+                $lockedPayment->update([
+                    'status' =>
+                        'initiated',
 
-            'metadata' =>
-                array_merge(
-                    $payment->metadata ?? [],
-                    [
-                        'create_response' =>
-                            $result,
-                    ]
-                ),
-        ]);
+                    'authority' =>
+                        $result['authority']
+                        ?? $lockedPayment->authority,
+
+                    'transaction_id' =>
+                        $result['transaction_id']
+                        ?? $lockedPayment->transaction_id,
+
+                    'metadata' =>
+                        array_merge(
+                            $lockedPayment->metadata ?? [],
+                            [
+                                'create_response' =>
+                                    $result,
+
+                                'initiated_at' =>
+                                    now()->toISOString(),
+                            ]
+                        ),
+                ]);
+            }
+        );
     }
 
     /**
@@ -723,15 +887,38 @@ class PaymentService
             ) {
                 $lockedPayment =
                     Payment::query()
-                        ->whereKey($payment->id)
+                        ->whereKey(
+                            $payment->id
+                        )
                         ->lockForUpdate()
                         ->firstOrFail();
 
                 /*
                  * Idempotency.
                  */
-                if ($lockedPayment->status === 'paid') {
+                if (
+                    $lockedPayment->status === 'paid'
+                ) {
                     return;
+                }
+
+                /*
+                 * A refunded/cancelled payment must not
+                 * magically become paid without a new attempt.
+                 */
+                if (
+                    in_array(
+                        $lockedPayment->status,
+                        [
+                            'cancelled',
+                            'refunded',
+                        ],
+                        true
+                    )
+                ) {
+                    throw new RuntimeException(
+                        'این تلاش پرداخت دیگر قابل تأیید نیست.'
+                    );
                 }
 
                 $lockedPayment->update([
@@ -748,7 +935,11 @@ class PaymentService
                     'metadata' =>
                         array_merge(
                             $lockedPayment->metadata ?? [],
-                            $extraMetadata
+                            $extraMetadata,
+                            [
+                                'paid_at' =>
+                                    now()->toISOString(),
+                            ]
                         ),
                 ]);
 
@@ -757,88 +948,185 @@ class PaymentService
 
                 if (! $order) {
                     throw new RuntimeException(
-                        'Payment order was not found.'
+                        'سفارش مربوط به پرداخت پیدا نشد.'
                     );
                 }
 
+                /*
+                 * External gateways represent an online payment.
+                 */
                 $order->update([
-                    'payment_status' =>
-                        'paid',
+                    'payment_status' => 'paid',
+
+                    'payment_method' => 'online',
+
+                    'payment_provider' =>
+                        $lockedPayment->gateway,
                 ]);
             }
         );
     }
 
     /**
-     * Mark payment as failed.
+     * Mark payment as failed and synchronize order state.
      */
     protected function markPaymentAsFailed(
         Payment $payment,
         ?string $message = null,
         array $data = []
     ): void {
-        $payment->update([
-            'status' =>
-                'failed',
+        DB::transaction(
+            function () use (
+                $payment,
+                $message,
+                $data
+            ) {
+                $lockedPayment =
+                    Payment::query()
+                        ->whereKey(
+                            $payment->id
+                        )
+                        ->lockForUpdate()
+                        ->first();
 
-            'metadata' =>
-                array_merge(
-                    $payment->metadata ?? [],
-                    [
-                        'failure_message' =>
-                            $message,
+                if (! $lockedPayment) {
+                    return;
+                }
 
-                        'failure_response' =>
-                            $data,
-                    ]
-                ),
-        ]);
+                /*
+                 * Do not overwrite a successful payment.
+                 */
+                if (
+                    $lockedPayment->status === 'paid'
+                ) {
+                    return;
+                }
 
-        $order =
-            $payment->order;
+                /*
+                 * A refunded payment stays refunded.
+                 */
+                if (
+                    $lockedPayment->status === 'refunded'
+                ) {
+                    return;
+                }
 
+                $lockedPayment->update([
+                    'status' =>
+                        'failed',
+
+                    'metadata' =>
+                        array_merge(
+                            $lockedPayment->metadata ?? [],
+                            [
+                                'failure_message' =>
+                                    $message,
+
+                                'failure_response' =>
+                                    $data,
+
+                                'failed_at' =>
+                                    now()->toISOString(),
+                            ]
+                        ),
+                ]);
+
+                $this->syncOrderPaymentStatus(
+                    $lockedPayment->order
+                );
+            }
+        );
+    }
+
+    /**
+     * Synchronize order payment status from its attempts.
+     */
+    protected function syncOrderPaymentStatus(
+        ?Order $order
+    ): void {
         if (! $order) {
             return;
         }
 
         /*
-         * Do not overwrite a successful payment state
-         * caused by another payment attempt.
+         * A paid attempt always wins.
          */
-        $hasSuccessfulPayment =
+        $hasPaid =
             $order->payments()
-                ->where(
-                    'id',
-                    '!=',
-                    $payment->id
-                )
                 ->where(
                     'status',
                     'paid'
                 )
                 ->exists();
 
-        if (! $hasSuccessfulPayment) {
+        if ($hasPaid) {
             $order->update([
-                'payment_status' =>
-                    'failed',
+                'payment_status' => 'paid',
             ]);
+
+            return;
         }
+
+        /*
+         * If another attempt is still active,
+         * the order remains payable.
+         */
+        $hasActive =
+            $order->payments()
+                ->whereIn(
+                    'status',
+                    [
+                        'pending',
+                        'initiated',
+                    ]
+                )
+                ->exists();
+
+        if ($hasActive) {
+            $order->update([
+                'payment_status' => 'pending',
+            ]);
+
+            return;
+        }
+
+        /*
+         * No paid or active attempt remains.
+         */
+        $hasRefunded =
+            $order->payments()
+                ->where(
+                    'status',
+                    'refunded'
+                )
+                ->exists();
+
+        if ($hasRefunded) {
+            $order->update([
+                'payment_status' => 'refunded',
+            ]);
+
+            return;
+        }
+
+        $order->update([
+            'payment_status' => 'failed',
+        ]);
     }
 
     /**
-     * Find the local payment from callback data.
-     *
-     * Gateway implementations should normalize provider-specific
-     * callback values as much as possible.
+     * Find local payment from callback data.
      */
     protected function findPaymentFromCallback(
         string $gateway,
         array $callbackData
     ): ?Payment {
         /*
-         * 1. Our local payment ID.
-         */
+        |--------------------------------------------------------------------------
+        | 1. Local payment ID
+        |--------------------------------------------------------------------------
+        */
+
         foreach ([
                      'payment_id',
                      'paymentId',
@@ -865,8 +1153,11 @@ class PaymentService
         }
 
         /*
-         * 2. Gateway authority / transaction / token.
-         */
+        |--------------------------------------------------------------------------
+        | 2. Authority / Transaction / Provider reference
+        |--------------------------------------------------------------------------
+        */
+
         foreach ([
                      'authority',
                      'Authority',
@@ -901,7 +1192,9 @@ class PaymentService
                         $gateway
                     )
                     ->where(
-                        function ($query) use ($value) {
+                        function (Builder $query) use (
+                            $value
+                        ) {
                             $query
                                 ->where(
                                     'authority',
@@ -922,8 +1215,15 @@ class PaymentService
         }
 
         /*
-         * 3. Our own order number.
-         */
+        |--------------------------------------------------------------------------
+        | 3. Internal order number
+        |--------------------------------------------------------------------------
+        |
+        | This is only a fallback.
+        | Final authenticity still depends on gateway verification.
+        |
+        */
+
         foreach ([
                      'order_number',
                      'orderNumber',
@@ -952,10 +1252,18 @@ class PaymentService
                 continue;
             }
 
-            return $order->payments()
+            return $order
+                ->payments()
                 ->where(
                     'gateway',
                     $gateway
+                )
+                ->whereIn(
+                    'status',
+                    [
+                        'pending',
+                        'initiated',
+                    ]
                 )
                 ->latest('id')
                 ->first();
@@ -965,16 +1273,44 @@ class PaymentService
     }
 
     /**
-     * Verify returned amount against our own records.
+     * Validate verified gateway amount.
      */
     protected function validateVerifiedAmount(
         Payment $payment,
         array $result
     ): void {
+        $order =
+            $payment->order;
+
+        if (! $order) {
+            throw new RuntimeException(
+                'سفارش مربوط به پرداخت پیدا نشد.'
+            );
+        }
+
         /*
-         * If gateway returned an amount,
-         * compare it with our Payment amount.
-         */
+        |--------------------------------------------------------------------------
+        | Our local payment amount must be positive.
+        |--------------------------------------------------------------------------
+        */
+
+        $expectedPaymentAmount =
+            $this->normalizeAmount(
+                $payment->amount
+            );
+
+        if ($expectedPaymentAmount <= 0) {
+            throw new RuntimeException(
+                'مبلغ پرداخت معتبر نیست.'
+            );
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | External gateway returned amount
+        |--------------------------------------------------------------------------
+        */
+
         if (
             array_key_exists(
                 'amount',
@@ -982,53 +1318,53 @@ class PaymentService
             )
             && $result['amount'] !== null
         ) {
-            $expected =
-                $this->normalizeAmount(
-                    $payment->amount
-                );
-
-            $received =
+            $receivedAmount =
                 $this->normalizeAmount(
                     $result['amount']
                 );
 
-            if ($expected !== $received) {
+            if (
+                $expectedPaymentAmount !==
+                $receivedAmount
+            ) {
                 throw new RuntimeException(
                     'Payment amount mismatch.'
                 );
             }
         }
 
-        $order =
-            $payment->order;
-
-        if (! $order) {
-            throw new RuntimeException(
-                'Payment order was not found.'
-            );
-        }
-
-        $paymentAmount =
-            $this->normalizeAmount(
-                $payment->amount
-            );
-
-        $orderAmount =
-            $this->normalizeAmount(
-                $order->total
-            );
+        /*
+        |--------------------------------------------------------------------------
+        | External online payment must equal current order total.
+        |--------------------------------------------------------------------------
+        |
+        | Internal Livora installment payments should NOT enter this
+        | method because they are a separate flow.
+        |
+        */
 
         if (
-            $paymentAmount !== $orderAmount
+            $payment->metadata['payment_method'] ?? null
+            === 'online'
         ) {
-            throw new RuntimeException(
-                'Payment amount does not match order total.'
-            );
+            $orderAmount =
+                $this->normalizeAmount(
+                    $order->total
+                );
+
+            if (
+                $expectedPaymentAmount !==
+                $orderAmount
+            ) {
+                throw new RuntimeException(
+                    'Payment amount does not match order total.'
+                );
+            }
         }
     }
 
     /**
-     * Validate order state.
+     * Validate order state before initiating online payment.
      */
     protected function validateOrderForPayment(
         Order $order
@@ -1056,10 +1392,26 @@ class PaymentService
                 'مبلغ سفارش معتبر نیست.'
             );
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Installment-created order is still payable only
+        | through its correct installment flow.
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+            $order->payment_method === 'installment'
+            && $order->installment_enabled
+        ) {
+            throw new RuntimeException(
+                'برای این سفارش ابتدا باید فرآیند پرداخت اقساطی ادامه پیدا کند.'
+            );
+        }
     }
 
     /**
-     * Normalize gateway name.
+     * Normalize gateway.
      */
     protected function normalizeGateway(
         string $gateway
@@ -1071,6 +1423,9 @@ class PaymentService
 
     /**
      * Normalize monetary values.
+     *
+     * Current database stores money with decimals, but
+     * the project works with whole تومان for gateway comparison.
      */
     protected function normalizeAmount(
         mixed $amount

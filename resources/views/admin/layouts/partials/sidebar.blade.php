@@ -13,7 +13,8 @@
             class="group flex min-w-0 items-center gap-3"
         >
 
-            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[var(--admin-text)] text-xs font-bold tracking-[0.12em] text-white transition duration-300 group-hover:bg-[var(--admin-accent)]">
+            <div
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[var(--admin-text)] text-xs font-bold tracking-[0.12em] text-white transition duration-300 group-hover:bg-[var(--admin-accent)]">
                 LV
             </div>
 
@@ -149,7 +150,8 @@
                     ])
                 >
 
-                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)] group-hover:text-[var(--admin-text)]">
+                    <span
+                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)] group-hover:text-[var(--admin-text)]">
 
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -191,7 +193,8 @@
                     ])
                 >
 
-                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">
+                    <span
+                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">
 
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -225,7 +228,7 @@
 
                 {{-- Media --}}
                 <a
-                    href="#"
+                    href="{{ route('admin.media.index') }}"
                     @class([
                         'group flex items-center gap-3 rounded-2xl px-3 py-3 text-xs font-medium transition',
                         'bg-[var(--admin-accent-soft)] text-[var(--admin-accent-dark)]' => request()->routeIs('admin.media.*'),
@@ -233,28 +236,29 @@
                     ])
                 >
 
-                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">
+    <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">
 
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            class="h-4 w-4"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l2.159 2.159m0 0 1.409-1.409a2.25 2.25 0 0 1 3.182 0l4.909 4.909M21.75 12V6.75a2.25 2.25 0 0 0-2.25-2.25H4.5a2.25 2.25 0 0 0-2.25 2.25v10.5a2.25 2.25 0 0 0 2.25 2.25h10.5"
-                            />
-                        </svg>
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="h-4 w-4"
+        >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l2.159 2.159m0 0 1.409-1.409a2.25 2.25 0 0 1 3.182 0l4.909 4.909M21.75 12V6.75a2.25 2.25 0 0 0-2.25-2.25H4.5a2.25 2.25 0 0 0-2.25 2.25v10.5a2.25 2.25 0 0 0 2.25 2.25h10.5"
+            />
+        </svg>
 
-                    </span>
+    </span>
 
                     <span class="flex-1">
-                        رسانه
-                    </span>
+        رسانه
+    </span>
 
                     @if(request()->routeIs('admin.media.*'))
 
@@ -290,7 +294,8 @@
                     ])
                 >
 
-                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">
+                    <span
+                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">
 
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -332,7 +337,8 @@
                     ])
                 >
 
-                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">
+                    <span
+                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">
 
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -387,7 +393,8 @@
                     class="group flex items-center gap-3 rounded-2xl px-3 py-3 text-xs font-medium text-[var(--admin-text-soft)] transition hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text)]"
                 >
 
-                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">
+                    <span
+                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">
 
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -441,7 +448,8 @@
 
             <div class="flex items-center gap-3">
 
-                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-text)] text-xs font-bold text-white">
+                <div
+                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-text)] text-xs font-bold text-white">
                     {{ mb_substr($adminUser?->name ?: 'A', 0, 1) }}
                 </div>
 

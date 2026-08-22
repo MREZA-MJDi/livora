@@ -93,4 +93,45 @@ class PlaceOrderRequest extends FormRequest
             'notes' => 'توضیحات',
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'first_name.required' =>
+                'وارد کردن نام الزامی است.',
+
+            'last_name.required' =>
+                'وارد کردن نام خانوادگی الزامی است.',
+
+            'phone.required' =>
+                'شماره موبایل را وارد کنید.',
+
+            'phone.regex' =>
+                'شماره موبایل باید به شکل 09123456789 باشد.',
+
+            'email.required' =>
+                'ایمیل را وارد کنید.',
+
+            'email.email' =>
+                'فرمت ایمیل صحیح نیست.',
+
+            'province.required' =>
+                'استان را انتخاب یا وارد کنید.',
+
+            'city.required' =>
+                'شهر را وارد کنید.',
+
+            'address.required' =>
+                'آدرس کامل را وارد کنید.',
+
+            'address.min' =>
+                'آدرس واردشده خیلی کوتاه است.',
+
+            'postal_code.required' =>
+                'کد پستی را وارد کنید.',
+
+            'postal_code.digits' =>
+                'کد پستی باید دقیقاً ۱۰ رقم باشد.',
+        ];
+    }
 }

@@ -149,21 +149,15 @@ class CartController extends Controller
         Request $request,
         CartItem $item
     ): RedirectResponse|JsonResponse {
-        $this->authorize('delete', $item);
 
-        $cart = $item->cart;
+        if (
+            ! $item->cart
+            || $item->cart->user_id !== auth()->id()
+        ) {
+            abort(403);
+        }
 
         $item->delete();
-
-        $cart->load('items');
-
-        if ($request->expectsJson()) {
-            return response()->json([
-                'message' => 'محصول حذف شد.',
-                'cart_count' => $cart->itemCount(),
-                'subtotal' => $cart->subtotal(),
-            ]);
-        }
 
         return back()->with(
             'success',

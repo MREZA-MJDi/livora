@@ -47,6 +47,53 @@ class CheckoutController extends Controller
     }
 
     /**
+     * @param Order $order
+     * @return View
+     */
+    public function installment(
+        Order $order
+    ): View {
+        abort_unless(
+            $order->user_id === Auth::id(),
+            403
+        );
+
+        $order->load([
+            'items.product.images',
+            'installments',
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | The installment plan must already exist.
+        |--------------------------------------------------------------------------
+        */
+
+        abort_unless(
+            $order->payment_method === 'installment'
+            && $order->installment_enabled === true,
+            404
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Make sure the order actually has installment rows.
+        |--------------------------------------------------------------------------
+        */
+
+        abort_unless(
+            $order->installments->isNotEmpty(),
+            404
+        );
+
+        return view(
+            'checkout.installment',
+            [
+                'order' => $order,
+            ]
+        );
+    }
+    /**
      * Create order from the active cart.
      */
     public function placeOrder(
@@ -54,193 +101,196 @@ class CheckoutController extends Controller
     ): RedirectResponse {
         $validated = $request->validated();
 
-        $cart = $this->getActiveCart();
+        try {
 
-        $cart->load([
-            'items.product',
-            'items.variant',
-        ]);
+            $cart = $this->getActiveCart();
 
-        abort_if(
-            $cart->items->isEmpty(),
-            422,
-            'سبد خرید خالی است.'
-        );
-
-        $order = DB::transaction(function () use (
-            $cart,
-            $validated
-        ) {
-            $subtotal = 0;
-
-            foreach ($cart->items as $item) {
-                $stock = $item->variant?->stock
-                    ?? $item->product->stock;
-
-                if ($item->quantity > $stock) {
-                    abort(
-                        422,
-                        "موجودی محصول {$item->product->name} کافی نیست."
-                    );
-                }
-
-                $subtotal +=
-                    (float) $item->unit_price
-                    * $item->quantity;
-            }
-
-            $shippingCost = 0;
-            $discount = 0;
-
-            $total = $subtotal
-                + $shippingCost
-                - $discount;
-
-            $order = Order::create([
-                'user_id' => Auth::id(),
-
-                'order_number' =>
-                    $this->generateOrderNumber(),
-
-                'status' => 'pending',
-                'payment_status' => 'pending',
-
-                /*
-                 * Payment is selected after
-                 * order creation.
-                 */
-                'payment_method' => 'online',
-                'payment_provider' => null,
-
-                /*
-                 * Internal installment snapshot.
-                 * These remain empty until the
-                 * customer chooses Livora installment.
-                 */
-                'installment_enabled' => false,
-                'installment_cash_percent' => null,
-                'installment_cash_amount' => null,
-                'installment_deferred_amount' => null,
-                'installment_remainder_method' => null,
-                'installment_cheque_count' => null,
-                'installment_interval_months' => null,
-
-                'subtotal' => $subtotal,
-                'shipping_cost' => $shippingCost,
-                'discount' => $discount,
-                'total' => $total,
-
-                'first_name' =>
-                    $validated['first_name'],
-
-                'last_name' =>
-                    $validated['last_name'],
-
-                'phone' =>
-                    $validated['phone'],
-
-                'email' =>
-                    $validated['email'],
-
-                'province' =>
-                    $validated['province'],
-
-                'city' =>
-                    $validated['city'],
-
-                'address' =>
-                    $validated['address'],
-
-                'postal_code' =>
-                    $validated['postal_code'],
-
-                'unit' =>
-                    $validated['unit'] ?? null,
-
-                'notes' =>
-                    $validated['notes'] ?? null,
+            $cart->load([
+                'items.product',
+                'items.variant',
             ]);
 
-            /*
-             * Create order items.
-             */
-            foreach ($cart->items as $item) {
-                $order->items()->create([
-                    'product_id' =>
-                        $item->product_id,
-
-                    'product_variant_id' =>
-                        $item->product_variant_id,
-
-                    'product_name' =>
-                        $item->product->name,
-
-                    'sku' =>
-                        $item->variant?->sku
-                        ?? $item->product->sku,
-
-                    'quantity' =>
-                        $item->quantity,
-
-                    'unit_price' =>
-                        $item->unit_price,
-
-                    'total' =>
-                        (float) $item->unit_price
-                        * $item->quantity,
-                ]);
+            if ($cart->items->isEmpty()) {
+                return redirect()
+                    ->route('cart.index')
+                    ->with(
+                        'error',
+                        'سبد خرید شما خالی است.'
+                    );
             }
 
+            $order = DB::transaction(function () use (
+                $cart,
+                $validated
+            ) {
+
+                $subtotal = 0;
+
+                foreach ($cart->items as $item) {
+
+                    $stock =
+                        $item->variant?->stock
+                        ?? $item->product->stock;
+
+                    if (
+                        $stock === null
+                        || $item->quantity > $stock
+                    ) {
+                        throw new \RuntimeException(
+                            "موجودی محصول «{$item->product->name}» کافی نیست."
+                        );
+                    }
+
+                    $subtotal +=
+                        (float) $item->unit_price
+                        * (int) $item->quantity;
+                }
+
+                $shippingCost = 0;
+                $discount = 0;
+
+                $total =
+                    $subtotal
+                    + $shippingCost
+                    - $discount;
+
+                $order = Order::create([
+                    'user_id' => Auth::id(),
+
+                    'order_number' =>
+                        $this->generateOrderNumber(),
+
+                    'status' => 'pending',
+
+                    'payment_status' => 'pending',
+
+                    'payment_method' => 'online',
+
+                    'payment_provider' => null,
+
+                    'installment_enabled' => false,
+
+                    'installment_cash_percent' => null,
+
+                    'installment_cash_amount' => null,
+
+                    'installment_deferred_amount' => null,
+
+                    'installment_remainder_method' => null,
+
+                    'installment_cheque_count' => null,
+
+                    'installment_interval_months' => null,
+
+                    'subtotal' => $subtotal,
+
+                    'shipping_cost' => $shippingCost,
+
+                    'discount' => $discount,
+
+                    'total' => $total,
+
+                    'first_name' =>
+                        $validated['first_name'],
+
+                    'last_name' =>
+                        $validated['last_name'],
+
+                    'phone' =>
+                        $validated['phone'],
+
+                    'email' =>
+                        $validated['email'],
+
+                    'province' =>
+                        $validated['province'],
+
+                    'city' =>
+                        $validated['city'],
+
+                    'address' =>
+                        $validated['address'],
+
+                    'postal_code' =>
+                        $validated['postal_code'],
+
+                    'unit' =>
+                        $validated['unit'] ?? null,
+
+                    'notes' =>
+                        $validated['notes'] ?? null,
+                ]);
+
+                foreach ($cart->items as $item) {
+
+                    $order->items()->create([
+                        'product_id' =>
+                            $item->product_id,
+
+                        'product_variant_id' =>
+                            $item->product_variant_id,
+
+                        'product_name' =>
+                            $item->product->name,
+
+                        'sku' =>
+                            $item->variant?->sku
+                            ?? $item->product->sku,
+
+                        'quantity' =>
+                            $item->quantity,
+
+                        'unit_price' =>
+                            $item->unit_price,
+
+                        'total' =>
+                            (float) $item->unit_price
+                            * (int) $item->quantity,
+                    ]);
+                }
+
+                return $order;
+            });
+
             /*
-             * Create the first local payment attempt.
-             *
-             * The actual gateway will be selected
-             * later on the payment page.
-             */
-//            Payment::create([
-//                'order_id' =>
-//                    $order->id,
-//
-//                'user_id' =>
-//                    Auth::id(),
-//
-//                'gateway' =>
-//                    'pending',
-//
-//                'amount' =>
-//                    $total,
-//
-//                'status' =>
-//                    'pending',
-//
-//                'metadata' => [
-//                    'payment_method' =>
-//                        'pending',
-//
-//                    'order_number' =>
-//                        $order->order_number,
-//                ],
-//            ]);
+            |--------------------------------------------------------------------------
+            | Empty active cart only after successful transaction
+            |--------------------------------------------------------------------------
+            */
 
-            return $order;
-        });
+            $cart->items()->delete();
 
-        /*
-         * Clear active cart after order creation.
-         */
-        $cart->items()->delete();
+            return redirect()
+                ->route(
+                    'checkout.payment',
+                    $order
+                )
+                ->with(
+                    'success',
+                    'سفارش شما با موفقیت ثبت شد.'
+                );
 
-        return redirect()
-            ->route(
-                'checkout.payment',
-                $order
-            )
-            ->with(
-                'success',
-                'سفارش با موفقیت ایجاد شد.'
-            );
+        } catch (\RuntimeException $e) {
+
+            return back()
+                ->withInput()
+                ->with(
+                    'error',
+                    $e->getMessage()
+                );
+
+        } catch (Throwable $e) {
+
+            report($e);
+
+            return back()
+                ->withInput()
+                ->with(
+                    'error',
+                    'ثبت سفارش انجام نشد. لطفاً دوباره تلاش کنید.'
+                );
+        }
     }
-
     /**
      * Show payment selection page.
      */
@@ -339,27 +389,28 @@ class CheckoutController extends Controller
         );
 
         try {
-            $installmentPlanService->create(
-                $order
-            );
+            $installmentPlanService->create($order);
 
             return redirect()
                 ->route(
-                    'checkout.payment',
+                    'checkout.installment',
                     $order
                 )
                 ->with(
                     'success',
                     'طرح خرید اقساطی برای سفارش ایجاد شد.'
                 );
+
         } catch (Throwable $e) {
             report($e);
 
-            return back()->with(
-                'error',
-                $e->getMessage()
-                    ?: 'امکان ایجاد طرح اقساطی وجود ندارد.'
-            );
+            return back()
+                ->withInput()
+                ->with(
+                    'error',
+                    $e->getMessage()
+                        ?: 'امکان ایجاد طرح اقساطی وجود ندارد.'
+                );
         }
     }
 
