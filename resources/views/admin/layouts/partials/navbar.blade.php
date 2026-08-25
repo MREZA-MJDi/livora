@@ -25,11 +25,52 @@
 
         'admin.media.index' => 'رسانه',
         'admin.media.create' => 'افزودن رسانه',
+
+        'admin.contact-messages.index' => 'پیام‌های کاربران',
+        'admin.contact-messages.show' => 'مشاهده پیام',
+        'admin.contact-settings.edit' => 'تنظیمات تماس',
     ];
 
     $pageTitle = $pageTitles[$currentRouteName]
         ?? 'مدیریت فروشگاه';
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Notifications
+    |--------------------------------------------------------------------------
+    */
+
+    $pendingOrdersCount = \App\Models\Order::query()
+        ->whereIn('status', [
+            'pending',
+            'processing',
+        ])
+        ->count();
+
+    $outOfStockCount = \App\Models\Product::query()
+        ->where('stock', 0)
+        ->count();
+
+    $unreadContactMessagesCount = \App\Models\ContactMessage::query()
+        ->where('status', 'unread')
+        ->count();
+
+    /*
+     * هر نوع اعلان یک notification محسوب می‌شود.
+     *
+     * بنابراین:
+     *
+     * 5 پیام جدید      => 5
+     * 3 سفارش           => 3
+     * محصولات بدون موجودی => 1 notification
+     */
+    $totalNotificationCount =
+        $unreadContactMessagesCount
+        + $pendingOrdersCount
+        + ($outOfStockCount > 0 ? 1 : 0);
 @endphp
+
 
 <header
     class="sticky top-0 z-30 flex h-[72px] shrink-0 items-center border-b border-[var(--admin-border)] bg-[var(--admin-white)]/95 backdrop-blur-xl"
@@ -37,12 +78,16 @@
 
     <div class="flex w-full items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
 
+
         {{-- =========================================================
              LEFT / PAGE INFO
         ========================================================== --}}
+
         <div class="flex min-w-0 items-center gap-3">
 
+
             {{-- Mobile Sidebar Toggle --}}
+
             <button
                 type="button"
                 @click="sidebarOpen = true"
@@ -71,6 +116,7 @@
             <div class="min-w-0">
 
                 {{-- Breadcrumb-ish label --}}
+
                 <div class="hidden items-center gap-2 text-[9px] text-[var(--admin-muted)] sm:flex">
 
                     <span>
@@ -87,6 +133,7 @@
 
                 </div>
 
+
                 <h1 class="mt-0.5 truncate text-sm font-bold text-[var(--admin-text)] sm:text-base">
                     {{ $pageTitle }}
                 </h1>
@@ -99,9 +146,14 @@
         {{-- =========================================================
              RIGHT ACTIONS
         ========================================================== --}}
+
         <div class="flex shrink-0 items-center gap-2 sm:gap-3">
 
-            {{-- Visit Store --}}
+
+            {{-- =====================================================
+                 VISIT STORE
+            ====================================================== --}}
+
             <a
                 href="{{ route('home') }}"
                 target="_blank"
@@ -122,6 +174,7 @@
                         stroke-linejoin="round"
                         d="M2.25 12s3.75-6 9.75-6 9.75 6 9.75 6-3.75 6-9.75 6-9.75-6-9.75-6Z"
                     />
+
                     <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
@@ -138,7 +191,10 @@
             </a>
 
 
-            {{-- Search --}}
+            {{-- =====================================================
+                 SEARCH
+            ====================================================== --}}
+
             <div class="relative hidden md:block">
 
                 <svg
@@ -165,7 +221,10 @@
             </div>
 
 
-            {{-- Notifications --}}
+            {{-- =====================================================
+                 NOTIFICATIONS
+            ====================================================== --}}
+
             <div
                 class="relative"
                 @click.outside="notificationOpen = false"
@@ -194,18 +253,31 @@
                         />
                     </svg>
 
-                    <span class="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-[var(--admin-accent)]"></span>
+
+                    @if($totalNotificationCount > 0)
+
+                        <span
+                            class="absolute -right-1 -top-1 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-[9px] font-bold leading-none text-white ring-2 ring-[var(--admin-white)]"
+                        >
+                            {{ $totalNotificationCount > 99 ? '99+' : $totalNotificationCount }}
+                        </span>
+
+                    @endif
 
                 </button>
 
 
-                {{-- Notification dropdown --}}
+                {{-- Notification Dropdown --}}
+
                 <div
                     x-show="notificationOpen"
                     x-cloak
                     x-transition
                     class="absolute left-0 top-[calc(100%+10px)] z-50 w-80 overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-white)] shadow-[var(--admin-shadow-lg)]"
                 >
+
+
+                    {{-- Header --}}
 
                     <div class="flex items-center justify-between border-b border-[var(--admin-border)] px-4 py-4">
 
@@ -221,46 +293,103 @@
 
                         </div>
 
-                        <span class="rounded-full bg-[var(--admin-accent-soft)] px-2 py-1 text-[9px] font-semibold text-[var(--admin-accent-dark)]">
-                            LIVE
-                        </span>
+
+                        @if($totalNotificationCount > 0)
+
+                            <span class="rounded-full bg-red-50 px-2 py-1 text-[9px] font-semibold text-red-600">
+                                {{ number_format($totalNotificationCount) }}
+                                مورد
+                            </span>
+
+                        @else
+
+                            <span class="rounded-full bg-[var(--admin-accent-soft)] px-2 py-1 text-[9px] font-semibold text-[var(--admin-accent-dark)]">
+                                LIVE
+                            </span>
+
+                        @endif
 
                     </div>
 
+
+                    {{-- Notification Items --}}
+
                     <div class="p-3">
 
-                        <a
-                            href="{{ route('admin.orders.index') }}"
-                            @click="notificationOpen = false"
-                            class="flex gap-3 rounded-xl p-3 transition hover:bg-[var(--admin-surface)]"
-                        >
 
-                            <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-50 text-amber-700">
-                                !
-                            </span>
+                        {{-- =================================================
+                             CONTACT MESSAGES
+                        ================================================== --}}
 
-                            <div class="min-w-0">
+                        @if($unreadContactMessagesCount > 0)
 
-                                <p class="text-[10px] font-semibold text-[var(--admin-text)]">
-                                    سفارش‌ها را بررسی کن
-                                </p>
+                            <a
+                                href="{{ route('admin.contact-messages.index') }}"
+                                @click="notificationOpen = false"
+                                class="flex gap-3 rounded-xl p-3 transition hover:bg-[var(--admin-surface)]"
+                            >
 
-                                <p class="mt-1 text-[9px] leading-5 text-[var(--admin-muted)]">
-                                    {{ number_format(
-                                        \App\Models\Order::whereIn(
-                                            'status',
-                                            ['pending', 'processing']
-                                        )->count()
-                                    ) }}
-                                    سفارش نیازمند بررسی است.
-                                </p>
+                                <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-600">
+                                    @
+                                </span>
 
-                            </div>
+                                <div class="min-w-0">
 
-                        </a>
+                                    <p class="text-[10px] font-semibold text-[var(--admin-text)]">
+                                        پیام جدید از کاربران
+                                    </p>
+
+                                    <p class="mt-1 text-[9px] leading-5 text-[var(--admin-muted)]">
+                                        {{ number_format($unreadContactMessagesCount) }}
+                                        پیام جدید برای بررسی دارید.
+                                    </p>
+
+                                </div>
+
+                            </a>
+
+                        @endif
 
 
-                        @if(\App\Models\Product::where('stock', 0)->count() > 0)
+                        {{-- =================================================
+                             ORDERS
+                        ================================================== --}}
+
+                        @if($pendingOrdersCount > 0)
+
+                            <a
+                                href="{{ route('admin.orders.index') }}"
+                                @click="notificationOpen = false"
+                                class="mt-1 flex gap-3 rounded-xl p-3 transition hover:bg-[var(--admin-surface)]"
+                            >
+
+                                <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-50 text-amber-700">
+                                    !
+                                </span>
+
+                                <div class="min-w-0">
+
+                                    <p class="text-[10px] font-semibold text-[var(--admin-text)]">
+                                        سفارش‌ها را بررسی کن
+                                    </p>
+
+                                    <p class="mt-1 text-[9px] leading-5 text-[var(--admin-muted)]">
+                                        {{ number_format($pendingOrdersCount) }}
+                                        سفارش نیازمند بررسی است.
+                                    </p>
+
+                                </div>
+
+                            </a>
+
+                        @endif
+
+
+                        {{-- =================================================
+                             OUT OF STOCK
+                        ================================================== --}}
+
+                        @if($outOfStockCount > 0)
 
                             <a
                                 href="{{ route('admin.products.index') }}"
@@ -279,15 +408,42 @@
                                     </p>
 
                                     <p class="mt-1 text-[9px] leading-5 text-[var(--admin-muted)]">
-                                        {{ number_format(
-                                            \App\Models\Product::where('stock', 0)->count()
-                                        ) }}
+                                        {{ number_format($outOfStockCount) }}
                                         محصول بدون موجودی است.
                                     </p>
 
                                 </div>
 
                             </a>
+
+                        @endif
+
+
+                        {{-- =================================================
+                             EMPTY STATE
+                        ================================================== --}}
+
+                        @if(
+                            $unreadContactMessagesCount === 0
+                            && $pendingOrdersCount === 0
+                            && $outOfStockCount === 0
+                        )
+
+                            <div class="px-3 py-8 text-center">
+
+                                <div class="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">
+                                    ✓
+                                </div>
+
+                                <p class="mt-3 text-[10px] font-semibold text-[var(--admin-text)]">
+                                    همه‌چیز مرتب است
+                                </p>
+
+                                <p class="mt-1 text-[9px] leading-5 text-[var(--admin-muted)]">
+                                    در حال حاضر اعلان مهمی ندارید.
+                                </p>
+
+                            </div>
 
                         @endif
 
@@ -298,11 +454,17 @@
             </div>
 
 
-            {{-- Divider --}}
+            {{-- =====================================================
+                 DIVIDER
+            ====================================================== --}}
+
             <span class="hidden h-7 w-px bg-[var(--admin-border)] sm:block"></span>
 
 
-            {{-- User Menu --}}
+            {{-- =====================================================
+                 USER MENU
+            ====================================================== --}}
+
             <div
                 class="relative"
                 @click.outside="userMenuOpen = false"
@@ -331,6 +493,7 @@
 
                     </span>
 
+
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -349,7 +512,8 @@
                 </button>
 
 
-                {{-- User dropdown --}}
+                {{-- User Dropdown --}}
+
                 <div
                     x-show="userMenuOpen"
                     x-cloak

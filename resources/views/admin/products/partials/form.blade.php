@@ -31,10 +31,14 @@
 
 <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
 
-    {{-- Main Information --}}
+    {{-- ============================================================
+         Main Information
+    ============================================================ --}}
     <div class="space-y-6 xl:col-span-2">
 
-        {{-- Product Information --}}
+        {{-- ========================================================
+             Product Information
+        ========================================================= --}}
         <div class="admin-card p-6">
 
             <div class="mb-6">
@@ -84,6 +88,7 @@
 
                 </div>
 
+
                 {{-- Name --}}
                 <div class="sm:col-span-2">
 
@@ -107,6 +112,7 @@
                     @enderror
 
                 </div>
+
 
                 {{-- Slug --}}
                 <div>
@@ -137,6 +143,7 @@
 
                 </div>
 
+
                 {{-- SKU --}}
                 <div>
 
@@ -162,6 +169,7 @@
 
                 </div>
 
+
                 {{-- Short Description --}}
                 <div class="sm:col-span-2">
 
@@ -184,6 +192,7 @@
                     @enderror
 
                 </div>
+
 
                 {{-- Description --}}
                 <div class="sm:col-span-2">
@@ -211,22 +220,31 @@
 
         </div>
 
-        {{-- Pricing --}}
+
+        {{-- ========================================================
+             Pricing
+        ========================================================= --}}
         <div class="admin-card p-6">
 
             <div class="mb-6">
+
                 <h3 class="text-base font-bold text-[var(--admin-text)]">
                     قیمت و موجودی
                 </h3>
 
-                <p class="mt-1 text-xs text-[var(--admin-muted)]">
+                <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">
                     قیمت فروش، قیمت قبل و موجودی محصول را مشخص کنید.
+                    هنگام ورود مبلغ، اعداد به‌صورت سه‌رقمی نمایش داده می‌شوند.
                 </p>
+
             </div>
+
 
             <div class="grid grid-cols-1 gap-5 sm:grid-cols-3">
 
-                {{-- Price --}}
+                {{-- =================================================
+                     Price
+                ================================================== --}}
                 <div>
 
                     <label for="price" class="admin-label">
@@ -238,19 +256,26 @@
                         <input
                             id="price"
                             name="price"
-                            type="number"
-                            min="0"
-                            step="0.01"
+                            type="text"
+                            inputmode="numeric"
+                            autocomplete="off"
                             value="{{ old('price', $product->price ?? '') }}"
                             class="admin-input pl-16"
+                            placeholder="15,000,000"
                             required
                         >
 
-                        <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[var(--admin-muted)]">
+                        <span
+                            class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[var(--admin-muted)]"
+                        >
                             تومان
                         </span>
 
                     </div>
+
+                    <p class="mt-2 text-xs leading-5 text-[var(--admin-muted)]">
+                        قیمت فعلی فروش محصول.
+                    </p>
 
                     @error('price')
                     <p class="mt-2 text-xs text-[var(--admin-danger)]">
@@ -260,7 +285,10 @@
 
                 </div>
 
-                {{-- Compare Price --}}
+
+                {{-- =================================================
+                     Compare At Price
+                ================================================== --}}
                 <div>
 
                     <label for="compare_at_price" class="admin-label">
@@ -272,18 +300,25 @@
                         <input
                             id="compare_at_price"
                             name="compare_at_price"
-                            type="number"
-                            min="0"
-                            step="0.01"
+                            type="text"
+                            inputmode="numeric"
+                            autocomplete="off"
                             value="{{ old('compare_at_price', $product->compare_at_price ?? '') }}"
                             class="admin-input pl-16"
+                            placeholder="20,000,000"
                         >
 
-                        <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[var(--admin-muted)]">
+                        <span
+                            class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[var(--admin-muted)]"
+                        >
                             تومان
                         </span>
 
                     </div>
+
+                    <p class="mt-2 text-xs leading-5 text-[var(--admin-muted)]">
+                        قیمت محصول قبل از تخفیف؛ در صورت نداشتن تخفیف خالی بگذارید.
+                    </p>
 
                     @error('compare_at_price')
                     <p class="mt-2 text-xs text-[var(--admin-danger)]">
@@ -293,22 +328,40 @@
 
                 </div>
 
-                {{-- Stock --}}
+
+                {{-- =================================================
+                     Stock
+                ================================================== --}}
                 <div>
 
                     <label for="stock" class="admin-label">
                         موجودی
                     </label>
 
-                    <input
-                        id="stock"
-                        name="stock"
-                        type="number"
-                        min="0"
-                        step="1"
-                        value="{{ old('stock', $product->stock ?? 0) }}"
-                        class="admin-input"
-                    >
+                    <div class="relative">
+
+                        <input
+                            id="stock"
+                            name="stock"
+                            type="text"
+                            inputmode="numeric"
+                            autocomplete="off"
+                            value="{{ old('stock', $product->stock ?? 0) }}"
+                            class="admin-input pl-16"
+                            placeholder="10"
+                        >
+
+                        <span
+                            class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[var(--admin-muted)]"
+                        >
+                            عدد
+                        </span>
+
+                    </div>
+
+                    <p class="mt-2 text-xs leading-5 text-[var(--admin-muted)]">
+                        تعداد موجودی قابل فروش محصول.
+                    </p>
 
                     @error('stock')
                     <p class="mt-2 text-xs text-[var(--admin-danger)]">
@@ -322,7 +375,10 @@
 
         </div>
 
-        {{-- Installment --}}
+
+        {{-- ========================================================
+             Installment
+        ========================================================= --}}
         <div class="admin-card p-6">
 
             <div class="mb-6">
@@ -330,6 +386,7 @@
                 <div class="flex items-start justify-between gap-4">
 
                     <div>
+
                         <h3 class="text-base font-bold text-[var(--admin-text)]">
                             فروش اقساطی
                         </h3>
@@ -338,6 +395,7 @@
                             شرایط فروش اقساطی این محصول را مشخص کنید.
                             محاسبه مبلغ نقدی و چک‌ها به‌صورت خودکار انجام می‌شود.
                         </p>
+
                     </div>
 
                     <span
@@ -350,6 +408,7 @@
                 </div>
 
             </div>
+
 
             <div class="space-y-5">
 
@@ -372,6 +431,7 @@
                     >
 
                     <span>
+
                         <span class="block text-sm font-semibold text-[var(--admin-text)]">
                             فعال‌سازی فروش اقساطی
                         </span>
@@ -379,9 +439,11 @@
                         <span class="mt-1 block text-xs leading-6 text-[var(--admin-muted)]">
                             مشتری می‌تواند این محصول را طبق شرایط تعریف‌شده به‌صورت اقساطی خریداری کند.
                         </span>
+
                     </span>
 
                 </label>
+
 
                 {{-- Installment Settings --}}
                 <div
@@ -394,7 +456,10 @@
                         {{-- Cash Percent --}}
                         <div>
 
-                            <label for="installment_cash_percent" class="admin-label">
+                            <label
+                                for="installment_cash_percent"
+                                class="admin-label"
+                            >
                                 درصد پیش‌پرداخت
                             </label>
 
@@ -411,7 +476,9 @@
                                     class="admin-input pr-12"
                                 >
 
-                                <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[var(--admin-muted)]">
+                                <span
+                                    class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[var(--admin-muted)]"
+                                >
                                     %
                                 </span>
 
@@ -425,10 +492,14 @@
 
                         </div>
 
+
                         {{-- Remainder Method --}}
                         <div>
 
-                            <label for="installment_remainder_method" class="admin-label">
+                            <label
+                                for="installment_remainder_method"
+                                class="admin-label"
+                            >
                                 روش تسویه باقی‌مانده
                             </label>
 
@@ -453,10 +524,14 @@
 
                         </div>
 
+
                         {{-- Cheque Count --}}
                         <div>
 
-                            <label for="installment_cheque_count" class="admin-label">
+                            <label
+                                for="installment_cheque_count"
+                                class="admin-label"
+                            >
                                 تعداد چک
                             </label>
 
@@ -479,10 +554,14 @@
 
                         </div>
 
+
                         {{-- Interval --}}
                         <div>
 
-                            <label for="installment_interval_months" class="admin-label">
+                            <label
+                                for="installment_interval_months"
+                                class="admin-label"
+                            >
                                 فاصله سررسید
                             </label>
 
@@ -499,7 +578,9 @@
                                     class="admin-input pl-16"
                                 >
 
-                                <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[var(--admin-muted)]">
+                                <span
+                                    class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[var(--admin-muted)]"
+                                >
                                     ماه
                                 </span>
 
@@ -515,14 +596,17 @@
 
                     </div>
 
+
                     {{-- Live Preview --}}
                     <div
                         id="installment_preview"
                         class="rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface-soft)] p-5"
                     >
+
                         <div class="mb-4 flex items-center justify-between">
 
                             <div>
+
                                 <p class="text-sm font-semibold text-[var(--admin-text)]">
                                     پیش‌نمایش شرایط اقساط
                                 </p>
@@ -530,13 +614,19 @@
                                 <p class="mt-1 text-xs text-[var(--admin-muted)]">
                                     مبالغ بر اساس قیمت محصول محاسبه می‌شوند.
                                 </p>
+
                             </div>
 
                         </div>
 
+
                         <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
 
-                            <div class="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4">
+                            {{-- Total --}}
+                            <div
+                                class="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4"
+                            >
+
                                 <p class="text-xs text-[var(--admin-muted)]">
                                     قیمت محصول
                                 </p>
@@ -547,9 +637,15 @@
                                 >
                                     ۰ تومان
                                 </p>
+
                             </div>
 
-                            <div class="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4">
+
+                            {{-- Cash --}}
+                            <div
+                                class="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4"
+                            >
+
                                 <p class="text-xs text-[var(--admin-muted)]">
                                     پیش‌پرداخت
                                 </p>
@@ -560,9 +656,15 @@
                                 >
                                     ۰ تومان
                                 </p>
+
                             </div>
 
-                            <div class="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4">
+
+                            {{-- Deferred --}}
+                            <div
+                                class="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4"
+                            >
+
                                 <p class="text-xs text-[var(--admin-muted)]">
                                     باقی‌مانده
                                 </p>
@@ -573,10 +675,13 @@
                                 >
                                     ۰ تومان
                                 </p>
+
                             </div>
 
                         </div>
 
+
+                        {{-- Cheques --}}
                         <div
                             id="installment_cheques_preview"
                             class="mt-4 space-y-3"
@@ -590,11 +695,14 @@
 
         </div>
 
-        {{-- SEO --}}
-        {{-- SEO --}}
+
+        {{-- ========================================================
+             SEO
+        ========================================================= --}}
         <div class="admin-card p-6">
 
             <div class="mb-6">
+
                 <h3 class="text-base font-bold text-[var(--admin-text)]">
                     بهینه‌سازی موتور جستجو
                 </h3>
@@ -602,7 +710,9 @@
                 <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">
                     عنوان و توضیحات صفحه محصول را برای نتایج جستجو تنظیم کنید.
                 </p>
+
             </div>
+
 
             <div class="space-y-6">
 
@@ -622,10 +732,11 @@
                             id="meta_title_counter"
                             class="text-[11px] text-[var(--admin-muted)]"
                         >
-                    0 / 255
-                </span>
+                            0 / 255
+                        </span>
 
                     </div>
+
 
                     <input
                         id="meta_title"
@@ -637,10 +748,12 @@
                         placeholder="مثلاً خرید مبل راحتی مدل Milano | LIVORA"
                     >
 
+
                     <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">
                         عنوانی که در تب مرورگر و نتایج جستجو نمایش داده می‌شود.
                         در صورت خالی بودن، عنوان محصول استفاده می‌شود.
                     </p>
+
 
                     @error('meta_title')
                     <p class="mt-2 text-xs text-[var(--admin-danger)]">
@@ -649,6 +762,7 @@
                     @enderror
 
                 </div>
+
 
                 {{-- Meta Description --}}
                 <div>
@@ -666,10 +780,11 @@
                             id="meta_description_counter"
                             class="text-[11px] text-[var(--admin-muted)]"
                         >
-                    0
-                </span>
+                            0 کاراکتر
+                        </span>
 
                     </div>
+
 
                     <textarea
                         id="meta_description"
@@ -679,9 +794,11 @@
                         placeholder="توضیح کوتاه و جذاب درباره محصول برای موتورهای جستجو..."
                     >{{ old('meta_description', $product->meta_description ?? '') }}</textarea>
 
+
                     <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">
                         توضیح مختصر و واقعی درباره محصول، ویژگی‌ها و کاربرد آن بنویسید.
                     </p>
+
 
                     @error('meta_description')
                     <p class="mt-2 text-xs text-[var(--admin-danger)]">
@@ -691,10 +808,14 @@
 
                 </div>
 
-                {{-- Google-like Preview --}}
-                <div class="rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface-soft)] p-5">
+
+                {{-- Google Preview --}}
+                <div
+                    class="rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface-soft)] p-5"
+                >
 
                     <div class="mb-4">
+
                         <p class="text-sm font-semibold text-[var(--admin-text)]">
                             پیش‌نمایش نتیجه جستجو
                         </p>
@@ -702,9 +823,13 @@
                         <p class="mt-1 text-xs text-[var(--admin-muted)]">
                             یک Preview تقریبی برای بررسی عنوان و توضیحات صفحه.
                         </p>
+
                     </div>
 
-                    <div class="rounded-xl bg-[var(--admin-surface)] p-4">
+
+                    <div
+                        class="rounded-xl bg-[var(--admin-surface)] p-4"
+                    >
 
                         <p
                             id="seo_preview_title"
@@ -712,6 +837,7 @@
                         >
                             {{ old('meta_title', $product->meta_title ?? '') ?: 'عنوان محصول شما' }}
                         </p>
+
 
                         <p
                             id="seo_preview_url"
@@ -721,6 +847,7 @@
                                 ? url('/product/' . $product->slug)
                                 : url('/product/example') }}
                         </p>
+
 
                         <p
                             id="seo_preview_description"
@@ -737,80 +864,17 @@
 
         </div>
 
-        @push('scripts')
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
-
-                    const titleInput =
-                        document.getElementById('meta_title');
-
-                    const descriptionInput =
-                        document.getElementById('meta_description');
-
-                    const titleCounter =
-                        document.getElementById('meta_title_counter');
-
-                    const descriptionCounter =
-                        document.getElementById('meta_description_counter');
-
-                    const previewTitle =
-                        document.getElementById('seo_preview_title');
-
-                    const previewDescription =
-                        document.getElementById('seo_preview_description');
-
-                    const nameInput =
-                        document.getElementById('name');
-
-                    function updateSeoPreview() {
-
-                        const title =
-                            titleInput.value.trim();
-
-                        const description =
-                            descriptionInput.value.trim();
-
-                        titleCounter.textContent =
-                            `${title.length} / 255`;
-
-                        descriptionCounter.textContent =
-                            `${description.length} کاراکتر`;
-
-                        previewTitle.textContent =
-                            title
-                            || nameInput.value.trim()
-                            || 'عنوان محصول شما';
-
-                        previewDescription.textContent =
-                            description
-                            || 'توضیحات متا محصول شما اینجا نمایش داده می‌شود.';
-                    }
-
-                    titleInput.addEventListener(
-                        'input',
-                        updateSeoPreview
-                    );
-
-                    descriptionInput.addEventListener(
-                        'input',
-                        updateSeoPreview
-                    );
-
-                    nameInput.addEventListener(
-                        'input',
-                        updateSeoPreview
-                    );
-
-                    updateSeoPreview();
-                });
-            </script>
-        @endpush
     </div>
 
-    {{-- Sidebar --}}
+
+    {{-- ============================================================
+         Sidebar
+    ============================================================ --}}
     <div class="space-y-6">
 
-        {{-- Publish --}}
+        {{-- ========================================================
+             Publish
+        ========================================================= --}}
         <div class="admin-card p-6">
 
             <div class="mb-5">
@@ -825,11 +889,16 @@
 
             </div>
 
+
             <div>
 
-                <label for="status" class="admin-label">
+                <label
+                    for="status"
+                    class="admin-label"
+                >
                     وضعیت
                 </label>
+
 
                 <select
                     id="status"
@@ -837,12 +906,14 @@
                     class="admin-select"
                     required
                 >
+
                     <option
                         value="draft"
                         @selected(old('status', $product->status ?? 'draft') === 'draft')
                     >
                     پیش‌نویس
                     </option>
+
 
                     <option
                         value="active"
@@ -851,13 +922,16 @@
                     فعال
                     </option>
 
+
                     <option
                         value="archived"
                         @selected(old('status', $product->status ?? '') === 'archived')
                     >
                     آرشیو
                     </option>
+
                 </select>
+
 
                 @error('status')
                 <p class="mt-2 text-xs text-[var(--admin-danger)]">
@@ -869,18 +943,27 @@
 
         </div>
 
-        {{-- Flags --}}
+
+        {{-- ========================================================
+             Flags
+        ========================================================= --}}
         <div class="admin-card p-6">
 
             <div class="mb-5">
+
                 <h3 class="text-base font-bold text-[var(--admin-text)]">
                     ویژگی‌های محصول
                 </h3>
+
             </div>
+
 
             <div class="space-y-3">
 
-                <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface-soft)] p-4">
+                {{-- Featured --}}
+                <label
+                    class="flex cursor-pointer items-start gap-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface-soft)] p-4"
+                >
 
                     <input
                         type="hidden"
@@ -896,6 +979,7 @@
                         @checked(old('is_featured', $product->is_featured ?? false))
                     >
 
+
                     <span>
 
                         <span class="block text-sm font-semibold text-[var(--admin-text)]">
@@ -910,7 +994,11 @@
 
                 </label>
 
-                <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface-soft)] p-4">
+
+                {{-- New --}}
+                <label
+                    class="flex cursor-pointer items-start gap-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface-soft)] p-4"
+                >
 
                     <input
                         type="hidden"
@@ -925,6 +1013,7 @@
                         class="admin-checkbox mt-1 h-4 w-4"
                         @checked(old('is_new', $product->is_new ?? false))
                     >
+
 
                     <span>
 
@@ -944,7 +1033,10 @@
 
         </div>
 
-        {{-- Save --}}
+
+        {{-- ========================================================
+             Save
+        ========================================================= --}}
         <div class="admin-card p-6">
 
             <div class="flex flex-col gap-3">
@@ -955,6 +1047,7 @@
                 >
                     {{ $editing ? 'ذخیره تغییرات' : 'ایجاد محصول' }}
                 </button>
+
 
                 <a
                     href="{{ route('admin.products.index') }}"
@@ -971,147 +1064,751 @@
 
 </div>
 
+
+{{-- ================================================================
+     Scripts
+================================================================ --}}
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const enabledInput = document.getElementById('installment_enabled');
-            const settings = document.getElementById('installment_settings');
-            const statusBadge = document.getElementById('installment_status_badge');
 
-            const priceInput = document.getElementById('price');
-            const cashPercentInput = document.getElementById('installment_cash_percent');
-            const chequeCountInput = document.getElementById('installment_cheque_count');
-            const intervalInput = document.getElementById('installment_interval_months');
+            /*
+            |--------------------------------------------------------------------------
+            | Elements
+            |--------------------------------------------------------------------------
+            */
 
-            const totalPreview = document.getElementById('installment_total_preview');
-            const cashPreview = document.getElementById('installment_cash_preview');
-            const deferredPreview = document.getElementById('installment_deferred_preview');
-            const chequesPreview = document.getElementById('installment_cheques_preview');
+            const form =
+                document.querySelector('form');
 
-            const formatter = new Intl.NumberFormat('fa-IR');
+            const priceInput =
+                document.getElementById('price');
+
+            const comparePriceInput =
+                document.getElementById('compare_at_price');
+
+            const stockInput =
+                document.getElementById('stock');
+
+
+            const enabledInput =
+                document.getElementById('installment_enabled');
+
+            const settings =
+                document.getElementById('installment_settings');
+
+            const statusBadge =
+                document.getElementById('installment_status_badge');
+
+
+            const cashPercentInput =
+                document.getElementById('installment_cash_percent');
+
+            const chequeCountInput =
+                document.getElementById('installment_cheque_count');
+
+            const intervalInput =
+                document.getElementById('installment_interval_months');
+
+
+            const totalPreview =
+                document.getElementById('installment_total_preview');
+
+            const cashPreview =
+                document.getElementById('installment_cash_preview');
+
+            const deferredPreview =
+                document.getElementById('installment_deferred_preview');
+
+            const chequesPreview =
+                document.getElementById('installment_cheques_preview');
+
+
+            const titleInput =
+                document.getElementById('meta_title');
+
+            const descriptionInput =
+                document.getElementById('meta_description');
+
+            const titleCounter =
+                document.getElementById('meta_title_counter');
+
+            const descriptionCounter =
+                document.getElementById('meta_description_counter');
+
+            const previewTitle =
+                document.getElementById('seo_preview_title');
+
+            const previewDescription =
+                document.getElementById('seo_preview_description');
+
+            const nameInput =
+                document.getElementById('name');
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Number Helpers
+            |--------------------------------------------------------------------------
+            */
+
+            function normalizeDigits(value) {
+
+                return String(value || '')
+                    .replace(/[۰-۹]/g, function (digit) {
+
+                        return '۰۱۲۳۴۵۶۷۸۹'.indexOf(digit);
+
+                    })
+                    .replace(/[٠-٩]/g, function (digit) {
+
+                        return '٠١٢٣٤٥٦٧٨٩'.indexOf(digit);
+
+                    });
+
+            }
+
+
+            function getRawNumber(value) {
+
+                return normalizeDigits(value)
+                    .replace(/,/g, '')
+                    .replace(/٬/g, '')
+                    .replace(/[^\d]/g, '');
+
+            }
+
+
+            function formatNumber(value) {
+
+                const raw =
+                    getRawNumber(value);
+
+                if (!raw) {
+                    return '';
+                }
+
+                return Number(raw).toLocaleString('en-US');
+
+            }
+
 
             function formatMoney(value) {
-                return `${formatter.format(Math.round(value))} تومان`;
+
+                return `${Number(value || 0).toLocaleString('fa-IR')} تومان`;
+
             }
 
-            function updateStatus() {
-                const enabled = enabledInput.checked;
 
-                settings.classList.toggle('hidden', !enabled);
+            /*
+            |--------------------------------------------------------------------------
+            | Price / Number Input Formatting
+            |--------------------------------------------------------------------------
+            */
 
-                statusBadge.textContent = enabled
-                    ? 'فعال'
-                    : 'غیرفعال';
+            function setupNumberInput(input) {
+
+                if (!input) {
+                    return;
+                }
+
+
+                /*
+                 * Format existing value when editing
+                 *
+                 * 15000000
+                 * ↓
+                 * 15,000,000
+                 */
+                input.value =
+                    formatNumber(input.value);
+
+
+                input.addEventListener('input', function () {
+
+                    const oldValue =
+                        input.value;
+
+                    const cursorPosition =
+                        input.selectionStart || 0;
+
+
+                    /*
+                     * How many actual digits
+                     * were before cursor?
+                     */
+                    const digitsBeforeCursor =
+                        getRawNumber(
+                            oldValue.substring(
+                                0,
+                                cursorPosition
+                            )
+                        ).length;
+
+
+                    /*
+                     * Format number
+                     */
+                    input.value =
+                        formatNumber(oldValue);
+
+
+                    /*
+                     * Restore cursor position
+                     */
+                    let newCursorPosition = 0;
+
+                    let digitCount = 0;
+
+
+                    for (
+                        let i = 0;
+                        i < input.value.length;
+                        i++
+                    ) {
+
+                        if (/\d/.test(input.value[i])) {
+
+                            digitCount++;
+
+                        }
+
+
+                        newCursorPosition =
+                            i + 1;
+
+
+                        if (
+                            digitCount >=
+                            digitsBeforeCursor
+                        ) {
+
+                            break;
+
+                        }
+
+                    }
+
+
+                    input.setSelectionRange(
+                        newCursorPosition,
+                        newCursorPosition
+                    );
+
+
+                    /*
+                     * Price changes should update
+                     * installment preview.
+                     */
+                    if (
+                        input === priceInput &&
+                        enabledInput &&
+                        enabledInput.checked
+                    ) {
+
+                        updateInstallmentPreview();
+
+                    }
+
+                });
+
+            }
+
+
+            setupNumberInput(priceInput);
+
+            setupNumberInput(comparePriceInput);
+
+            setupNumberInput(stockInput);
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Installment Status
+            |--------------------------------------------------------------------------
+            */
+
+            function updateInstallmentStatus() {
+
+                if (!enabledInput) {
+                    return;
+                }
+
+
+                const enabled =
+                    enabledInput.checked;
+
+
+                if (settings) {
+
+                    settings.classList.toggle(
+                        'hidden',
+                        !enabled
+                    );
+
+                }
+
+
+                if (statusBadge) {
+
+                    statusBadge.textContent =
+                        enabled
+                            ? 'فعال'
+                            : 'غیرفعال';
+
+                }
+
 
                 if (enabled) {
-                    updatePreview();
+
+                    updateInstallmentPreview();
+
                 }
+
             }
 
-            function updatePreview() {
-                if (!enabledInput.checked) {
+
+            /*
+            |--------------------------------------------------------------------------
+            | Installment Preview
+            |--------------------------------------------------------------------------
+            */
+
+            function updateInstallmentPreview() {
+
+                if (
+                    !enabledInput ||
+                    !enabledInput.checked
+                ) {
+
+                    return;
+
+                }
+
+
+                /*
+                 * IMPORTANT:
+                 *
+                 * Price is visually:
+                 *
+                 * 15,000,000
+                 *
+                 * But calculation must use:
+                 *
+                 * 15000000
+                 */
+                const total =
+                    Number(
+                        getRawNumber(
+                            priceInput?.value || ''
+                        ) || 0
+                    );
+
+
+                const cashPercent =
+                    Number(
+                        cashPercentInput?.value || 0
+                    );
+
+
+                const chequeCount =
+                    Math.max(
+                        1,
+                        Number(
+                            chequeCountInput?.value || 1
+                        )
+                    );
+
+
+                const intervalMonths =
+                    Math.max(
+                        1,
+                        Number(
+                            intervalInput?.value || 1
+                        )
+                    );
+
+
+                /*
+                 * Invalid values
+                 */
+                if (
+                    total <= 0 ||
+                    cashPercent <= 0
+                ) {
+
+                    if (totalPreview) {
+
+                        totalPreview.textContent =
+                            formatMoney(0);
+
+                    }
+
+
+                    if (cashPreview) {
+
+                        cashPreview.textContent =
+                            formatMoney(0);
+
+                    }
+
+
+                    if (deferredPreview) {
+
+                        deferredPreview.textContent =
+                            formatMoney(0);
+
+                    }
+
+
+                    if (chequesPreview) {
+
+                        chequesPreview.innerHTML =
+                            '';
+
+                    }
+
+
+                    return;
+
+                }
+
+
+                /*
+                 * Cash payment
+                 */
+                const cashAmount =
+                    Math.round(
+                        total *
+                        (cashPercent / 100)
+                    );
+
+
+                /*
+                 * Remaining amount
+                 */
+                const deferredAmount =
+                    Math.max(
+                        0,
+                        total - cashAmount
+                    );
+
+
+                /*
+                 * Main cards
+                 */
+                if (totalPreview) {
+
+                    totalPreview.textContent =
+                        formatMoney(total);
+
+                }
+
+
+                if (cashPreview) {
+
+                    cashPreview.textContent =
+                        formatMoney(cashAmount);
+
+                }
+
+
+                if (deferredPreview) {
+
+                    deferredPreview.textContent =
+                        formatMoney(deferredAmount);
+
+                }
+
+
+                /*
+                 * Cheques
+                 */
+                if (!chequesPreview) {
                     return;
                 }
 
-                const total = Number(priceInput.value || 0);
-                const cashPercent = Number(cashPercentInput.value || 0);
-                const chequeCount = Math.max(
-                    1,
-                    Number(chequeCountInput.value || 1)
-                );
-                const intervalMonths = Math.max(
-                    1,
-                    Number(intervalInput.value || 1)
-                );
 
-                if (total <= 0 || cashPercent <= 0) {
-                    totalPreview.textContent = formatMoney(0);
-                    cashPreview.textContent = formatMoney(0);
-                    deferredPreview.textContent = formatMoney(0);
-                    chequesPreview.innerHTML = '';
-                    return;
-                }
+                const baseAmount =
+                    Math.floor(
+                        deferredAmount /
+                        chequeCount
+                    );
 
-                const cashAmount = Math.round(
-                    total * (cashPercent / 100)
-                );
-
-                const deferredAmount = Math.max(
-                    0,
-                    total - cashAmount
-                );
-
-                totalPreview.textContent =
-                    formatMoney(total);
-
-                cashPreview.textContent =
-                    formatMoney(cashAmount);
-
-                deferredPreview.textContent =
-                    formatMoney(deferredAmount);
-
-                const baseAmount = Math.floor(
-                    deferredAmount / chequeCount
-                );
 
                 let distributed = 0;
 
                 const rows = [];
 
-                for (let index = 1; index <= chequeCount; index++) {
+
+                for (
+                    let index = 1;
+                    index <= chequeCount;
+                    index++
+                ) {
+
                     let amount;
 
-                    if (index === chequeCount) {
+
+                    /*
+                     * Last cheque receives
+                     * the rounding remainder.
+                     */
+                    if (
+                        index === chequeCount
+                    ) {
+
                         amount =
-                            deferredAmount - distributed;
+                            deferredAmount -
+                            distributed;
+
                     } else {
-                        amount = baseAmount;
+
+                        amount =
+                            baseAmount;
+
                     }
+
 
                     distributed += amount;
 
+
                     const months =
-                        intervalMonths * index;
+                        intervalMonths *
+                        index;
+
 
                     rows.push(`
-                <div class="flex items-center justify-between rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-4 py-3">
+
+                <div
+                    class="flex items-center justify-between rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-4 py-3"
+                >
+
                     <div>
+
                         <p class="text-xs text-[var(--admin-muted)]">
-                            چک ${formatter.format(index)}
+                            چک ${Number(index).toLocaleString('fa-IR')}
                         </p>
+
                         <p class="mt-1 text-sm font-semibold text-[var(--admin-text)]">
                             ${formatMoney(amount)}
                         </p>
+
                     </div>
 
-                    <span class="rounded-full border border-[var(--admin-border)] px-3 py-1 text-xs text-[var(--admin-muted)]">
-                        ${formatter.format(months)} ماه بعد
+
+                    <span
+                        class="rounded-full border border-[var(--admin-border)] px-3 py-1 text-xs text-[var(--admin-muted)]"
+                    >
+                        ${Number(months).toLocaleString('fa-IR')} ماه بعد
                     </span>
+
                 </div>
+
             `);
+
                 }
 
-                chequesPreview.innerHTML = rows.join('');
+
+                chequesPreview.innerHTML =
+                    rows.join('');
+
             }
 
-            enabledInput.addEventListener(
-                'change',
-                updateStatus
-            );
+
+            /*
+            |--------------------------------------------------------------------------
+            | SEO Preview
+            |--------------------------------------------------------------------------
+            */
+
+            function updateSeoPreview() {
+
+                if (
+                    !titleInput ||
+                    !descriptionInput
+                ) {
+
+                    return;
+
+                }
+
+
+                const title =
+                    titleInput.value.trim();
+
+
+                const description =
+                    descriptionInput.value.trim();
+
+
+                if (titleCounter) {
+
+                    titleCounter.textContent =
+                        `${title.length} / 255`;
+
+                }
+
+
+                if (descriptionCounter) {
+
+                    descriptionCounter.textContent =
+                        `${description.length} کاراکتر`;
+
+                }
+
+
+                if (previewTitle) {
+
+                    previewTitle.textContent =
+                        title ||
+                        nameInput?.value.trim() ||
+                        'عنوان محصول شما';
+
+                }
+
+
+                if (previewDescription) {
+
+                    previewDescription.textContent =
+                        description ||
+                        'توضیحات متا محصول شما اینجا نمایش داده می‌شود.';
+
+                }
+
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Events
+            |--------------------------------------------------------------------------
+            */
+
+            if (enabledInput) {
+
+                enabledInput.addEventListener(
+                    'change',
+                    updateInstallmentStatus
+                );
+
+            }
+
 
             [
-                priceInput,
                 cashPercentInput,
                 chequeCountInput,
                 intervalInput
-            ].forEach(function (input) {
-                input.addEventListener(
-                    'input',
-                    updatePreview
-                );
-            });
+            ]
+                .filter(Boolean)
+                .forEach(function (input) {
 
-            updateStatus();
+                    input.addEventListener(
+                        'input',
+                        updateInstallmentPreview
+                    );
+
+                });
+
+
+            if (titleInput) {
+
+                titleInput.addEventListener(
+                    'input',
+                    updateSeoPreview
+                );
+
+            }
+
+
+            if (descriptionInput) {
+
+                descriptionInput.addEventListener(
+                    'input',
+                    updateSeoPreview
+                );
+
+            }
+
+
+            if (nameInput) {
+
+                nameInput.addEventListener(
+                    'input',
+                    updateSeoPreview
+                );
+
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Form Submit
+            |--------------------------------------------------------------------------
+            |
+            | IMPORTANT:
+            |
+            | User sees:
+            |
+            | 15,000,000
+            |
+            | Backend receives:
+            |
+            | 15000000
+            |
+            */
+
+            if (form) {
+
+                form.addEventListener(
+                    'submit',
+                    function () {
+
+                        if (priceInput) {
+
+                            priceInput.value =
+                                getRawNumber(
+                                    priceInput.value
+                                );
+
+                        }
+
+
+                        if (comparePriceInput) {
+
+                            comparePriceInput.value =
+                                getRawNumber(
+                                    comparePriceInput.value
+                                );
+
+                        }
+
+
+                        if (stockInput) {
+
+                            stockInput.value =
+                                getRawNumber(
+                                    stockInput.value
+                                );
+
+                        }
+
+                    }
+                );
+
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Initial State
+            |--------------------------------------------------------------------------
+            */
+
+            updateInstallmentStatus();
+
+            updateSeoPreview();
+
         });
     </script>
 @endpush

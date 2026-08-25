@@ -47,28 +47,21 @@
     >
 
     <script type="application/ld+json">
-{
-    "@@context": "https://schema.org",
-    "@@type": "WebSite",
-    "name": "LIVORA",
-    "url": @json(url('/')),
-    "potentialAction": {
-        "@@type": "SearchAction",
-        "target": @json(url('/shop') . '?search={search_term_string}'),
-        "query-input": "required name=search_term_string"
+    {
+        "@@context": "https://schema.org",
+        "@@type": "WebSite",
+        "name": "LIVORA",
+        "url": @json(url('/')),
+        "potentialAction": {
+            "@@type": "SearchAction",
+            "target": @json(url('/shop') . '?search={search_term_string}'),
+            "query-input": "required name=search_term_string"
+        }
     }
-}
-</script>
+    </script>
 
-{{--    <script type="application/ld+json">--}}
-{{--{--}}
-{{--    "@@context": "https://schema.org",--}}
-{{--    "@@type": "Organization",--}}
-{{--    "name": "LIVORA",--}}
-{{--    "url": @json(url('/'))--}}
-{{--        }--}}
-{{--</script>--}}
 @endpush
+
 
 @section('content')
 
@@ -77,6 +70,7 @@
         {{-- =========================================================
              HERO
         ========================================================== --}}
+
         <section class="border-b border-[var(--livora-border)] bg-[var(--livora-white)]">
 
             <x-layout.container>
@@ -98,10 +92,11 @@
                         <span>/</span>
 
                         <span class="text-[var(--livora-ink)]">
-                        تماس با ما
-                    </span>
+                            تماس با ما
+                        </span>
 
                     </nav>
+
 
                     <div class="mt-10 grid items-end gap-10 lg:grid-cols-[1.1fr_0.9fr]">
 
@@ -114,11 +109,12 @@
                             <h1 class="mt-5 text-5xl font-semibold leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl">
                                 برای انتخاب بهتر،
                                 <span class="block text-[var(--livora-accent)]">
-                                کنار شما هستیم.
-                            </span>
+                                    کنار شما هستیم.
+                                </span>
                             </h1>
 
                         </div>
+
 
                         <div>
 
@@ -148,525 +144,679 @@
         {{-- =========================================================
              CONTACT METHODS
         ========================================================== --}}
+
         <section class="border-b border-[var(--livora-border)]">
 
             <x-layout.container>
 
                 <div class="grid gap-4 py-10 sm:grid-cols-2 lg:grid-cols-4">
 
+                    {{-- PHONE --}}
+
+                    @if($contactSetting?->phone)
+
+                        <a
+                            href="tel:{{ $contactSetting->phone }}"
+                            class="group rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-6 transition duration-300 hover:-translate-y-1 hover:border-[var(--livora-ink)]"
+                        >
+
+                            @else
+
+                                <div
+                                    class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-6"
+                                >
+
+                                    @endif
+
+                                    <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--livora-surface)] text-xs font-semibold">
+                                        01
+                                    </div>
+
+                                    <p class="mt-7 text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                                        PHONE
+                                    </p>
+
+                                    <h2 class="mt-2 text-base font-semibold">
+                                        {{ $contactSetting?->phone_label ?? 'تماس تلفنی' }}
+                                    </h2>
+
+                                    <p class="mt-3 break-all text-xs leading-6 text-[var(--livora-stone)]">
+                                        {{ $contactSetting?->phone ?? 'شماره تماس ثبت نشده است.' }}
+                                    </p>
+
+                                @if($contactSetting?->phone)
+
+                        </a>
+
+                    @else
+
+                </div>
+
+                @endif
+
+
+                {{-- EMAIL --}}
+
+                @if($contactSetting?->email)
+
                     <a
-                        href="tel:{{ config('app.contact.phone') }}"
+                        href="mailto:{{ $contactSetting->email }}"
                         class="group rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-6 transition duration-300 hover:-translate-y-1 hover:border-[var(--livora-ink)]"
                     >
 
-                        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--livora-surface)] text-xs font-semibold">
-                            01
-                        </div>
+                        @else
 
-                        <p class="mt-7 text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
-                            PHONE
-                        </p>
+                            <div
+                                class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-6"
+                            >
 
-                        <h2 class="mt-2 text-base font-semibold">
-                            تماس تلفنی
-                        </h2>
+                                @endif
 
-                        <p class="mt-3 break-all text-xs leading-6 text-[var(--livora-stone)]">
-                            {{ config('app.contact.phone', 'شماره تماس شما') }}
-                        </p>
+                                <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--livora-surface)] text-xs font-semibold">
+                                    02
+                                </div>
 
-                    </a>
+                                <p class="mt-7 text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                                    EMAIL
+                                </p>
 
+                                <h2 class="mt-2 text-base font-semibold">
+                                    {{ $contactSetting?->email_label ?? 'ایمیل' }}
+                                </h2>
 
-                    <a
-                        href="mailto:{{ config('app.contact.email') }}"
-                        class="group rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-6 transition duration-300 hover:-translate-y-1 hover:border-[var(--livora-ink)]"
-                    >
+                                <p class="mt-3 break-all text-xs leading-6 text-[var(--livora-stone)]">
+                                    {{ $contactSetting?->email ?? 'ایمیل ثبت نشده است.' }}
+                                </p>
 
-                        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--livora-surface)] text-xs font-semibold">
-                            02
-                        </div>
-
-                        <p class="mt-7 text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
-                            EMAIL
-                        </p>
-
-                        <h2 class="mt-2 text-base font-semibold">
-                            ایمیل
-                        </h2>
-
-                        <p class="mt-3 break-all text-xs leading-6 text-[var(--livora-stone)]">
-                            {{ config('app.contact.email', 'ایمیل شما') }}
-                        </p>
+                            @if($contactSetting?->email)
 
                     </a>
 
+        @else
 
-                    <div class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-6">
+    </div>
 
-                        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--livora-surface)] text-xs font-semibold">
-                            03
+    @endif
+
+
+    {{-- SUPPORT --}}
+
+    <div class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-6">
+
+        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--livora-surface)] text-xs font-semibold">
+            03
+        </div>
+
+        <p class="mt-7 text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+            SUPPORT
+        </p>
+
+        <h2 class="mt-2 text-base font-semibold">
+            {{ $contactSetting?->support_label ?? 'پشتیبانی' }}
+        </h2>
+
+        <p class="mt-3 text-xs leading-6 text-[var(--livora-stone)]">
+            {{ $contactSetting?->support_description ?? 'پاسخ‌گویی به پرسش‌های خرید و سفارش.' }}
+        </p>
+
+    </div>
+
+
+    {{-- ONLINE --}}
+
+    <div class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-6">
+
+        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--livora-surface)] text-xs font-semibold">
+            04
+        </div>
+
+        <p class="mt-7 text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+            ONLINE
+        </p>
+
+        <h2 class="mt-2 text-base font-semibold">
+            {{ $contactSetting?->online_label ?? 'ارتباط آنلاین' }}
+        </h2>
+
+        <p class="mt-3 text-xs leading-6 text-[var(--livora-stone)]">
+            {{ $contactSetting?->online_description ?? 'پیام خود را ارسال کنید تا با شما تماس بگیریم.' }}
+        </p>
+
+    </div>
+
+    </div>
+
+    </x-layout.container>
+
+    </section>
+
+
+    {{-- =========================================================
+         FORM + INFO
+    ========================================================== --}}
+
+    <section id="contact-form">
+
+        <x-layout.container>
+
+            <div class="grid gap-8 py-14 sm:py-16 lg:grid-cols-[0.8fr_1.2fr] lg:py-24">
+
+                {{-- INFO --}}
+
+                <div>
+
+                    <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--livora-accent)]">
+                        LET'S TALK
+                    </p>
+
+                    <h2 class="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
+                        چه کمکی از دست ما برمی‌آید؟
+                    </h2>
+
+                    <p class="mt-5 max-w-xl text-sm leading-8 text-[var(--livora-stone)]">
+                        اگر درباره محصول، موجودی، قیمت، شرایط خرید اقساطی،
+                        ارسال یا سفارش خود سؤالی دارید، پیام بگذارید.
+                    </p>
+
+
+                    {{-- ADDRESS --}}
+
+                    <div class="mt-10 space-y-3">
+
+                        <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-5">
+
+                            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                                ADDRESS
+                            </p>
+
+                            <p class="mt-3 text-sm leading-8 text-[var(--livora-stone)]">
+                                {{ $contactSetting?->address ?? 'آدرس فروشگاه ثبت نشده است.' }}
+                            </p>
+
                         </div>
 
-                        <p class="mt-7 text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
-                            SUPPORT
-                        </p>
 
-                        <h2 class="mt-2 text-base font-semibold">
-                            پشتیبانی
-                        </h2>
+                        {{-- HOURS --}}
 
-                        <p class="mt-3 text-xs leading-6 text-[var(--livora-stone)]">
-                            پاسخ‌گویی به پرسش‌های خرید و سفارش.
-                        </p>
+                        <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-5">
 
-                    </div>
+                            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                                HOURS
+                            </p>
 
+                            <p class="mt-3 text-sm leading-8 text-[var(--livora-stone)]">
+                                {{ $contactSetting?->hours ?? 'ساعات کاری فروشگاه ثبت نشده است.' }}
+                            </p>
 
-                    <div class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-6">
-
-                        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--livora-surface)] text-xs font-semibold">
-                            04
                         </div>
 
-                        <p class="mt-7 text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
-                            ONLINE
-                        </p>
 
-                        <h2 class="mt-2 text-base font-semibold">
-                            ارتباط آنلاین
-                        </h2>
+                        {{-- INSTALLMENT --}}
 
-                        <p class="mt-3 text-xs leading-6 text-[var(--livora-stone)]">
-                            پیام خود را ارسال کنید تا با شما تماس بگیریم.
-                        </p>
+                        <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-5">
+
+                            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                                INSTALLMENT
+                            </p>
+
+                            <p class="mt-3 text-sm leading-8 text-[var(--livora-stone)]">
+                                برای اطلاع از شرایط اقساط هر محصول،
+                                صفحه همان محصول را بررسی کنید یا از طریق فرم با ما تماس بگیرید.
+                            </p>
+
+                        </div>
 
                     </div>
 
                 </div>
 
-            </x-layout.container>
 
-        </section>
+                {{-- FORM --}}
 
+                <div class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-6 sm:p-8 lg:p-10">
 
-        {{-- =========================================================
-             FORM + INFO
-        ========================================================== --}}
-        <section id="contact-form">
+                    <div class="mb-8">
 
-            <x-layout.container>
-
-                <div class="grid gap-8 py-14 sm:py-18 lg:grid-cols-[0.8fr_1.2fr] lg:py-24">
-
-                    {{-- INFO --}}
-                    <div>
-
-                        <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--livora-accent)]">
-                            LET'S TALK
+                        <p class="text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--livora-accent)]">
+                            CONTACT FORM
                         </p>
 
-                        <h2 class="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
-                            چه کمکی از دست ما برمی‌آید؟
+                        <h2 class="mt-3 text-2xl font-semibold">
+                            پیام خود را ارسال کنید
                         </h2>
 
-                        <p class="mt-5 max-w-xl text-sm leading-8 text-[var(--livora-stone)]">
-                            اگر درباره محصول، موجودی، قیمت، شرایط خرید اقساطی،
-                            ارسال یا سفارش خود سؤالی دارید، پیام بگذارید.
+                        <p class="mt-2 text-xs leading-7 text-[var(--livora-stone)]">
+                            اطلاعات تماس خود را وارد کنید تا بتوانیم پاسخ دقیق‌تری ارائه دهیم.
                         </p>
-
-
-                        {{-- Contact Details --}}
-                        <div class="mt-10 space-y-3">
-
-                            <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-5">
-
-                                <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
-                                    ADDRESS
-                                </p>
-
-                                <p class="mt-3 text-sm leading-8 text-[var(--livora-stone)]">
-                                    {{ config('app.contact.address', 'آدرس فروشگاه در این قسمت قرار می‌گیرد.') }}
-                                </p>
-
-                            </div>
-
-
-                            <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-5">
-
-                                <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
-                                    HOURS
-                                </p>
-
-                                <p class="mt-3 text-sm leading-8 text-[var(--livora-stone)]">
-                                    {{ config('app.contact.hours', 'ساعات کاری فروشگاه') }}
-                                </p>
-
-                            </div>
-
-
-                            <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-5">
-
-                                <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
-                                    INSTALLMENT
-                                </p>
-
-                                <p class="mt-3 text-sm leading-8 text-[var(--livora-stone)]">
-                                    برای اطلاع از شرایط اقساط هر محصول،
-                                    صفحه همان محصول را بررسی کنید یا از طریق فرم با ما تماس بگیرید.
-                                </p>
-
-                            </div>
-
-                        </div>
 
                     </div>
 
 
-                    {{-- FORM --}}
-                    <div class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-6 sm:p-8 lg:p-10">
+                    {{-- SUCCESS MESSAGE --}}
 
-                        <div class="mb-8">
+                    @if(session('success'))
 
-                            <p class="text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--livora-accent)]">
-                                CONTACT FORM
-                            </p>
+                        <div class="mb-6 rounded-2xl border border-[var(--livora-success)]/20 bg-[var(--livora-success-soft)] p-4">
 
-                            <h2 class="mt-3 text-2xl font-semibold">
-                                پیام خود را ارسال کنید
-                            </h2>
-
-                            <p class="mt-2 text-xs leading-7 text-[var(--livora-stone)]">
-                                اطلاعات تماس خود را وارد کنید تا بتوانیم پاسخ دقیق‌تری ارائه دهیم.
+                            <p class="text-xs leading-7 text-[var(--livora-success)]">
+                                {{ session('success') }}
                             </p>
 
                         </div>
 
-
-                        {{--
-                            این فرم را فعلاً به route جدید وصل نمی‌کنیم.
-                            چون در پروژه فعلی route پردازش فرم تماس نداریم.
-                        --}}
-                        <form
-                            action="#"
-                            method="POST"
-                            class="space-y-5"
-                            onsubmit="return false;"
-                        >
-
-                            @csrf
-
-                            <div class="grid gap-5 sm:grid-cols-2">
-
-                                <div>
-
-                                    <label
-                                        for="name"
-                                        class="admin-label"
-                                    >
-                                        نام و نام خانوادگی
-                                    </label>
-
-                                    <input
-                                        id="name"
-                                        name="name"
-                                        type="text"
-                                        value="{{ old('name', auth()->user()->name ?? '') }}"
-                                        class="admin-input mt-2 w-full"
-                                        autocomplete="name"
-                                        placeholder="نام شما"
-                                    >
-
-                                </div>
+                    @endif
 
 
-                                <div>
+                    {{-- VALIDATION ERRORS --}}
 
-                                    <label
-                                        for="phone"
-                                        class="admin-label"
-                                    >
-                                        شماره تماس
-                                    </label>
+                    @if($errors->any())
 
-                                    <input
-                                        id="phone"
-                                        name="phone"
-                                        type="tel"
-                                        value="{{ old('phone', auth()->user()->phone ?? '') }}"
-                                        class="admin-input mt-2 w-full"
-                                        autocomplete="tel"
-                                        dir="ltr"
-                                        placeholder="09xxxxxxxxx"
-                                    >
+                        <div class="mb-6 rounded-2xl border border-[var(--livora-danger)]/20 bg-[var(--livora-danger-soft)] p-4">
 
-                                </div>
+                            <ul class="space-y-1 text-xs leading-6 text-[var(--livora-danger)]">
 
-                            </div>
+                                @foreach($errors->all() as $error)
 
+                                    <li>
+                                        {{ $error }}
+                                    </li>
+
+                                @endforeach
+
+                            </ul>
+
+                        </div>
+
+                    @endif
+
+
+                    {{-- CONTACT FORM --}}
+
+                    <form
+                        action="{{ route('contact.store') }}"
+                        method="POST"
+                        class="space-y-5"
+                    >
+
+                        @csrf
+
+
+                        {{-- NAME + PHONE --}}
+
+                        <div class="grid gap-5 sm:grid-cols-2">
+
+                            {{-- NAME --}}
 
                             <div>
 
                                 <label
-                                    for="email"
+                                    for="name"
                                     class="admin-label"
                                 >
-                                    ایمیل
+                                    نام و نام خانوادگی
                                 </label>
 
                                 <input
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    value="{{ old('email', auth()->user()->email ?? '') }}"
-                                    class="admin-input mt-2 w-full"
-                                    autocomplete="email"
-                                    dir="ltr"
-                                    placeholder="you@example.com"
+                                    id="name"
+                                    name="name"
+                                    type="text"
+                                    value="{{ old('name', auth()->user()?->name) }}"
+                                    class="admin-input mt-2 w-full @error('name') border-[var(--livora-danger)] @enderror"
+                                    autocomplete="name"
+                                    placeholder="نام شما"
                                 >
 
-                            </div>
+                                @error('name')
 
-
-                            <div>
-
-                                <label
-                                    for="subject"
-                                    class="admin-label"
-                                >
-                                    موضوع
-                                </label>
-
-                                <select
-                                    id="subject"
-                                    name="subject"
-                                    class="admin-select mt-2 w-full"
-                                >
-
-                                    <option value="">
-                                        انتخاب موضوع
-                                    </option>
-
-                                    <option value="product">
-                                        مشاوره درباره محصول
-                                    </option>
-
-                                    <option value="installment">
-                                        شرایط خرید اقساطی
-                                    </option>
-
-                                    <option value="order">
-                                        پیگیری سفارش
-                                    </option>
-
-                                    <option value="shipping">
-                                        ارسال و تحویل
-                                    </option>
-
-                                    <option value="other">
-                                        سایر
-                                    </option>
-
-                                </select>
-
-                            </div>
-
-
-                            <div>
-
-                                <label
-                                    for="message"
-                                    class="admin-label"
-                                >
-                                    پیام
-                                </label>
-
-                                <textarea
-                                    id="message"
-                                    name="message"
-                                    rows="7"
-                                    class="admin-textarea mt-2 w-full"
-                                    placeholder="پیام خود را بنویسید..."
-                                ></textarea>
-
-                            </div>
-
-
-                            <div class="rounded-2xl bg-[var(--livora-surface)] p-4">
-
-                                <p class="text-[11px] leading-7 text-[var(--livora-stone)]">
-                                    فرم تماس در محیط فعلی به‌صورت نمایشی آماده شده است.
-                                    پس از ساخت Controller و endpoint تماس، ارسال واقعی این فرم فعال می‌شود.
+                                <p class="mt-1 text-[11px] text-[var(--livora-danger)]">
+                                    {{ $message }}
                                 </p>
 
+                                @enderror
+
                             </div>
 
 
-                            <button
-                                type="submit"
-                                disabled
-                                class="w-full cursor-not-allowed rounded-2xl bg-[var(--livora-ink)] px-6 py-4 text-sm font-medium text-white opacity-50"
+                            {{-- PHONE --}}
+
+                            <div>
+
+                                <label
+                                    for="phone"
+                                    class="admin-label"
+                                >
+                                    شماره تماس
+                                </label>
+
+                                <input
+                                    id="phone"
+                                    name="phone"
+                                    type="tel"
+                                    value="{{ old('phone', auth()->user()?->phone) }}"
+                                    class="admin-input mt-2 w-full @error('phone') border-[var(--livora-danger)] @enderror"
+                                    autocomplete="tel"
+                                    dir="ltr"
+                                    placeholder="09xxxxxxxxx"
+                                >
+
+                                @error('phone')
+
+                                <p class="mt-1 text-[11px] text-[var(--livora-danger)]">
+                                    {{ $message }}
+                                </p>
+
+                                @enderror
+
+                            </div>
+
+                        </div>
+
+
+                        {{-- EMAIL --}}
+
+                        <div>
+
+                            <label
+                                for="email"
+                                class="admin-label"
                             >
-                                ارسال پیام
+                                ایمیل
+                            </label>
+
+                            <input
+                                id="email"
+                                name="email"
+                                type="email"
+                                value="{{ old('email', auth()->user()?->email) }}"
+                                class="admin-input mt-2 w-full @error('email') border-[var(--livora-danger)] @enderror"
+                                autocomplete="email"
+                                dir="ltr"
+                                placeholder="you@example.com"
+                            >
+
+                            @error('email')
+
+                            <p class="mt-1 text-[11px] text-[var(--livora-danger)]">
+                                {{ $message }}
+                            </p>
+
+                            @enderror
+
+                        </div>
+
+
+                        {{-- SUBJECT --}}
+
+                        <div>
+
+                            <label
+                                for="subject"
+                                class="admin-label"
+                            >
+                                موضوع
+                            </label>
+
+                            <select
+                                id="subject"
+                                name="subject"
+                                class="admin-select mt-2 w-full @error('subject') border-[var(--livora-danger)] @enderror"
+                            >
+
+                                <option value="">
+                                    انتخاب موضوع
+                                </option>
+
+                                <option
+                                    value="product"
+                                    @selected(old('subject') === 'product')
+                                >
+                                مشاوره درباره محصول
+                                </option>
+
+                                <option
+                                    value="installment"
+                                    @selected(old('subject') === 'installment')
+                                >
+                                شرایط خرید اقساطی
+                                </option>
+
+                                <option
+                                    value="order"
+                                    @selected(old('subject') === 'order')
+                                >
+                                پیگیری سفارش
+                                </option>
+
+                                <option
+                                    value="shipping"
+                                    @selected(old('subject') === 'shipping')
+                                >
+                                ارسال و تحویل
+                                </option>
+
+                                <option
+                                    value="other"
+                                    @selected(old('subject') === 'other')
+                                >
+                                سایر
+                                </option>
+
+                            </select>
+
+                            @error('subject')
+
+                            <p class="mt-1 text-[11px] text-[var(--livora-danger)]">
+                                {{ $message }}
+                            </p>
+
+                            @enderror
+
+                        </div>
+
+
+                        {{-- MESSAGE --}}
+
+                        <div>
+
+                            <label
+                                for="message"
+                                class="admin-label"
+                            >
+                                پیام
+                            </label>
+
+                            <textarea
+                                id="message"
+                                name="message"
+                                rows="7"
+                                class="admin-textarea mt-2 w-full @error('message') border-[var(--livora-danger)] @enderror"
+                                placeholder="پیام خود را بنویسید..."
+                            >{{ old('message') }}</textarea>
+
+                            @error('message')
+
+                            <p class="mt-1 text-[11px] text-[var(--livora-danger)]">
+                                {{ $message }}
+                            </p>
+
+                            @enderror
+
+                        </div>
+
+
+                        {{-- FORM NOTE --}}
+
+                        <div class="rounded-2xl bg-[var(--livora-surface)] p-4">
+
+                            <p class="text-[11px] leading-7 text-[var(--livora-stone)]">
+                                پیام شما پس از ارسال بررسی می‌شود و در صورت نیاز
+                                از طریق اطلاعات تماس واردشده با شما ارتباط خواهیم گرفت.
+                            </p>
+
+                        </div>
+
+
+                        {{-- SUBMIT --}}
+
+                        <button
+                            type="submit"
+                            class="w-full rounded-2xl bg-[var(--livora-ink)] px-6 py-4 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:bg-[var(--livora-accent)]"
+                        >
+                            ارسال پیام
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </x-layout.container>
+
+    </section>
+
+
+    {{-- =========================================================
+         FAQ
+         FAQ is intentionally static for the first version.
+    ========================================================== --}}
+
+    <section class="border-t border-[var(--livora-border)] bg-[var(--livora-white)]">
+
+        <x-layout.container>
+
+            <div
+                x-data="{ active: null }"
+                class="grid gap-10 py-14 sm:py-16 lg:grid-cols-[0.7fr_1.3fr] lg:py-24"
+            >
+
+                <div>
+
+                    <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--livora-accent)]">
+                        FAQ
+                    </p>
+
+                    <h2 class="mt-4 text-3xl font-semibold tracking-tight">
+                        پرسش‌های متداول
+                    </h2>
+
+                    <p class="mt-4 text-sm leading-8 text-[var(--livora-stone)]">
+                        پاسخ چند سؤال رایج درباره ارتباط با LIVORA و خرید از فروشگاه.
+                    </p>
+
+                </div>
+
+
+                <div class="space-y-3">
+
+                    @forelse($faqs as $index => $faq)
+
+                        <article class="overflow-hidden rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-cream)]">
+
+                            <button
+                                type="button"
+                                @click="active === {{ $index }} ? active = null : active = {{ $index }}"
+                                :aria-expanded="active === {{ $index }} ? 'true' : 'false'"
+                                class="flex w-full items-center justify-between gap-5 px-5 py-5 text-right sm:px-6"
+                            >
+
+                                    <span class="text-sm font-semibold">
+                                        {{ $faq['question'] }}
+                                    </span>
+
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke-width="1.5"
+                                    stroke="currentColor"
+                                    class="h-4 w-4 shrink-0 transition-transform duration-300"
+                                    :class="active === {{ $index }} ? 'rotate-180' : ''"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                                    />
+                                </svg>
+
                             </button>
 
-                        </form>
 
-                    </div>
+                            <div
+                                x-show="active === {{ $index }}"
+                                x-collapse
+                                x-cloak
+                            >
 
-                </div>
-
-            </x-layout.container>
-
-        </section>
-
-
-        {{-- =========================================================
-             FAQ
-        ========================================================== --}}
-        <section class="border-t border-[var(--livora-border)] bg-[var(--livora-white)]">
-
-            <x-layout.container>
-
-                <div
-                    x-data="{
-                    active: null
-                }"
-                    class="grid gap-10 py-14 sm:py-18 lg:grid-cols-[0.7fr_1.3fr] lg:py-24"
-                >
-
-                    <div>
-
-                        <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--livora-accent)]">
-                            FAQ
-                        </p>
-
-                        <h2 class="mt-4 text-3xl font-semibold tracking-tight">
-                            پرسش‌های متداول
-                        </h2>
-
-                        <p class="mt-4 text-sm leading-8 text-[var(--livora-stone)]">
-                            پاسخ چند سؤال رایج درباره ارتباط با LIVORA و خرید از فروشگاه.
-                        </p>
-
-                    </div>
-
-
-                    <div class="space-y-3">
-
-                        @php
-                            $faqs = [
-                                [
-                                    'question' => 'چطور شرایط اقساط یک محصول را ببینم؟',
-                                    'answer' => 'اگر محصول قابلیت خرید اقساطی داشته باشد، شرایط پیش‌پرداخت، تعداد چک و فاصله سررسید در صفحه همان محصول نمایش داده می‌شود.',
-                                ],
-                                [
-                                    'question' => 'چطور وضعیت سفارش خود را پیگیری کنم؟',
-                                    'answer' => 'پس از ورود به حساب کاربری، از بخش سفارش‌ها می‌توانید وضعیت سفارش، پرداخت و در صورت وجود برنامه اقساط را مشاهده کنید.',
-                                ],
-                                [
-                                    'question' => 'برای مشاوره خرید چگونه با شما تماس بگیرم؟',
-                                    'answer' => 'می‌توانید از اطلاعات تماس بالای همین صفحه استفاده کنید یا پیام خود را از فرم تماس برای ما ارسال کنید.',
-                                ],
-                                [
-                                    'question' => 'آیا شرایط همه محصولات اقساطی یکسان است؟',
-                                    'answer' => 'خیر. شرایط اقساط توسط فروشگاه برای هر محصول تعریف می‌شود و ممکن است درصد پیش‌پرداخت، تعداد چک و فاصله سررسید متفاوت باشد.',
-                                ],
-                            ];
-                        @endphp
-
-                        @foreach($faqs as $index => $faq)
-
-                            <article class="overflow-hidden rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-cream)]">
-
-                                <button
-                                    type="button"
-                                    @click="active === {{ $index }} ? active = null : active = {{ $index }}"
-                                    class="flex w-full items-center justify-between gap-5 px-5 py-5 text-right sm:px-6"
-                                >
-
-                                <span class="text-sm font-semibold">
-                                    {{ $faq['question'] }}
-                                </span>
-
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke-width="1.5"
-                                        stroke="currentColor"
-                                        class="h-4 w-4 shrink-0 transition-transform"
-                                        :class="active === {{ $index }} ? 'rotate-180' : ''"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            d="m19.5 8.25-7.5 7.5-7.5-7.5"
-                                        />
-                                    </svg>
-
-                                </button>
-
-                                <div
-                                    x-show="active === {{ $index }}"
-                                    x-collapse
-                                    x-cloak
-                                >
-                                    <div class="border-t border-[var(--livora-border)] px-5 py-5 text-xs leading-7 text-[var(--livora-stone)] sm:px-6">
-                                        {{ $faq['answer'] }}
-                                    </div>
+                                <div class="border-t border-[var(--livora-border)] px-5 py-5 text-xs leading-7 text-[var(--livora-stone)] sm:px-6">
+                                    {{ $faq['answer'] }}
                                 </div>
 
-                            </article>
+                            </div>
 
-                        @endforeach
+                        </article>
 
-                    </div>
+                    @empty
 
-                </div>
+                        <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-cream)] p-6">
 
-            </x-layout.container>
+                            <p class="text-sm leading-7 text-[var(--livora-stone)]">
+                                در حال حاضر پرسش متداولی ثبت نشده است.
+                            </p>
 
-        </section>
+                        </div>
 
-
-        {{-- =========================================================
-             FINAL CTA
-        ========================================================== --}}
-        <section class="border-t border-[var(--livora-border)] bg-[var(--livora-surface)]">
-
-            <x-layout.container>
-
-                <div class="flex flex-col gap-6 py-12 sm:flex-row sm:items-center sm:justify-between sm:py-16">
-
-                    <div>
-
-                        <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--livora-accent)]">
-                            LIVORA
-                        </p>
-
-                        <h2 class="mt-2 text-2xl font-semibold">
-                            آماده‌ای انتخابت را پیدا کنی؟
-                        </h2>
-
-                        <p class="mt-2 text-sm leading-7 text-[var(--livora-stone)]">
-                            مجموعه محصولات را ببین و انتخاب بعدی‌ات را پیدا کن.
-                        </p>
-
-                    </div>
-
-                    <a
-                        href="{{ route('shop.index') }}"
-                        class="inline-flex w-fit rounded-2xl bg-[var(--livora-ink)] px-6 py-4 text-sm font-medium text-white transition hover:bg-[var(--livora-accent)]"
-                    >
-                        ورود به فروشگاه
-                    </a>
+                    @endforelse
 
                 </div>
 
-            </x-layout.container>
+            </div>
 
-        </section>
+        </x-layout.container>
+
+    </section>
+
+
+    {{-- =========================================================
+         FINAL CTA
+    ========================================================== --}}
+
+    <section class="border-t border-[var(--livora-border)] bg-[var(--livora-surface)]">
+
+        <x-layout.container>
+
+            <div class="flex flex-col gap-6 py-12 sm:flex-row sm:items-center sm:justify-between sm:py-16">
+
+                <div>
+
+                    <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--livora-accent)]">
+                        LIVORA
+                    </p>
+
+                    <h2 class="mt-2 text-2xl font-semibold">
+                        آماده‌ای انتخابت را پیدا کنی؟
+                    </h2>
+
+                    <p class="mt-2 text-sm leading-7 text-[var(--livora-stone)]">
+                        مجموعه محصولات را ببین و انتخاب بعدی‌ات را پیدا کن.
+                    </p>
+
+                </div>
+
+
+                <a
+                    href="{{ route('shop.index') }}"
+                    class="inline-flex w-fit rounded-2xl bg-[var(--livora-ink)] px-6 py-4 text-sm font-medium text-white transition hover:bg-[var(--livora-accent)]"
+                >
+                    ورود به فروشگاه
+                </a>
+
+            </div>
+
+        </x-layout.container>
+
+    </section>
 
     </div>
 

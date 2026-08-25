@@ -1,3 +1,8 @@
+@props([
+'categories' => collect(),
+'selectedCategory' => null,
+])
+
 <div
     x-show="filterOpen"
     x-cloak
@@ -10,7 +15,10 @@
     class="fixed inset-0 z-[80] lg:hidden"
 >
 
-    {{-- Backdrop --}}
+    {{-- =========================================================
+         BACKDROP
+    ========================================================== --}}
+
     <button
         type="button"
         aria-label="بستن فیلترها"
@@ -19,7 +27,10 @@
     ></button>
 
 
-    {{-- Drawer --}}
+    {{-- =========================================================
+         DRAWER
+    ========================================================== --}}
+
     <aside
         x-show="filterOpen"
         x-transition:enter="transition ease-out duration-300"
@@ -31,8 +42,13 @@
         class="absolute right-0 top-0 flex h-full w-[88%] max-w-md flex-col bg-[var(--livora-cream)] shadow-2xl"
     >
 
-        {{-- Header --}}
-        <div class="flex h-[76px] items-center justify-between border-b border-[var(--livora-border)] bg-[var(--livora-white)] px-5">
+        {{-- =====================================================
+             HEADER
+        ====================================================== --}}
+
+        <div
+            class="flex h-[76px] shrink-0 items-center justify-between border-b border-[var(--livora-border)] bg-[var(--livora-white)] px-5"
+        >
 
             <div>
 
@@ -45,6 +61,7 @@
                 </h2>
 
             </div>
+
 
             <button
                 type="button"
@@ -73,274 +90,42 @@
         </div>
 
 
-        {{-- Form --}}
+        {{-- =====================================================
+             MOBILE FILTER FORM
+        ====================================================== --}}
+
         <form
             method="GET"
             action="{{ route('shop.index') }}"
             class="flex min-h-0 flex-1 flex-col"
         >
 
-            {{-- Scroll Area --}}
-            <div class="flex-1 overflow-y-auto px-5 py-6">
-
-                <div class="space-y-5">
-
-                    {{-- Category --}}
-                    <section class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-5">
-
-                        <div class="flex items-center justify-between gap-3">
-
-                            <div>
-                                <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
-                                    CATEGORY
-                                </p>
-
-                                <h3 class="mt-2 text-sm font-semibold">
-                                    دسته‌بندی
-                                </h3>
-                            </div>
-
-                        </div>
-
-                        <div class="mt-5">
-
-                            @if(isset($categories) && $categories->isNotEmpty())
-
-                                <div class="space-y-2">
-
-                                    @foreach($categories as $category)
-
-                                        <label class="flex cursor-pointer items-center justify-between gap-4 rounded-2xl border border-transparent bg-[var(--livora-surface)] px-4 py-3 transition hover:border-[var(--livora-border)]">
-
-                                            <span class="flex min-w-0 items-center gap-3">
-
-                                                <input
-                                                    type="radio"
-                                                    name="category"
-                                                    value="{{ $category->id }}"
-                                                    @checked((string) request('category') === (string) $category->id)
-                                                    class="h-4 w-4 border-[var(--livora-border)] text-[var(--livora-ink)] focus:ring-[var(--livora-ink)]"
-                                                >
-
-                                                <span class="truncate text-xs text-[var(--livora-ink)]">
-                                                    {{ $category->name }}
-                                                </span>
-
-                                            </span>
-
-                                            @if(isset($category->products_count))
-
-                                                <span class="text-[10px] text-[var(--livora-stone)]">
-                                                    {{ number_format($category->products_count) }}
-                                                </span>
-
-                                            @endif
-
-                                        </label>
-
-                                    @endforeach
-
-                                </div>
-
-                            @else
-
-                                <p class="text-xs leading-6 text-[var(--livora-stone)]">
-                                    دسته‌بندی‌ای برای نمایش وجود ندارد.
-                                </p>
-
-                            @endif
-
-                        </div>
-
-                    </section>
-
-
-                    {{-- Search --}}
-                    <section class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-5">
-
-                        <div>
-                            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
-                                SEARCH
-                            </p>
-
-                            <h3 class="mt-2 text-sm font-semibold">
-                                جستجو
-                            </h3>
-                        </div>
-
-                        <div class="mt-5">
-
-                            <input
-                                type="search"
-                                name="search"
-                                value="{{ request('search') }}"
-                                placeholder="نام یا مدل محصول..."
-                                class="w-full rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-surface)] px-4 py-3.5 text-sm outline-none transition placeholder:text-[var(--livora-stone)] focus:border-[var(--livora-ink)]"
-                            >
-
-                        </div>
-
-                    </section>
-
-
-                    {{-- Installment --}}
-                    <section class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-5">
-
-                        <div>
-                            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
-                                PAYMENT
-                            </p>
-
-                            <h3 class="mt-2 text-sm font-semibold">
-                                روش خرید
-                            </h3>
-                        </div>
-
-                        <div class="mt-5 space-y-2">
-
-                            <label class="flex cursor-pointer items-center gap-3 rounded-2xl bg-[var(--livora-surface)] px-4 py-3">
-
-                                <input
-                                    type="checkbox"
-                                    name="installment"
-                                    value="1"
-                                    @checked(request()->boolean('installment'))
-                                class="h-4 w-4 rounded border-[var(--livora-border)] text-[var(--livora-ink)] focus:ring-[var(--livora-ink)]"
-                                >
-
-                                <span class="text-xs">
-                                    فقط محصولات قابل خرید اقساطی
-                                </span>
-
-                            </label>
-
-                        </div>
-
-                    </section>
-
-
-                    {{-- Price --}}
-                    <section class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-5">
-
-                        <div>
-                            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
-                                PRICE
-                            </p>
-
-                            <h3 class="mt-2 text-sm font-semibold">
-                                محدوده قیمت
-                            </h3>
-                        </div>
-
-                        <div class="mt-5 grid grid-cols-2 gap-3">
-
-                            <div>
-
-                                <label
-                                    for="min_price_mobile"
-                                    class="mb-2 block text-[10px] text-[var(--livora-stone)]"
-                                >
-                                    حداقل
-                                </label>
-
-                                <input
-                                    id="min_price_mobile"
-                                    type="number"
-                                    name="min_price"
-                                    min="0"
-                                    value="{{ request('min_price') }}"
-                                    placeholder="0"
-                                    class="w-full rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-surface)] px-3 py-3 text-xs outline-none focus:border-[var(--livora-ink)]"
-                                >
-
-                            </div>
-
-                            <div>
-
-                                <label
-                                    for="max_price_mobile"
-                                    class="mb-2 block text-[10px] text-[var(--livora-stone)]"
-                                >
-                                    حداکثر
-                                </label>
-
-                                <input
-                                    id="max_price_mobile"
-                                    type="number"
-                                    name="max_price"
-                                    min="0"
-                                    value="{{ request('max_price') }}"
-                                    placeholder="مثلاً 100000000"
-                                    class="w-full rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-surface)] px-3 py-3 text-xs outline-none focus:border-[var(--livora-ink)]"
-                                >
-
-                            </div>
-
-                        </div>
-
-                    </section>
-
-
-                    {{-- Status --}}
-                    <section class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-5">
-
-                        <div>
-                            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
-                                DISCOVERY
-                            </p>
-
-                            <h3 class="mt-2 text-sm font-semibold">
-                                محصولات ویژه
-                            </h3>
-                        </div>
-
-                        <div class="mt-5 space-y-2">
-
-                            <label class="flex cursor-pointer items-center gap-3 rounded-2xl bg-[var(--livora-surface)] px-4 py-3">
-
-                                <input
-                                    type="checkbox"
-                                    name="featured"
-                                    value="1"
-                                    @checked(request()->boolean('featured'))
-                                class="h-4 w-4 rounded border-[var(--livora-border)] text-[var(--livora-ink)] focus:ring-[var(--livora-ink)]"
-                                >
-
-                                <span class="text-xs">
-                                    فقط محصولات ویژه
-                                </span>
-
-                            </label>
-
-                            <label class="flex cursor-pointer items-center gap-3 rounded-2xl bg-[var(--livora-surface)] px-4 py-3">
-
-                                <input
-                                    type="checkbox"
-                                    name="new"
-                                    value="1"
-                                    @checked(request()->boolean('new'))
-                                class="h-4 w-4 rounded border-[var(--livora-border)] text-[var(--livora-ink)] focus:ring-[var(--livora-ink)]"
-                                >
-
-                                <span class="text-xs">
-                                    فقط محصولات جدید
-                                </span>
-
-                            </label>
-
-                        </div>
-
-                    </section>
-
-                </div>
+            {{-- =================================================
+                 SCROLL AREA
+            ================================================== --}}
+
+            <div class="min-h-0 flex-1 overflow-y-auto px-5 py-6">
+
+                <x-shop.filters
+                    mobile
+                    :categories="$categories"
+                    :selected-category="$selectedCategory"
+                />
 
             </div>
 
 
-            {{-- Bottom Actions --}}
-            <div class="border-t border-[var(--livora-border)] bg-[var(--livora-white)] p-5">
+            {{-- =================================================
+                 BOTTOM ACTIONS
+            ================================================== --}}
+
+            <div
+                class="shrink-0 border-t border-[var(--livora-border)] bg-[var(--livora-white)] p-5"
+            >
 
                 <div class="grid grid-cols-2 gap-3">
+
+                    {{-- CLEAR --}}
 
                     <a
                         href="{{ route('shop.index') }}"
@@ -349,6 +134,9 @@
                     >
                         پاک کردن
                     </a>
+
+
+                    {{-- APPLY --}}
 
                     <button
                         type="submit"

@@ -1,11 +1,13 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\Admin\ContactMessageController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
@@ -19,6 +21,7 @@ use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\ProductImageController as AdminProductImageController;
 use App\Http\Controllers\Admin\ProductVariantController as AdminProductVariantController;
 use Illuminate\Support\Facades\Route;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -46,8 +49,26 @@ Route::get(
 Route::view('/about', 'about.index')
     ->name('about');
 
-Route::view('/contact', 'contact.index')
-    ->name('contact');
+
+/*
+|--------------------------------------------------------------------------
+| Contact
+|--------------------------------------------------------------------------
+|
+| Contact page and contact form are public.
+| Guests are allowed to send messages.
+|
+*/
+
+Route::get(
+    '/contact',
+    [ContactController::class, 'index']
+)->name('contact');
+
+Route::post(
+    '/contact',
+    [ContactController::class, 'store']
+)->name('contact.store');
 
 
 /*
@@ -219,6 +240,7 @@ Route::middleware(['auth', 'customer'])->group(function () {
                 [AccountController::class, 'index']
             )->name('index');
 
+
             /*
             | Profile
             */
@@ -232,6 +254,7 @@ Route::middleware(['auth', 'customer'])->group(function () {
                 '/profile',
                 [AccountController::class, 'updateProfile']
             )->name('profile.update');
+
 
             /*
             | Addresses
@@ -262,6 +285,7 @@ Route::middleware(['auth', 'customer'])->group(function () {
                 [AccountController::class, 'setDefaultAddress']
             )->name('addresses.default');
 
+
             /*
             | Orders
             */
@@ -275,6 +299,7 @@ Route::middleware(['auth', 'customer'])->group(function () {
                 '/orders/{order}',
                 [OrderController::class, 'show']
             )->name('orders.show');
+
 
             /*
             | Wishlist
@@ -295,6 +320,7 @@ Route::middleware(['auth', 'customer'])->group(function () {
                 [WishlistController::class, 'destroy']
             )->name('wishlist.destroy');
         });
+
 });
 
 
@@ -309,30 +335,71 @@ Route::middleware(['auth', 'admin'])
     ->name('admin.')
     ->group(function () {
 
+        /*
+        |--------------------------------------------------------------------------
+        | Dashboard
+        |--------------------------------------------------------------------------
+        */
+
         Route::get(
             '/',
             [AdminDashboardController::class, 'index']
         )->name('dashboard');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Categories
+        |--------------------------------------------------------------------------
+        */
 
         Route::resource(
             'categories',
             AdminCategoryController::class
         );
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Products
+        |--------------------------------------------------------------------------
+        */
+
         Route::resource(
             'products',
             AdminProductController::class
         );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Product Images
+        |--------------------------------------------------------------------------
+        */
 
         Route::resource(
             'product-images',
             AdminProductImageController::class
         );
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Product Variants
+        |--------------------------------------------------------------------------
+        */
+
         Route::resource(
             'product-variants',
             AdminProductVariantController::class
         );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Orders
+        |--------------------------------------------------------------------------
+        */
 
         Route::get(
             'orders',
@@ -348,6 +415,13 @@ Route::middleware(['auth', 'admin'])
             'orders/{order}/status',
             [AdminOrderController::class, 'updateStatus']
         )->name('orders.status');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Customers
+        |--------------------------------------------------------------------------
+        */
 
         Route::get(
             'customers',
@@ -369,15 +443,57 @@ Route::middleware(['auth', 'admin'])
             [AdminCustomerController::class, 'update']
         )->name('customers.update');
 
-        Route::get('/media', [MediaController::class, 'index'])
-            ->name('media.index');
 
-        Route::get('/media/create', [MediaController::class, 'create'])
-            ->name('media.create');
+        /*
+        |--------------------------------------------------------------------------
+        | Media
+        |--------------------------------------------------------------------------
+        */
 
-        Route::post('/media', [MediaController::class, 'store'])
-            ->name('media.store');
+        Route::get(
+            '/media',
+            [MediaController::class, 'index']
+        )->name('media.index');
 
-        Route::delete('/media/{media}', [MediaController::class, 'destroy'])
-            ->name('media.destroy');
+        Route::get(
+            '/media/create',
+            [MediaController::class, 'create']
+        )->name('media.create');
+
+        Route::post(
+            '/media',
+            [MediaController::class, 'store']
+        )->name('media.store');
+
+        Route::delete(
+            '/media/{media}',
+            [MediaController::class, 'destroy']
+        )->name('media.destroy');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Contact Messages
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/contact-messages',
+            [ContactMessageController::class, 'index']
+        )->name('contact-messages.index');
+
+        Route::get(
+            '/contact-messages/{contactMessage}',
+            [ContactMessageController::class, 'show']
+        )->name('contact-messages.show');
+
+        Route::patch(
+            '/contact-messages/{contactMessage}/read',
+            [ContactMessageController::class, 'markAsRead']
+        )->name('contact-messages.read');
+
+        Route::delete(
+            '/contact-messages/{contactMessage}',
+            [ContactMessageController::class, 'destroy']
+        )->name('contact-messages.destroy');
     });

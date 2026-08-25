@@ -11,20 +11,35 @@
 
 @push('seo')
 
-    <meta property="og:type" content="website">
+    <meta
+        property="og:type"
+        content="website"
+    >
 
-    <meta property="og:title" content="فروشگاه مبلمان | LIVORA">
+    <meta
+        property="og:title"
+        content="فروشگاه مبلمان | LIVORA"
+    >
 
     <meta
         property="og:description"
         content="مجموعه مبلمان و لوازم خانه LIVORA را ببینید و محصول مناسب فضای خود را پیدا کنید."
     >
 
-    <meta property="og:url" content="{{ route('shop.index') }}">
+    <meta
+        property="og:url"
+        content="{{ route('shop.index') }}"
+    >
 
-    <meta name="twitter:card" content="summary_large_image">
+    <meta
+        name="twitter:card"
+        content="summary_large_image"
+    >
 
-    <meta name="twitter:title" content="فروشگاه مبلمان | LIVORA">
+    <meta
+        name="twitter:title"
+        content="فروشگاه مبلمان | LIVORA"
+    >
 
     <meta
         name="twitter:description"
@@ -50,21 +65,29 @@
 
 @section('content')
 
-    <div class="bg-[var(--livora-cream)]">
-
+    <div
+        class="overflow-hidden bg-[var(--livora-cream)]"
+        x-data="{
+            filterOpen: false
+        }"
+    >
 
         {{-- =========================================================
-             HEADER
+             SHOP HEADER
         ========================================================== --}}
 
         <section class="border-b border-[var(--livora-border)] bg-[var(--livora-white)]">
 
             <x-layout.container>
 
-                <div class="py-10 sm:py-14">
+                <div class="py-10 sm:py-14 lg:py-16">
 
                     {{-- Breadcrumb --}}
-                    <div class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--livora-stone)]">
+
+                    <nav
+                        aria-label="breadcrumb"
+                        class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--livora-stone)]"
+                    >
 
                         <a
                             href="{{ route('home') }}"
@@ -79,10 +102,11 @@
                             فروشگاه
                         </span>
 
-                    </div>
+                    </nav>
 
 
-                    {{-- Header content --}}
+                    {{-- Header Content --}}
+
                     <div class="mt-7 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
 
                         <div class="max-w-3xl">
@@ -105,7 +129,9 @@
 
                         <div class="text-sm text-[var(--livora-stone)]">
 
-                            {{ number_format($products->total()) }}
+                            <span class="font-semibold text-[var(--livora-ink)]">
+                                {{ number_format($products->total()) }}
+                            </span>
 
                             محصول
 
@@ -120,7 +146,6 @@
         </section>
 
 
-
         {{-- =========================================================
              SHOP CONTENT
         ========================================================== --}}
@@ -129,304 +154,338 @@
 
             <x-layout.container>
 
-                <form
-                    method="GET"
-                    action="{{ route('shop.index') }}"
-                >
-
-                    <div class="grid gap-8 py-8 lg:grid-cols-[250px_minmax(0,1fr)] lg:py-12">
+                <div class="grid gap-8 py-8 lg:grid-cols-[250px_minmax(0,1fr)] lg:py-12">
 
 
-                        {{-- =================================================
-                             DESKTOP SIDEBAR
-                        ================================================== --}}
+                    {{-- =================================================
+                         DESKTOP SIDEBAR
+                    ================================================== --}}
 
-                        <aside class="hidden lg:block">
+                    <aside class="hidden min-w-0 lg:block">
 
-                            <div class="sticky top-28 space-y-5">
-
-
-                                {{-- =================================================
-                                     FILTER BOX
-                                ================================================== --}}
-
-                                <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-5">
-
-                                    <div class="flex items-center justify-between gap-3">
-
-                                        <div>
-
-                                            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
-                                                DISCOVER
-                                            </p>
-
-                                            <h2 class="mt-2 text-sm font-semibold">
-                                                فیلترها
-                                            </h2>
-
-                                        </div>
-
-
-                                        {{-- Clear all filters --}}
-                                        <a
-                                            href="{{ route('shop.index') }}"
-                                            class="text-[11px] text-[var(--livora-stone)] transition hover:text-[var(--livora-accent)]"
-                                        >
-                                            پاک کردن
-                                        </a>
-
-                                    </div>
-
-
-                                    <div class="mt-6">
-
-                                        {{--
-
-                                            IMPORTANT:
-                                            selected-category contains SLUG.
-
-                                            Example:
-                                            /shop?category=sofa
-
-                                            NOT:
-                                            /shop?category=3
-
-                                        --}}
-
-                                        <x-shop.filters
-                                            :categories="$categories"
-                                            :selected-category="request('category')"
-                                        />
-
-                                    </div>
-
-
-                                    {{-- Apply filters --}}
-                                    <button
-                                        type="submit"
-                                        class="mt-6 w-full rounded-2xl bg-[var(--livora-ink)] px-5 py-3.5 text-sm font-medium text-white transition hover:bg-[var(--livora-accent)]"
-                                    >
-                                        اعمال فیلتر
-                                    </button>
-
-                                </div>
-
-
-
-                                {{-- =================================================
-                                     SEO / DISCOVERY BOX
-                                ================================================== --}}
-
-                                <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-surface)] p-5">
-
-                                    <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
-                                        LIVORA
-                                    </p>
-
-                                    <h3 class="mt-3 text-sm font-semibold">
-                                        انتخاب آگاهانه
-                                    </h3>
-
-                                    <p class="mt-2 text-xs leading-7 text-[var(--livora-stone)]">
-                                        قیمت، طراحی، موجودی و شرایط خرید اقساطی را
-                                        قبل از انتخاب محصول بررسی کنید.
-                                    </p>
-
-                                </div>
-
-                            </div>
-
-                        </aside>
-
-
-
-                        {{-- =================================================
-                             PRODUCTS AREA
-                        ================================================== --}}
-
-                        <div class="min-w-0">
+                        <div class="sticky top-28 space-y-5">
 
 
                             {{-- =================================================
-                                 MOBILE TOOLBAR
+                                 FILTER CARD
                             ================================================== --}}
 
-                            <div class="mb-5 flex items-center justify-between gap-3 lg:hidden">
+                            <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-5">
 
-                                <button
-                                    type="button"
-                                    @click="filterOpen = true"
-                                    class="inline-flex items-center rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] px-4 py-3 text-sm font-medium transition hover:border-[var(--livora-ink)]"
-                                >
-                                    فیلترها
-                                </button>
-
-
-                                <span class="text-xs text-[var(--livora-stone)]">
-
-                                    {{ number_format($products->total()) }}
-
-                                    محصول
-
-                                </span>
-
-                            </div>
-
-
-
-                            {{-- =================================================
-                                 SORTING TOOLBAR
-                            ================================================== --}}
-
-                            <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-4 sm:p-5">
-
-                                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-
+                                <div class="flex items-center justify-between gap-3">
 
                                     <div>
 
                                         <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
-                                            CURATED PRODUCTS
+                                            DISCOVER
                                         </p>
 
-                                        <p class="mt-2 text-sm font-medium">
-                                            مجموعه LIVORA
-                                        </p>
+                                        <h2 class="mt-2 text-sm font-semibold">
+                                            فیلترها
+                                        </h2>
 
                                     </div>
 
 
-                                    <div class="sm:min-w-[220px]">
+                                    <a
+                                        href="{{ route('shop.index') }}"
+                                        class="shrink-0 text-[11px] text-[var(--livora-stone)] transition hover:text-[var(--livora-accent)]"
+                                    >
+                                        پاک کردن
+                                    </a>
 
-                                        <x-shop.sorting
-                                            :products="$products"
-                                        />
+                                </div>
 
-                                    </div>
+
+                                {{-- Desktop Filter has its own GET form --}}
+
+                                <form
+                                    method="GET"
+                                    action="{{ route('shop.index') }}"
+                                    class="mt-6"
+                                >
+
+                                    <x-shop.filters
+                                        :categories="$categories"
+                                        :selected-category="request('category')"
+                                    />
+
+                                </form>
+
+                            </div>
+
+
+                            {{-- =================================================
+                                 DISCOVERY BOX
+                            ================================================== --}}
+
+                            <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-surface)] p-5">
+
+                                <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                                    LIVORA
+                                </p>
+
+                                <h3 class="mt-3 text-sm font-semibold">
+                                    انتخاب آگاهانه
+                                </h3>
+
+                                <p class="mt-2 text-xs leading-7 text-[var(--livora-stone)]">
+                                    قیمت، طراحی، موجودی و شرایط خرید اقساطی را
+                                    قبل از انتخاب محصول بررسی کنید.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </aside>
+
+
+                    {{-- =================================================
+                         PRODUCTS AREA
+                    ================================================== --}}
+
+                    <div class="min-w-0">
+
+
+                        {{-- =================================================
+                             MOBILE TOOLBAR
+                        ================================================== --}}
+
+                        <div class="mb-5 flex items-center justify-between gap-3 lg:hidden">
+
+                            <button
+                                type="button"
+                                @click="filterOpen = true"
+                                class="inline-flex items-center gap-2 rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] px-4 py-3 text-sm font-medium text-[var(--livora-ink)] transition hover:border-[var(--livora-ink)]"
+                            >
+
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke-width="1.5"
+                                    stroke="currentColor"
+                                    class="h-4 w-4"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M3.75 6.75h16.5M6.75 12h10.5m-7.5 5.25h5.25"
+                                    />
+                                </svg>
+
+                                فیلترها
+
+                            </button>
+
+
+                            <span class="text-xs text-[var(--livora-stone)]">
+
+                                <span class="font-medium text-[var(--livora-ink)]">
+                                    {{ number_format($products->total()) }}
+                                </span>
+
+                                محصول
+
+                            </span>
+
+                        </div>
+
+
+                        {{-- =================================================
+                             SORTING TOOLBAR
+                        ================================================== --}}
+
+                        <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-4 sm:p-5">
+
+                            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+
+                                <div class="min-w-0">
+
+                                    <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                                        CURATED PRODUCTS
+                                    </p>
+
+                                    <p class="mt-2 text-sm font-medium text-[var(--livora-ink)]">
+                                        مجموعه LIVORA
+                                    </p>
+
+                                </div>
+
+
+                                <div class="w-full sm:min-w-[220px] sm:w-auto">
+
+                                    <x-shop.sorting
+                                        :products="$products"
+                                    />
 
                                 </div>
 
                             </div>
 
+                        </div>
+
+
+                        {{-- =================================================
+                             ACTIVE FILTER
+                        ================================================== --}}
+
+                        @if(request()->filled('category'))
+
+                            @php
+                                $activeCategory = $categories->firstWhere(
+                                    'slug',
+                                    request('category')
+                                );
+                            @endphp
+
+
+                            <div class="mt-5 flex flex-wrap items-center gap-2">
+
+                                <span class="text-xs text-[var(--livora-stone)]">
+                                    فیلتر فعال:
+                                </span>
+
+                                <span class="inline-flex items-center rounded-full border border-[var(--livora-border)] bg-[var(--livora-white)] px-3 py-1.5 text-[11px] text-[var(--livora-ink)]">
+                                    {{ $activeCategory?->name ?? request('category') }}
+                                </span>
+
+                                <a
+                                    href="{{ route('shop.index') }}"
+                                    class="inline-flex items-center rounded-full border border-[var(--livora-border)] px-3 py-1.5 text-[11px] text-[var(--livora-stone)] transition hover:border-[var(--livora-ink)] hover:text-[var(--livora-ink)]"
+                                >
+                                    حذف
+                                </a>
+
+                            </div>
+
+                        @endif
+
+
+                        {{-- =================================================
+                             RESULT META
+                        ================================================== --}}
+
+                        @if($products->total() > 0)
+
+                            <div class="mt-6">
+
+                                <p class="text-xs text-[var(--livora-stone)]">
+
+                                    نمایش
+
+                                    <span class="font-medium text-[var(--livora-ink)]">
+                                        {{ number_format($products->firstItem()) }}
+                                    </span>
+
+                                    تا
+
+                                    <span class="font-medium text-[var(--livora-ink)]">
+                                        {{ number_format($products->lastItem()) }}
+                                    </span>
+
+                                    از
+
+                                    <span class="font-medium text-[var(--livora-ink)]">
+                                        {{ number_format($products->total()) }}
+                                    </span>
+
+                                </p>
+
+                            </div>
+
+                        @endif
+
+
+                        {{-- =================================================
+                             PRODUCT GRID
+                        ================================================== --}}
+
+                        @if($products->isNotEmpty())
+
+                            <div class="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-5 lg:grid-cols-2 xl:grid-cols-3">
+
+                                @foreach($products as $product)
+
+                                    <x-product.card
+                                        :product="$product"
+                                    />
+
+                                @endforeach
+
+                            </div>
 
 
                             {{-- =================================================
-                                 ACTIVE CATEGORY
+                                 PAGINATION
                             ================================================== --}}
 
-                            @if(request()->filled('category'))
+                            @if($products->hasPages())
 
-                                @php
-
-                                    /*
-                                    |--------------------------------------------------------------------------
-                                    | Find active category by SLUG
-                                    |--------------------------------------------------------------------------
-                                    */
-
-                                    $activeCategory = $categories->firstWhere(
-                                        'slug',
-                                        request('category')
-                                    );
-
-                                @endphp
-
-
-                                <div class="mt-5 flex flex-wrap items-center gap-2">
-
-                                    <span class="text-xs text-[var(--livora-stone)]">
-                                        فیلتر فعال:
-                                    </span>
-
-
-                                    <span class="inline-flex items-center rounded-full border border-[var(--livora-border)] bg-[var(--livora-white)] px-3 py-1.5 text-[11px] text-[var(--livora-ink)]">
-
-                                        {{ $activeCategory?->name ?? request('category') }}
-
-                                    </span>
-
-                                </div>
-
-                            @endif
-
-
-
-                            {{-- =================================================
-                                 PRODUCT GRID
-                            ================================================== --}}
-
-                            @if($products->count())
-
-                                <div class="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-2 xl:grid-cols-3">
-
-                                    @foreach($products as $product)
-
-                                        <x-product.card
-                                            :product="$product"
-                                        />
-
-                                    @endforeach
-
-                                </div>
-
-
-
-                                {{-- =================================================
-                                     PAGINATION
-                                ================================================== --}}
-
-                                <div class="mt-14">
+                                <nav
+                                    class="mt-14"
+                                    aria-label="صفحه‌بندی محصولات"
+                                >
 
                                     {{ $products->withQueryString()->links() }}
 
-                                </div>
-
-
-                            @else
-
-
-                                {{-- =================================================
-                                     EMPTY STATE
-                                ================================================== --}}
-
-                                <div class="mt-8 rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] px-6 py-24 text-center">
-
-
-                                    <span class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--livora-surface)] text-sm text-[var(--livora-stone)]">
-                                        —
-                                    </span>
-
-
-                                    <h2 class="mt-6 text-2xl font-semibold text-[var(--livora-ink)]">
-                                        محصولی پیدا نشد
-                                    </h2>
-
-
-                                    <p class="mx-auto mt-3 max-w-md text-sm leading-7 text-[var(--livora-stone)]">
-                                        فیلترها یا عبارت جستجو را تغییر دهید و دوباره مجموعه محصولات را بررسی کنید.
-                                    </p>
-
-
-                                    <a
-                                        href="{{ route('shop.index') }}"
-                                        class="mt-7 inline-flex rounded-2xl bg-[var(--livora-ink)] px-6 py-3.5 text-sm font-medium text-white transition hover:bg-[var(--livora-accent)]"
-                                    >
-                                        مشاهده همه محصولات
-                                    </a>
-
-                                </div>
+                                </nav>
 
                             @endif
 
-                        </div>
+
+                        @else
+
+                            {{-- =================================================
+                                 EMPTY STATE
+                            ================================================== --}}
+
+                            <div class="mt-8 rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] px-6 py-24 text-center">
+
+                                <span class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--livora-surface)] text-sm text-[var(--livora-stone)]">
+                                    —
+                                </span>
+
+
+                                <h2 class="mt-6 text-2xl font-semibold text-[var(--livora-ink)]">
+                                    محصولی پیدا نشد
+                                </h2>
+
+
+                                <p class="mx-auto mt-3 max-w-md text-sm leading-7 text-[var(--livora-stone)]">
+                                    فیلترها یا عبارت جستجو را تغییر دهید و دوباره مجموعه محصولات را بررسی کنید.
+                                </p>
+
+
+                                <a
+                                    href="{{ route('shop.index') }}"
+                                    class="mt-7 inline-flex rounded-2xl bg-[var(--livora-ink)] px-6 py-3.5 text-sm font-medium text-white transition hover:bg-[var(--livora-accent)]"
+                                >
+                                    مشاهده همه محصولات
+                                </a>
+
+                            </div>
+
+                        @endif
 
                     </div>
 
-                </form>
+                </div>
 
             </x-layout.container>
 
         </section>
+
+
+        {{-- =========================================================
+             MOBILE FILTER DRAWER
+        ========================================================== --}}
+
+        <x-shop.filter-drawer
+            :categories="$categories"
+            :selected-category="request('category')"
+        />
 
     </div>
 

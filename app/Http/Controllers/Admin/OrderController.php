@@ -86,8 +86,9 @@ class OrderController extends Controller
         $order->load([
             'user',
             'items.product',
-            'items.productVariant',
-            'payment',
+            'items.variant',
+            'latestPayment',
+            'installments'
         ]);
 
         return view(

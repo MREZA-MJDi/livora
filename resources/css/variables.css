@@ -1,0 +1,132 @@
+:root {
+
+    /* =====================================================
+       BRAND
+    ====================================================== */
+
+    --livora-ink: #181715;
+    --livora-charcoal: #24221f;
+
+    /* Chocolate */
+    --livora-chocolate: #5a4638;
+    --livora-chocolate-dark: #3f3027;
+    --livora-chocolate-soft: #eee5de;
+
+
+    /* =====================================================
+       SURFACES
+    ====================================================== */
+
+    --livora-cream: #f3efe8;
+    --livora-white: #faf9f6;
+    --livora-surface: #eee8df;
+
+
+    /* =====================================================
+       WARM NEUTRALS
+    ====================================================== */
+
+    --livora-sand: #d8d0c4;
+    --livora-stone: #a79f93;
+
+
+    /* =====================================================
+       ORIGINAL WARM ACCENT
+    ====================================================== */
+
+    --livora-accent: #9a7658;
+    --livora-accent-dark: #76583f;
+    --livora-accent-soft: #ede2d7;
+
+
+    /* =====================================================
+       SAGE GREEN
+    ====================================================== */
+
+    --livora-sage: #68755d;
+    --livora-sage-dark: #4f5c46;
+    --livora-sage-soft: #e5e9df;
+
+
+    /* =====================================================
+       BORDERS
+    ====================================================== */
+
+    --livora-border: #d6d0c7;
+    --livora-border-dark: #bbb2a6;
+
+
+    /* =====================================================
+       STATES
+    ====================================================== */
+
+    --livora-success: #3f7650;
+    --livora-success-soft: #e8f1e9;
+
+    --livora-warning: #b45309;
+    --livora-warning-soft: #fff7ed;
+
+    --livora-danger: #b91c1c;
+    --livora-danger-soft: #fef2f2;
+
+    --livora-info: #0369a1;
+    --livora-info-soft: #f0f9ff;
+
+
+    /* =====================================================
+       SHADOWS
+    ====================================================== */
+
+    --livora-shadow-sm:
+        0 4px 14px rgba(24, 23, 21, 0.05);
+
+    --livora-shadow-md:
+        0 12px 35px rgba(24, 23, 21, 0.08);
+
+    --livora-shadow-lg:
+        0 25px 70px rgba(24, 23, 21, 0.12);
+
+
+    /* =====================================================
+       RADIUS
+    ====================================================== */
+
+    --livora-radius-sm: 0.75rem;
+    --livora-radius-md: 1rem;
+    --livora-radius-lg: 1.5rem;
+    --livora-radius-xl: 2rem;
+
+
+    /* =====================================================
+       MOTION
+    ====================================================== */
+
+    --livora-duration-fast: 180ms;
+    --livora-duration: 300ms;
+    --livora-duration-slow: 650ms;
+
+
+    /* =====================================================
+       CONTAINER
+    ====================================================== */
+
+    --livora-container: 1440px;}
+
+/* =========================================================
+LIVORA CONTAINER SYSTEM
+========================================================= */
+
+.livora-container {
+    width: 100%;
+    max-width: var(--livora-container);
+
+    margin-inline: auto;
+
+    padding-inline: clamp(
+        1rem,
+        3vw,
+        2.5rem
+    );
+}
+
+

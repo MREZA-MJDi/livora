@@ -14,7 +14,8 @@
         >
 
             <div
-                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[var(--admin-text)] text-xs font-bold tracking-[0.12em] text-white transition duration-300 group-hover:bg-[var(--admin-accent)]">
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[var(--admin-text)] text-xs font-bold tracking-[0.12em] text-white transition duration-300 group-hover:bg-[var(--admin-accent)]"
+            >
                 LV
             </div>
 
@@ -151,7 +152,8 @@
                 >
 
                     <span
-                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)] group-hover:text-[var(--admin-text)]">
+                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)] group-hover:text-[var(--admin-text)]"
+                    >
 
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -194,7 +196,8 @@
                 >
 
                     <span
-                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">
+                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]"
+                    >
 
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -236,29 +239,30 @@
                     ])
                 >
 
-    <span
-        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">
+                    <span
+                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]"
+                    >
 
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="h-4 w-4"
-        >
-            <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l2.159 2.159m0 0 1.409-1.409a2.25 2.25 0 0 1 3.182 0l4.909 4.909M21.75 12V6.75a2.25 2.25 0 0 0-2.25-2.25H4.5a2.25 2.25 0 0 0-2.25 2.25v10.5a2.25 2.25 0 0 0 2.25 2.25h10.5"
-            />
-        </svg>
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.5"
+                            stroke="currentColor"
+                            class="h-4 w-4"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l2.159 2.159m0 0 1.409-1.409a2.25 2.25 0 0 1 3.182 0l4.909 4.909M21.75 12V6.75a2.25 2.25 0 0 0-2.25-2.25H4.5a2.25 2.25 0 0 0-2.25 2.25v10.5a2.25 2.25 0 0 1-2.25 2.25h10.5"
+                            />
+                        </svg>
 
-    </span>
+                    </span>
 
                     <span class="flex-1">
-        رسانه
-    </span>
+                        رسانه
+                    </span>
 
                     @if(request()->routeIs('admin.media.*'))
 
@@ -295,7 +299,8 @@
                 >
 
                     <span
-                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">
+                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]"
+                    >
 
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -338,7 +343,8 @@
                 >
 
                     <span
-                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">
+                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]"
+                    >
 
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -362,6 +368,55 @@
                     </span>
 
                     @if(request()->routeIs('admin.customers.*'))
+
+                        <span class="h-1.5 w-1.5 rounded-full bg-[var(--admin-accent)]"></span>
+
+                    @endif
+
+                </a>
+
+
+                {{-- Contact Messages --}}
+                <a
+                    href="{{ route('admin.contact-messages.index') }}"
+                    @class([
+                        'group flex items-center gap-3 rounded-2xl px-3 py-3 text-xs font-medium transition',
+                        'bg-[var(--admin-accent-soft)] text-[var(--admin-accent-dark)]' => request()->routeIs('admin.contact-messages.*'),
+                        'text-[var(--admin-text-soft)] hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text)]' => !request()->routeIs('admin.contact-messages.*'),
+                    ])
+                >
+
+                    <span
+                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)] group-hover:text-[var(--admin-text)]"
+                    >
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.5"
+                            stroke="currentColor"
+                            class="h-4 w-4"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M21.75 12c0 4.556-4.365 8.25-9.75 8.25a10.57 10.57 0 0 1-3.867-.72L4.5 20.25l.966-2.9A7.92 7.92 0 0 1 2.25 12c0-4.556 4.365-8.25 9.75-8.25s9.75 3.694 9.75 8.25Z"
+                            />
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M8.25 12h.008v.008H8.25V12Zm3.742 0H12v.008h-.008V12Zm3.75 0h.008v.008h-.008V12Z"
+                            />
+                        </svg>
+
+                    </span>
+
+                    <span class="flex-1">
+                        پیام‌های کاربران
+                    </span>
+
+                    @if(request()->routeIs('admin.contact-messages.*'))
 
                         <span class="h-1.5 w-1.5 rounded-full bg-[var(--admin-accent)]"></span>
 
@@ -394,7 +449,8 @@
                 >
 
                     <span
-                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">
+                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]"
+                    >
 
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -449,7 +505,8 @@
             <div class="flex items-center gap-3">
 
                 <div
-                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-text)] text-xs font-bold text-white">
+                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-text)] text-xs font-bold text-white"
+                >
                     {{ mb_substr($adminUser?->name ?: 'A', 0, 1) }}
                 </div>
 
