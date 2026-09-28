@@ -15,9 +15,9 @@
             @endif
             <a href="{{ route('home') }}" class="btn primary">بازگشت به فروشگاه</a>
             @auth
-                @if(auth()->user()->isCustomer() && IlluminateSupportFacadesRoute::has('account.index'))
+                @if(auth()->user()->isCustomer() && \Illuminate\Support\Facades\Route::has('account.index'))
                     <a href="{{ route('account.index') }}" class="btn secondary">حساب کاربری</a>
-                @elseif(auth()->user()->isAdmin() && IlluminateSupportFacadesRoute::has('admin.dashboard'))
+                @elseif(auth()->user()->isAdmin() && \Illuminate\Support\Facades\Route::has('admin.dashboard'))
                     <a href="{{ route('admin.dashboard') }}" class="btn secondary">پنل مدیریت</a>
                 @endif
             @endauth
