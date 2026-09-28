@@ -11,6 +11,8 @@ use App\Models\ProductImage;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+use Throwable;
 use Illuminate\View\View;
 
 class ProductController extends Controller
@@ -159,21 +161,33 @@ class ProductController extends Controller
         $uploadedImage = $request->file('image');
         unset($data['image']);
 
-        $product = Product::create($data);
+        $storedImage = null;
 
-        if ($uploadedImage) {
-            $path = $uploadedImage->store(
+        try {
+            $storedImage = $uploadedImage?->store(
                 'products/images',
                 'public'
             );
 
-            ProductImage::create([
-                'product_id' => $product->id,
-                'path' => $path,
-                'alt' => $product->name,
-                'sort_order' => 0,
-                'is_primary' => true,
-            ]);
+            DB::transaction(function () use ($data, $storedImage, &$product) {
+                $product = Product::create($data);
+
+                if ($storedImage) {
+                    ProductImage::create([
+                        'product_id' => $product->id,
+                        'path' => $storedImage,
+                        'alt' => $product->name,
+                        'sort_order' => 0,
+                        'is_primary' => true,
+                    ]);
+                }
+            });
+        } catch (Throwable $e) {
+            if ($storedImage) {
+                Storage::disk('public')->delete($storedImage);
+            }
+
+            throw $e;
         }
 
         return redirect()
@@ -237,50 +251,62 @@ class ProductController extends Controller
         $uploadedImage = $request->file('image');
         unset($data['image']);
 
-        $product->update($data);
+        $storedImage = null;
 
-        if ($uploadedImage) {
-            $primaryImage =
-                $product->images
-                    ->firstWhere('is_primary', true)
-                ?? $product->images->first();
-
-            $oldPath = $primaryImage?->path;
-
-            $newPath = $uploadedImage->store(
-                'products/images',
-                'public'
-            );
-
-            if ($primaryImage) {
-                $primaryImage->update([
-                    'path' => $newPath,
-                    'alt' => $product->name,
-                    'is_primary' => true,
-                ]);
-
-                $product->images()
-                    ->where('id', '!=', $primaryImage->id)
-                    ->update(['is_primary' => false]);
-            } else {
-                ProductImage::create([
-                    'product_id' => $product->id,
-                    'path' => $newPath,
-                    'alt' => $product->name,
-                    'sort_order' => 0,
-                    'is_primary' => true,
-                ]);
+        try {
+            if ($uploadedImage) {
+                $storedImage = $uploadedImage->store(
+                    'products/images',
+                    'public'
+                );
             }
 
-            if (
-                $oldPath
-                && ! str_starts_with($oldPath, 'http://')
-                && ! str_starts_with($oldPath, 'https://')
-                && ! str_starts_with($oldPath, '//')
-                && $oldPath !== $newPath
+            DB::transaction(function () use (
+                $product,
+                $data,
+                $storedImage
             ) {
-                Storage::disk('public')->delete($oldPath);
+                $product->update($data);
+
+                if (! $storedImage) {
+                    return;
+                }
+
+                $primaryImage =
+                    $product->images()
+                        ->where('is_primary', true)
+                        ->first()
+                    ?? $product->images()
+                        ->orderBy('sort_order')
+                        ->orderBy('id')
+                        ->first();
+
+                if ($primaryImage) {
+                    $primaryImage->update([
+                        'path' => $storedImage,
+                        'alt' => $product->name,
+                        'is_primary' => true,
+                    ]);
+
+                    $product->images()
+                        ->where('id', '!=', $primaryImage->id)
+                        ->update(['is_primary' => false]);
+                } else {
+                    ProductImage::create([
+                        'product_id' => $product->id,
+                        'path' => $storedImage,
+                        'alt' => $product->name,
+                        'sort_order' => 0,
+                        'is_primary' => true,
+                    ]);
+                }
+            });
+        } catch (Throwable $e) {
+            if ($storedImage) {
+                Storage::disk('public')->delete($storedImage);
             }
+
+            throw $e;
         }
 
         return redirect()
