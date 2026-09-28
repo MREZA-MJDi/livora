@@ -77,6 +77,7 @@ class CartController extends Controller
                 'sku' => $variant->sku,
                 'color_hex' => $variant->color_hex,
                 'price_adjustment' => (float) $variant->price_adjustment,
+                'stock' => (int) $variant->stock,
             ])
             ->values()
             ->all();
