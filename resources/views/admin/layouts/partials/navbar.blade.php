@@ -392,7 +392,7 @@
                         @if($outOfStockCount > 0)
 
                             <a
-                                href="{{ route('admin.products.index') }}"
+                                href="{{ route('admin.products.index', ['stock' => 'out']) }}"
                                 @click="notificationOpen = false"
                                 class="mt-1 flex gap-3 rounded-xl p-3 transition hover:bg-[var(--admin-surface)]"
                             >
