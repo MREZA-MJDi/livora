@@ -150,6 +150,13 @@ class StoreProductRequest extends FormRequest
                 'string',
             ],
 
+            'image' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:2048',
+            ],
+
             'price' => [
                 'required',
                 'numeric',
@@ -273,6 +280,10 @@ class StoreProductRequest extends FormRequest
 
             'short_description.max' => 'توضیح کوتاه نباید بیشتر از ۲۵۵ کاراکتر باشد.',
 
+            'image.image' => 'فایل انتخاب‌شده باید تصویر باشد.',
+            'image.mimes' => 'فرمت تصویر باید jpg، jpeg، png یا webp باشد.',
+            'image.max' => 'حجم تصویر نباید بیشتر از ۲ مگابایت باشد.',
+
             'price.required' => 'وارد کردن قیمت محصول الزامی است.',
             'price.numeric' => 'قیمت محصول باید یک عدد معتبر باشد.',
             'price.min' => 'قیمت محصول نمی‌تواند منفی باشد.',
@@ -322,6 +333,7 @@ class StoreProductRequest extends FormRequest
             'sku' => 'SKU',
             'short_description' => 'توضیح کوتاه',
             'description' => 'توضیحات',
+            'image' => 'تصویر محصول',
             'price' => 'قیمت',
             'compare_at_price' => 'قیمت قبل',
             'stock' => 'موجودی',
