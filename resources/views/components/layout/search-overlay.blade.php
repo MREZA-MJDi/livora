@@ -86,10 +86,35 @@
 
             <div class="py-7 sm:py-9">
 
+                @php
+                    $searchResetQuery = request()->except(['search', 'page']);
+                    $searchResetUrl = route('shop.index')
+                        . ($searchResetQuery
+                            ? '?' . http_build_query($searchResetQuery)
+                            : '');
+                @endphp
+
                 <form
                     action="{{ route('shop.index') }}"
                     method="GET"
                     class="relative"
+                    x-data="{ searchValue: @js((string) request('search', '')) }"
+                    @submit.prevent="
+                        const value = searchValue.trim();
+                        const url = new URL(window.location.href);
+
+                        url.pathname = @js(parse_url(route('shop.index'), PHP_URL_PATH));
+                        url.searchParams.delete('search');
+                        url.searchParams.delete('page');
+
+                        if (value) {
+                            url.searchParams.set('search', value);
+                        }
+
+                        window.location.assign(
+                            url.pathname + (url.search ? url.search : '')
+                        );
+                    "
                 >
 
                     <label
@@ -104,7 +129,7 @@
                         id="global-search"
                         name="search"
                         type="search"
-                        value="{{ request('search') }}"
+                        x-model="searchValue"
                         autocomplete="off"
                         placeholder="مثلاً: مبل راحتی، میز ناهارخوری، مبل چستر..."
                         class="w-full rounded-[1.5rem] border border-[var(--livora-border)] bg-[var(--livora-white)] px-14 py-5 text-sm text-[var(--livora-ink)] outline-none transition placeholder:text-[var(--livora-stone)] focus:border-[var(--livora-ink)]"
@@ -125,12 +150,39 @@
                         />
                     </svg>
 
-                    <button
-                        type="submit"
-                        class="absolute left-2 top-1/2 -translate-y-1/2 rounded-2xl bg-[var(--livora-ink)] px-5 py-3 text-xs font-medium text-white transition hover:bg-[var(--livora-accent)]"
-                    >
-                        جستجو
-                    </button>
+                    <div class="absolute left-2 top-1/2 flex -translate-y-1/2 items-center gap-2">
+                        <a
+                            href="{{ $searchResetUrl }}"
+                            x-show="searchValue.length > 0"
+                            x-cloak
+                            aria-label="پاک کردن جستجو"
+                            title="پاک کردن جستجو"
+                            class="flex h-10 w-10 items-center justify-center rounded-xl text-[var(--livora-stone)] transition hover:bg-[var(--livora-surface)] hover:text-[var(--livora-ink)]"
+                            @click="searchValue = ''"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke-width="1.7"
+                                stroke="currentColor"
+                                class="h-4 w-4"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M6 6l12 12M18 6 6 18"
+                                />
+                            </svg>
+                        </a>
+
+                        <button
+                            type="submit"
+                            class="rounded-2xl bg-[var(--livora-ink)] px-5 py-3 text-xs font-medium text-white transition hover:bg-[var(--livora-accent)]"
+                        >
+                            جستجو
+                        </button>
+                    </div>
 
                 </form>
 
