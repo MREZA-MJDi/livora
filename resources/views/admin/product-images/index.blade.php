@@ -55,73 +55,14 @@
         >
 
             <div>
-
-                <label for="product_id" class="admin-label">
-                    فیلتر محصول
-                </label>
-
-                <div
-                    data-admin-product-selector
-                class="relative"
-                    data-search-url="{{ route('admin.product-images.product-options') }}"
-                    data-selected-id="{{ $selectedProduct?->id ?? request('product_id') }}"
-                    data-selected-label="{{ $selectedProduct?->name ?? '' }}"
-                >
-
-                    <div class="admin-search">
-
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.6"
-                            stroke="currentColor"
-                            class="admin-search-icon h-4 w-4"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="m21 21-4.35-4.35m1.35-5.4a6.75 6.75 0 1 1-13.5 0 6.75 6.75 0 0 1 13.5 0Z"
-                            />
-                        </svg>
-
-                        <input
-                            id="product-search"
-                            type="search"
-                            class="admin-search-input"
-                            value="{{ $selectedProduct?->name ?? (request('product_id') ? 'محصول شماره ' . request('product_id') : '') }}"
-                            placeholder="نام محصول یا SKU..."
-                            autocomplete="off"
-                            role="combobox"
-                            aria-expanded="false"
-                            aria-controls="admin-product-options"
-                        >
-
-                    </div>
-
-                    <input
-                        type="hidden"
-                        id="product_id"
-                        name="product_id"
-                        value="{{ $selectedProduct?->id ?? request('product_id') }}"
-                        data-product-value
-                    >
-
-                    <div
-                        id="admin-product-options"
-                        data-product-results
-                        class="absolute inset-x-0 z-40 mt-2 hidden max-h-72 overflow-y-auto rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-white)] p-2 shadow-[var(--admin-shadow-lg)]"
-                    ></div>
-
-                    <p
-                        data-product-status
-                        class="admin-help"
-                    >
-                        جستجوی محدود و سریع در کاتالوگ؛ همه محصولات یکجا لود نمی‌شوند.
-                    </p>
-
-                </div>
-
+                @include('admin.partials.product-selector', [
+                    'inputName' => 'product_id',
+                    'fieldId' => 'product-images-filter-product',
+                    'selectedProduct' => $selectedProduct,
+                    'label' => 'فیلتر محصول',
+                    'placeholder' => 'نام محصول یا SKU...',
+                    'required' => false,
+                ])
             </div>
 
             <div class="flex flex-col justify-end gap-2 sm:flex-row">
