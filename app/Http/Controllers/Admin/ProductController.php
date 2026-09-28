@@ -231,7 +231,7 @@ class ProductController extends Controller
 
         $categories = Category::query()
             ->orderBy('name')
-            ->get();
+            ->get(['id', 'name']);
 
         return view(
             'admin.products.edit',
