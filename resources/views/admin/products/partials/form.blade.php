@@ -64,6 +64,7 @@
 
                     <div class="admin-image-preview mb-5 aspect-[4/3]">
                         <img
+                            id="product-image-preview"
                             src="{{ $primaryImage->url }}"
                             alt="{{ $primaryImage->alt ?: $product->name }}"
                             class="admin-image"
@@ -93,6 +94,7 @@
                 >
 
                 <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">
+                
                     با انتخاب فایل جدید، همین تصویر اصلی جایگزین می‌شود. حداکثر حجم ۲ مگابایت.
                 </p>
 
@@ -1161,6 +1163,12 @@
             const stockInput =
                 document.getElementById('stock');
 
+            const imageInput =
+                document.getElementById('image');
+
+            const imagePreview =
+                document.getElementById('product-image-preview');
+
 
             const enabledInput =
                 document.getElementById('installment_enabled');
@@ -1444,6 +1452,39 @@
                 stockInput,
                 false
             );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Instant Image Preview
+            |--------------------------------------------------------------------------
+            */
+
+            if (imageInput && imagePreview) {
+
+                imageInput.addEventListener('change', function () {
+
+                    const file =
+                        imageInput.files?.[0];
+
+                    if (!file || !file.type.startsWith('image/')) {
+                        return;
+                    }
+
+                    const objectUrl =
+                        URL.createObjectURL(file);
+
+                    imagePreview.src =
+                        objectUrl;
+
+                    imagePreview.onload =
+                        function () {
+                            URL.revokeObjectURL(objectUrl);
+                        };
+
+                });
+
+            }
 
 
             /*
