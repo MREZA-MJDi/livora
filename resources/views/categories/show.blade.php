@@ -41,7 +41,7 @@
     @if($category->image)
         <meta
             property="og:image"
-            content="{{ $category->image }}"
+            content="{{ $category->image_url }}"
         >
     @endif
 
@@ -63,7 +63,7 @@
     @if($category->image)
         <meta
             name="twitter:image"
-            content="{{ $category->image }}"
+            content="{{ $category->image_url }}"
         >
     @endif
 
@@ -186,7 +186,7 @@
                             @if($category->image)
 
                                 <img
-                                    src="{{ $category->image }}"
+                                    src="{{ $category->image_url }}"
                                     alt="{{ $category->name }}"
                                     class="aspect-[4/3] h-full w-full object-cover transition duration-700 hover:scale-[1.03]"
                                 >
