@@ -30,8 +30,8 @@ class ProductSeeder extends Seeder
                 'status' => 'active',
                 'is_featured' => true,
                 'is_new' => true,
-                'meta_title' => 'Luna Sofa | SilaGallery',
-                'meta_description' => 'خرید Luna Sofa از SilaGallery',
+                'meta_title' => 'Luna Sofa | سیلاگالری',
+                'meta_description' => 'خرید Luna Sofa از سیلاگالری',
             ],
             [
                 'category_id' => $chairs->id,
@@ -46,8 +46,8 @@ class ProductSeeder extends Seeder
                 'status' => 'active',
                 'is_featured' => true,
                 'is_new' => true,
-                'meta_title' => 'Siena Lounge Chair | SilaGallery',
-                'meta_description' => 'خرید Siena Lounge Chair از SilaGallery',
+                'meta_title' => 'Siena Lounge Chair | سیلاگالری',
+                'meta_description' => 'خرید Siena Lounge Chair از سیلاگالری',
             ],
             [
                 'category_id' => $chairs->id,
@@ -62,8 +62,8 @@ class ProductSeeder extends Seeder
                 'status' => 'active',
                 'is_featured' => true,
                 'is_new' => false,
-                'meta_title' => 'Milo Accent Chair | SilaGallery',
-                'meta_description' => 'خرید Milo Accent Chair از SilaGallery',
+                'meta_title' => 'Milo Accent Chair | سیلاگالری',
+                'meta_description' => 'خرید Milo Accent Chair از سیلاگالری',
             ],
             [
                 'category_id' => $chairs->id,
@@ -78,8 +78,8 @@ class ProductSeeder extends Seeder
                 'status' => 'active',
                 'is_featured' => false,
                 'is_new' => true,
-                'meta_title' => 'Oak Dining Chair | SilaGallery',
-                'meta_description' => 'خرید Oak Dining Chair از SilaGallery',
+                'meta_title' => 'Oak Dining Chair | سیلاگالری',
+                'meta_description' => 'خرید Oak Dining Chair از سیلاگالری',
             ],
             [
                 'category_id' => $tables->id,
@@ -94,8 +94,8 @@ class ProductSeeder extends Seeder
                 'status' => 'active',
                 'is_featured' => true,
                 'is_new' => true,
-                'meta_title' => 'Nordic Side Table | SilaGallery',
-                'meta_description' => 'خرید Nordic Side Table از SilaGallery',
+                'meta_title' => 'Nordic Side Table | سیلاگالری',
+                'meta_description' => 'خرید Nordic Side Table از سیلاگالری',
             ],
             [
                 'category_id' => $furniture->id,
@@ -110,8 +110,8 @@ class ProductSeeder extends Seeder
                 'status' => 'active',
                 'is_featured' => true,
                 'is_new' => false,
-                'meta_title' => 'Mora Lounge Sofa | SilaGallery',
-                'meta_description' => 'خرید Mora Lounge Sofa از SilaGallery',
+                'meta_title' => 'Mora Lounge Sofa | سیلاگالری',
+                'meta_description' => 'خرید Mora Lounge Sofa از سیلاگالری',
             ],
             [
                 'category_id' => $tables->id,
@@ -126,8 +126,8 @@ class ProductSeeder extends Seeder
                 'status' => 'active',
                 'is_featured' => true,
                 'is_new' => false,
-                'meta_title' => 'Linea Coffee Table | SilaGallery',
-                'meta_description' => 'خرید Linea Coffee Table از SilaGallery',
+                'meta_title' => 'Linea Coffee Table | سیلاگالری',
+                'meta_description' => 'خرید Linea Coffee Table از سیلاگالری',
             ],
             [
                 'category_id' => $decor->id,
@@ -142,8 +142,8 @@ class ProductSeeder extends Seeder
                 'status' => 'active',
                 'is_featured' => false,
                 'is_new' => true,
-                'meta_title' => 'Arc Floor Lamp | SilaGallery',
-                'meta_description' => 'خرید Arc Floor Lamp از SilaGallery',
+                'meta_title' => 'Arc Floor Lamp | سیلاگالری',
+                'meta_description' => 'خرید Arc Floor Lamp از سیلاگالری',
             ],
             [
                 'category_id' => $accessories->id,
@@ -158,8 +158,8 @@ class ProductSeeder extends Seeder
                 'status' => 'active',
                 'is_featured' => false,
                 'is_new' => true,
-                'meta_title' => 'Stone Vase | SilaGallery',
-                'meta_description' => 'خرید Stone Vase از SilaGallery',
+                'meta_title' => 'Stone Vase | سیلاگالری',
+                'meta_description' => 'خرید Stone Vase از سیلاگالری',
             ],
         ];
 
