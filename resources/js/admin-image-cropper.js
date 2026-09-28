@@ -333,18 +333,6 @@
             handleSelectedFile(event.target.files?.[0] || null);
         });
 
-        /*
-         * Defensive delegated listener for admin forms that may be rendered
-         * dynamically or re-initialized after navigation.
-         */
-        document.addEventListener('change', (event) => {
-            if (event.target !== input) {
-                return;
-            }
-
-            handleSelectedFile(input.files?.[0] || null);
-        });
-
         if (openButton) {
             openButton.addEventListener('click', () => {
                 const file = input.files?.[0];
