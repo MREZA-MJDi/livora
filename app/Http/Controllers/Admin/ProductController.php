@@ -9,7 +9,9 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -138,6 +140,68 @@ class ProductController extends Controller
             compact('products', 'categories')
         );
     }
+
+    /**
+     * Return a small searchable product dataset for admin selectors.
+     */
+    public function options(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'q' => [
+                'nullable',
+                'string',
+                'max:100',
+            ],
+            'id' => [
+                'nullable',
+                'integer',
+                'exists:products,id',
+            ],
+        ]);
+
+        $query = Product::query()
+            ->select([
+                'id',
+                'name',
+                'sku',
+            ])
+            ->orderBy('name');
+
+        if (! empty($validated['id'])) {
+            $query->where('id', $validated['id']);
+        } else {
+            $search = trim($validated['q'] ?? '');
+
+            if (mb_strlen($search) < 2) {
+                return response()->json([
+                    'data' => [],
+                    'has_more' => false,
+                ]);
+            }
+
+            $query->where(function ($productQuery) use ($search) {
+                $productQuery
+                    ->where('name', 'like', "%{$search}%")
+                    ->orWhere('sku', 'like', "%{$search}%");
+            });
+        }
+
+        $products = $query
+            ->limit(20)
+            ->get();
+
+        return response()->json([
+            'data' => $products->map(
+                fn (Product $product) => [
+                    'id' => $product->id,
+                    'label' => $product->name,
+                    'sku' => $product->sku,
+                ]
+            )->values(),
+            'has_more' => $products->count() === 20,
+        ]);
+    }
+
 
     /**
      * Show the form for creating a new product.
