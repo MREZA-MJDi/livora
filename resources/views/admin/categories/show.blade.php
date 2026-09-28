@@ -203,6 +203,111 @@
 
             <div class="admin-card p-6">
 
+                <div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+
+                    <div>
+                        <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--admin-accent)]">
+                            CATEGORY PRODUCTS
+                        </p>
+
+                        <h3 class="mt-2 text-base font-bold text-[var(--admin-text)]">
+                            محصولات این دسته‌بندی
+                        </h3>
+
+                        <p class="mt-1 text-xs text-[var(--admin-muted)]">
+                            {{ number_format($products->total()) }} محصول ثبت شده در این دسته‌بندی.
+                        </p>
+                    </div>
+
+                    <a
+                        href="{{ route('admin.products.index', ['category' => $category->id]) }}"
+                        class="admin-btn admin-btn-secondary"
+                    >
+                        مدیریت همه
+                    </a>
+
+                </div>
+
+                @if($products->isNotEmpty())
+
+                    <div class="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+
+                        @foreach($products as $product)
+
+                            <a
+                                href="{{ route('admin.products.show', $product) }}"
+                                class="group flex items-center gap-3 rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface-soft)] p-3 transition hover:border-[var(--admin-accent)]"
+                            >
+
+                                <div class="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-[var(--admin-surface)]">
+
+                                    @if($product->primaryImage?->url)
+
+                                        <img
+                                            src="{{ $product->primaryImage->url }}"
+                                            alt="{{ $product->primaryImage->alt ?: $product->name }}"
+                                            class="h-full w-full object-cover"
+                                            loading="lazy"
+                                        >
+
+                                    @endif
+
+                                </div>
+
+                                <div class="min-w-0">
+
+                                    <p class="truncate text-sm font-semibold text-[var(--admin-text)] group-hover:text-[var(--admin-accent)]">
+                                        {{ $product->name }}
+                                    </p>
+
+                                    <p class="mt-1 font-mono text-[10px] text-[var(--admin-muted)]">
+                                        {{ $product->sku }}
+                                    </p>
+
+                                    <p class="mt-1 text-[10px] text-[var(--admin-muted)]">
+                                        {{ number_format((float) $product->price) }} تومان
+                                    </p>
+
+                                </div>
+
+                            </a>
+
+                        @endforeach
+
+                    </div>
+
+                    @if($products->hasPages())
+
+                        <div class="mt-6">
+                            {{ $products->links() }}
+                        </div>
+
+                    @endif
+
+                @else
+
+                    <div class="admin-empty mt-6">
+
+                        <h4 class="text-sm font-semibold text-[var(--admin-text)]">
+                            محصولی در این دسته‌بندی نیست.
+                        </h4>
+
+                        <a
+                            href="{{ route('admin.products.create') }}"
+                            class="admin-btn admin-btn-primary mt-4"
+                        >
+                            افزودن محصول
+                        </a>
+
+                    </div>
+
+                @endif
+
+            </div>
+
+
+            <div class="admin-card p-6">
+
                 <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
 
                     <div>
