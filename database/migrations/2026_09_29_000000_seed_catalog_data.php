@@ -291,7 +291,10 @@ return new class extends Migration
             // Product/category images are intentionally empty here.
             // They are uploaded from the admin panel and stored in the media layer.
             DB::table('categories')->update(['image' => null]);
-            DB::table('product_images')->delete();
+            DB::table('product_images')
+                ->whereNull('media_id')
+                ->where('path', 'like', 'https://images.unsplash.com/%')
+                ->delete();
             if (DB::getSchemaBuilder()->hasTable('product_variant_images')) {
                 DB::table('product_variant_images')->delete();
             }
@@ -339,9 +342,20 @@ return new class extends Migration
                     ->delete();
             }
 
-            DB::table('categories')
+            $categoryIds = DB::table('categories')
                 ->whereIn('slug', ['furniture', 'chairs', 'tables', 'decor', 'accessories'])
-                ->delete();
+                ->pluck('id');
+
+            if ($categoryIds->isNotEmpty()) {
+                DB::table('categories')
+                    ->whereIn('id', $categoryIds)
+                    ->whereNotExists(function ($query) {
+                        $query->selectRaw('1')
+                            ->from('products')
+                            ->whereColumn('products.category_id', 'categories.id');
+                    })
+                    ->delete();
+            }
         });
     }
 };
