@@ -673,6 +673,12 @@ p {
     color: var(--admin-text-soft);
 }
 
+.admin-badge-neutral {
+    border-color: var(--admin-border);
+    background: var(--admin-white);
+    color: var(--admin-text-soft);
+}
+
 .admin-badge-success {
     background: var(--admin-success-bg);
     color: var(--admin-success);
