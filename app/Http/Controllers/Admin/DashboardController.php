@@ -233,6 +233,11 @@ class DashboardController extends Controller
         |--------------------------------------------------------------------------
         */
 
+        $todayLabel = $this->formatPersianDate(
+            now(),
+            'EEEE، d MMMM yyyy'
+        );
+
         return view('admin.dashboard.index', [
             'totalProducts' => $totalProducts,
             'activeProducts' => $activeProducts,
@@ -267,13 +272,14 @@ class DashboardController extends Controller
             'featuredProductsCount' => $featuredProductsCount,
             'newProductsCount' => $newProductsCount,
             'installmentProductsCount' => $installmentProductsCount,
+            'todayLabel' => $todayLabel,
         ]);
     }
 
     /**
      * Format a date using the Persian calendar when Intl is available.
      */
-    protected function formatPersianDate(Carbon $date, string $pattern): string
+    public function formatPersianDate(Carbon $date, string $pattern): string
     {
         if (class_exists(\\IntlDateFormatter::class)) {
             $formatter = new \\IntlDateFormatter(
