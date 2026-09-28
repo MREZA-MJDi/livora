@@ -154,10 +154,13 @@
     @push('scripts')
         <script>
             document.addEventListener('DOMContentLoaded', function () {
+                const firstErrorField =
+                    @json($errors->keys()[0] ?? null);
+
                 const firstError =
-                    document.querySelector(
-                        'input.is-invalid, select.is-invalid, textarea.is-invalid'
-                    );
+                    firstErrorField
+                        ? document.getElementsByName(firstErrorField)[0]
+                        : null;
 
                 if (firstError) {
                     firstError.scrollIntoView({
