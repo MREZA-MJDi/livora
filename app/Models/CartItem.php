@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Models;
+namespace App\\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\\Database\\Eloquent\\Factories\\HasFactory;
+use Illuminate\\Database\\Eloquent\\Model;
+use Illuminate\\Database\\Eloquent\\Relations\\BelongsTo;
 
 class CartItem extends Model
 {
@@ -14,6 +14,8 @@ class CartItem extends Model
         'cart_id',
         'product_id',
         'product_variant_id',
+        'variant_key',
+        'variant_options',
         'quantity',
         'unit_price',
     ];
@@ -21,6 +23,7 @@ class CartItem extends Model
     protected function casts(): array
     {
         return [
+            'variant_options' => 'array',
             'quantity' => 'integer',
             'unit_price' => 'decimal:2',
         ];
@@ -42,6 +45,29 @@ class CartItem extends Model
             ProductVariant::class,
             'product_variant_id'
         );
+    }
+
+    /**
+     * IDs of all selected variants, including the legacy single-variant field.
+     */
+    public function selectedVariantIds(): array
+    {
+        $options = is_array($this->variant_options)
+            ? $this->variant_options
+            : [];
+
+        $ids = collect($options)
+            ->pluck('id')
+            ->filter()
+            ->map(fn ($id) => (int) $id)
+            ->values()
+            ->all();
+
+        if (empty($ids) && $this->product_variant_id) {
+            $ids = [(int) $this->product_variant_id];
+        }
+
+        return array_values(array_unique($ids));
     }
 
     public function total(): float
