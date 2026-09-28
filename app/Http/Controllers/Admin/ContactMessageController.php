@@ -5,15 +5,33 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ContactMessage;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class ContactMessageController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $messages = ContactMessage::query()
-            ->latest()
-            ->paginate(15);
+        $validated = $request->validate([
+            'status' => [
+                'nullable',
+                'in:unread,read',
+            ],
+        ]);
+
+        $query = ContactMessage::query()
+            ->latest();
+
+        if (! empty($validated['status'])) {
+            $query->where(
+                'status',
+                $validated['status']
+            );
+        }
+
+        $messages = $query
+            ->paginate(15)
+            ->withQueryString();
 
         return view('admin.contact-messages.index', [
             'messages' => $messages,
