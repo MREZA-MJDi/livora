@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin\ProductVariant;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreProductVariantRequest extends FormRequest
 {
@@ -36,6 +37,9 @@ class StoreProductVariantRequest extends FormRequest
                 'required',
                 'string',
                 'max:255',
+                Rule::unique('product_variants', 'value')
+                    ->where('product_id', $this->input('product_id'))
+                    ->where('type', $this->input('type')),
             ],
 
             'sku' => [
@@ -88,6 +92,7 @@ class StoreProductVariantRequest extends FormRequest
             'value.max' => 'مقدار ویژگی نباید بیشتر از ۲۵۵ کاراکتر باشد.',
 
             'sku.unique' => 'این SKU قبلاً استفاده شده است.',
+            'value.unique' => 'این مقدار ویژگی قبلاً برای همین نوع و محصول ثبت شده است.',
 
             'price_adjustment.numeric' => 'تعدیل قیمت باید عدد باشد.',
             'price_adjustment.decimal' => 'تعدیل قیمت باید حداکثر دو رقم اعشار داشته باشد.',
