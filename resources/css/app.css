@@ -261,6 +261,8 @@ h6 {
    ========================================================= */
 
 .livora-container {
+    min-width: 0;
+
     width: min(
         100%,
         var(--livora-container)
@@ -390,153 +392,6 @@ h6 {
 .livora-button-secondary:hover {
     border-color: var(--livora-ink);
     background: var(--livora-surface);
-}
-
-
-/* =========================================================
-   FORM SYSTEM
-   ========================================================= */
-
-.admin-label {
-    display: block;
-
-    margin-bottom: 0.5rem;
-
-    color: var(--livora-ink);
-
-    font-size: 0.75rem;
-    font-weight: 600;
-}
-
-.admin-input,
-.admin-select,
-.admin-textarea {
-    width: 100%;
-
-    border: 1px solid var(--livora-border);
-    border-radius: 1rem;
-
-    background: var(--livora-white);
-    color: var(--livora-ink);
-
-    font-size: 0.875rem;
-
-    outline: none;
-
-    transition:
-        border-color var(--livora-duration-fast),
-        box-shadow var(--livora-duration-fast),
-        background-color var(--livora-duration-fast);
-}
-
-.admin-input,
-.admin-select {
-    min-height: 3rem;
-    padding: 0.75rem 1rem;
-}
-
-.admin-textarea {
-    min-height: 8rem;
-    padding: 0.9rem 1rem;
-    resize: vertical;
-}
-
-.admin-input::placeholder,
-.admin-textarea::placeholder {
-    color: var(--livora-stone);
-}
-
-.admin-input:hover,
-.admin-select:hover,
-.admin-textarea:hover {
-    border-color: var(--livora-border-dark);
-}
-
-.admin-input:focus,
-.admin-select:focus,
-.admin-textarea:focus {
-    border-color: var(--livora-ink);
-
-    box-shadow:
-        0 0 0 3px
-        rgba(24, 23, 21, 0.05);
-}
-
-.admin-input:disabled,
-.admin-select:disabled,
-.admin-textarea:disabled {
-    cursor: not-allowed;
-    opacity: 0.55;
-    background: var(--livora-surface);
-}
-
-.admin-checkbox {
-    accent-color: var(--livora-ink);
-}
-
-
-/* =========================================================
-   ADMIN BUTTON HELPERS
-   ========================================================= */
-
-.admin-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-
-    min-height: 3rem;
-
-    padding-inline: 1.25rem;
-
-    border-radius: 1rem;
-
-    font-size: 0.875rem;
-    font-weight: 600;
-
-    transition:
-        transform var(--livora-duration-fast),
-        background-color var(--livora-duration-fast),
-        border-color var(--livora-duration-fast),
-        color var(--livora-duration-fast);
-}
-
-.admin-btn:hover {
-    transform: translateY(-1px);
-}
-
-.admin-btn-primary {
-    background: var(--livora-ink);
-    color: white;
-}
-
-.admin-btn-primary:hover {
-    background: var(--livora-accent);
-}
-
-.admin-btn-secondary {
-    border: 1px solid var(--livora-border);
-    background: var(--livora-white);
-    color: var(--livora-ink);
-}
-
-.admin-btn-secondary:hover {
-    border-color: var(--livora-ink);
-    background: var(--livora-surface);
-}
-
-
-/* =========================================================
-   ADMIN CARD
-   ========================================================= */
-
-.admin-card {
-    border: 1px solid var(--livora-border);
-    border-radius: var(--livora-radius-xl);
-
-    background: var(--livora-white);
-
-    box-shadow: var(--livora-shadow-sm);
 }
 
 
@@ -815,7 +670,7 @@ h6 {
 /* SilaGallery responsive safeguards */
 :root { --site-content-max: 1440px; }
 .livora-container { max-width: var(--site-content-max); }
-.livora-button, .admin-btn { white-space: nowrap; flex: 0 0 auto; }
+.livora-button { white-space: nowrap; flex: 0 0 auto; }
 @media (max-width: 767px) { .livora-container { padding-inline: 1rem; } .livora-button { min-height: 2.875rem; padding-inline: 1rem; font-size: .8125rem; } }
 @media (min-width: 768px) { .livora-button { min-height: 3rem; } }
 
@@ -890,10 +745,6 @@ a:hover .silagallery-wordmark {
 
 
 /* Product detail layout */
-.product-detail-container {
-    max-width: 1320px;
-}
-
 .product-detail-grid {
     width: 100%;
 }
@@ -908,10 +759,6 @@ a:hover .silagallery-wordmark {
 }
 
 @media (max-width: 1023px) {
-    .product-detail-container {
-        max-width: 100%;
-    }
-
     .product-detail-grid {
         gap: 2rem;
     }
