@@ -8,6 +8,8 @@ use App\Http\Requests\Admin\Category\UpdateCategoryRequest;
 use App\Models\Category;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Throwable;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -95,14 +97,27 @@ class CategoryController extends Controller
     public function store(StoreCategoryRequest $request): RedirectResponse
     {
         $data = $request->validated();
+        $storedImage = null;
 
-        if ($request->hasFile('image')) {
-            $data['image'] = $request
-                ->file('image')
-                ->store('categories', 'public');
+        try {
+            if ($request->hasFile('image')) {
+                $storedImage = $request
+                    ->file('image')
+                    ->store('categories', 'public');
+
+                $data['image'] = $storedImage;
+            }
+
+            DB::transaction(function () use ($data) {
+                Category::create($data);
+            });
+        } catch (Throwable $e) {
+            if ($storedImage) {
+                Storage::disk('public')->delete($storedImage);
+            }
+
+            throw $e;
         }
-
-        Category::create($data);
 
         return redirect()
             ->route('admin.categories.index')
@@ -157,7 +172,17 @@ class CategoryController extends Controller
             $data['image'] = $newImage;
         }
 
-        $category->update($data);
+        try {
+            DB::transaction(function () use ($category, $data) {
+                $category->update($data);
+            });
+        } catch (Throwable $e) {
+            if ($newImage) {
+                Storage::disk('public')->delete($newImage);
+            }
+
+            throw $e;
+        }
 
         if (
             $newImage
