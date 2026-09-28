@@ -3,33 +3,92 @@
 namespace App\Services\Payments;
 
 use App\Services\Payments\Contracts\InstallmentPaymentGatewayInterface;
-use App\Services\Payments\Gateways\DigiPayGateway;
-use App\Services\Payments\Gateways\SnapPayGateway;
-use App\Services\Payments\Gateways\TorobPayGateway;
 use InvalidArgumentException;
 
 class PaymentManager
 {
     /**
-     * Resolve an installment payment gateway.
+     * @param array<string, InstallmentPaymentGatewayInterface> $drivers
      */
-    public function driver(
-        string $gateway
-    ): InstallmentPaymentGatewayInterface {
-        return match (strtolower($gateway)) {
-            'digipay' =>
-            app(DigiPayGateway::class),
+    public function __construct(
+        protected array $drivers
+    ) {
+        foreach ($this->drivers as $key => $driver) {
+            if (! $driver instanceof InstallmentPaymentGatewayInterface) {
+                throw new InvalidArgumentException(
+                    "Payment driver [{$key}] must implement InstallmentPaymentGatewayInterface."
+                );
+            }
+        }
+    }
 
-            'snappay' =>
-            app(SnapPayGateway::class),
+    public function driver(string $gateway): InstallmentPaymentGatewayInterface
+    {
+        $gateway = $this->normalize($gateway);
 
-            'torobpay' =>
-            app(TorobPayGateway::class),
-
-            default =>
+        if (! isset($this->drivers[$gateway])) {
             throw new InvalidArgumentException(
                 "Unsupported payment gateway [{$gateway}]."
-            ),
-        };
+            );
+        }
+
+        return $this->drivers[$gateway];
+    }
+
+    public function supports(string $gateway): bool
+    {
+        return isset($this->drivers[$this->normalize($gateway)]);
+    }
+
+    /**
+     * Return configured online payment methods for the checkout UI.
+     *
+     * @return array<int, array{
+     *     key:string,
+     *     name:string,
+     *     fa_name:string,
+     *     description:string,
+     *     enabled:bool,
+     *     badge:string
+     * }>
+     */
+    public function onlineMethods(): array
+    {
+        $definitions = [
+            'digipay' => [
+                'name' => 'DigiPay',
+                'fa_name' => 'دیجی‌پی',
+                'description' => 'پرداخت آنلاین از طریق دیجی‌پی',
+                'badge' => 'DIGIPAY',
+            ],
+            'snappay' => [
+                'name' => 'SnappPay',
+                'fa_name' => 'اسنپ‌پی',
+                'description' => 'پرداخت آنلاین از طریق اسنپ‌پی',
+                'badge' => 'SNAPPAY',
+            ],
+            'torobpay' => [
+                'name' => 'TorobPay',
+                'fa_name' => 'ترب‌پی',
+                'description' => 'پرداخت آنلاین از طریق ترب‌پی',
+                'badge' => 'TOROBPAY',
+            ],
+        ];
+
+        return collect($definitions)
+            ->map(function (array $definition, string $key): array {
+                return [
+                    'key' => $key,
+                    ...$definition,
+                    'enabled' => (bool) config("payment.{$key}.enabled", false),
+                ];
+            })
+            ->values()
+            ->all();
+    }
+
+    public function normalize(string $gateway): string
+    {
+        return strtolower(trim($gateway));
     }
 }
