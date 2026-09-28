@@ -38,10 +38,10 @@
         content="{{ route('categories.show', $category->slug) }}"
     >
 
-    @if($category->image)
+    @if($category->homepage_image_url)
         <meta
             property="og:image"
-            content="{{ $category->image_url }}"
+            content="{{ $category->homepage_image_url }}"
         >
     @endif
 
@@ -60,7 +60,7 @@
         content="{{ $category->description ?? ('محصولات ' . $category->name . ' در SilaGallery') }}"
     >
 
-    @if($category->image)
+    @if($category->homepage_image_url)
         <meta
             name="twitter:image"
             content="{{ $category->image_url }}"
@@ -183,7 +183,7 @@
                         {{-- Category image --}}
                         <div class="overflow-hidden rounded-[2rem] bg-[var(--livora-surface)]">
 
-                            @if($category->image)
+                            @if($category->homepage_image_url)
 
                                 <img
                                     src="{{ $category->homepage_image_url }}"
