@@ -320,10 +320,16 @@
 
                         <td>
 
-                            @if($variant->stock > 0)
+                            @if($variant->stock <= 0)
 
-                                <span class="admin-badge admin-badge-success">
-                                        {{ number_format($variant->stock) }}
+                                <span class="admin-badge admin-badge-danger">
+                                        ناموجود
+                                    </span>
+
+                            @elseif($variant->stock <= 3)
+
+                                <span class="admin-badge admin-badge-warning">
+                                        {{ number_format($variant->stock) }} · کم‌موجودی
                                     </span>
 
                             @else
