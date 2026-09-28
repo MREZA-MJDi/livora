@@ -8,6 +8,7 @@ use App\Models\CartItem;
 use App\Models\ProductVariant;
 use App\Models\Order;
 use App\Services\Installments\InstallmentPlanService;
+use App\Services\Inventory\InventoryService;
 use App\Services\Payments\PaymentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -99,7 +100,8 @@ class CheckoutController extends Controller
      * Create order from the active cart.
      */
     public function placeOrder(
-        PlaceOrderRequest $request
+        PlaceOrderRequest $request,
+        InventoryService $inventoryService
     ): RedirectResponse {
         $validated = $request->validated();
 
@@ -123,7 +125,8 @@ class CheckoutController extends Controller
 
             $order = DB::transaction(function () use (
                 $cart,
-                $validated
+                $validated,
+                $inventoryService
             ) {
 
                 $subtotal = 0;
@@ -269,6 +272,10 @@ class CheckoutController extends Controller
                             * (int) $item->quantity,
                     ]);
                 }
+
+                $order->load('items');
+
+                $inventoryService->reserveOrder($order);
 
                 return $order;
             });
