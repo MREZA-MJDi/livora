@@ -142,7 +142,7 @@
         @if($imageCount > 0)
 
             <div
-                class="product-gallery-stage relative aspect-[4/5] w-full cursor-zoom-in overflow-hidden lg:aspect-auto lg:h-[clamp(500px,calc(100svh-220px),720px)]"
+                class="product-gallery-stage relative aspect-square w-full cursor-zoom-in overflow-hidden"
                 @click="zoom = true"
             >
 
@@ -278,7 +278,7 @@
         @else
 
             {{-- No image --}}
-            <div class="flex aspect-[4/5] w-full items-center justify-center lg:aspect-auto lg:h-[clamp(500px,calc(100svh-220px),720px)]">
+            <div class="flex aspect-square w-full items-center justify-center">
 
                 <div class="text-center">
 
