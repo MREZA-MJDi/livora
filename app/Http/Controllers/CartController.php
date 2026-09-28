@@ -1,19 +1,19 @@
 <?php
 
-namespace AppHttpControllers;
+namespace App\Http\Controllers;
 
-use AppHttpRequestsCartAddToCartRequest;
-use AppHttpRequestsCartUpdateCartRequest;
-use AppModelsCart;
-use AppModelsCartItem;
-use AppModelsProduct;
-use AppModelsProductVariant;
-use IlluminateHttpJsonResponse;
-use IlluminateHttpRedirectResponse;
-use IlluminateHttpRequest;
-use IlluminateSupportFacadesAuth;
-use IlluminateSupportStr;
-use IlluminateViewView;
+use App\Http\Requests\Cart\AddToCartRequest;
+use App\Http\Requests\Cart\UpdateCartRequest;
+use App\Models\Cart;
+use App\Models\CartItem;
+use App\Models\Product;
+use App\Models\ProductVariant;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use Illuminate\View\View;
 
 class CartController extends Controller
 {
