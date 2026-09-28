@@ -9,7 +9,7 @@
 <div
     data-admin-product-selector
     class="relative"
-    data-search-url="{{ route('admin.product-images.product-options') }}"
+    data-search-url="{{ route('admin.products.options') }}"
     data-selected-id="{{ $selectedProductId }}"
     data-selected-label="{{ $selectedProductLabel }}"
 >
