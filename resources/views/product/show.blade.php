@@ -127,8 +127,26 @@
     $mainImage =
         $product->images?->first()?->url;
 
+    $variantGroups =
+        $product->variants
+            ->groupBy('type');
+
+    $variantOptionsAvailable =
+        $variantGroups->isNotEmpty()
+        && $variantGroups->every(
+            fn ($options) =>
+                $options->contains(
+                    fn ($option) => (int) $option->stock > 0
+                )
+        );
+
+    $canPurchase =
+        $variantGroups->isNotEmpty()
+            ? $variantOptionsAvailable
+            : (int) $product->stock > 0;
+
     $availability =
-        $product->stock > 0
+        $canPurchase
             ? 'https://schema.org/InStock'
             : 'https://schema.org/OutOfStock';
 @endphp
@@ -615,6 +633,19 @@
 
                                     </div>
 
+                                    @if(
+                                        $errors->has('variants')
+                                        || collect($errors->keys())
+                                            ->contains(
+                                                fn ($key) =>
+                                                    str_starts_with($key, 'variants.')
+                                            )
+                                    )
+                                        <div class="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-xs leading-6 text-red-800">
+                                            لطفاً تمام ویژگی‌های ضروری محصول را انتخاب کنید.
+                                        </div>
+                                    @endif
+
                                 </div>
 
                             @endif
@@ -654,10 +685,10 @@
 
                                 <button
                                     type="submit"
-                                    @disabled($product->stock < 1)
+                                    @disabled(!$canPurchase)
                                     class="flex w-full items-center justify-center rounded-2xl bg-[var(--livora-ink)] px-6 py-4 text-sm font-medium text-white transition duration-300 hover:bg-[var(--livora-accent)] disabled:cursor-not-allowed disabled:opacity-40"
                                     >
-                                    {{ $product->stock > 0 ? 'افزودن به سبد خرید' : 'این محصول ناموجود است' }}
+                                    {{ $canPurchase ? 'افزودن به سبد خرید' : 'این محصول ناموجود است' }}
                                 </button>
 
                             </div>
