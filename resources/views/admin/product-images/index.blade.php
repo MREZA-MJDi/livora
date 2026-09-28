@@ -62,6 +62,7 @@
 
                 <div
                     data-admin-product-selector
+                class="relative"
                     data-search-url="{{ route('admin.product-images.product-options') }}"
                     data-selected-id="{{ $selectedProduct?->id ?? request('product_id') }}"
                     data-selected-label="{{ $selectedProduct?->name ?? '' }}"
