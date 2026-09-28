@@ -19,7 +19,7 @@ class ProductImageController extends Controller
     public function index(Request $request): View
     {
         $query = ProductImage::query()
-            ->with('product')
+            ->with('product:id,name,sku')
             ->orderBy('product_id')
             ->orderBy('sort_order')
             ->orderByDesc('created_at');
