@@ -12,43 +12,34 @@ class ProductImageSeeder extends Seeder
     {
         $images = [
             'luna-sofa' => [
-                'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=85',
-                'https://images.unsplash.com/photo-1550226891-ef816aed4a98?auto=format&fit=crop&w=1200&q=85',
-                'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1000&q=80',
+                '/images/seed/products/sofa-front.svg',
+                '/images/seed/products/sofa-detail.svg',
             ],
-
             'siena-lounge-chair' => [
-                'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&w=1200&q=85',
-                'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?auto=format&fit=crop&w=1200&q=85',
+                '/images/seed/products/chair-front.svg',
+                '/images/seed/products/chair-detail.svg',
             ],
-
             'milo-accent-chair' => [
-                'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1200&q=85',
-                'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&w=1200&q=85',
+                '/images/seed/products/chair-detail.svg',
+                '/images/seed/products/chair-front.svg',
             ],
-
             'oak-dining-chair' => [
-                'https://images.unsplash.com/photo-1503602642458-232111445657?auto=format&fit=crop&w=1200&q=85',
+                '/images/seed/products/chair-front.svg',
             ],
-
             'nordic-side-table' => [
-                'https://images.unsplash.com/photo-1532372320572-cda25653a26d?auto=format&fit=crop&w=1200&q=85',
+                '/images/seed/products/table.svg',
             ],
-
             'mora-lounge-sofa' => [
-                'https://images.unsplash.com/photo-1550226891-ef816aed4a98?auto=format&fit=crop&w=1200&q=85',
+                '/images/seed/products/sofa-detail.svg',
             ],
-
             'linea-coffee-table' => [
-                'https://images.unsplash.com/photo-1532372320572-cda25653a26d?auto=format&fit=crop&w=1200&q=85',
+                '/images/seed/products/table.svg',
             ],
-
             'arc-floor-lamp' => [
-                'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=1200&q=85',
+                '/images/seed/products/lamp.svg',
             ],
-
             'stone-vase' => [
-                'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1200&q=85',
+                '/images/seed/products/vase.svg',
             ],
         ];
 
@@ -63,11 +54,11 @@ class ProductImageSeeder extends Seeder
                 ProductImage::updateOrCreate(
                     [
                         'product_id' => $product->id,
-                        'path' => $path,
+                        'sort_order' => $index,
                     ],
                     [
+                        'path' => $path,
                         'alt' => $product->name,
-                        'sort_order' => $index,
                         'is_primary' => $index === 0,
                     ]
                 );
