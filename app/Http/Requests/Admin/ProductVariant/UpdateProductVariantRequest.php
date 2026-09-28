@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Requests\Admin\ProductVariant;
+namespace AppHttpRequestsAdminProductVariant;
 
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
+use IlluminateFoundationHttpFormRequest;
+use IlluminateValidationRule;
 
 class UpdateProductVariantRequest extends FormRequest
 {
@@ -45,6 +45,31 @@ class UpdateProductVariantRequest extends FormRequest
                     ->ignore($productVariant),
             ],
 
+            'color_hex' => [
+                'nullable',
+                'string',
+                'max:20',
+                'regex:/^#[0-9A-Fa-f]{3,8}$/',
+            ],
+
+            'image_ids' => [
+                'nullable',
+                'array',
+                'max:30',
+            ],
+
+            'image_ids.*' => [
+                'integer',
+                Rule::exists('product_images', 'id')
+                    ->where(
+                        fn ($query) =>
+                            $query->where(
+                                'product_id',
+                                $this->input('product_id')
+                            )
+                    ),
+            ],
+
             'sku' => [
                 'nullable',
                 'string',
@@ -73,7 +98,13 @@ class UpdateProductVariantRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        $colorHex = trim((string) ($this->color_hex ?? ''));
+
         $this->merge([
+            'color_hex' => $colorHex !== ''
+                ? $colorHex
+                : null,
+
             'price_adjustment' => $this->price_adjustment ?? 0,
             'stock' => $this->stock ?? 0,
             'is_active' => $this->boolean('is_active'),
@@ -87,13 +118,17 @@ class UpdateProductVariantRequest extends FormRequest
             'product_id.exists' => 'محصول انتخاب‌شده وجود ندارد.',
 
             'type.required' => 'نوع ویژگی الزامی است.',
-
             'name.required' => 'نام ویژگی الزامی است.',
-
             'value.required' => 'مقدار ویژگی الزامی است.',
+            'value.unique' => 'این مقدار ویژگی قبلاً برای همین نوع و محصول ثبت شده است.',
+
+            'color_hex.regex' => 'کد رنگ باید مانند #C8A27A باشد.',
+
+            'image_ids.array' => 'تصاویر انتخاب‌شده نامعتبر هستند.',
+            'image_ids.max' => 'حداکثر ۳۰ تصویر می‌توان برای یک تنوع انتخاب کرد.',
+            'image_ids.*.exists' => 'یکی از تصاویر انتخاب‌شده متعلق به این محصول نیست.',
 
             'sku.unique' => 'این SKU قبلاً استفاده شده است.',
-            'value.unique' => 'این مقدار ویژگی قبلاً برای همین نوع و محصول ثبت شده است.',
 
             'price_adjustment.numeric' => 'تعدیل قیمت باید عدد باشد.',
             'price_adjustment.decimal' => 'تعدیل قیمت باید حداکثر دو رقم اعشار داشته باشد.',
