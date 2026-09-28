@@ -79,7 +79,7 @@ html {
     background: var(--livora-cream);
     color: var(--livora-ink);
 
-    font-family: "Vazirmatn", sans-serif;
+    font-family: var(--livora-font-family);
 
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -102,7 +102,7 @@ body {
 
     color: var(--livora-ink);
 
-    font-family: "Vazirmatn", sans-serif;
+    font-family: var(--livora-font-family);
 
     overflow-x: hidden;
 }
