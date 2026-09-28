@@ -10,6 +10,18 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
+        $adminPassword = env('ADMIN_PASSWORD');
+
+        if (blank($adminPassword)) {
+            if (app()->environment(['local', 'testing'])) {
+                $adminPassword = 'password';
+            } else {
+                throw new \RuntimeException(
+                    'ADMIN_PASSWORD must be configured before running the user seeder in production.'
+                );
+            }
+        }
+
         User::updateOrCreate(
             [
                 'email' => env('ADMIN_EMAIL', 'admin@silagallery.test'),
@@ -17,7 +29,7 @@ class UserSeeder extends Seeder
             [
                 'name' => env('ADMIN_NAME', 'SilaGallery Admin'),
                 'role' => 'admin',
-                'password' => Hash::make(env('ADMIN_PASSWORD', 'change-this-before-production')),
+                'password' => Hash::make($adminPassword),
                 'email_verified_at' => now(),
             ]
         );
