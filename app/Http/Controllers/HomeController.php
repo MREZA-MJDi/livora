@@ -39,10 +39,16 @@ class HomeController extends Controller
             ->limit(8)
             ->get();
 
+        $installmentProductCount = Product::query()
+            ->active()
+            ->where('installment_enabled', true)
+            ->count();
+
         return view('home.index', [
             'categories' => $categories,
             'featuredProducts' => $featuredProducts,
             'newProducts' => $newProducts,
+            'installmentProductCount' => $installmentProductCount,
         ]);
     }
 }
