@@ -76,7 +76,7 @@ html {
     background: var(--admin-bg);
     color: var(--admin-text);
 
-    font-family: "Vazirmatn", sans-serif;
+    font-family: var(--livora-font-family);
 
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
