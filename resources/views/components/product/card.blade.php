@@ -117,14 +117,14 @@
                 <form
                     action="{{ route('account.wishlist.store', $product) }}"
                     method="POST"
-                    class="absolute bottom-3 right-3 opacity-0 transition duration-300 group-hover:opacity-100"
+                    class="absolute bottom-3 right-3 transition duration-300"
                 >
                     @csrf
 
                     <button
                         type="submit"
                         aria-label="افزودن به علاقه‌مندی‌ها"
-                        class="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/25 text-white backdrop-blur-xl transition hover:bg-white hover:text-[var(--livora-ink)]"
+                        class="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/30 text-white shadow-sm backdrop-blur-xl transition hover:bg-white hover:text-[var(--livora-ink)] focus-visible:bg-white focus-visible:text-[var(--livora-ink)]"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
