@@ -107,6 +107,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             };
 
+            const initialProductId =
+                document.querySelector('[data-product-value]')?.value ?? '';
+
+            const hasServerRenderedImages =
+                Boolean(
+                    grid.querySelector(
+                        'input[name="image_ids[]"]'
+                    )
+                );
+
+            if (
+                initialProductId
+                && ! hasServerRenderedImages
+            ) {
+                loadImages(initialProductId);
+            }
+
             document.addEventListener('admin-product-selected', (event) => {
                 loadImages(event.detail?.id ?? '');
             });
