@@ -66,7 +66,7 @@
                 </p>
             </div>
 
-            <div class="admin-image-preview mb-5 aspect-[4/3]">
+            <div class="admin-image-preview mb-5 aspect-[4/5] w-full max-w-[380px] overflow-hidden rounded-2xl">
 
                 <img
                     id="product-image-preview"
@@ -77,7 +77,7 @@
 
                 <div
                     id="product-image-placeholder"
-                    class="{{ $productImageUrl ? 'hidden' : 'flex' }} h-full flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--admin-border)] bg-[var(--admin-surface-soft)] p-6 text-center"
+                    class="{{ $productImageUrl ? 'hidden' : 'flex' }} h-full w-full flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--admin-border)] bg-[var(--admin-surface-soft)] p-6 text-center"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg"
                          fill="none"
