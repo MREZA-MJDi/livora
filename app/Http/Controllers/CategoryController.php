@@ -14,7 +14,7 @@ class CategoryController extends Controller
             ->withCount([
                 'products' => fn ($query) => $query->active(),
             ])
-            ->with('latestActiveProduct.images.media')
+            ->with('latestActiveProduct.primaryImage')
             ->orderBy('sort_order')
             ->get();
 
