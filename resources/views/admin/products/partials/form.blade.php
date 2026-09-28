@@ -1282,7 +1282,8 @@
                             oldValue.substring(
                                 0,
                                 cursorPosition
-                            )
+                            ),
+                            allowDecimal
                         ).length;
 
 
