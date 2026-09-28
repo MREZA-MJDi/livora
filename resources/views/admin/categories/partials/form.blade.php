@@ -266,12 +266,6 @@
             </div>
 
 
-            <div class="mt-5">
-
-                <label for="image" class="admin-label">
-                    انتخاب تصویر
-                </label>
-
                 <input
                     id="image"
                     data-crop-input
