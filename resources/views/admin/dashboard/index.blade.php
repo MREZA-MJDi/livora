@@ -143,7 +143,7 @@
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
 
             {{-- Products --}}
-            <div class="admin-stat admin-card-hover p-5">
+            <a href="{{ route('admin.products.index') }}" class="admin-stat admin-card-hover block p-5">
 
                 <div class="flex items-start justify-between gap-4">
 
@@ -207,11 +207,11 @@
 
                 </div>
 
-            </div>
+            </a>
 
 
             {{-- Customers --}}
-            <div class="admin-stat admin-card-hover p-5">
+            <a href="{{ route('admin.customers.index') }}" class="admin-stat admin-card-hover block p-5">
 
                 <div class="flex items-start justify-between gap-4">
 
@@ -257,11 +257,11 @@
                     مشتری جدید در لیست اخیر
                 </div>
 
-            </div>
+            </a>
 
 
             {{-- Orders --}}
-            <div class="admin-stat admin-card-hover p-5">
+            <a href="{{ route('admin.orders.index') }}" class="admin-stat admin-card-hover block p-5">
 
                 <div class="flex items-start justify-between gap-4">
 
@@ -305,20 +305,19 @@
 
                 <div class="mt-4 flex items-center gap-2 text-[11px]">
 
-                <a
-                    href="{{ route('admin.orders.index', ['payment_status' => 'paid']) }}"
-                    class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-emerald-700 transition hover:bg-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
+                <span
+                    class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-emerald-700"
                 >
                     {{ number_format($paidOrderPercent) }}٪ پرداخت‌شده
-                </a>
+                </span>
 
                 </div>
 
-            </div>
+            </a>
 
 
             {{-- Revenue --}}
-            <div class="admin-stat admin-card-hover overflow-hidden p-5">
+            <a href="{{ route('admin.orders.index', ['payment_status' => 'paid']) }}" class="admin-stat admin-card-hover block overflow-hidden p-5">
 
                 <div class="flex items-start justify-between gap-4">
 
@@ -376,7 +375,7 @@
 
                 </div>
 
-            </div>
+            </a>
 
         </div>
 
@@ -570,7 +569,7 @@
 
                                     </div>
 
-                                </div>
+                                </a>
 
                             @endforeach
 
@@ -717,23 +716,26 @@
                                     ];
                             @endphp
 
-                            <div class="flex items-center justify-between gap-2 rounded-2xl {{ $color['bg'] }} px-3 py-2.5">
+                            <a
+                                href="{{ route('admin.orders.index', ['status' => $status]) }}"
+                                class="flex items-center justify-between gap-2 rounded-2xl {{ $color['bg'] }} px-3 py-2.5 transition hover:-translate-y-0.5 hover:shadow-sm"
+                            >
 
-                            <span class="flex items-center gap-2">
+                                <span class="flex min-w-0 items-center gap-2">
 
-                                <span class="h-2 w-2 rounded-full {{ str_replace('text-', 'bg-', $color['text']) }}"></span>
+                                    <span class="h-2 w-2 shrink-0 rounded-full {{ str_replace('text-', 'bg-', $color['text']) }}"></span>
 
-                                <span class="text-[10px] {{ $color['text'] }}">
-                                    {{ $label }}
+                                    <span class="truncate text-[10px] {{ $color['text'] }}">
+                                        {{ $label }}
+                                    </span>
+
                                 </span>
 
-                            </span>
+                                <span class="shrink-0 text-[10px] font-bold {{ $color['text'] }}">
+                                    {{ number_format($count) }}
+                                </span>
 
-                                <span class="text-[10px] font-bold {{ $color['text'] }}">
-                                {{ number_format($count) }}
-                            </span>
-
-                            </div>
+                            </a>
 
                         @endforeach
 
@@ -804,7 +806,10 @@
                                         );
                                 @endphp
 
-                                <div class="group">
+                                <a
+                                    href="{{ route('admin.products.show', $product['product_id']) }}"
+                                    class="group block rounded-2xl p-1 transition hover:bg-[var(--admin-surface)]"
+                                >
 
                                     <div class="flex items-center gap-4">
 
