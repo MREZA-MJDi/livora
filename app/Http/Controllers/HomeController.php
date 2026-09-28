@@ -15,6 +15,7 @@ class HomeController extends Controller
             ->withCount([
                 'products' => fn ($query) => $query->active(),
             ])
+            ->with('latestActiveProduct.images')
             ->orderBy('sort_order')
             ->get();
 

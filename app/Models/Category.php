@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Category extends Model
 {
@@ -55,6 +56,38 @@ class Category extends Model
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);
+    }
+
+    /**
+     * Latest active product used as the homepage image fallback.
+     *
+     * Admin-uploaded category images keep priority. Seeded/external
+     * category images fall back to the latest active product image.
+     */
+    public function latestActiveProduct(): HasOne
+    {
+        return $this->hasOne(Product::class)
+            ->where('status', 'active')
+            ->latestOfMany('updated_at');
+    }
+
+    public function getHomepageImageUrlAttribute(): ?string
+    {
+        $categoryImageIsUploaded =
+            $this->image
+            && ! Str::startsWith($this->image, [
+                'http://',
+                'https://',
+                '//',
+            ]);
+
+        if ($categoryImageIsUploaded && $this->image_url) {
+            return $this->image_url;
+        }
+
+        $productImage = $this->latestActiveProduct?->images?->first()?->url;
+
+        return $productImage ?: $this->image_url;
     }
 
     public function scopeActive($query)

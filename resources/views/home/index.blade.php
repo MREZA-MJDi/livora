@@ -459,7 +459,7 @@
 
                             <x-shop.category-card
                                 :name="$category->name"
-                                :image="$category->image_url"
+                                :image="$category->homepage_image_url"
                                 :href="route('categories.show', $category->slug)"
                                 :count="$category->products_count"
                             />
