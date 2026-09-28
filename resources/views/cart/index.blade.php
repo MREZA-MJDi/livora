@@ -453,7 +453,7 @@
                                                     class="group h-32 w-full shrink-0 overflow-hidden rounded-2xl bg-[var(--livora-surface)] sm:h-32 sm:w-28"
                                                 >
 
-                                                    @if($product->images->first()?->url)
+                                                    @if($product->primaryImage?->url)
 
                                                         <img
                                                             src="{{ $product->images->first()->url }}"
