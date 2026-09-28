@@ -22,7 +22,7 @@ class ShopController extends Controller
         $query = Product::query()
             ->with([
                 'category',
-                'images.media',
+                'primaryImage',
             ])
             ->active();
 
