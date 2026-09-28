@@ -24,7 +24,7 @@ class CheckoutController extends Controller
     /**
      * Show checkout page.
      */
-    public function index(): View
+    public function index(): View|RedirectResponse
     {
         $cart = $this->getActiveCart();
 
@@ -34,11 +34,14 @@ class CheckoutController extends Controller
             'items.variant',
         ]);
 
-        abort_if(
-            $cart->items->isEmpty(),
-            404,
-            'سبد خرید خالی است.'
-        );
+        if ($cart->items->isEmpty()) {
+            return redirect()
+                ->route('cart.index')
+                ->with(
+                    'warning',
+                    'سبد خرید شما خالی است. ابتدا یک محصول به سبد اضافه کنید.'
+                );
+        }
 
         $defaultAddress = Auth::user()
             ->defaultAddress()
