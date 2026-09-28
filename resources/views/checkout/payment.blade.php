@@ -748,6 +748,9 @@
                                 @php
                                     $itemImage =
                                         $item->product?->images?->first()?->url;
+
+                                    $variantOptions =
+                                        collect($item->variant_options ?? []);
                                 @endphp
 
                                 <div class="flex gap-3 rounded-2xl bg-[var(--livora-surface)] p-3">
@@ -779,7 +782,28 @@
                                             {{ $item->product_name }}
                                         </p>
 
-                                        <p class="mt-1 text-[10px] text-[var(--livora-stone)]">
+                                        @if($variantOptions->isNotEmpty())
+
+                                            <div class="mt-1 flex flex-wrap gap-1.5">
+
+                                                @foreach($variantOptions as $option)
+
+                                                    <span class="rounded-full border border-[var(--livora-border)] px-2 py-1 text-[9px] text-[var(--livora-stone)]">
+
+                                                        {{ $option['name'] ?? $option['type'] ?? 'ویژگی' }}:
+                                                        <span class="font-medium text-[var(--livora-ink)]">
+                                                            {{ $option['value'] ?? '—' }}
+                                                        </span>
+
+                                                    </span>
+
+                                                @endforeach
+
+                                            </div>
+
+                                        @endif
+
+                                        <p class="mt-2 text-[10px] text-[var(--livora-stone)]">
                                             تعداد:
                                             {{ number_format($item->quantity) }}
                                         </p>
