@@ -255,14 +255,14 @@
         ========================================================== --}}
         <section>
 
-            <x-layout.container>
+            <x-layout.container class="product-detail-container">
 
-                <div class="grid gap-8 py-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-14 lg:py-14 xl:gap-20">
+                <div class="product-detail-grid grid items-start gap-8 py-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-12 lg:py-12 xl:gap-16">
 
                     {{-- Gallery --}}
                     <div class="min-w-0">
 
-                        <div class="lg:sticky lg:top-28">
+                        <div class="xl:sticky xl:top-24">
                             <x-product.gallery
                                 :product="$product"
                             />
