@@ -75,27 +75,7 @@ class AuthController extends Controller
 
         $this->mergeGuestCartIntoUserCart($request);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Role Based Redirect
-        |--------------------------------------------------------------------------
-        */
-
-        if ($request->user()->isAdmin()) {
-            return redirect()
-                ->route('admin.dashboard')
-                ->with(
-                    'success',
-                    'به پنل مدیریت خوش آمدید.'
-                );
-        }
-
-        return redirect()
-            ->intended(route('account.index'))
-            ->with(
-                'success',
-                'با موفقیت وارد شدید.'
-            );
+        return $this->redirectAfterAuthentication($request);
     }
 
     public function showRegister(): View
@@ -141,22 +121,140 @@ class AuthController extends Controller
 
         $this->mergeGuestCartIntoUserCart($request);
 
+        return $this->redirectAfterAuthentication(
+            $request,
+            'حساب کاربری با موفقیت ایجاد شد.'
+        );
+    }
 
-        if ($request->user()->isAdmin()) {
+    protected function redirectAfterAuthentication(
+        Request $request,
+        string $successMessage = 'با موفقیت وارد شدید.'
+    ): RedirectResponse {
+        $user = $request->user();
+
+        if (! $user) {
             return redirect()
-                ->route('admin.dashboard')
-                ->with(
-                    'success',
-                    'به پنل مدیریت خوش آمدید.'
-                );
+                ->route('login')
+                ->withErrors([
+                    'email' => 'احراز هویت انجام نشد. دوباره تلاش کنید.',
+                ]);
+        }
+
+        $fallbackRoute = match (true) {
+            $user->isAdmin() => 'admin.dashboard',
+            $user->isCustomer() => 'account.index',
+            default => 'home',
+        };
+
+        $intended = $request->session()->pull('url.intended');
+
+        if (
+            is_string($intended) &&
+            $this->isSafeIntendedUrl($request, $intended)
+        ) {
+            $path = parse_url(
+                $intended,
+                PHP_URL_PATH
+            ) ?: '/';
+
+            if (
+                $user->isAdmin() &&
+                $this->matchesPathPrefix(
+                    $path,
+                    ['/admin']
+                )
+            ) {
+                return redirect()
+                    ->to($intended)
+                    ->with(
+                        'success',
+                        $successMessage
+                    );
+            }
+
+            if (
+                $user->isCustomer() &&
+                $this->matchesPathPrefix(
+                    $path,
+                    ['/account', '/checkout']
+                )
+            ) {
+                return redirect()
+                    ->to($intended)
+                    ->with(
+                        'success',
+                        $successMessage
+                    );
+            }
         }
 
         return redirect()
-            ->intended(route('account.index'))
+            ->route($fallbackRoute)
             ->with(
                 'success',
-                'حساب کاربری با موفقیت ایجاد شد.'
+                $successMessage
             );
+    }
+
+    protected function isSafeIntendedUrl(
+        Request $request,
+        string $intended
+    ): bool {
+        $parsed = parse_url($intended);
+
+        if ($parsed === false) {
+            return false;
+        }
+
+        $host = $parsed['host'] ?? null;
+        $port = $parsed['port'] ?? null;
+
+        if ($host === null) {
+            return true;
+        }
+
+        return hash_equals(
+            $request->getHost(),
+            $host
+        ) &&
+            (
+                $port === null ||
+                (int) $port === (int) $request->getPort()
+            );
+    }
+
+    protected function matchesPathPrefix(
+        string $path,
+        array $prefixes
+    ): bool {
+        $normalizedPath = rtrim(
+            $path,
+            '/'
+        );
+
+        if ($normalizedPath === '') {
+            $normalizedPath = '/';
+        }
+
+        foreach ($prefixes as $prefix) {
+            $normalizedPrefix = rtrim(
+                $prefix,
+                '/'
+            );
+
+            if (
+                $normalizedPath === $normalizedPrefix ||
+                Str::startsWith(
+                    $normalizedPath,
+                    $normalizedPrefix . '/'
+                )
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function logout(
