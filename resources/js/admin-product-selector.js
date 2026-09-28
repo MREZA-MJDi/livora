@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document
         .querySelectorAll('[data-admin-product-selector]')
         .forEach((root) => {
-            const input = root.querySelector('#product-search');
+            const input = root.querySelector('[data-product-search]');
             const hidden = root.querySelector('[data-product-value]');
             const results = root.querySelector('[data-product-results]');
             const selected = root.querySelector('[data-product-selected]');
