@@ -26,7 +26,7 @@ class StoreProductRequest extends FormRequest
                     ?: Str::slug($this->name),
 
             'stock' =>
-                $this->stock ?? 0,
+                $this->normalizeNumericInput($this->input('stock')) ?? 0,
 
             'is_featured' =>
                 $this->boolean('is_featured'),
