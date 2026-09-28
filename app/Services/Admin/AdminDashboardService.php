@@ -118,8 +118,7 @@ class AdminDashboardService
                         ? 'سفارش‌های در انتظار یا در حال پردازش را بررسی کنید.'
                         : 'در حال حاضر سفارشی در صف اقدام نیست.',
                     'href' => route(
-                        'admin.orders.index',
-                        ['status' => 'pending']
+                        'admin.orders.index'
                     ),
                     'tone' => 'warning',
                 ],
