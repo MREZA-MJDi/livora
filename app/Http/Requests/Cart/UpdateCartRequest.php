@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Requests\Cart;
+namespace AppHttpRequestsCart;
 
-use Illuminate\Foundation\Http\FormRequest;
+use IlluminateFoundationHttpFormRequest;
 
 class UpdateCartRequest extends FormRequest
 {
@@ -20,6 +20,16 @@ class UpdateCartRequest extends FormRequest
                 'min:1',
                 'max:99',
             ],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'quantity.required' => 'تعداد محصول را وارد کنید.',
+            'quantity.integer' => 'تعداد باید عدد صحیح باشد.',
+            'quantity.min' => 'تعداد باید حداقل ۱ باشد.',
+            'quantity.max' => 'تعداد بیشتر از حد مجاز است.',
         ];
     }
 }
