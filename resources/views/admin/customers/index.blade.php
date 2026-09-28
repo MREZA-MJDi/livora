@@ -143,7 +143,7 @@
 
                         <td>
                                 <span class="admin-badge admin-badge-info">
-                                    {{ $customer->orders_count ?? $customer->orders->count() }}
+                                    {{ $customer->orders_count }}
                                     سفارش
                                 </span>
                         </td>
