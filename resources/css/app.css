@@ -110,6 +110,44 @@ body {
 
 
 /* =========================================================
+   STOREFRONT TYPOGRAPHY NORMALIZATION
+   ========================================================= */
+
+.storefront-content h1,
+.storefront-content h2,
+.storefront-content h3,
+.storefront-content h4,
+.storefront-content h5,
+.storefront-content h6 {
+    line-height: 1.35;
+    font-weight: 600;
+    letter-spacing: -0.012em;
+}
+
+.storefront-content p,
+.storefront-content li {
+    line-height: 1.85;
+}
+
+@media (max-width: 639px) {
+    .storefront-content h1,
+    .storefront-content h2,
+    .storefront-content h3,
+    .storefront-content h4,
+    .storefront-content h5,
+    .storefront-content h6 {
+        line-height: 1.4;
+        letter-spacing: -0.008em;
+    }
+
+    .storefront-content p,
+    .storefront-content li {
+        line-height: 1.9;
+    }
+}
+
+
+/* =========================================================
    GLOBAL ELEMENTS
    ========================================================= */
 
