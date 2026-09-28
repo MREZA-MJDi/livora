@@ -49,4 +49,27 @@ class OrderItem extends Model
             'product_variant_id'
         );
     }
+
+    /**
+     * Resolve all selected variant IDs from the immutable order snapshot.
+     */
+    public function selectedVariantIds(): array
+    {
+        $options = is_array($this->variant_options)
+            ? $this->variant_options
+            : [];
+
+        $ids = collect($options)
+            ->pluck('id')
+            ->filter()
+            ->map(fn ($id) => (int) $id)
+            ->values()
+            ->all();
+
+        if (empty($ids) && $this->product_variant_id) {
+            $ids = [(int) $this->product_variant_id];
+        }
+
+        return array_values(array_unique($ids));
+    }
 }
