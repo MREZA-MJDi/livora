@@ -8,6 +8,7 @@ use App\Models\CartItem;
 use App\Models\ProductVariant;
 use App\Models\Order;
 use App\Services\Installments\InstallmentPlanService;
+use App\Services\Payments\PaymentManager;
 use App\Services\Payments\PaymentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -317,7 +318,9 @@ class CheckoutController extends Controller
      * Show payment selection page.
      */
     public function payment(
-        Order $order
+        Order $order,
+        PaymentManager $paymentManager,
+        InstallmentPlanService $installmentPlanService
     ): View {
         abort_unless(
             $order->user_id === Auth::id(),
@@ -330,15 +333,29 @@ class CheckoutController extends Controller
             'installments',
         ]);
 
+        $installmentPreview = null;
+
+        try {
+            $installmentPreview = $installmentPlanService->preview($order);
+        } catch (Throwable $e) {
+            $installmentPreview = [
+                'enabled' => false,
+                'message' => $e->getMessage()
+                    ?: 'شرایط خرید اقساطی برای این سفارش قابل محاسبه نیست.',
+            ];
+        }
+
         return view('checkout.payment', [
             'order' => $order,
+            'gateways' => $paymentManager->onlineMethods(),
+            'installmentPreview' => $installmentPreview,
         ]);
     }
 
     /**
-     * Start DigiPay / SnapPay / TorobPay installment payment.
+     * Start an online payment through the selected gateway.
      */
-    public function startInstallmentPayment(
+    public function startOnlinePayment(
         Request $request,
         Order $order,
         PaymentService $paymentService
@@ -358,7 +375,7 @@ class CheckoutController extends Controller
 
         try {
             $result = $paymentService
-                ->startInstallmentPayment(
+                ->startOnlinePayment(
                     $order,
                     $validated['gateway']
                 );
