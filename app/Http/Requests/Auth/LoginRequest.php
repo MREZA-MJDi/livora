@@ -34,6 +34,25 @@ class LoginRequest extends FormRequest
         ];
     }
 
+    public function messages(): array
+    {
+        return [
+            'email.required' => 'وارد کردن ایمیل الزامی است.',
+            'email.email' => 'فرمت ایمیل صحیح نیست.',
+            'password.required' => 'وارد کردن رمز عبور الزامی است.',
+            'password.min' => 'رمز عبور باید حداقل ۸ کاراکتر باشد.',
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'email' => 'ایمیل',
+            'password' => 'رمز عبور',
+            'remember' => 'مرا به خاطر بسپار',
+        ];
+    }
+
     protected function prepareForValidation(): void
     {
         $this->merge([
