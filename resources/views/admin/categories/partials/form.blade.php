@@ -207,7 +207,9 @@
                 @if($editing && !empty($category->image))
 
                     <img
-                        src="{{ asset('storage/' . ltrim($category->image, '/')) }}"
+                        src="{{ str_starts_with($category->image, 'http://') || str_starts_with($category->image, 'https://') || str_starts_with($category->image, '//')
+                            ? $category->image
+                            : asset('storage/' . ltrim($category->image, '/')) }}"
                         alt="{{ $category->name }}"
                         class="admin-image"
                     >
