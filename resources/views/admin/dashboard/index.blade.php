@@ -143,19 +143,24 @@
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
 
             {{-- Products --}}
-            <a href="{{ route('admin.products.index') }}" class="admin-stat admin-card-hover block p-5">
+            <div class="admin-stat admin-card-hover p-5">
 
                 <div class="flex items-start justify-between gap-4">
 
                     <div>
 
-                        <p class="admin-stat-label">
-                            کل محصولات
-                        </p>
+                        <a
+                            href="{{ route('admin.products.index') }}"
+                            class="block min-w-0 rounded-lg transition hover:text-[var(--admin-accent-dark)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--admin-accent)]"
+                        >
+                            <p class="admin-stat-label">
+                                کل محصولات
+                            </p>
 
-                        <p class="mt-2 text-3xl font-bold text-[var(--admin-text)]">
-                            {{ number_format($totalProducts) }}
-                        </p>
+                            <p class="mt-2 text-3xl font-bold text-[var(--admin-text)]">
+                                {{ number_format($totalProducts) }}
+                            </p>
+                        </a>
 
                         <p class="mt-2 text-xs text-[var(--admin-muted)]">
                             {{ number_format($activeProducts) }}
@@ -207,23 +212,28 @@
 
                 </div>
 
-            </a>
+            </div>
 
 
             {{-- Customers --}}
-            <a href="{{ route('admin.customers.index') }}" class="admin-stat admin-card-hover block p-5">
+            <div class="admin-stat admin-card-hover p-5">
 
                 <div class="flex items-start justify-between gap-4">
 
                     <div>
 
-                        <p class="admin-stat-label">
-                            مشتریان
-                        </p>
+                        <a
+                            href="{{ route('admin.customers.index') }}"
+                            class="block min-w-0 rounded-lg transition hover:text-[var(--admin-accent-dark)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--admin-accent)]"
+                        >
+                            <p class="admin-stat-label">
+                                مشتریان
+                            </p>
 
-                        <p class="mt-2 text-3xl font-bold text-[var(--admin-text)]">
-                            {{ number_format($totalCustomers) }}
-                        </p>
+                            <p class="mt-2 text-3xl font-bold text-[var(--admin-text)]">
+                                {{ number_format($totalCustomers) }}
+                            </p>
+                        </a>
 
                         <p class="mt-2 text-xs text-[var(--admin-muted)]">
                             ثبت‌نام‌شده
@@ -252,28 +262,37 @@
 
                 </div>
 
-                <div class="mt-4 text-xs text-[var(--admin-muted)]">
-                    {{ $recentCustomers->count() }}
-                    مشتری جدید در لیست اخیر
+                <div class="mt-4">
+                    <a
+                        href="{{ route('admin.customers.index') }}"
+                        class="text-xs font-medium text-[var(--admin-accent)]"
+                    >
+                        مشاهده فهرست مشتریان ←
+                    </a>
                 </div>
 
-            </a>
+            </div>
 
 
             {{-- Orders --}}
-            <a href="{{ route('admin.orders.index') }}" class="admin-stat admin-card-hover block p-5">
+            <div class="admin-stat admin-card-hover p-5">
 
                 <div class="flex items-start justify-between gap-4">
 
                     <div>
 
-                        <p class="admin-stat-label">
-                            سفارش‌ها
-                        </p>
+                        <a
+                            href="{{ route('admin.orders.index') }}"
+                            class="block min-w-0 rounded-lg transition hover:text-[var(--admin-accent-dark)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--admin-accent)]"
+                        >
+                            <p class="admin-stat-label">
+                                سفارش‌ها
+                            </p>
 
-                        <p class="mt-2 text-3xl font-bold text-[var(--admin-text)]">
-                            {{ number_format($totalOrders) }}
-                        </p>
+                            <p class="mt-2 text-3xl font-bold text-[var(--admin-text)]">
+                                {{ number_format($totalOrders) }}
+                            </p>
+                        </a>
 
                         <p class="mt-2 text-xs text-[var(--admin-muted)]">
                             {{ number_format($pendingOrders) }}
@@ -303,17 +322,27 @@
 
                 </div>
 
-                <div class="mt-4 flex items-center gap-2 text-[11px]">
+                <div class="mt-4 flex flex-wrap items-center gap-2 text-[11px]">
 
-                <span
-                    class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-emerald-700"
-                >
-                    {{ number_format($paidOrderPercent) }}٪ پرداخت‌شده
-                </span>
+                    <a
+                        href="{{ route('admin.orders.index', ['payment_status' => 'paid']) }}"
+                        class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-emerald-700 transition hover:bg-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
+                    >
+                        {{ number_format($paidOrderPercent) }}٪ پرداخت‌شده
+                    </a>
+
+                    @if($pendingOrders > 0)
+                        <a
+                            href="{{ route('admin.orders.index') }}"
+                            class="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-1 text-amber-700 transition hover:bg-amber-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
+                        >
+                            {{ number_format($pendingOrders) }} نیازمند اقدام
+                        </a>
+                    @endif
 
                 </div>
 
-            </a>
+            </div>
 
 
             {{-- Revenue --}}
@@ -758,7 +787,7 @@
 
                 <div class="border-b border-[var(--admin-border)] p-6">
 
-                    <div class="flex items-center justify-between gap-4">
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 
                         <div>
 
@@ -811,7 +840,7 @@
                                     class="group block rounded-2xl p-1 transition hover:bg-[var(--admin-surface)]"
                                 >
 
-                                    <div class="flex items-center gap-4">
+                                    <div class="flex min-w-0 items-center gap-3 sm:gap-4">
 
                                         {{-- Rank --}}
                                         <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-xs font-bold text-[var(--admin-text)]">
@@ -845,7 +874,7 @@
                                         {{-- Product --}}
                                         <div class="min-w-0 flex-1">
 
-                                            <div class="flex items-start justify-between gap-3">
+                                            <div class="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
 
                                                 <div class="min-w-0">
 
@@ -1117,7 +1146,7 @@
 
                         <a
                             href="{{ route('admin.orders.show', $order) }}"
-                            class="flex items-center justify-between gap-4 p-5 transition hover:bg-[var(--admin-surface)]"
+                            class="flex flex-col items-stretch gap-3 p-4 transition hover:bg-[var(--admin-surface)] sm:flex-row sm:items-center sm:justify-between sm:p-5"
                         >
 
                             <div class="min-w-0">
@@ -1207,7 +1236,7 @@
 
                         <a
                             href="{{ route('admin.customers.show', $customer) }}"
-                            class="flex items-center gap-4 p-5 transition hover:bg-[var(--admin-surface)]"
+                            class="flex items-center gap-3 p-4 transition hover:bg-[var(--admin-surface)] sm:gap-4 sm:p-5"
                         >
 
                             <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[var(--admin-surface)] text-xs font-bold text-[var(--admin-text)]">
