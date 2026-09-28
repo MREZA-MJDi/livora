@@ -243,15 +243,24 @@
 
                 </div>
 
-                <div class="admin-image-cropper-actions">
+                                <div class="admin-image-cropper-actions">
+
+                    <label
+                        for="image"
+                        class="admin-btn admin-btn-secondary"
+                    >
+                        {{ $categoryImageUrl ? 'تعویض تصویر' : 'انتخاب تصویر' }}
+                    </label>
+
                     <button
                         type="button"
                         data-crop-open
                         class="admin-btn admin-btn-secondary"
-                        {{ $categoryImageUrl ? '' : 'disabled' }}
+                        
                     >
-                        تنظیم قاب / برش
+                        ویرایش قاب
                     </button>
+
                 </div>
 
             </div>
@@ -269,7 +278,7 @@
                     name="image"
                     type="file"
                     accept="image/*"
-                    class="admin-input p-2"
+                    class="class="admin-input sr-only"
                 >
 
                 <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">
