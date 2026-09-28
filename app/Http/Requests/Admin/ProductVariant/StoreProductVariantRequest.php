@@ -97,6 +97,11 @@ class StoreProductVariantRequest extends FormRequest
         $colorHex = trim((string) ($this->color_hex ?? ''));
 
         $this->merge([
+            'type' => trim((string) $this->type),
+            'name' => trim((string) $this->name),
+            'value' => trim((string) $this->value),
+            'sku' => trim((string) ($this->sku ?? '')) ?: null,
+
             'color_hex' => $colorHex !== ''
                 ? $colorHex
                 : null,
