@@ -8,6 +8,7 @@ use App\Models\Order;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use App\Services\Inventory\InventoryService;
 
 class OrderController extends Controller
 {
@@ -102,20 +103,40 @@ class OrderController extends Controller
      */
     public function updateStatus(
         UpdateOrderStatusRequest $request,
-        Order $order
+        Order $order,
+        InventoryService $inventoryService
     ): RedirectResponse {
-        $order->update([
-            'status' => $request->validated('status'),
-        ]);
+        $newStatus = $request->validated('status');
 
-        return redirect()
-            ->route(
-                'admin.orders.show',
-                $order
-            )
-            ->with(
-                'success',
-                'وضعیت سفارش با موفقیت بروزرسانی شد.'
-            );
+        try {
+            if (
+                $newStatus === 'cancelled'
+                && $order->status !== 'cancelled'
+            ) {
+                $inventoryService->releaseOrder($order);
+            }
+
+            $order->update([
+                'status' => $newStatus,
+            ]);
+
+            return redirect()
+                ->route(
+                    'admin.orders.show',
+                    $order
+                )
+                ->with(
+                    'success',
+                    'وضعیت سفارش با موفقیت بروزرسانی شد.'
+                );
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()
+                ->with(
+                    'error',
+                    'تغییر وضعیت سفارش انجام نشد؛ وضعیت موجودی دست‌نخورده باقی ماند.'
+                );
+        }
     }
 }
