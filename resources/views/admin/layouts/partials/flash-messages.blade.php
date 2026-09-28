@@ -102,7 +102,7 @@
 @endif
 
 
-@if($errors->any())
+@if(isset($errors) && $errors->any())
     <div
         class="admin-alert admin-alert-danger mb-6"
         role="alert"
