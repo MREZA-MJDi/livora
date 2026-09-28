@@ -289,11 +289,6 @@
             modal.modal.classList.add('hidden');
             document.body.classList.remove('admin-image-crop-open');
             state.image = null;
-
-            if (objectUrl) {
-                URL.revokeObjectURL(objectUrl);
-                objectUrl = null;
-            }
         };
 
         input.addEventListener('change', () => {
@@ -317,17 +312,24 @@
             openButton.addEventListener('click', () => {
                 const file = input.files?.[0];
 
-                if (!file) {
+                if (file) {
+                    if (objectUrl) {
+                        URL.revokeObjectURL(objectUrl);
+                    }
+
+                    objectUrl = URL.createObjectURL(file);
+
+                    openCrop(objectUrl, file);
                     return;
                 }
 
-                if (objectUrl) {
-                    URL.revokeObjectURL(objectUrl);
+                const currentSource =
+                    preview.currentSrc ||
+                    preview.getAttribute('src');
+
+                if (currentSource) {
+                    openCrop(currentSource);
                 }
-
-                objectUrl = URL.createObjectURL(file);
-
-                openCrop(objectUrl, file);
             });
         }
 
