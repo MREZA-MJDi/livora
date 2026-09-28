@@ -18,7 +18,7 @@
             image.onload = () => resolve(image);
             image.onerror = () => reject(new Error('تصویر قابل خواندن نیست.'));
 
-            if (/^https?:\\/\\//i.test(source)) {
+            if (/^https?:\/\//i.test(source)) {
                 image.crossOrigin = 'anonymous';
             }
 
