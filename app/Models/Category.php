@@ -86,7 +86,11 @@ class Category extends Model
             return $this->image_url;
         }
 
-        $productImage = $this->latestActiveProduct?->images?->first()?->url;
+        $product = $this->latestActiveProduct;
+
+        $productImage =
+            $product?->primaryImage?->url
+            ?? $product?->images?->first()?->url;
 
         return $productImage ?: $this->image_url;
     }
