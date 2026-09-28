@@ -165,8 +165,16 @@ class AdminDashboardService
 
     protected function salesSummary(Carbon $now): array
     {
+        /*
+         * A refunded payment leaves the paid state in this schema.
+         * Gross sales therefore includes both paid and refunded rows;
+         * refunds are then subtracted exactly once.
+         */
         $grossRevenue = (float) Payment::query()
-            ->where('status', 'paid')
+            ->whereIn('status', [
+                'paid',
+                'refunded',
+            ])
             ->sum('amount');
 
         $refundedRevenue = (float) Payment::query()
