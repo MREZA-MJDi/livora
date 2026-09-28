@@ -57,6 +57,20 @@ class RegisterRequest extends FormRequest
         ];
     }
 
+    public function messages(): array
+    {
+        return [
+            'password.letters' => 'رمز عبور باید حداقل یک حرف داشته باشد.',
+            'password.mixed' => 'رمز عبور باید حداقل یک حرف بزرگ و یک حرف کوچک داشته باشد.',
+            'password.numbers' => 'رمز عبور باید حداقل یک عدد داشته باشد.',
+            'password.confirmed' => 'تکرار رمز عبور با رمز عبور یکسان نیست.',
+            'password.min' => 'رمز عبور باید حداقل ۸ کاراکتر باشد.',
+            'email.unique' => 'این ایمیل قبلاً ثبت شده است.',
+            'phone.regex' => 'شماره موبایل باید با فرمت 09123456789 وارد شود.',
+            'terms.accepted' => 'برای ایجاد حساب، پذیرش قوانین و شرایط الزامی است.',
+        ];
+    }
+
     public function attributes(): array
     {
         return [
