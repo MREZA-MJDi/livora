@@ -1821,7 +1821,8 @@
 
                             priceInput.value =
                                 getRawNumber(
-                                    priceInput.value
+                                    priceInput.value,
+                                    true
                                 );
 
                         }
@@ -1831,7 +1832,8 @@
 
                             comparePriceInput.value =
                                 getRawNumber(
-                                    comparePriceInput.value
+                                    comparePriceInput.value,
+                                    true
                                 );
 
                         }
