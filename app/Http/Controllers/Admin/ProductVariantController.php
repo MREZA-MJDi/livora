@@ -1,15 +1,16 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace AppHttpControllersAdmin;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\ProductVariant\StoreProductVariantRequest;
-use App\Http\Requests\Admin\ProductVariant\UpdateProductVariantRequest;
-use App\Models\Product;
-use App\Models\ProductVariant;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\View\View;
+use AppHttpControllersController;
+use AppHttpRequestsAdminProductVariantStoreProductVariantRequest;
+use AppHttpRequestsAdminProductVariantUpdateProductVariantRequest;
+use AppModelsProduct;
+use AppModelsProductImage;
+use AppModelsProductVariant;
+use IlluminateHttpRedirectResponse;
+use IlluminateHttpRequest;
+use IlluminateViewView;
 
 class ProductVariantController extends Controller
 {
@@ -19,7 +20,10 @@ class ProductVariantController extends Controller
     public function index(Request $request): View
     {
         $query = ProductVariant::query()
-            ->with('product')
+            ->with([
+                'product',
+                'images',
+            ])
             ->orderBy('type')
             ->orderBy('name')
             ->orderBy('value');
@@ -85,11 +89,20 @@ class ProductVariantController extends Controller
             ? $request->integer('product_id')
             : null;
 
+        $selectedProductImages = $selectedProductId
+            ? ProductImage::query()
+                ->where('product_id', $selectedProductId)
+                ->orderBy('sort_order')
+                ->orderBy('id')
+                ->get()
+            : collect();
+
         return view(
             'admin.product-variants.create',
             compact(
                 'products',
-                'selectedProductId'
+                'selectedProductId',
+                'selectedProductImages'
             )
         );
     }
@@ -102,7 +115,12 @@ class ProductVariantController extends Controller
     ): RedirectResponse {
         $data = $request->validated();
 
-        ProductVariant::create($data);
+        $imageIds = $data['image_ids'] ?? [];
+        unset($data['image_ids']);
+
+        $productVariant = ProductVariant::create($data);
+
+        $productVariant->images()->sync($imageIds);
 
         return redirect()
             ->route(
@@ -123,7 +141,10 @@ class ProductVariantController extends Controller
     public function show(
         ProductVariant $productVariant
     ): View {
-        $productVariant->load('product');
+        $productVariant->load([
+            'product',
+            'images',
+        ]);
 
         return view(
             'admin.product-variants.show',
@@ -137,6 +158,8 @@ class ProductVariantController extends Controller
     public function edit(
         ProductVariant $productVariant
     ): View {
+        $productVariant->load('images');
+
         $products = Product::query()
             ->orderBy('name')
             ->get([
@@ -144,11 +167,21 @@ class ProductVariantController extends Controller
                 'name',
             ]);
 
+        $selectedProductId = (int) $productVariant->product_id;
+
+        $selectedProductImages = ProductImage::query()
+            ->where('product_id', $selectedProductId)
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get();
+
         return view(
             'admin.product-variants.edit',
             compact(
                 'productVariant',
-                'products'
+                'products',
+                'selectedProductId',
+                'selectedProductImages'
             )
         );
     }
@@ -162,7 +195,12 @@ class ProductVariantController extends Controller
     ): RedirectResponse {
         $data = $request->validated();
 
+        $imageIds = $data['image_ids'] ?? [];
+        unset($data['image_ids']);
+
         $productVariant->update($data);
+
+        $productVariant->images()->sync($imageIds);
 
         return redirect()
             ->route(
