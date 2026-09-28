@@ -3,12 +3,16 @@
     <div class="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
 
         <div>
-            <h3 class="text-base font-bold text-[var(--admin-text)]">
+            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--admin-accent)]">
+                PRODUCT VARIANTS
+            </p>
+
+            <h3 class="mt-2 text-base font-bold text-[var(--admin-text)]">
                 تنوع‌های محصول
             </h3>
 
             <p class="mt-1 text-xs text-[var(--admin-muted)]">
-                مدیریت رنگ، اندازه، قیمت و موجودی تنوع‌های محصول.
+                {{ number_format($variants->total()) }} تنوع · مرتب‌شده و صفحه‌بندی‌شده.
             </p>
         </div>
 
@@ -43,7 +47,7 @@
 
                     <tbody>
 
-                    @foreach($product->allVariants as $variant)
+                    @foreach($variants as $variant)
 
                         <tr>
 
@@ -137,6 +141,14 @@
                 </table>
 
             </div>
+
+            @if($variants->hasPages())
+
+                <div class="mt-6">
+                    {{ $variants->links() }}
+                </div>
+
+            @endif
 
         </div>
 
