@@ -603,65 +603,57 @@
                         </div>
 
 
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
 
                             <div class="rounded-3xl border border-white/10 bg-white/5 p-5 sm:p-6">
-
-                                <span class="text-[10px] uppercase tracking-[0.18em] text-white/40">
-                                    Today
-                                </span>
+                                <p class="text-[10px] uppercase tracking-[0.18em] text-white/40">
+                                    INSTALLMENTS
+                                </p>
 
                                 <p class="mt-4 text-2xl font-semibold">
-                                    50%
+                                    {{ number_format($installmentProductCount) }}
                                 </p>
 
                                 <p class="mt-2 text-xs leading-6 text-white/45">
-                                    پیش‌پرداخت نمونه
+                                    محصول دارای شرایط اقساطی
                                 </p>
-
                             </div>
 
-
                             <div class="rounded-3xl border border-white/10 bg-white/5 p-5 sm:p-6">
+                                <p class="text-[10px] uppercase tracking-[0.18em] text-white/40">
+                                    DETAILS
+                                </p>
 
-                                <span class="text-[10px] uppercase tracking-[0.18em] text-white/40">
-                                    Cheques
-                                </span>
-
-                                <p class="mt-4 text-2xl font-semibold">
-                                    2+
+                                <p class="mt-4 text-base font-semibold">
+                                    شفاف و محصول‌محور
                                 </p>
 
                                 <p class="mt-2 text-xs leading-6 text-white/45">
-                                    قابل تنظیم توسط فروشگاه
+                                    درصد پیش‌پرداخت، تعداد چک و زمان‌بندی در صفحه هر محصول نمایش داده می‌شود.
                                 </p>
-
                             </div>
 
-
-                            <div class="col-span-2 rounded-3xl border border-white/10 bg-white/[0.07] p-5 sm:p-6">
-
+                            <div class="sm:col-span-2 rounded-3xl border border-white/10 bg-white/[0.07] p-5 sm:p-6">
                                 <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
                                     <div>
-
                                         <p class="text-sm font-semibold">
-                                            شرایط هر محصول متفاوت است
+                                            شرایط خرید را قبل از Checkout ببینید
                                         </p>
 
                                         <p class="mt-2 text-xs leading-6 text-white/45">
-                                            درصد پیش‌پرداخت و برنامه تسویه را در صفحه محصول ببینید.
+                                            جزئیات هر محصول همان‌جا که تصمیم خرید می‌گیرید قابل بررسی است.
                                         </p>
-
                                     </div>
 
-
-                                    <span class="inline-flex w-fit rounded-full border border-white/10 px-4 py-2 text-[11px] text-white/60">
-                                        Transparent pricing
-                                    </span>
+                                    <a
+                                        href="{{ route('shop.index') }}"
+                                        class="inline-flex w-fit shrink-0 items-center rounded-full border border-white/15 px-4 py-2 text-[11px] text-white/75 transition hover:border-white/30 hover:bg-white/10"
+                                    >
+                                        ورود به فروشگاه
+                                    </a>
 
                                 </div>
-
                             </div>
 
                         </div>
@@ -1018,7 +1010,7 @@
 
             <x-layout.container>
 
-                <div class="py-20 sm:py-28">
+                <div class="py-16 sm:py-24">
 
                     <div class="mx-auto max-w-3xl text-center">
 
