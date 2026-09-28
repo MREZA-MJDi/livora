@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const grid = picker.querySelector('[data-variant-image-grid]');
             const status = picker.querySelector('[data-variant-image-status]');
             const endpoint = picker.dataset.imagesUrl;
+            const createImageUrl = picker.dataset.createImageUrl;
 
             if (!grid || !endpoint) return;
 
@@ -17,9 +18,24 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             const emptyState = (message, productId = '') => {
-                const action = productId
-                    ? '<a href="/admin/product-images/create?product_id=' + encodeURIComponent(productId) + '" class="admin-btn admin-btn-primary mt-4">افزودن تصویر محصول</a>'
-                    : '';
+                let action = '';
+
+                if (productId && createImageUrl) {
+                    const createUrl = new URL(
+                        createImageUrl,
+                        window.location.origin
+                    );
+
+                    createUrl.searchParams.set(
+                        'product_id',
+                        productId
+                    );
+
+                    action =
+                        '<a href="' +
+                        escapeHtml(createUrl.toString()) +
+                        '" class="admin-btn admin-btn-primary mt-4">افزودن تصویر محصول</a>';
+                }
 
                 grid.innerHTML =
                     '<div data-variant-image-empty class="col-span-full rounded-2xl border border-dashed border-[var(--admin-border)] bg-[var(--admin-surface-soft)] px-5 py-6 text-center">' +
