@@ -190,10 +190,22 @@ class ProductController extends Controller
             'category',
             'primaryImage',
             'images.media',
-            'allVariants.images.media',
         ]);
 
-        return view('admin.products.show', compact('product'));
+        $variants = $product
+            ->allVariants()
+            ->with('images.media')
+            ->orderBy('type')
+            ->orderBy('name')
+            ->orderBy('value')
+            ->orderBy('id')
+            ->paginate(20, ['*'], 'variants_page')
+            ->withQueryString();
+
+        return view(
+            'admin.products.show',
+            compact('product', 'variants')
+        );
     }
 
     /**
@@ -201,7 +213,7 @@ class ProductController extends Controller
      */
     public function edit(Product $product): View
     {
-        $product->load('images');
+        $product->load('images.media');
 
         $categories = Category::query()
             ->orderBy('name')
