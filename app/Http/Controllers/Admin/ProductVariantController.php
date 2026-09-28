@@ -51,7 +51,8 @@ class ProductVariantController extends Controller
         ]);
 
         $query = ProductVariant::query()
-            ->with('product:id,name');
+            ->with('product:id,name')
+            ->withCount('images');
 
         if (! empty($validated['search'])) {
             $search = trim($validated['search']);
