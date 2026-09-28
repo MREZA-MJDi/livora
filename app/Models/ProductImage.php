@@ -58,8 +58,12 @@ class ProductImage extends Model
 
     public function getUrlAttribute(): string
     {
+        if ($this->media?->url) {
+            return $this->media->url;
+        }
+
         if (
-            Str::startsWith($this->path, [
+            Str::startsWith($this->path ?? '', [
                 'http://',
                 'https://',
                 '//',
@@ -68,10 +72,14 @@ class ProductImage extends Model
             return $this->path;
         }
 
+        if (! $this->path) {
+            return '';
+        }
+
         $path = ltrim($this->path, '/');
 
         if (! Storage::disk('public')->exists($path)) {
-            return $this->media?->url ?? '';
+            return '';
         }
 
         return Storage::disk('public')->url($path);
