@@ -377,6 +377,11 @@ Route::middleware(['auth', 'admin'])
         |--------------------------------------------------------------------------
         */
 
+        Route::get(
+            'products/options',
+            [AdminProductController::class, 'options']
+        )->name('products.options');
+
         Route::resource(
             'products',
             AdminProductController::class
