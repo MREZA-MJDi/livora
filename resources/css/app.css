@@ -108,6 +108,54 @@ body {
 }
 
 
+.storefront-content {
+    min-width: 0;
+    width: 100%;
+}
+
+.storefront-content section {
+    min-width: 0;
+}
+
+.storefront-content .livora-container > * {
+    min-width: 0;
+}
+
+.storefront-content input,
+.storefront-content textarea,
+.storefront-content select,
+.storefront-content button,
+.storefront-content a {
+    max-width: 100%;
+}
+
+.storefront-content h1 {
+    font-size: clamp(2rem, 4vw, 3.75rem);
+}
+
+.storefront-content h2 {
+    font-size: clamp(1.5rem, 2.2vw, 2.35rem);
+}
+
+.storefront-content h3 {
+    font-size: clamp(1.05rem, 1.45vw, 1.35rem);
+}
+
+.storefront-content p,
+.storefront-content li {
+    max-width: 72ch;
+}
+
+@media (max-width: 639px) {
+    .storefront-content h1 {
+        font-size: clamp(1.85rem, 9vw, 2.7rem);
+    }
+
+    .storefront-content h2 {
+        font-size: clamp(1.3rem, 6vw, 1.85rem);
+    }
+}
+
 /* =========================================================
    STOREFRONT TYPOGRAPHY NORMALIZATION
    ========================================================= */
