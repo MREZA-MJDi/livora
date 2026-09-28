@@ -50,34 +50,35 @@
         <form
             action="{{ route('admin.product-variants.index') }}"
             method="GET"
-            class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4"
+            class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5"
         >
 
             <div>
-                <label for="product_id" class="admin-label">
-                    محصول
-                </label>
-
-                <select
-                    id="product_id"
-                    name="product_id"
-                    class="admin-select"
-                >
-                    <option value="">
-                        همه محصولات
-                    </option>
-
-                    @foreach($products as $product)
-                        <option
-                            value="{{ $product->id }}"
-                            @selected((string) request('product_id') === (string) $product->id)
-                        >
-                        {{ $product->name }}
-                        </option>
-                    @endforeach
-                </select>
+                @include('admin.partials.product-selector', [
+                    'inputName' => 'product_id',
+                    'fieldId' => 'variant-filter-product',
+                    'selectedProduct' => $selectedProduct,
+                    'label' => 'محصول',
+                    'placeholder' => 'نام محصول یا SKU...',
+                    'required' => false,
+                ])
             </div>
 
+            <div>
+                <label for="search" class="admin-label">
+                    جستجو
+                </label>
+
+                <input
+                    id="search"
+                    name="search"
+                    type="search"
+                    maxlength="120"
+                    value="{{ request('search') }}"
+                    class="admin-input"
+                    placeholder="نوع، عنوان، مقدار یا SKU..."
+                >
+            </div>
 
             <div>
                 <label for="type" class="admin-label">
@@ -173,6 +174,23 @@
                 </select>
             </div>
 
+            <div>
+                <label for="sort" class="admin-label">
+                    مرتب‌سازی
+                </label>
+
+                <select id="sort" name="sort" class="admin-select">
+                    <option value="type" @selected(request('sort', 'type') === 'type')>نوع / نام</option>
+                    <option value="name" @selected(request('sort') === 'name')>نام</option>
+                    <option value="newest" @selected(request('sort') === 'newest')>جدیدترین</option>
+                    <option value="oldest" @selected(request('sort') === 'oldest')>قدیمی‌ترین</option>
+                    <option value="stock_low" @selected(request('sort') === 'stock_low')>کمترین موجودی</option>
+                    <option value="stock_high" @selected(request('sort') === 'stock_high')>بیشترین موجودی</option>
+                    <option value="price_low" @selected(request('sort') === 'price_low')>کمترین تعدیل قیمت</option>
+                    <option value="price_high" @selected(request('sort') === 'price_high')>بیشترین تعدیل قیمت</option>
+                </select>
+            </div>
+
             <div class="flex items-end gap-2">
 
                 <button
@@ -182,7 +200,7 @@
                     اعمال فیلتر
                 </button>
 
-                @if(request()->hasAny(['product_id', 'type', 'is_active', 'stock']))
+                @if(request()->hasAny(['search', 'product_id', 'type', 'is_active', 'stock', 'sort']))
                     <a
                         href="{{ route('admin.product-variants.index') }}"
                         class="admin-btn admin-btn-ghost"
@@ -215,6 +233,7 @@
                     <th>SKU</th>
                     <th>تعدیل قیمت</th>
                     <th>موجودی</th>
+                    <th>تصاویر</th>
                     <th>وضعیت</th>
                     <th>عملیات</th>
                 </tr>
@@ -344,6 +363,12 @@
 
 
                         <td>
+                            <span class="admin-badge admin-badge-neutral">
+                                {{ number_format($variant->images_count ?? 0) }}
+                            </span>
+                        </td>
+
+                        <td>
 
                             @if($variant->is_active)
 
@@ -405,7 +430,7 @@
                 @empty
 
                     <tr>
-                        <td colspan="10">
+                        <td colspan="11">
 
                             <div class="admin-empty">
 
