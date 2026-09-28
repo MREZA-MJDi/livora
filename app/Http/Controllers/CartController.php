@@ -23,7 +23,7 @@ class CartController extends Controller
 
         $cart->load([
             'items.product.category',
-            'items.product.images',
+            'items.product.primaryImage',
             'items.variant',
         ]);
 
