@@ -258,6 +258,9 @@
                                         <img
                                             src="{{ $image }}"
                                             alt="{{ $product->name }}"
+                                            loading="{{ $index === 0 ? 'eager' : 'lazy' }}"
+                                            fetchpriority="{{ $index === 0 ? 'high' : 'auto' }}"
+                                            decoding="async"
                                             class="h-full w-full object-cover"
                                         >
 
