@@ -96,6 +96,24 @@ class InventoryService
                 );
             }
 
+            $reference = implode(':', [
+                'order',
+                $order->id,
+                'item',
+                $item->id,
+                'variant',
+                'base',
+            ]);
+
+            $existing = InventoryReservation::query()
+                ->where('reference_key', $reference)
+                ->lockForUpdate()
+                ->first();
+
+            if ($existing) {
+                return;
+            }
+
             $this->ensureAvailable(
                 (int) $product->stock,
                 $quantity,
@@ -129,14 +147,30 @@ class InventoryService
         }
 
         foreach ($variants as $variant) {
+            $reference = implode(':', [
+                'order',
+                $order->id,
+                'item',
+                $item->id,
+                'variant',
+                $variant->id,
+            ]);
+
+            $existing = InventoryReservation::query()
+                ->where('reference_key', $reference)
+                ->lockForUpdate()
+                ->first();
+
+            if ($existing) {
+                continue;
+            }
+
             $this->ensureAvailable(
                 (int) $variant->stock,
                 $quantity,
                 $item->product_name . ' / ' . $variant->value
             );
-        }
 
-        foreach ($variants as $variant) {
             $variant->decrement('stock', $quantity);
 
             $this->createReservation(
