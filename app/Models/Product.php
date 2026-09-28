@@ -98,7 +98,10 @@ class Product extends Model
     public function variants(): HasMany
     {
         return $this->hasMany(ProductVariant::class)
-            ->where('is_active', true);
+            ->where('is_active', true)
+            ->orderBy('type')
+            ->orderBy('name')
+            ->orderBy('value');
     }
 
     /**
