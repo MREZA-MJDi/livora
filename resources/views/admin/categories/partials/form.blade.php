@@ -256,7 +256,7 @@
                         type="button"
                         data-crop-open
                         class="admin-btn admin-btn-secondary"
-                        
+                        {{ $categoryImageUrl ? '' : 'disabled' }}
                     >
                         ویرایش قاب
                     </button>
@@ -278,7 +278,7 @@
                     name="image"
                     type="file"
                     accept="image/*"
-                    class="class="admin-input sr-only"
+                    class="sr-only"
                 >
 
                 <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">
