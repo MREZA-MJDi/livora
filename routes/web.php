@@ -406,6 +406,22 @@ Route::middleware(['auth', 'admin'])
             [AdminOrderController::class, 'index']
         )->name('orders.index');
 
+        /*
+        |--------------------------------------------------------------------------
+        | Installments
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get(
+            'installments',
+            [\App\Http\Controllers\Admin\InstallmentController::class, 'index']
+        )->name('installments.index');
+
+        Route::patch(
+            'installments/{installment}/paid',
+            [\App\Http\Controllers\Admin\InstallmentController::class, 'markPaid']
+        )->name('installments.paid');
+
         Route::get(
             'orders/{order}',
             [AdminOrderController::class, 'show']
