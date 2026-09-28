@@ -29,69 +29,22 @@
 
     @php
 
-        /*
-        |--------------------------------------------------------------------------
-        | Gateway Configuration
-        |--------------------------------------------------------------------------
-        */
-
-        $gateways = [
-            [
-                'key' => 'digipay',
-                'name' => 'DigiPay',
-                'fa_name' => 'دیجی‌پی',
-                'description' => 'پرداخت از طریق درگاه دیجی‌پی',
-                'enabled' => (bool) config('payment.digipay.enabled', false),
-                'badge' => 'DIGIPAY',
-            ],
-
-            [
-                'key' => 'snappay',
-                'name' => 'SnappPay',
-                'fa_name' => 'اسنپ‌پی',
-                'description' => 'پرداخت از طریق درگاه اسنپ‌پی',
-                'enabled' => (bool) config('payment.snappay.enabled', false),
-                'badge' => 'SNAPPAY',
-            ],
-
-            [
-                'key' => 'torobpay',
-                'name' => 'TorobPay',
-                'fa_name' => 'ترب‌پی',
-                'description' => 'پرداخت از طریق درگاه ترب‌پی',
-                'enabled' => (bool) config('payment.torobpay.enabled', false),
-                'badge' => 'TOROBPAY',
-            ],
-        ];
-
         $enabledGateways = collect($gateways)
             ->where('enabled', true)
             ->values();
 
+        $installmentPreviewEnabled =
+            (bool) ($installmentPreview['enabled'] ?? false);
 
         /*
-        |--------------------------------------------------------------------------
-        | Order Totals
-        |--------------------------------------------------------------------------
-        */
-
-        $orderTotal = (float) $order->total;
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Existing Installment Plan
-        |--------------------------------------------------------------------------
-        */
-
+         * Prefer persisted plan data after it has been created.
+         */
         $hasInstallmentPlan =
             (bool) $order->installment_enabled
-            && $order->installments
-                ->isNotEmpty();
+            && $order->installments->isNotEmpty();
 
         $cashInstallment =
-            $order->installments
-                ->firstWhere('type', 'cash');
+            $order->installments->firstWhere('type', 'cash');
 
         $chequeInstallments =
             $order->installments
@@ -101,50 +54,35 @@
         $cashPercent =
             (int) (
                 $order->installment_cash_percent
-                ?? 0
+                ?? data_get($installmentPreview, 'cash_percent', 0)
             );
 
         $cashAmount =
             $cashInstallment
                 ? (float) $cashInstallment->amount
-                : null;
+                : data_get($installmentPreview, 'cash_amount');
 
         $deferredAmount =
             (float) (
                 $order->installment_deferred_amount
-                ?? 0
+                ?? data_get($installmentPreview, 'deferred_amount', 0)
             );
 
         $chequeCount =
-            $chequeInstallments->count();
+            $chequeInstallments->count()
+            ?: (int) data_get($installmentPreview, 'cheque_count', 0);
 
         $intervalMonths =
             (int) (
                 $order->installment_interval_months
-                ?? 0
+                ?? data_get($installmentPreview, 'interval_months', 0)
             );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Payment Status
-        |--------------------------------------------------------------------------
-        */
 
         $isPaid =
             $order->payment_status === 'paid';
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | Current Payment
-        |--------------------------------------------------------------------------
-        */
-
         $latestPayment =
             $order->latestPayment;
-
-
     @endphp
 
 
@@ -424,7 +362,7 @@
 
                                 <form
                                     method="POST"
-                                    action="{{ route('checkout.payment.installment', $order) }}"
+                                    action="{{ route('checkout.payment.gateway', $order) }}"
                                     x-ref="onlineForm"
                                 >
 
@@ -664,18 +602,21 @@
                                     <div class="flex items-start gap-4">
 
                                         <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10">
-                                            ✓
+                                            {{ $installmentPreviewEnabled ? '✓' : '!' }}
                                         </div>
 
                                         <div>
 
                                             <p class="text-sm font-semibold">
-                                                شرایط اقساطی را قبل از ثبت نهایی ببینید.
+                                                {{ $installmentPreviewEnabled
+                                                    ? 'طرح اقساطی برای این سفارش قابل استفاده است.'
+                                                    : 'طرح اقساطی برای این سفارش در دسترس نیست.' }}
                                             </p>
 
                                             <p class="mt-2 text-xs leading-7 text-white/45">
-                                                پس از انتخاب خرید اقساطی، سیستم شرایط محصولات سفارش را بررسی
-                                                و درصد پیش‌پرداخت، مبلغ چک‌ها و سررسیدها را ایجاد می‌کند.
+                                                {{ $installmentPreviewEnabled
+                                                    ? 'شرایط فعلی قبل از ایجاد سفارش اقساطی قابل بررسی است.'
+                                                    : data_get($installmentPreview, 'message', 'شرایط اقساطی قابل محاسبه نیست.') }}
                                             </p>
 
                                         </div>
@@ -684,6 +625,37 @@
 
                                 </div>
 
+                                @if($installmentPreviewEnabled)
+
+                                    <div class="mt-5 grid gap-3 sm:grid-cols-3">
+
+                                        <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                                            <p class="text-[10px] text-white/40">پیش‌پرداخت</p>
+                                            <p class="mt-2 text-lg font-semibold">
+                                                {{ number_format((float) $cashAmount) }}
+                                                <span class="text-[9px] font-normal text-white/45">تومان · {{ $cashPercent }}٪</span>
+                                            </p>
+                                        </div>
+
+                                        <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                                            <p class="text-[10px] text-white/40">باقی‌مانده</p>
+                                            <p class="mt-2 text-lg font-semibold">
+                                                {{ number_format((float) $deferredAmount) }}
+                                                <span class="text-[9px] font-normal text-white/45">تومان</span>
+                                            </p>
+                                        </div>
+
+                                        <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                                            <p class="text-[10px] text-white/40">چک‌ها</p>
+                                            <p class="mt-2 text-lg font-semibold">
+                                                {{ $chequeCount }}
+                                                <span class="text-[9px] font-normal text-white/45">فقره · هر {{ $intervalMonths }} ماه</span>
+                                            </p>
+                                        </div>
+
+                                    </div>
+
+                                @endif
 
                                 <form
                                     action="{{ route('checkout.payment.livora-installment', $order) }}"
@@ -695,9 +667,12 @@
 
                                     <button
                                         type="submit"
-                                        class="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-6 py-4 text-sm font-medium text-white transition hover:bg-white/15"
+                                        @disabled(! $installmentPreviewEnabled)
+                                        class="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-6 py-4 text-sm font-medium text-white transition hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-40"
                                     >
-                                        محاسبه و ایجاد طرح اقساطی
+                                        {{ $installmentPreviewEnabled
+                                            ? 'ایجاد و ادامه طرح اقساطی'
+                                            : 'طرح اقساطی در دسترس نیست' }}
                                     </button>
 
                                 </form>
