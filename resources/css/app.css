@@ -895,3 +895,21 @@ a:hover .silagallery-wordmark {
         max-height: none;
     }
 }
+
+
+/* Stable storefront CTA hover
+   Keep dark CTA text readable while only the visual surface animates. */
+a[class*="bg-[var(--livora-ink)]"][class*="text-white"],
+button[class*="bg-[var(--livora-ink)]"][class*="text-white"] {
+    color: #fff !important;
+    transition-property: background-color, border-color, color, transform, box-shadow !important;
+    transition-duration: 180ms !important;
+    transition-timing-function: ease-out !important;
+}
+
+a[class*="bg-[var(--livora-ink)]"][class*="text-white"]:hover,
+a[class*="bg-[var(--livora-ink)]"][class*="text-white"]:focus-visible,
+button[class*="bg-[var(--livora-ink)]"][class*="text-white"]:hover,
+button[class*="bg-[var(--livora-ink)]"][class*="text-white"]:focus-visible {
+    color: #fff !important;
+}
