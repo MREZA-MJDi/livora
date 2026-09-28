@@ -136,6 +136,43 @@
             </div>
 
 
+            <div>
+                <label for="stock" class="admin-label">
+                    موجودی
+                </label>
+
+                <select
+                    id="stock"
+                    name="stock"
+                    class="admin-select"
+                >
+                    <option value="">
+                        همه
+                    </option>
+
+                    <option
+                        value="in_stock"
+                        @selected(request('stock') === 'in_stock')
+                    >
+                        موجود
+                    </option>
+
+                    <option
+                        value="low_stock"
+                        @selected(request('stock') === 'low_stock')
+                    >
+                        کم‌موجودی
+                    </option>
+
+                    <option
+                        value="out_of_stock"
+                        @selected(request('stock') === 'out_of_stock')
+                    >
+                        ناموجود
+                    </option>
+                </select>
+            </div>
+
             <div class="flex items-end gap-2">
 
                 <button
@@ -145,7 +182,7 @@
                     اعمال فیلتر
                 </button>
 
-                @if(request()->hasAny(['product_id', 'type', 'is_active']))
+                @if(request()->hasAny(['product_id', 'type', 'is_active', 'stock']))
                     <a
                         href="{{ route('admin.product-variants.index') }}"
                         class="admin-btn admin-btn-ghost"
