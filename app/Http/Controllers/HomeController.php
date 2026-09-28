@@ -28,7 +28,7 @@ class HomeController extends Controller
 
         if ($featuredProducts->isEmpty()) {
             $featuredProducts = Product::query()
-                ->with(['category', 'images.media'])
+                ->with(['category', 'primaryImage'])
                 ->active()
                 ->latest('updated_at')
                 ->limit(8)
