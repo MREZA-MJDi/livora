@@ -22,16 +22,18 @@ class UserSeeder extends Seeder
             ]
         );
 
-        User::updateOrCreate(
-            [
-                'email' => 'demo@livora.test',
-            ],
-            [
-                'name' => 'Demo User',
-                'role' => 'customer',
-                'password' => Hash::make('password'),
-                'email_verified_at' => now(),
-            ]
-        );
+        if (app()->environment(['local', 'testing'])) {
+            User::updateOrCreate(
+                [
+                    'email' => 'demo@livora.test',
+                ],
+                [
+                    'name' => 'Demo User',
+                    'role' => 'customer',
+                    'password' => Hash::make('password'),
+                    'email_verified_at' => now(),
+                ]
+            );
+        }
     }
 }
