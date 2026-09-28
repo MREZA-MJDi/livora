@@ -3,6 +3,7 @@
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\CustomerMiddleware;
 use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 
@@ -56,5 +57,8 @@ return Application::configure(
                 return route('home');
             }
         );
+    })
+    ->withExceptions(function (Exceptions $exceptions): void {
+        // Keep Laravel's default exception reporting and rendering enabled.
     })
     ->create();
