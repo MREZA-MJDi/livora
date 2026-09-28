@@ -36,77 +36,93 @@
     ============================================================ --}}
     <div class="space-y-6 xl:col-span-2">
 
-        @if($editing)
+        @php
+            $primaryImage = null;
 
-            @php
+            if ($editing) {
                 $primaryImage = $product->relationLoaded('images')
                     ? ($product->images->firstWhere('is_primary', true) ?? $product->images->first())
                     : $product->images()
                         ->orderByDesc('is_primary')
                         ->orderBy('sort_order')
                         ->first();
-            @endphp
+            }
 
-            {{-- Product Image --}}
-            <div class="admin-card p-6">
+            $productImageUrl = $primaryImage?->url;
+        @endphp
 
-                <div class="mb-6">
-                    <h3 class="text-base font-bold text-[var(--admin-text)]">
-                        تصویر اصلی محصول
-                    </h3>
+        {{-- Product Image --}}
+        <div class="admin-card p-6">
 
-                    <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">
-                        تصویر اصلی را عوض کنید؛ تصاویر دیگر و اتصال Variantها حفظ می‌شوند.
-                    </p>
-                </div>
+            <div class="mb-6">
+                <h3 class="text-base font-bold text-[var(--admin-text)]">
+                    تصویر اصلی محصول
+                </h3>
 
-                @if($primaryImage?->url)
+                <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">
+                    {{ $editing
+                        ? 'تصویر اصلی را عوض کنید؛ تصاویر دیگر و اتصال Variantها حفظ می‌شوند.'
+                        : 'برای محصول جدید یک تصویر اصلی انتخاب کنید. اتصال تصاویر Variantها بعداً در مدیریت Variant انجام می‌شود.' }}
+                </p>
+            </div>
 
-                    <div class="admin-image-preview mb-5 aspect-[4/3]">
-                        <img
-                            id="product-image-preview"
-                            src="{{ $primaryImage->url }}"
-                            alt="{{ $primaryImage->alt ?: $product->name }}"
-                            class="admin-image"
-                        >
-                    </div>
+            <div class="admin-image-preview mb-5 aspect-[4/3]">
 
-                @else
-
-                    <div class="mb-5 flex aspect-[4/3] items-center justify-center rounded-2xl border border-dashed border-[var(--admin-border)] bg-[var(--admin-surface-soft)]">
-                        <span class="text-xs text-[var(--admin-muted)]">
-                            تصویری برای این محصول ثبت نشده است.
-                        </span>
-                    </div>
-
-                @endif
-
-                <label for="image" class="admin-label">
-                    تغییر تصویر
-                </label>
-
-                <input
-                    id="image"
-                    name="image"
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    class="admin-input p-2"
+                <img
+                    id="product-image-preview"
+                    src="{{ $productImageUrl ?: '' }}"
+                    alt="{{ $primaryImage?->alt ?: ($product->name ?? 'تصویر محصول') }}"
+                    class="admin-image {{ $productImageUrl ? '' : 'hidden' }}"
                 >
 
-                <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">
-                
-                    با انتخاب فایل جدید، همین تصویر اصلی جایگزین می‌شود. حداکثر حجم ۲ مگابایت.
-                </p>
+                <div
+                    id="product-image-placeholder"
+                    class="{{ $productImageUrl ? 'hidden' : 'flex' }} h-full flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--admin-border)] bg-[var(--admin-surface-soft)] p-6 text-center"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         fill="none"
+                         viewBox="0 0 24 24"
+                         stroke-width="1.5"
+                         stroke="currentColor"
+                         class="mb-3 h-10 w-10 text-[var(--admin-muted)]">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l2.659 2.659 1.5-1.5a2.25 2.25 0 0 1 3.182 0l3.068 3.068M3.75 19.5h16.5A1.5 1.5 0 0 0 21.75 18V6A1.5 1.5 0 0 0 20.25 4.5H3.75A1.5 1.5 0 0 0 2.25 6v12A1.5 1.5 0 0 0 3.75 19.5Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M8.25 8.25h.008v.008H8.25V8.25Z" />
+                    </svg>
 
-                @error('image')
-                <p class="mt-2 text-xs text-[var(--admin-danger)]">
-                    {{ $message }}
-                </p>
-                @enderror
+                    <span class="text-xs text-[var(--admin-muted)]">
+                        {{ $editing ? 'تصویری برای این محصول ثبت نشده است.' : 'هنوز تصویری انتخاب نشده است.' }}
+                    </span>
+                </div>
 
             </div>
 
-            @endif
+            <label for="image" class="admin-label">
+                {{ $editing ? 'تغییر تصویر' : 'انتخاب تصویر اصلی' }}
+            </label>
+
+            <input
+                id="image"
+                name="image"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                class="admin-input p-2"
+            >
+
+            <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">
+                {{ $editing
+                    ? 'با انتخاب فایل جدید، همین تصویر اصلی جایگزین می‌شود؛ تصاویر دیگر و اتصال Variantها باقی می‌مانند.'
+                    : 'تصویر اصلی محصول را انتخاب کنید. حداکثر حجم ۲ مگابایت.' }}
+            </p>
+
+            @error('image')
+            <p class="mt-2 text-xs text-[var(--admin-danger)]">
+                {{ $message }}
+            </p>
+            @enderror
+
+        </div>
 
 
         {{-- ========================================================
