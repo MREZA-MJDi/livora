@@ -57,7 +57,7 @@
                 <div class="admin-image-preview aspect-square">
 
                     @php
-                        $primaryImage = $product->primaryImage();
+                        $primaryImage = $product->primaryImage;
                     @endphp
 
                     @if($primaryImage)
