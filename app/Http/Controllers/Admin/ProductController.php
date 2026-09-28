@@ -188,8 +188,9 @@ class ProductController extends Controller
     {
         $product->load([
             'category',
-            'images',
-            'allVariants.images',
+            'primaryImage',
+            'images.media',
+            'allVariants.images.media',
         ]);
 
         return view('admin.products.show', compact('product'));
