@@ -15,6 +15,26 @@ return new class extends Migration
             );
         });
 
+        $duplicate = DB::table('product_variants')
+            ->select([
+                'product_id',
+                'type',
+                'value',
+            ])
+            ->groupBy([
+                'product_id',
+                'type',
+                'value',
+            ])
+            ->havingRaw('COUNT(*) > 1')
+            ->first();
+
+        if ($duplicate) {
+            throw new RuntimeException(
+                'Duplicate product variant values exist for the same product/type. Resolve them before adding the unique constraint.'
+            );
+        }
+
         Schema::table('product_variants', function (Blueprint $table) {
             $table->index(
                 ['product_id', 'is_active', 'type'],
@@ -26,9 +46,9 @@ return new class extends Migration
                 'product_variants_stock_active_index'
             );
 
-            $table->index(
+            $table->unique(
                 ['product_id', 'type', 'value'],
-                'product_variants_product_type_value_index'
+                'product_variants_product_type_value_unique'
             );
         });
 
@@ -49,7 +69,7 @@ return new class extends Migration
         Schema::table('product_variants', function (Blueprint $table) {
             $table->dropIndex('product_variants_product_active_type_index');
             $table->dropIndex('product_variants_stock_active_index');
-            $table->dropIndex('product_variants_product_type_value_index');
+            $table->dropUnique('product_variants_product_type_value_unique');
         });
 
         Schema::table('product_variant_images', function (Blueprint $table) {
