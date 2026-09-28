@@ -14,7 +14,9 @@ class UpdateProductVariantRequest extends FormRequest
 
     public function rules(): array
     {
-        $productVariant = $this->route('productVariant');
+        $productVariant =
+            $this->route('productVariant')
+            ?? $this->route('product_variant');
 
         return [
             'product_id' => [
