@@ -7,6 +7,9 @@
 ])
 
 @php
+    $fieldName = $attributes->get('name');
+    $resolvedError = $error ?: ($fieldName ? $errors->first($fieldName) : null);
+
     $inputClasses = implode(' ', [
         'w-full',
         'rounded-2xl',
@@ -25,7 +28,7 @@
         'focus:ring-[var(--livora-ink)]/5',
         'disabled:cursor-not-allowed',
         'disabled:opacity-50',
-        $error
+         $resolvedError
             ? 'border-red-300 focus:border-red-500 focus:ring-red-500/5'
             : 'border-[var(--livora-border)]',
         $icon ? 'pr-11' : '',
@@ -68,7 +71,7 @@
 
     </div>
 
-    @if($error)
+    @if($resolvedError)
 
         <p
             class="mt-2 flex items-start gap-2 text-[11px] leading-6 text-red-600"
@@ -90,7 +93,7 @@
             </svg>
 
             <span>
-                {{ $error }}
+                {{ $resolvedError }}
             </span>
         </p>
 
