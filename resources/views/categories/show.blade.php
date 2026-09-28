@@ -129,7 +129,7 @@
 
                         <span>/</span>
 
-                        <span class="text-[var(--livora-ink)]">
+                        <span class="min-w-0 break-words text-[var(--livora-ink)]">
                         {{ $category->name }}
                     </span>
 
@@ -143,13 +143,13 @@
                                 COLLECTION
                             </p>
 
-                            <h1 class="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
+                            <h1 class="mt-3 min-w-0 break-words text-4xl font-semibold tracking-tight sm:text-5xl">
                                 {{ $category->name }}
                             </h1>
 
                             @if($category->description)
 
-                                <div class="mt-5 max-w-2xl text-sm leading-8 text-[var(--livora-stone)]">
+                                <div class="mt-5 min-w-0 max-w-2xl break-words text-sm leading-8 text-[var(--livora-stone)]">
                                     {{ $category->description }}
                                 </div>
 
@@ -181,7 +181,7 @@
                         </div>
 
                         {{-- Category image --}}
-                        <div class="overflow-hidden rounded-[2rem] bg-[var(--livora-surface)]">
+                        <div class="min-w-0 overflow-hidden rounded-[2rem] bg-[var(--livora-surface)]">
 
                             @if($category->image)
 
@@ -312,7 +312,7 @@
                         ABOUT THIS COLLECTION
                     </p>
 
-                    <h2 class="mt-4 text-2xl font-semibold tracking-tight sm:text-3xl">
+                    <h2 class="mt-4 min-w-0 break-words text-2xl font-semibold tracking-tight sm:text-3xl">
                         راهنمای انتخاب {{ $category->name }}
                     </h2>
 
