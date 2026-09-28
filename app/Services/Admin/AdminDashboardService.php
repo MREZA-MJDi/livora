@@ -290,8 +290,8 @@ class AdminDashboardService
                     'key' => $key,
                     'label' => $this->persianDate($date, 'LLLL'),
                     'full_label' => $this->persianDate($date, 'MMMM yyyy'),
-                    'revenue' => (float) ($rows->get($key)['revenue'] ?? 0),
-                    'orders' => (int) ($rows->get($key)['orders'] ?? 0),
+                    'revenue' => (float) data_get($rows->get($key), 'revenue', 0),
+                    'orders' => (int) data_get($rows->get($key), 'orders', 0),
                 ];
             });
     }
