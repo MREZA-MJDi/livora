@@ -28,28 +28,105 @@ class ProductImageController extends Controller
             $query->where('product_id', $request->integer('product_id'));
         }
 
-        $images = $query->paginate(20)->withQueryString();
+        $images = $query
+            ->paginate(20)
+            ->withQueryString();
 
-        $products = Product::query()
-            ->orderBy('name')
-            ->get(['id', 'name']);
+        $selectedProduct = $request->filled('product_id')
+            ? Product::query()
+                ->select(['id', 'name', 'sku'])
+                ->find($request->integer('product_id'))
+            : null;
 
-        return view('admin.product-images.index', compact('images', 'products'));
+        return view(
+            'admin.product-images.index',
+            compact('images', 'selectedProduct')
+        );
+    }
+
+    /**
+     * Return a small, searchable product dataset for admin selectors.
+     *
+     * This endpoint deliberately refuses unbounded product lists so a large
+     * catalog never becomes a giant HTML <select> or JSON response.
+     */
+    public function productOptions(Request $request)
+    {
+        $validated = $request->validate([
+            'q' => [
+                'nullable',
+                'string',
+                'max:100',
+            ],
+
+            'id' => [
+                'nullable',
+                'integer',
+                'exists:products,id',
+            ],
+        ]);
+
+        $query = Product::query()
+            ->select([
+                'id',
+                'name',
+                'sku',
+            ])
+            ->orderBy('name');
+
+        if (! empty($validated['id'])) {
+            $query->where(
+                'id',
+                $validated['id']
+            );
+        } else {
+            $search = trim($validated['q'] ?? '');
+
+            if (mb_strlen($search) < 2) {
+                return response()->json([
+                    'data' => [],
+                    'has_more' => false,
+                ]);
+            }
+
+            $query->where(function ($productQuery) use ($search) {
+                $productQuery
+                    ->where('name', 'like', `%{$search}%`)
+                    ->orWhere('sku', 'like', `%{$search}%`);
+            });
+        }
+
+        $products = $query
+            ->limit(20)
+            ->get();
+
+        return response()->json([
+            'data' => $products->map(
+                fn (Product $product) => [
+                    'id' => $product->id,
+                    'label' => $product->name,
+                    'sku' => $product->sku,
+                ]
+            )->values(),
+            'has_more' => $products->count() === 20,
+        ]);
     }
 
     public function create(Request $request): View
     {
-        $products = Product::query()
-            ->orderBy('name')
-            ->get(['id', 'name']);
-
         $selectedProductId = $request->filled('product_id')
             ? $request->integer('product_id')
             : null;
 
+        $selectedProduct = $selectedProductId
+            ? Product::query()
+                ->select(['id', 'name', 'sku'])
+                ->find($selectedProductId)
+            : null;
+
         return view(
             'admin.product-images.create',
-            compact('products', 'selectedProductId')
+            compact('selectedProduct')
         );
     }
 
@@ -96,13 +173,11 @@ class ProductImageController extends Controller
 
     public function edit(ProductImage $productImage): View
     {
-        $products = Product::query()
-            ->orderBy('name')
-            ->get(['id', 'name']);
+        $productImage->load('product:id,name,sku');
 
         return view(
             'admin.product-images.edit',
-            compact('productImage', 'products')
+            compact('productImage')
         );
     }
 
