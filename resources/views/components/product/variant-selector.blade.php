@@ -108,10 +108,11 @@
 
                 <input
                     type="radio"
-                    name="{{ $name }}"
+                    name="variants[{{ $name }}]"
                     value="{{ $optionId }}"
                     data-label="{{ $optionLabel }}"
                     x-model="selected"
+                    @change="window.dispatchEvent(new CustomEvent('product-variant-selected', { detail: { id: {{ $optionId }}, type: @js($name), label: @js($optionLabel) } }))"
                     class="sr-only"
                     @disabled($isUnavailable)
                     @if($isUnavailable)
