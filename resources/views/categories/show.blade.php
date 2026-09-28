@@ -7,7 +7,7 @@
 
 @section(
     'description',
-    $category->meta_description
+    $category->description
         ?? ('مشاهده و خرید محصولات دسته‌بندی ' . $category->name . ' در SilaGallery؛ بررسی قیمت، مشخصات و شرایط خرید اقساطی.')
 )
 
@@ -30,7 +30,7 @@
 
     <meta
         property="og:description"
-        content="{{ $category->meta_description ?? ('محصولات ' . $category->name . ' در SilaGallery') }}"
+        content="{{ $category->description ?? ('محصولات ' . $category->name . ' در SilaGallery') }}"
     >
 
     <meta
@@ -57,7 +57,7 @@
 
     <meta
         name="twitter:description"
-        content="{{ $category->meta_description ?? ('محصولات ' . $category->name . ' در SilaGallery') }}"
+        content="{{ $category->description ?? ('محصولات ' . $category->name . ' در SilaGallery') }}"
     >
 
     @if($category->image)
@@ -186,7 +186,7 @@
                             @if($category->image)
 
                                 <img
-                                    src="{{ $category->image_url }}"
+                                    src="{{ $category->homepage_image_url }}"
                                     alt="{{ $category->name }}"
                                     class="aspect-[4/3] h-full w-full object-cover transition duration-700 hover:scale-[1.03]"
                                 >
