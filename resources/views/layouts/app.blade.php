@@ -51,7 +51,7 @@
         searchOpen: false,
         filterOpen: false
     }"
-    class="min-h-screen"
+    class="min-h-screen pb-24 lg:pb-0"
 >
 
     <x-layout.navbar />
@@ -67,6 +67,8 @@
     </main>
 
     <x-layout.footer />
+
+    <x-layout.mobile-bottom-bar />
 
 </div>
 
