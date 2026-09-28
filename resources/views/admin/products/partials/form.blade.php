@@ -1485,28 +1485,6 @@
 
 
 
-                    const objectUrl =
-                        URL.createObjectURL(file);
-
-                    imagePreview.src =
-                        objectUrl;
-
-                    imagePreview.classList.remove('hidden');
-
-                    if (imagePlaceholder) {
-                        imagePlaceholder.classList.add('hidden');
-                        imagePlaceholder.classList.remove('flex');
-                    }
-
-                    imagePreview.onload =
-                        function () {
-                            URL.revokeObjectURL(objectUrl);
-                        };
-
-                });
-
-            }
-
 
             /*
             |--------------------------------------------------------------------------
