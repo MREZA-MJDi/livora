@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'دسته‌بندی محصولات | LIVORA')
+@section('title', 'دسته‌بندی محصولات | SilaGallery')
 
 @section(
     'description',
-    'دسته‌بندی‌های مختلف مبلمان و لوازم خانه در LIVORA را ببینید و محصول مناسب فضای خود را پیدا کنید.'
+    'دسته‌بندی‌های مختلف مبلمان و لوازم خانه در SilaGallery را ببینید و محصول مناسب فضای خود را پیدا کنید.'
 )
 
 @section('canonical', route('categories.index'))
@@ -22,12 +22,12 @@
 
     <meta
         property="og:title"
-        content="دسته‌بندی محصولات | LIVORA"
+        content="دسته‌بندی محصولات | SilaGallery"
     >
 
     <meta
         property="og:description"
-        content="دسته‌بندی‌های مختلف مبلمان و لوازم خانه در LIVORA."
+        content="دسته‌بندی‌های مختلف مبلمان و لوازم خانه در SilaGallery."
     >
 
     <meta
@@ -77,7 +77,7 @@
 
                         <p class="mt-5 max-w-2xl text-sm leading-8 text-[var(--livora-stone)] sm:text-base">
                             از مبلمان و نشیمن تا میز، صندلی و سایر عناصر خانه؛
-                            مجموعه‌های LIVORA را بر اساس فضای موردنظر بررسی کن.
+                            مجموعه‌های SilaGallery را بر اساس فضای موردنظر بررسی کن.
                         </p>
 
                     </div>
@@ -171,7 +171,7 @@
                     <div>
 
                         <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--livora-accent)]">
-                            LIVORA
+                            SilaGallery
                         </p>
 
                         <h2 class="mt-2 text-2xl font-semibold">

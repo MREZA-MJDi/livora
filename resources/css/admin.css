@@ -1,5 +1,3 @@
-@import "tailwindcss";
-
 /* =========================================================
    LIVORA ADMIN DESIGN SYSTEM
    ========================================================= */
@@ -1383,3 +1381,12 @@ p {
         scroll-behavior: auto !important;
     }
 }
+
+
+/* SilaGallery admin responsive safeguards */
+.admin-btn { white-space: nowrap; flex: 0 0 auto; min-width: max-content; }
+.admin-btn svg { flex: 0 0 auto; }
+.admin-page-header { min-width: 0; }
+.admin-page-header > * { min-width: 0; }
+.admin-table-wrapper { -webkit-overflow-scrolling: touch; }
+@media (max-width: 767px) { .admin-btn { min-height: 2.875rem; padding-inline: .875rem; font-size: .8125rem; } .admin-table { min-width: 680px; } .admin-page-title, .admin-title { font-size: clamp(1.4rem, 5vw, 1.7rem); } }

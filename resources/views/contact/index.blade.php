@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'تماس با LIVORA | ارتباط با ما')
+@section('title', 'تماس با SilaGallery | ارتباط با ما')
 
 @section(
     'description',
-    'برای مشاوره خرید، پیگیری سفارش و دریافت اطلاعات بیشتر درباره محصولات و خدمات LIVORA با ما در ارتباط باشید.'
+    'برای مشاوره خرید، پیگیری سفارش و دریافت اطلاعات بیشتر درباره محصولات و خدمات SilaGallery با ما در ارتباط باشید.'
 )
 
 @section('canonical', route('contact'))
@@ -18,12 +18,12 @@
 
     <meta
         property="og:title"
-        content="تماس با LIVORA | ارتباط با ما"
+        content="تماس با SilaGallery | ارتباط با ما"
     >
 
     <meta
         property="og:description"
-        content="برای مشاوره خرید، پیگیری سفارش و دریافت اطلاعات بیشتر با LIVORA در ارتباط باشید."
+        content="برای مشاوره خرید، پیگیری سفارش و دریافت اطلاعات بیشتر با SilaGallery در ارتباط باشید."
     >
 
     <meta
@@ -38,19 +38,19 @@
 
     <meta
         name="twitter:title"
-        content="تماس با LIVORA"
+        content="تماس با SilaGallery"
     >
 
     <meta
         name="twitter:description"
-        content="راه‌های ارتباطی و پشتیبانی LIVORA."
+        content="راه‌های ارتباطی و پشتیبانی SilaGallery."
     >
 
     <script type="application/ld+json">
     {
         "@@context": "https://schema.org",
         "@@type": "WebSite",
-        "name": "LIVORA",
+        "name": "SilaGallery",
         "url": @json(url('/')),
         "potentialAction": {
             "@@type": "SearchAction",
@@ -120,7 +120,7 @@
 
                             <p class="text-sm leading-8 text-[var(--livora-stone)] sm:text-base">
                                 برای مشاوره خرید، پیگیری سفارش، پرسش درباره شرایط اقساط
-                                یا هر موضوع دیگری می‌توانید با LIVORA در ارتباط باشید.
+                                یا هر موضوع دیگری می‌توانید با SilaGallery در ارتباط باشید.
                             </p>
 
                             <a
@@ -701,7 +701,7 @@
                     </h2>
 
                     <p class="mt-4 text-sm leading-8 text-[var(--livora-stone)]">
-                        پاسخ چند سؤال رایج درباره ارتباط با LIVORA و خرید از فروشگاه.
+                        پاسخ چند سؤال رایج درباره ارتباط با SilaGallery و خرید از فروشگاه.
                     </p>
 
                 </div>
@@ -791,7 +791,7 @@
                 <div>
 
                     <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--livora-accent)]">
-                        LIVORA
+                        SilaGallery
                     </p>
 
                     <h2 class="mt-2 text-2xl font-semibold">

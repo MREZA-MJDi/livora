@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'سبد خرید | LIVORA')
+@section('title', 'سبد خرید | SilaGallery')
 
 @section(
     'description',
-    'سبد خرید LIVORA؛ بررسی محصولات انتخاب‌شده، مبلغ سفارش و شرایط خرید اقساطی قبل از ورود به تسویه حساب.'
+    'سبد خرید SilaGallery؛ بررسی محصولات انتخاب‌شده، مبلغ سفارش و شرایط خرید اقساطی قبل از ورود به تسویه حساب.'
 )
 
 @section('canonical', route('cart.index'))
@@ -18,12 +18,12 @@
 
     <meta
         property="og:title"
-        content="سبد خرید | LIVORA"
+        content="سبد خرید | SilaGallery"
     >
 
     <meta
         property="og:description"
-        content="محصولات انتخاب‌شده خود را در سبد خرید LIVORA بررسی و برای پرداخت آماده کنید."
+        content="محصولات انتخاب‌شده خود را در سبد خرید SilaGallery بررسی و برای پرداخت آماده کنید."
     >
 
     <meta
@@ -38,12 +38,12 @@
 
     <meta
         name="twitter:title"
-        content="سبد خرید | LIVORA"
+        content="سبد خرید | SilaGallery"
     >
 
     <meta
         name="twitter:description"
-        content="بررسی سبد خرید و آماده‌سازی سفارش در LIVORA."
+        content="بررسی سبد خرید و آماده‌سازی سفارش در SilaGallery."
     >
 
 @endpush
@@ -458,7 +458,7 @@
                                                     @else
 
                                                         <div class="flex h-full w-full items-center justify-center text-[10px] tracking-[0.18em] text-[var(--livora-stone)]">
-                                                            LIVORA
+                                                            SilaGallery
                                                         </div>
 
                                                     @endif

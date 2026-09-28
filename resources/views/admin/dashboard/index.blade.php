@@ -6,7 +6,7 @@
 
 @section(
     'meta_description',
-    'داشبورد مدیریت فروشگاه LIVORA'
+    'داشبورد مدیریت فروشگاه SilaGallery'
 )
 
 @section('content')
@@ -106,7 +106,7 @@
             <div>
 
                 <div class="mb-2 text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--admin-accent)]">
-                    LIVORA / ADMIN
+                    SilaGallery / ADMIN
                 </div>
 
                 <h1 class="admin-title">

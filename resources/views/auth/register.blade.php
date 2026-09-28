@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'ثبت نام | LIVORA')
+@section('title', 'ثبت نام | SilaGallery')
 
-@section('description', 'ایجاد حساب کاربری در LIVORA')
+@section('description', 'ایجاد حساب کاربری در SilaGallery')
 
 @section('content')
 
@@ -17,7 +17,7 @@
                     <div class="text-center">
 
                         <p class="text-xs font-medium uppercase tracking-[0.2em] text-[var(--livora-accent)]">
-                            JOIN LIVORA
+                            JOIN SilaGallery
                         </p>
 
                         <h1 class="mt-3 text-3xl font-semibold text-[var(--livora-ink)]">
@@ -25,7 +25,7 @@
                         </h1>
 
                         <p class="mt-3 text-sm leading-7 text-[var(--livora-stone)]">
-                            برای خرید و پیگیری سفارش‌ها حساب LIVORA خود را ایجاد کنید.
+                            برای خرید و پیگیری سفارش‌ها حساب SilaGallery خود را ایجاد کنید.
                         </p>
 
                     </div>
@@ -132,7 +132,7 @@
                                     >
                                         قوانین و شرایط
                                     </a>
-                                    LIVORA موافقم.
+                                    SilaGallery موافقم.
                                 </span>
 
                             </label>

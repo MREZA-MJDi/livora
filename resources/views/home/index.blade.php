@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'LIVORA | مبلمان و لوازم خانه')
+@section('title', 'SilaGallery | مبلمان و لوازم خانه')
 
 @section(
     'description',
-    'LIVORA؛ انتخابی دقیق برای خانه‌ای که قرار است ماندگار باشد. کشف مجموعه مبلمان، دکوراسیون و خرید اقساطی.'
+    'SilaGallery؛ انتخابی دقیق برای خانه‌ای که قرار است ماندگار باشد. کشف مجموعه مبلمان، دکوراسیون و خرید اقساطی.'
 )
 
 @section('canonical', url('/'))
@@ -18,12 +18,12 @@
 
     <meta
         property="og:title"
-        content="LIVORA | مبلمان و لوازم خانه"
+        content="SilaGallery | مبلمان و لوازم خانه"
     >
 
     <meta
         property="og:description"
-        content="کشف مجموعه منتخب LIVORA برای فضاهایی که قرار است شخصیت داشته باشند."
+        content="کشف مجموعه منتخب SilaGallery برای فضاهایی که قرار است شخصیت داشته باشند."
     >
 
     <meta
@@ -38,19 +38,19 @@
 
     <meta
         name="twitter:title"
-        content="LIVORA | مبلمان و لوازم خانه"
+        content="SilaGallery | مبلمان و لوازم خانه"
     >
 
     <meta
         name="twitter:description"
-        content="کشف مجموعه منتخب LIVORA برای فضاهایی که قرار است شخصیت داشته باشند."
+        content="کشف مجموعه منتخب SilaGallery برای فضاهایی که قرار است شخصیت داشته باشند."
     >
 
     <script type="application/ld+json">
     {
         "@@context": "https://schema.org",
         "@@type": "WebSite",
-        "name": "LIVORA",
+        "name": "SilaGallery",
         "url": @json(url('/')),
         "potentialAction": {
             "@@type": "SearchAction",
@@ -64,7 +64,7 @@
     {
         "@@context": "https://schema.org",
         "@@type": "Organization",
-        "name": "LIVORA",
+        "name": "SilaGallery",
         "url": @json(url('/'))
         }
 </script>
@@ -390,7 +390,7 @@
                             <div class="flex min-h-[520px] items-center justify-center bg-[var(--livora-surface)]">
 
                                 <span class="text-sm tracking-[0.2em] text-[var(--livora-stone)]">
-                                    LIVORA
+                                    SilaGallery
                                 </span>
 
                             </div>
@@ -572,7 +572,7 @@
                         <div>
 
                             <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-white/45">
-                                LIVORA INSTALLMENTS
+                                SilaGallery INSTALLMENTS
                             </p>
 
                             <h2 class="mt-4 max-w-xl text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
@@ -760,7 +760,7 @@
                             </p>
 
                             <h2 class="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-                                تازه‌های LIVORA
+                                تازه‌های SilaGallery
                             </h2>
 
                             <p class="mt-3 max-w-xl text-sm leading-8 text-[var(--livora-stone)]">
@@ -856,7 +856,7 @@
                                 href="{{ route('about') }}"
                                 class="mt-7 inline-flex items-center text-sm font-medium text-[var(--livora-ink)] transition-colors duration-300 hover:text-[var(--livora-accent)]"
                             >
-                                درباره LIVORA
+                                درباره SilaGallery
 
                                 <span class="mr-2">
                                     ←
@@ -1027,7 +1027,7 @@
                     <div class="mx-auto max-w-3xl text-center">
 
                         <p class="text-[10px] font-medium uppercase tracking-[0.24em] text-[var(--livora-accent)]">
-                            LIVORA
+                            SilaGallery
                         </p>
 
                         <h2 class="mt-5 text-4xl font-semibold tracking-tight sm:text-5xl">

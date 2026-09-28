@@ -2,12 +2,12 @@
 
 @section(
     'title',
-    'خرید اقساطی | ' . $order->order_number . ' | LIVORA'
+    'خرید اقساطی | ' . $order->order_number . ' | SilaGallery'
 )
 
 @section(
     'description',
-    'تکمیل فرآیند خرید اقساطی سفارش در LIVORA.'
+    'تکمیل فرآیند خرید اقساطی سفارش در SilaGallery.'
 )
 
 @push('seo')
@@ -99,7 +99,7 @@
                     <div class="mt-8">
 
                         <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--livora-accent)]">
-                            LIVORA INSTALLMENT
+                            SilaGallery INSTALLMENT
                         </p>
 
                         <h1 class="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">

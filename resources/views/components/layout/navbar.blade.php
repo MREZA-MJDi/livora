@@ -14,12 +14,12 @@
                 <a
                     href="{{ route('home') }}"
                     class="group inline-flex items-center"
-                    aria-label="LIVORA"
+                    aria-label="SilaGallery"
                 >
                     <span
                         class="text-[22px] font-semibold tracking-[0.24em] text-[var(--livora-ink)] transition duration-300 group-hover:opacity-60"
                     >
-                        LIVORA
+                        SilaGallery
                     </span>
                 </a>
 

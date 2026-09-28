@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'فروشگاه مبلمان | LIVORA')
+@section('title', 'فروشگاه مبلمان | SilaGallery')
 
 @section(
     'description',
-    'خرید مبلمان و لوازم خانه از LIVORA؛ مشاهده محصولات جدید، ویژه، تخفیف‌دار و دارای شرایط خرید اقساطی.'
+    'خرید مبلمان و لوازم خانه از SilaGallery؛ مشاهده محصولات جدید، ویژه، تخفیف‌دار و دارای شرایط خرید اقساطی.'
 )
 
 @section('canonical', route('shop.index'))
@@ -18,12 +18,12 @@
 
     <meta
         property="og:title"
-        content="فروشگاه مبلمان | LIVORA"
+        content="فروشگاه مبلمان | SilaGallery"
     >
 
     <meta
         property="og:description"
-        content="مجموعه مبلمان و لوازم خانه LIVORA را ببینید و محصول مناسب فضای خود را پیدا کنید."
+        content="مجموعه مبلمان و لوازم خانه SilaGallery را ببینید و محصول مناسب فضای خود را پیدا کنید."
     >
 
     <meta
@@ -38,19 +38,19 @@
 
     <meta
         name="twitter:title"
-        content="فروشگاه مبلمان | LIVORA"
+        content="فروشگاه مبلمان | SilaGallery"
     >
 
     <meta
         name="twitter:description"
-        content="مجموعه منتخب LIVORA برای خانه‌ای زیباتر و ماندگارتر."
+        content="مجموعه منتخب SilaGallery برای خانه‌ای زیباتر و ماندگارتر."
     >
 
     <script type="application/ld+json">
     {
         "@@context": "https://schema.org",
         "@@type": "WebSite",
-        "name": "LIVORA",
+        "name": "SilaGallery",
         "url": @json(url('/')),
         "potentialAction": {
             "@@type": "SearchAction",
@@ -112,7 +112,7 @@
                         <div class="max-w-3xl">
 
                             <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--livora-accent)]">
-                                LIVORA COLLECTION
+                                SilaGallery COLLECTION
                             </p>
 
                             <h1 class="mt-3 text-4xl font-semibold tracking-tight text-[var(--livora-ink)] sm:text-5xl">
@@ -222,7 +222,7 @@
                             <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-surface)] p-5">
 
                                 <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
-                                    LIVORA
+                                    SilaGallery
                                 </p>
 
                                 <h3 class="mt-3 text-sm font-semibold">
@@ -308,7 +308,7 @@
                                     </p>
 
                                     <p class="mt-2 text-sm font-medium text-[var(--livora-ink)]">
-                                        مجموعه LIVORA
+                                        مجموعه SilaGallery
                                     </p>
 
                                 </div>

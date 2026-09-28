@@ -10,28 +10,42 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
+        $adminPassword = env('ADMIN_PASSWORD');
+
+        if (blank($adminPassword)) {
+            if (app()->environment(['local', 'testing'])) {
+                $adminPassword = 'password';
+            } else {
+                throw new \RuntimeException(
+                    'ADMIN_PASSWORD must be configured before running the user seeder in production.'
+                );
+            }
+        }
+
         User::updateOrCreate(
             [
-                'email' => 'admin@livora.test',
+                'email' => env('ADMIN_EMAIL', 'admin@silagallery.test'),
             ],
             [
-                'name' => 'LIVORA Admin',
+                'name' => env('ADMIN_NAME', 'SilaGallery Admin'),
                 'role' => 'admin',
-                'password' => Hash::make('password'),
+                'password' => Hash::make($adminPassword),
                 'email_verified_at' => now(),
             ]
         );
 
-        User::updateOrCreate(
-            [
-                'email' => 'demo@livora.test',
-            ],
-            [
-                'name' => 'Demo User',
-                'role' => 'customer',
-                'password' => Hash::make('password'),
-                'email_verified_at' => now(),
-            ]
-        );
+        if (app()->environment(['local', 'testing'])) {
+            User::updateOrCreate(
+                [
+                    'email' => 'demo@livora.test',
+                ],
+                [
+                    'name' => 'Demo User',
+                    'role' => 'customer',
+                    'password' => Hash::make('password'),
+                    'email_verified_at' => now(),
+                ]
+            );
+        }
     }
 }

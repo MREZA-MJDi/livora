@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'سفارش‌های من | LIVORA')
+@section('title', 'سفارش‌های من | SilaGallery')
 
 @section(
     'description',
-    'مشاهده و مدیریت سفارش‌های شما در LIVORA.'
+    'مشاهده و مدیریت سفارش‌های شما در SilaGallery.'
 )
 
 @push('seo')
@@ -129,7 +129,7 @@
                             </h2>
 
                             <p class="mx-auto mt-4 max-w-md text-sm leading-8 text-[var(--livora-stone)]">
-                                اولین انتخابت را از مجموعه LIVORA پیدا کن.
+                                اولین انتخابت را از مجموعه SilaGallery پیدا کن.
                             </p>
 
                             <a
@@ -255,7 +255,7 @@
                                                             @else
 
                                                                 <div class="flex h-full w-full items-center justify-center text-[9px] tracking-wider text-[var(--livora-stone)]">
-                                                                    LIVORA
+                                                                    SilaGallery
                                                                 </div>
 
                                                             @endif

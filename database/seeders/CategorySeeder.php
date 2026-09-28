@@ -13,7 +13,7 @@ class CategorySeeder extends Seeder
             [
                 'name' => 'مبلمان',
                 'slug' => 'furniture',
-                'description' => 'مجموعه مبلمان مدرن و مینیمال LIVORA',
+                'description' => 'مجموعه مبلمان مدرن و مینیمال SilaGallery',
                 'image' => 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=85',
                 'is_active' => true,
                 'sort_order' => 1,

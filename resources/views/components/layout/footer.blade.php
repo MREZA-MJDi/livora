@@ -12,11 +12,11 @@
 
                 <a
                     href="{{ route('home') }}"
-                    aria-label="LIVORA"
+                    aria-label="SilaGallery"
                     class="inline-flex items-center"
                 >
                     <span class="text-2xl font-semibold tracking-[0.24em] text-white transition hover:text-[var(--livora-cream)]">
-                        LIVORA
+                        SilaGallery
                     </span>
                 </a>
 
@@ -216,7 +216,7 @@
                     href="{{ route('contact') }}"
                     class="mt-6 inline-flex items-center rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-xs font-medium text-white transition hover:border-white/20 hover:bg-white/10"
                 >
-                    ارتباط با LIVORA
+                    ارتباط با SilaGallery
                     <span class="mr-2">←</span>
                 </a>
 
@@ -277,7 +277,7 @@
             <div>
 
                 <p class="text-xs text-white/40">
-                    © {{ date('Y') }} LIVORA.
+                    © {{ date('Y') }} SilaGallery.
                     تمامی حقوق محفوظ است.
                 </p>
 

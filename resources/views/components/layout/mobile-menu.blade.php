@@ -37,7 +37,7 @@
                 @click="mobileOpen = false"
                 class="text-xl font-semibold tracking-[0.22em] text-[var(--livora-ink)]"
             >
-                LIVORA
+                SilaGallery
             </a>
 
             <button
@@ -148,7 +148,7 @@
                         @click="mobileOpen = false"
                         class="flex items-center justify-between px-4 py-4 text-sm font-medium"
                     >
-                        <span>درباره LIVORA</span>
+                        <span>درباره SilaGallery</span>
                         <span class="text-[var(--livora-stone)]">←</span>
                     </a>
 
@@ -170,7 +170,7 @@
             <div class="mt-8">
 
                 <p class="px-2 text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--livora-accent)]">
-                    MY LIVORA
+                    MY SilaGallery
                 </p>
 
                 <div class="mt-3 grid grid-cols-2 gap-3">
@@ -309,7 +309,7 @@
                 <div>
 
                     <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-stone)]">
-                        LIVORA
+                        SilaGallery
                     </p>
 
                     <p class="mt-1 text-[11px] text-[var(--livora-stone)]">

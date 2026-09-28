@@ -25,14 +25,14 @@
 ========================================================= --}}
 
 <title>
-    @yield('title', 'داشبورد مدیریت') | LIVORA
+    @yield('title', 'داشبورد مدیریت') | SilaGallery
 </title>
 
 <meta
     name="description"
     content="@yield(
         'meta_description',
-        'پنل مدیریت فروشگاه LIVORA'
+        'پنل مدیریت فروشگاه SilaGallery'
     )"
 />
 
