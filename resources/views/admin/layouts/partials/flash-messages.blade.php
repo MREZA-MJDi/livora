@@ -103,7 +103,11 @@
 
 
 @if($errors->any())
-    <div class="admin-alert admin-alert-danger mb-6">
+    <div
+        class="admin-alert admin-alert-danger mb-6"
+        role="alert"
+        aria-live="assertive"
+    >
 
         <div class="flex items-start gap-3">
 
@@ -143,4 +147,27 @@
         </div>
 
     </div>
+@endif
+
+
+@if($errors->any())
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const firstError =
+                    document.querySelector(
+                        'input.is-invalid, select.is-invalid, textarea.is-invalid'
+                    );
+
+                if (firstError) {
+                    firstError.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+
+                    firstError.focus({ preventScroll: true });
+                }
+            });
+        </script>
+    @endpush
 @endif
