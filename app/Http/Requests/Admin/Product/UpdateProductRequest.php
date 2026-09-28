@@ -247,7 +247,6 @@ class UpdateProductRequest extends FormRequest
             ],
         ];
     }
-}
 
     public function messages(): array
     {
@@ -285,4 +284,4 @@ class UpdateProductRequest extends FormRequest
             'status' => 'وضعیت',
         ];
     }
-
+}
