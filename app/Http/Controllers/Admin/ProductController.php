@@ -19,10 +19,33 @@ class ProductController extends Controller
      */
     public function index(): View
     {
-        $products = Product::query()
-            ->with('category')
+        $query = Product::query()
+            ->with('category');
+
+        if (request()->boolean('featured')) {
+            $query->where('is_featured', true);
+        }
+
+        if (request()->boolean('new')) {
+            $query->where('is_new', true);
+        }
+
+        if (request()->boolean('installment')) {
+            $query->where('installment_enabled', true);
+        }
+
+        if (request()->get('stock') === 'low') {
+            $query->whereBetween('stock', [1, 5]);
+        }
+
+        if (request()->get('stock') === 'out') {
+            $query->where('stock', 0);
+        }
+
+        $products = $query
             ->latest()
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
 
         return view('admin.products.index', compact('products'));
     }
