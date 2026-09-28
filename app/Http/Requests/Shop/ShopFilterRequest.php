@@ -80,7 +80,8 @@ class ShopFilterRequest extends FormRequest
             'sort' => [
                 'nullable',
                 Rule::in([
-                    'newest',
+                    'latest',
+                    'oldest',
                     'popular',
                     'price_asc',
                     'price_desc',
