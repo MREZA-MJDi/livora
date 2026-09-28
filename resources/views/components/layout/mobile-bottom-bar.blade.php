@@ -1,17 +1,28 @@
+@php
+    $activeItem = match (true) {
+        request()->routeIs('home') => 'home',
+        request()->routeIs('shop.index', 'categories.*', 'product.show') => 'shop',
+        request()->routeIs('cart.*') => 'cart',
+        request()->routeIs('admin.*') => 'admin',
+        request()->routeIs('account.*') => 'account',
+        default => null,
+    };
+@endphp
+
 <nav
     class="fixed inset-x-3 bottom-3 z-[90] lg:hidden"
     aria-label="ناوبری موبایل"
 >
     <div class="mx-auto grid max-w-md grid-cols-5 items-center rounded-[1.6rem] border border-[var(--livora-border)] bg-[color:var(--livora-cream)]/95 p-2 shadow-[0_16px_45px_rgba(24,23,21,.14)] backdrop-blur-2xl">
 
-        <a href="{{ route('home') }}" class="flex flex-col items-center justify-center gap-1.5 rounded-2xl px-2 py-2.5 text-[var(--livora-stone)] transition hover:text-[var(--livora-ink)]" aria-label="خانه">
+        <a href="{{ route('home') }}" class="flex flex-col items-center justify-center gap-1.5 rounded-2xl px-2 py-2.5 {{ $activeItem === 'home' ? 'bg-[var(--livora-ink)] text-white shadow-sm' : 'text-[var(--livora-stone)] hover:text-[var(--livora-ink)]' }} transition" aria-current="{{ $activeItem === 'home' ? 'page' : 'false' }}" aria-label="خانه">
             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>
             </svg>
             <span class="text-[9px] font-medium">خانه</span>
         </a>
 
-        <a href="{{ route('shop.index') }}" class="flex flex-col items-center justify-center gap-1.5 rounded-2xl px-2 py-2.5 text-[var(--livora-stone)] transition hover:text-[var(--livora-ink)]" aria-label="فروشگاه">
+        <a href="{{ route('shop.index') }}" class="flex flex-col items-center justify-center gap-1.5 rounded-2xl px-2 py-2.5 {{ $activeItem === 'shop' ? 'bg-[var(--livora-ink)] text-white shadow-sm' : 'text-[var(--livora-stone)] hover:text-[var(--livora-ink)]' }} transition" aria-current="{{ $activeItem === 'shop' ? 'page' : 'false' }}" aria-label="فروشگاه">
             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 8h12l1.5 12h-15zM8 8a4 4 0 0 1 8 0"/>
             </svg>
@@ -31,7 +42,7 @@
             <span class="text-[9px] font-medium">جستجو</span>
         </button>
 
-        <a href="{{ route('cart.index') }}" class="relative flex flex-col items-center justify-center gap-1.5 rounded-2xl px-2 py-2.5 text-[var(--livora-stone)] transition hover:text-[var(--livora-ink)]" aria-label="سبد خرید">
+        <a href="{{ route('cart.index') }}" class="relative flex flex-col items-center justify-center gap-1.5 rounded-2xl px-2 py-2.5 {{ $activeItem === 'cart' ? 'bg-[var(--livora-ink)] text-white shadow-sm' : 'text-[var(--livora-stone)] hover:text-[var(--livora-ink)]' }} transition" aria-current="{{ $activeItem === 'cart' ? 'page' : 'false' }}" aria-label="سبد خرید">
             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h1.5l1.5 10h11l2-7H6M9 19.5a1 1 0 1 1-2 0m10 0a1 1 0 1 1-2 0"/>
             </svg>
@@ -52,7 +63,7 @@
 
         @auth
             @if(auth()->user()->isAdmin())
-                <a href="{{ route('admin.dashboard') }}" class="flex flex-col items-center justify-center gap-1.5 rounded-2xl px-2 py-2.5 text-[var(--livora-ink)] transition" aria-label="پنل مدیریت">
+                <a href="{{ route('admin.dashboard') }}" class="flex flex-col items-center justify-center gap-1.5 rounded-2xl px-2 py-2.5 {{ $activeItem === 'admin' ? 'bg-[var(--livora-ink)] text-white shadow-sm' : 'text-[var(--livora-stone)] hover:text-[var(--livora-ink)]' }} transition" aria-current="{{ $activeItem === 'admin' ? 'page' : 'false' }}" aria-label="پنل مدیریت">
                     <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 3 20 7v5c0 4.5-3.3 7.4-8 9-4.7-1.6-8-4.5-8-9V7z"/>
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6M12 9v6"/>
@@ -60,7 +71,7 @@
                     <span class="text-[9px] font-medium">مدیریت</span>
                 </a>
             @elseif(auth()->user()->isCustomer())
-                <a href="{{ route('account.index') }}" class="flex flex-col items-center justify-center gap-1.5 rounded-2xl px-2 py-2.5 text-[var(--livora-stone)] transition hover:text-[var(--livora-ink)]" aria-label="حساب کاربری">
+                <a href="{{ route('account.index') }}" class="flex flex-col items-center justify-center gap-1.5 rounded-2xl px-2 py-2.5 {{ $activeItem === 'account' ? 'bg-[var(--livora-ink)] text-white shadow-sm' : 'text-[var(--livora-stone)] hover:text-[var(--livora-ink)]' }} transition" aria-current="{{ $activeItem === 'account' ? 'page' : 'false' }}" aria-label="حساب کاربری">
                     <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
                         <circle cx="12" cy="8" r="3.5"/>
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 20a7 7 0 0 1 14 0"/>
