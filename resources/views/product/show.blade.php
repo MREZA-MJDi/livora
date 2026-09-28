@@ -290,7 +290,7 @@
 
                     <span>/</span>
 
-                    <span class="text-[var(--livora-ink)]">
+                    <span class="min-w-0 break-words text-[var(--livora-ink)]">
                     {{ $product->name }}
                 </span>
 
@@ -306,7 +306,7 @@
         ========================================================== --}}
         <section>
 
-            <x-layout.container class="product-detail-container">
+            <x-layout.container>
 
                 <div class="product-detail-grid grid items-start gap-8 py-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-12 lg:py-12 xl:gap-16">
 
@@ -367,7 +367,7 @@
 
 
                         {{-- Title --}}
-                        <h1 class="mt-3 text-3xl font-semibold leading-tight tracking-tight text-[var(--livora-ink)] sm:text-4xl xl:text-5xl">
+                        <h1 class="mt-3 min-w-0 break-words text-3xl font-semibold leading-tight tracking-tight text-[var(--livora-ink)] sm:text-4xl xl:text-5xl">
                             {{ $product->name }}
                         </h1>
 
@@ -404,7 +404,7 @@
 
                             <div class="mt-7 border-t border-[var(--livora-border)] pt-7">
 
-                                <p class="text-sm leading-8 text-[var(--livora-stone)]">
+                                <p class="min-w-0 break-words text-sm leading-8 text-[var(--livora-stone)]">
                                     {{ $product->short_description }}
                                 </p>
 
@@ -893,13 +893,13 @@
                                 INSTALLMENT GUIDE
                             </p>
 
-                            <h2 class="mt-3 text-2xl font-semibold">
+                            <h2 class="mt-3 min-w-0 break-words text-2xl font-semibold">
                                 شرایط خرید اقساطی {{ $product->name }}
                             </h2>
 
                         </div>
 
-                        <div class="text-sm leading-8 text-[var(--livora-stone)]">
+                        <div class="min-w-0 break-words text-sm leading-8 text-[var(--livora-stone)]">
 
                             <p>
                                 این محصول با
