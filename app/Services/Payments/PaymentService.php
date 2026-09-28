@@ -779,6 +779,9 @@ class PaymentService
                             'status' =>
                                 'refunded',
 
+                            'refunded_at' =>
+                                now(),
+
                             'metadata' =>
                                 array_merge(
                                     $lockedPayment->metadata ?? [],
