@@ -210,12 +210,6 @@
 
         transfer.items.add(file);
         input.files = transfer.files;
-
-        input.dispatchEvent(
-            new Event('change', {
-                bubbles: true,
-            })
-        );
     }
 
     function init(root) {
