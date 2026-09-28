@@ -5,15 +5,10 @@
         $selectedProduct
         ?? ($productImage?->product ?? null);
 
-    $selectedProductId =
-        old(
-            'product_id',
-            $resolvedSelectedProduct?->id ?? ''
-        );
-
-    $selectedProductLabel =
-        $resolvedSelectedProduct?->name
-        ?? ($selectedProductId ? 'محصول شماره ' . $selectedProductId : '');
+    $selectedProductId = old(
+        'product_id',
+        $resolvedSelectedProduct?->id ?? ''
+    );
 @endphp
 
 @csrf
