@@ -371,7 +371,12 @@ class CheckoutController extends Controller
             'gateway' => [
                 'required',
                 'string',
-                Rule::in(array_column($paymentManager->onlineMethods(), 'key')),
+                Rule::in(
+                    collect($paymentManager->onlineMethods())
+                        ->where('enabled', true)
+                        ->pluck('key')
+                        ->all()
+                ),
             ],
         ]);
 
