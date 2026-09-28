@@ -7,12 +7,20 @@
     |--------------------------------------------------------------------------
     */
 
-    $pageTitle = $product->meta_title
-        ?: ($product->name . ' | سیلاگالری');
+    $pageTitle = str_ireplace(
+        'SilaGallery',
+        'سیلاگالری',
+        $product->meta_title
+            ?: ($product->name . ' | سیلاگالری')
+    );
 
-    $pageDescription = $product->meta_description
-        ?: ($product->short_description
-            ?: ('خرید ' . $product->name . ' با مشاهده قیمت، مشخصات و شرایط خرید در سیلاگالری.'));
+    $pageDescription = str_ireplace(
+        'SilaGallery',
+        'سیلاگالری',
+        $product->meta_description
+            ?: ($product->short_description
+                ?: ('خرید ' . $product->name . ' با مشاهده قیمت، مشخصات و شرایط خرید در سیلاگالری.'))
+    );
 
     /*
     |--------------------------------------------------------------------------
