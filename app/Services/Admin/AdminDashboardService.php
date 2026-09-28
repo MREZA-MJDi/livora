@@ -6,6 +6,7 @@ use App\Models\ContactMessage;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -89,6 +90,21 @@ class AdminDashboardService
 
         $installmentProductsCount = Product::query()
             ->where('installment_enabled', true)
+            ->count();
+
+        $totalVariants = ProductVariant::query()->count();
+
+        $activeVariants = ProductVariant::query()
+            ->where('is_active', true)
+            ->count();
+
+        $lowStockVariants = ProductVariant::query()
+            ->where('stock', '>', 0)
+            ->where('stock', '<=', 3)
+            ->count();
+
+        $outOfStockVariants = ProductVariant::query()
+            ->where('stock', '<=', 0)
             ->count();
 
         /*
@@ -256,6 +272,11 @@ class AdminDashboardService
             'outOfStockProducts' => $outOfStockProducts,
             'featuredProductsCount' => $featuredProductsCount,
             'installmentProductsCount' => $installmentProductsCount,
+
+            'totalVariants' => $totalVariants,
+            'activeVariants' => $activeVariants,
+            'lowStockVariants' => $lowStockVariants,
+            'outOfStockVariants' => $outOfStockVariants,
 
             'totalCustomers' => $totalCustomers,
 
