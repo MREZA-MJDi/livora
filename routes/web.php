@@ -210,9 +210,20 @@ Route::middleware(['auth', 'customer'])->group(function () {
             )->name('payment');
 
             Route::post(
+                '/payment/{order}/gateway',
+                [CheckoutController::class, 'startOnlinePayment']
+            )->name('payment.gateway');
+
+            // Backward-compatible alias for existing clients/forms.
+            Route::post(
                 '/payment/{order}/installment',
-                [CheckoutController::class, 'startInstallmentPayment']
+                [CheckoutController::class, 'startOnlinePayment']
             )->name('payment.installment');
+
+            Route::get(
+                '/installment/{order}/preview',
+                [CheckoutController::class, 'installmentPreview']
+            )->name('installment.preview');
 
             Route::get(
                 '/installment/{order}',
