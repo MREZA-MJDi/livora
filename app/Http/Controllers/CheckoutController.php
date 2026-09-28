@@ -14,6 +14,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Throwable;
@@ -358,7 +359,8 @@ class CheckoutController extends Controller
     public function startOnlinePayment(
         Request $request,
         Order $order,
-        PaymentService $paymentService
+        PaymentService $paymentService,
+        PaymentManager $paymentManager
     ): RedirectResponse {
         abort_unless(
             $order->user_id === Auth::id(),
@@ -369,7 +371,7 @@ class CheckoutController extends Controller
             'gateway' => [
                 'required',
                 'string',
-                'in:digipay,snappay,torobpay',
+                Rule::in(array_column($paymentManager->onlineMethods(), 'key')),
             ],
         ]);
 
