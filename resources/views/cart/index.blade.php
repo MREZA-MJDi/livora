@@ -409,10 +409,17 @@
 
                                             $variant = $item->variant;
 
-                                            $itemStock =
-                                                $variant?->stock
-                                                ?? $product?->stock
-                                                ?? 0;
+                                            $variantOptions = collect(
+                                                $item->variant_options ?? []
+                                            );
+
+                                            $itemStock = $variantOptions->isNotEmpty()
+                                                ? (int) $variantOptions->min('stock')
+                                                : (
+                                                    $variant?->stock
+                                                    ?? $product?->stock
+                                                    ?? 0
+                                                );
 
                                             $itemTotal =
                                                 (float) $item->unit_price
@@ -492,7 +499,26 @@
 
                                                             </a>
 
-                                                            @if($variant)
+                                                            @if($variantOptions->isNotEmpty())
+
+                                                                <div class="mt-3 flex flex-wrap gap-2">
+
+                                                                    @foreach($variantOptions as $option)
+
+                                                                        <span class="rounded-full border border-[var(--livora-border)] bg-[var(--livora-surface)] px-2.5 py-1 text-[10px] text-[var(--livora-stone)]">
+
+                                                                            {{ $option['name'] ?? $option['type'] ?? 'ویژگی' }}:
+                                                                            <span class="font-medium text-[var(--livora-ink)]">
+                                                                                {{ $option['value'] ?? '—' }}
+                                                                            </span>
+
+                                                                        </span>
+
+                                                                    @endforeach
+
+                                                                </div>
+
+                                                            @elseif($variant)
 
                                                                 <p class="mt-2 text-xs text-[var(--livora-stone)]">
 
