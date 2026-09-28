@@ -18,6 +18,7 @@ class CustomerController extends Controller
     {
         $query = User::query()
             ->where('role', 'customer')
+            ->withCount('orders')
             ->latest();
 
         if ($request->filled('search')) {
