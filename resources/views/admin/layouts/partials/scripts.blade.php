@@ -124,6 +124,53 @@
 
 
 {{-- =========================================================
+     SHARED IMAGE PREVIEW
+========================================================= --}}
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document
+            .querySelectorAll('[data-image-preview-target]')
+            .forEach((input) => {
+                const targetId = input.dataset.imagePreviewTarget;
+                const placeholderId = input.dataset.imagePreviewPlaceholder;
+
+                const preview = targetId
+                    ? document.getElementById(targetId)
+                    : null;
+
+                const placeholder = placeholderId
+                    ? document.getElementById(placeholderId)
+                    : null;
+
+                if (!preview) {
+                    return;
+                }
+
+                input.addEventListener('change', () => {
+                    const file = input.files?.[0];
+
+                    if (!file || !file.type.startsWith('image/')) {
+                        return;
+                    }
+
+                    const objectUrl = URL.createObjectURL(file);
+
+                    preview.src = objectUrl;
+                    preview.classList.remove('hidden');
+
+                    if (placeholder) {
+                        placeholder.classList.add('hidden');
+                        placeholder.classList.remove('flex');
+                    }
+
+                    preview.onload = () => URL.revokeObjectURL(objectUrl);
+                });
+            });
+    });
+</script>
+
+{{-- =========================================================
      PAGE SPECIFIC SCRIPTS
 ========================================================= --}}
 
