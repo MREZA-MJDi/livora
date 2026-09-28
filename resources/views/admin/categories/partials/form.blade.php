@@ -214,7 +214,7 @@
                     : null;
             @endphp
 
-            <div class="admin-image-preview aspect-[4/5]">
+            <div class="admin-image-preview aspect-[4/3]">
 
                 <img
                     id="category-image-preview"
