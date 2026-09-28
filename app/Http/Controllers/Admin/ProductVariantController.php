@@ -21,7 +21,7 @@ class ProductVariantController extends Controller
     {
         $query = ProductVariant::query()
             ->with([
-                'product',
+                'product:id,name',
                 'images',
             ])
             ->orderBy('type')
@@ -44,6 +44,17 @@ class ProductVariantController extends Controller
                 'is_active',
                 $request->boolean('is_active')
             );
+        }
+
+        if ($request->filled('stock')) {
+            match ($request->string('stock')->toString()) {
+                'in_stock' => $query->where('stock', '>', 0),
+                'low_stock' => $query
+                    ->where('stock', '>', 0)
+                    ->where('stock', '<=', 3),
+                'out_of_stock' => $query->where('stock', '<=', 0),
+                default => null,
+            };
         }
 
         $variants = $query
