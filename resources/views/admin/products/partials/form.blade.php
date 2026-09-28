@@ -36,6 +36,75 @@
     ============================================================ --}}
     <div class="space-y-6 xl:col-span-2">
 
+        @if($editing)
+
+            @php
+                $primaryImage = $product->relationLoaded('images')
+                    ? ($product->images->firstWhere('is_primary', true) ?? $product->images->first())
+                    : $product->images()
+                        ->orderByDesc('is_primary')
+                        ->orderBy('sort_order')
+                        ->first();
+            @endphp
+
+            {{-- Product Image --}}
+            <div class="admin-card p-6">
+
+                <div class="mb-6">
+                    <h3 class="text-base font-bold text-[var(--admin-text)]">
+                        تصویر اصلی محصول
+                    </h3>
+
+                    <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">
+                        تصویر اصلی را عوض کنید؛ تصاویر دیگر و اتصال Variantها حفظ می‌شوند.
+                    </p>
+                </div>
+
+                @if($primaryImage?->url)
+
+                    <div class="admin-image-preview mb-5 aspect-[4/3]">
+                        <img
+                            src="{{ $primaryImage->url }}"
+                            alt="{{ $primaryImage->alt ?: $product->name }}"
+                            class="admin-image"
+                        >
+                    </div>
+
+                @else
+
+                    <div class="mb-5 flex aspect-[4/3] items-center justify-center rounded-2xl border border-dashed border-[var(--admin-border)] bg-[var(--admin-surface-soft)]">
+                        <span class="text-xs text-[var(--admin-muted)]">
+                            تصویری برای این محصول ثبت نشده است.
+                        </span>
+                    </div>
+
+                @endif
+
+                <label for="image" class="admin-label">
+                    تغییر تصویر
+                </label>
+
+                <input
+                    id="image"
+                    name="image"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    class="admin-input p-2"
+                >
+
+                <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">
+                    با انتخاب فایل جدید، همین تصویر اصلی جایگزین می‌شود. حداکثر حجم ۲ مگابایت.
+                </p>
+
+                @error('image')
+                <p class="mt-2 text-xs text-[var(--admin-danger)]">
+                    {{ $message }}
+                </p>
+                @enderror
+
+            </div>
+
+
         {{-- ========================================================
              Product Information
         ========================================================= --}}
