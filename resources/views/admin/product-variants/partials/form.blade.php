@@ -247,6 +247,7 @@
             <div
                 data-variant-image-picker
                 data-images-url="{{ route('admin.product-variants.product-images') }}"
+                data-create-image-url="{{ route('admin.product-images.create') }}"
                 data-selected-ids='@json($selectedImageIds)'
             >
                 <div
