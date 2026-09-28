@@ -18,8 +18,17 @@
             image.onload = () => resolve(image);
             image.onerror = () => reject(new Error('تصویر قابل خواندن نیست.'));
 
-            if (/^https?:\/\//i.test(source)) {
-                image.crossOrigin = 'anonymous';
+            try {
+                const sourceUrl = new URL(
+                    source,
+                    window.location.href
+                );
+
+                if (sourceUrl.origin !== window.location.origin) {
+                    image.crossOrigin = 'anonymous';
+                }
+            } catch (error) {
+                // Keep browser defaults for blob/data URLs.
             }
 
             image.src = source;
