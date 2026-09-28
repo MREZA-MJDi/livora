@@ -46,6 +46,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     : 'محصول انتخاب شد.';
 
                 results.innerHTML = '';
+
+                root.dispatchEvent(
+                    new CustomEvent('admin-product-selected', {
+                        bubbles: true,
+                        detail: product,
+                    })
+                );
+
                 setOpen(false);
             };
 
@@ -59,6 +67,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     'برای جستجو حداقل ۲ حرف وارد کنید.';
 
                 setOpen(false);
+
+                root.dispatchEvent(
+                    new CustomEvent('admin-product-selected', {
+                        bubbles: true,
+                        detail: null,
+                    })
+                );
+
                 input.focus();
             };
 
