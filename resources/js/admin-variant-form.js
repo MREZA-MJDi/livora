@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         '<img src="' + escapeHtml(image.url) + '" alt="' + escapeHtml(image.alt || 'تصویر محصول') + '" class="aspect-[4/3] w-full object-cover transition duration-200 group-hover:scale-[1.02]" loading="lazy">' +
                         '<span class="absolute inset-0 hidden bg-black/10 peer-checked:block"></span>' +
                         '<span class="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full border border-white/60 bg-white/90 text-xs opacity-0 shadow-sm peer-checked:opacity-100">✓</span>' +
-                        '<span class="block border-t border-[var(--admin-border)] px-3 py-2 text-[10px] text-[var(--admin-muted)]">#' + Number(image.sort_order ?? 0 + 1) + '</span>' +
+                        '<span class="block border-t border-[var(--admin-border)] px-3 py-2 text-[10px] text-[var(--admin-muted)]">#' + Number(image.sort_order ?? 0) + 1 + '</span>' +
                         '</label>';
                 }).join('');
             };
