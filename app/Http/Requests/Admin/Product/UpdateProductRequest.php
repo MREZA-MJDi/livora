@@ -150,6 +150,13 @@ class UpdateProductRequest extends FormRequest
                 'string',
             ],
 
+            'image' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:2048',
+            ],
+
             'price' => [
                 'required',
                 'numeric',
@@ -272,6 +279,10 @@ class UpdateProductRequest extends FormRequest
             'sku.unique' => 'این SKU قبلاً استفاده شده است.',
 
             'short_description.max' => 'توضیح کوتاه نباید بیشتر از ۲۵۵ کاراکتر باشد.',
+
+            'image.image' => 'فایل انتخاب‌شده باید تصویر باشد.',
+            'image.mimes' => 'فرمت تصویر باید jpg، jpeg، png یا webp باشد.',
+            'image.max' => 'حجم تصویر نباید بیشتر از ۲ مگابایت باشد.',
 
             'price.required' => 'وارد کردن قیمت محصول الزامی است.',
             'price.numeric' => 'قیمت محصول باید یک عدد معتبر باشد.',
