@@ -64,9 +64,7 @@
                     @if($category->image)
 
                         <img
-                            src="{{ str_starts_with($category->image, 'http://') || str_starts_with($category->image, 'https://') || str_starts_with($category->image, '//')
-                                                    ? $category->image
-                                                    : asset('storage/' . ltrim($category->image, '/')) }}"
+                            src="{{ $category->image_url }}"
                             alt="{{ $category->name }}"
                             class="admin-image"
                         >
