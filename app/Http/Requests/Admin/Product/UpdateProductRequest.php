@@ -19,11 +19,12 @@ class UpdateProductRequest extends FormRequest
             $this->boolean('installment_enabled');
 
         $this->merge([
+            'name' => trim((string) $this->name),
+            'sku' => trim((string) $this->sku),
             'price' => $this->normalizeNumericInput($this->input('price')),
             'compare_at_price' => $this->normalizeNumericInput($this->input('compare_at_price')),
-            'slug' =>
-                $this->slug
-                    ?: Str::slug($this->name),
+            'slug' => trim((string) $this->slug)
+                ?: Str::slug(trim((string) $this->name)),
 
             'stock' =>
                 $this->normalizeNumericInput($this->input('stock')) ?? 0,
