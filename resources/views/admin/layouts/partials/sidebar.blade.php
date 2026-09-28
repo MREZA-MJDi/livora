@@ -185,6 +185,29 @@
                 </a>
 
 
+                {{-- Product Variants --}}
+                <a
+                    href="{{ route('admin.product-variants.index') }}"
+                    @class([
+                        'group flex items-center gap-3 rounded-2xl px-3 py-3 text-xs font-medium transition',
+                        'bg-[var(--admin-accent-soft)] text-[var(--admin-accent-dark)]' => request()->routeIs('admin.product-variants.*'),
+                        'text-[var(--admin-text-soft)] hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text)]' => !request()->routeIs('admin.product-variants.*'),
+                    ])
+                >
+                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">
+                        <span class="text-[11px] font-bold">V</span>
+                    </span>
+
+                    <span class="flex-1">
+                        تنوع محصولات
+                    </span>
+
+                    @if(request()->routeIs('admin.product-variants.*'))
+                        <span class="h-1.5 w-1.5 rounded-full bg-[var(--admin-accent)]"></span>
+                    @endif
+                </a>
+
+
                 {{-- Categories --}}
                 <a
                     href="{{ route('admin.categories.index') }}"
