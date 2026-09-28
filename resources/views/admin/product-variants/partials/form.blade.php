@@ -1,6 +1,11 @@
 @php
     $editing = isset($productVariant);
 
+    $selectedProductId = old(
+        'product_id',
+        $selectedProduct?->id ?? $productVariant?->product_id ?? ''
+    );
+
     $selectedImageIds = collect(
         old(
             'image_ids',
@@ -32,42 +37,19 @@
                 </p>
             </div>
 
-            <label for="product_id" class="admin-label">
-                محصول
-            </label>
-
-            <select
-                id="product_id"
-                name="product_id"
-                class="admin-select"
-                required
-            >
-                <option value="">
-                    انتخاب محصول
-                </option>
-
-                @foreach($products as $product)
-
-                    <option
-                        value="{{ $product->id }}"
-                        @selected(
-                        old(
-                    'product_id',
-                    $productVariant->product_id ?? $selectedProductId ?? ''
-                    ) == $product->id
-                    )
-                    >
-                    {{ $product->name }}
-                    </option>
-
-                @endforeach
-
-            </select>
+            @include('admin.partials.product-selector', [
+                'inputName' => 'product_id',
+                'fieldId' => 'variant-product',
+                'selectedProduct' => $selectedProduct ?? null,
+                'label' => 'محصول',
+                'placeholder' => 'نام محصول یا SKU را جستجو کنید...',
+                'required' => true,
+            ])
 
             @error('product_id')
-            <p class="mt-2 text-xs text-[var(--admin-danger)]">
-                {{ $message }}
-            </p>
+                <p class="mt-2 text-xs text-[var(--admin-danger)]">
+                    {{ $message }}
+                </p>
             @enderror
 
         </div>
@@ -262,68 +244,76 @@
             </div>
 
 
-            @if(($selectedProductImages ?? collect())->isNotEmpty())
+            <div
+                data-variant-image-picker
+                data-images-url="{{ route('admin.product-variants.product-images') }}"
+                data-selected-ids='@json($selectedImageIds)'
+            >
+                <div
+                    data-variant-image-grid
+                    class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4"
+                >
+                    @if(($selectedProductImages ?? collect())->isNotEmpty())
+                        @foreach($selectedProductImages as $image)
+                            <label class="group relative cursor-pointer overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface-soft)]">
+                                <input
+                                    type="checkbox"
+                                    name="image_ids[]"
+                                    value="{{ $image->id }}"
+                                    class="peer sr-only"
+                                    @checked(in_array($image->id, $selectedImageIds, true))
+                                >
 
-                <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                                <img
+                                    src="{{ $image->url }}"
+                                    alt="{{ $image->alt ?? 'تصویر محصول' }}"
+                                    class="aspect-[4/3] w-full object-cover transition duration-200 group-hover:scale-[1.02]"
+                                >
 
-                    @foreach($selectedProductImages as $image)
+                                <span class="absolute inset-0 hidden bg-black/10 peer-checked:block"></span>
 
-                        <label class="group relative cursor-pointer overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface-soft)]">
+                                <span class="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full border border-white/60 bg-white/90 text-xs opacity-0 shadow-sm peer-checked:opacity-100">
+                                    ✓
+                                </span>
 
-                            <input
-                                type="checkbox"
-                                name="image_ids[]"
-                                value="{{ $image->id }}"
-                                class="peer sr-only"
-                                @checked(in_array($image->id, $selectedImageIds, true))
-                            >
+                                <span class="block border-t border-[var(--admin-border)] px-3 py-2 text-[10px] text-[var(--admin-muted)]">
+                                    #{{ $image->sort_order + 1 }}
+                                </span>
+                            </label>
+                        @endforeach
+                    @else
+                        <div data-variant-image-empty class="col-span-full rounded-2xl border border-dashed border-[var(--admin-border)] bg-[var(--admin-surface-soft)] px-5 py-6 text-center">
+                            <p class="text-sm font-semibold text-[var(--admin-text)]">
+                                هنوز تصویری برای این محصول ثبت نشده است.
+                            </p>
 
-                            <img
-                                src="{{ $image->url }}"
-                                alt="{{ $image->alt ?? 'تصویر محصول' }}"
-                                class="aspect-[4/3] w-full object-cover transition duration-200 group-hover:scale-[1.02]"
-                            >
+                            <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">
+                                ابتدا تصویر محصول را اضافه کنید تا بتوانید آن را به این تنوع متصل کنید.
+                            </p>
 
-                            <span class="absolute inset-0 hidden bg-black/10 peer-checked:block"></span>
-
-                            <span class="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full border border-white/60 bg-white/90 text-xs opacity-0 shadow-sm peer-checked:opacity-100">
-                                ✓
-                            </span>
-
-                            <span class="block border-t border-[var(--admin-border)] px-3 py-2 text-[10px] text-[var(--admin-muted)]">
-                                #{{ $image->sort_order + 1 }}
-                            </span>
-
-                        </label>
-
-                    @endforeach
-
-                </div>
-
-            @else
-
-                <div class="rounded-2xl border border-dashed border-[var(--admin-border)] bg-[var(--admin-surface-soft)] px-5 py-6 text-center">
-
-                    <p class="text-sm font-semibold text-[var(--admin-text)]">
-                        هنوز تصویری برای این محصول ثبت نشده است.
-                    </p>
-
-                    <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">
-                        ابتدا تصویر محصول را اضافه کنید تا بتوانید آن را به این تنوع متصل کنید.
-                    </p>
-
-                    @if($selectedProductId ?? null)
-                        <a
-                            href="{{ route('admin.product-images.create', ['product_id' => $selectedProductId]) }}"
-                            class="admin-btn admin-btn-primary mt-4"
-                        >
-                            افزودن تصویر محصول
-                        </a>
+                            @if($selectedProductId)
+                                <a
+                                    href="{{ route('admin.product-images.create', ['product_id' => $selectedProductId]) }}"
+                                    class="admin-btn admin-btn-primary mt-4"
+                                >
+                                    افزودن تصویر محصول
+                                </a>
+                            @endif
+                        </div>
                     @endif
-
                 </div>
 
-            @endif
+                <p
+                    data-variant-image-status
+                    class="mt-3 text-xs text-[var(--admin-muted)]"
+                >
+                    @if($selectedProductId)
+                        تصاویر محصول انتخاب‌شده آماده انتخاب هستند.
+                    @else
+                        ابتدا یک محصول انتخاب کنید.
+                    @endif
+                </p>
+            </div>
 
 
             @error('image_ids')
