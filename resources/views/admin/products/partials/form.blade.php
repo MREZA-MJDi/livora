@@ -257,7 +257,7 @@
                             id="price"
                             name="price"
                             type="text"
-                            inputmode="numeric"
+                            inputmode="decimal"
                             autocomplete="off"
                             value="{{ old('price', $product->price ?? '') }}"
                             class="admin-input pl-16"
@@ -301,7 +301,7 @@
                             id="compare_at_price"
                             name="compare_at_price"
                             type="text"
-                            inputmode="numeric"
+                            inputmode="decimal"
                             autocomplete="off"
                             value="{{ old('compare_at_price', $product->compare_at_price ?? '') }}"
                             class="admin-input pl-16"
@@ -1169,27 +1169,64 @@
             }
 
 
-            function getRawNumber(value) {
+            function getRawNumber(value, allowDecimal = false) {
 
-                return normalizeDigits(value)
-                    .replace(/,/g, '')
-                    .replace(/٬/g, '')
-                    .replace(/[^\d]/g, '');
+                let raw =
+                    normalizeDigits(value)
+                        .replace(/,/g, '')
+                        .replace(/٬/g, '')
+                        .replace(/\s+/g, '')
+                        .replace(/٫/g, '.');
 
+                if (!allowDecimal) {
+                    return raw.replace(/[^\d]/g, '');
+                }
+
+                raw = raw.replace(/[^\d.]/g, '');
+
+                const firstDot =
+                    raw.indexOf('.');
+
+                if (firstDot !== -1) {
+                    raw =
+                        raw.slice(0, firstDot + 1) +
+                        raw.slice(firstDot + 1).replace(/\./g, '');
+                }
+
+                return raw;
             }
 
 
-            function formatNumber(value) {
+            function formatNumber(value, allowDecimal = false) {
 
                 const raw =
-                    getRawNumber(value);
+                    getRawNumber(
+                        value,
+                        allowDecimal
+                    );
 
                 if (!raw) {
                     return '';
                 }
 
-                return Number(raw).toLocaleString('en-US');
+                if (!allowDecimal || !raw.includes('.')) {
+                    return Number(raw).toLocaleString('en-US');
+                }
 
+                const parts =
+                    raw.split('.');
+
+                const integerPart =
+                    parts[0] || '0';
+
+                const decimalPart =
+                    parts[1] || '';
+
+                return (
+                    Number(integerPart).toLocaleString('en-US') +
+                    '.' +
+                    decimalPart
+                );
             }
 
 
@@ -1206,7 +1243,7 @@
             |--------------------------------------------------------------------------
             */
 
-            function setupNumberInput(input) {
+            function setupNumberInput(input, allowDecimal = false) {
 
                 if (!input) {
                     return;
@@ -1221,7 +1258,10 @@
                  * 15,000,000
                  */
                 input.value =
-                    formatNumber(input.value);
+                    formatNumber(
+                        input.value,
+                        allowDecimal
+                    );
 
 
                 input.addEventListener('input', function () {
@@ -1250,7 +1290,10 @@
                      * Format number
                      */
                     input.value =
-                        formatNumber(oldValue);
+                        formatNumber(
+                            oldValue,
+                            allowDecimal
+                        );
 
 
                     /*
@@ -1315,11 +1358,20 @@
             }
 
 
-            setupNumberInput(priceInput);
+            setupNumberInput(
+                priceInput,
+                true
+            );
 
-            setupNumberInput(comparePriceInput);
+            setupNumberInput(
+                comparePriceInput,
+                true
+            );
 
-            setupNumberInput(stockInput);
+            setupNumberInput(
+                stockInput,
+                false
+            );
 
 
             /*
@@ -1400,7 +1452,8 @@
                 const total =
                     Number(
                         getRawNumber(
-                            priceInput?.value || ''
+                            priceInput?.value || '',
+                            true
                         ) || 0
                     );
 
