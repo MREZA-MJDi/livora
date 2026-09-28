@@ -71,7 +71,7 @@
                     </a>
 
                     <a
-                        href="{{ route('shop.index', ['sort' => 'newest']) }}"
+                        href="{{ route('shop.index', ['sort' => 'latest']) }}"
                         class="text-sm text-white/55 transition hover:text-white"
                     >
                         تازه‌ها
