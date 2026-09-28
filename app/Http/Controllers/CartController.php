@@ -1,18 +1,19 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace AppHttpControllers;
 
-use App\Http\Requests\Cart\AddToCartRequest;
-use App\Http\Requests\Cart\UpdateCartRequest;
-use App\Models\Cart;
-use App\Models\CartItem;
-use App\Models\Product;
-use App\Models\ProductVariant;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
+use AppHttpRequestsCartAddToCartRequest;
+use AppHttpRequestsCartUpdateCartRequest;
+use AppModelsCart;
+use AppModelsCartItem;
+use AppModelsProduct;
+use AppModelsProductVariant;
+use IlluminateHttpJsonResponse;
+use IlluminateHttpRedirectResponse;
+use IlluminateHttpRequest;
+use IlluminateSupportFacadesAuth;
+use IlluminateSupportStr;
+use IlluminateViewView;
 
 class CartController extends Controller
 {
@@ -39,33 +40,94 @@ class CartController extends Controller
 
         $cart = $this->getCart($request);
 
-        $variant = null;
+        $variants = $this->resolveSelectedVariants(
+            $product,
+            $validated['variants'] ?? null,
+            $validated['product_variant_id'] ?? null
+        );
 
-        if (! empty($validated['product_variant_id'])) {
-            $variant = ProductVariant::query()
-                ->whereKey($validated['product_variant_id'])
-                ->where('product_id', $product->id)
-                ->where('is_active', true)
-                ->firstOrFail();
-        }
-
-        $availableStock = $variant?->stock ?? $product->stock;
-
-        $unitPrice = (float) $product->price;
-
-        if ($variant) {
-            $unitPrice += (float) $variant->price_adjustment;
-        }
-
-        $item = $cart->items()
-            ->where('product_id', $product->id)
-            ->where('product_variant_id', $variant?->id)
-            ->first();
+        $availableStock = $variants->isNotEmpty()
+            ? (int) $variants->min('stock')
+            : (int) $product->stock;
 
         $quantity = (int) $validated['quantity'];
 
+        if ($quantity > $availableStock) {
+            return back()->withErrors([
+                'quantity' => 'موجودی کافی نیست.',
+            ]);
+        }
+
+        $unitPrice = max(
+            0,
+            (float) $product->price
+            + (float) $variants->sum(
+                fn (ProductVariant $variant) =>
+                    (float) $variant->price_adjustment
+            )
+        );
+
+        $variantOptions = $variants
+            ->sortBy('type', SORT_NATURAL | SORT_FLAG_CASE)
+            ->map(fn (ProductVariant $variant) => [
+                'id' => (int) $variant->id,
+                'type' => (string) $variant->type,
+                'name' => (string) $variant->name,
+                'value' => (string) $variant->value,
+                'sku' => $variant->sku,
+                'color_hex' => $variant->color_hex,
+                'price_adjustment' => (float) $variant->price_adjustment,
+            ])
+            ->values()
+            ->all();
+
+        $variantKey = $this->buildVariantKey(
+            $variants,
+            $product
+        );
+
+        $primaryVariantId = $variants->first()?->id;
+
+        $item = $cart->items()
+            ->where('product_id', $product->id)
+            ->where(function ($query) use (
+                $variantKey,
+                $primaryVariantId,
+                $variants
+            ) {
+                $query->where('variant_key', $variantKey);
+
+                /*
+                 * Merge legacy one-variant cart rows created before the
+                 * multi-variant snapshot fields were introduced.
+                 */
+                if ($variants->count() === 1) {
+                    $query->orWhere(function ($legacy) use (
+                        $primaryVariantId
+                    ) {
+                        $legacy
+                            ->whereNull('variant_key')
+                            ->whereNull('variant_options')
+                            ->where(
+                                'product_variant_id',
+                                $primaryVariantId
+                            );
+                    });
+                }
+
+                if ($variants->isEmpty()) {
+                    $query->orWhere(function ($legacy) {
+                        $legacy
+                            ->whereNull('variant_key')
+                            ->whereNull('variant_options')
+                            ->whereNull('product_variant_id');
+                    });
+                }
+            })
+            ->first();
+
         if ($item) {
-            $quantity += $item->quantity;
+            $quantity += (int) $item->quantity;
         }
 
         if ($quantity > $availableStock) {
@@ -74,18 +136,21 @@ class CartController extends Controller
             ]);
         }
 
+        $payload = [
+            'product_id' => $product->id,
+            'product_variant_id' => $primaryVariantId,
+            'variant_key' => $variantKey,
+            'variant_options' => $variantOptions ?: null,
+            'quantity' => $quantity,
+            'unit_price' => $unitPrice,
+        ];
+
         if ($item) {
-            $item->update([
-                'quantity' => $quantity,
-                'unit_price' => $unitPrice,
-            ]);
+            $item->update($payload);
         } else {
-            $cart->items()->create([
-                'product_id' => $product->id,
-                'product_variant_id' => $variant?->id,
-                'quantity' => $quantity,
-                'unit_price' => $unitPrice,
-            ]);
+            $cart->items()->create(
+                $payload
+            );
         }
 
         $cart->load('items');
@@ -117,7 +182,11 @@ class CartController extends Controller
             'variant',
         ]);
 
-        $stock = $item->variant?->stock ?? $item->product->stock;
+        $variants = $this->resolveVariantsFromCartItem($item);
+
+        $stock = $variants->isNotEmpty()
+            ? (int) $variants->min('stock')
+            : (int) $item->product->stock;
 
         if ((int) $validated['quantity'] > $stock) {
             return back()->withErrors([
@@ -149,13 +218,7 @@ class CartController extends Controller
         Request $request,
         CartItem $item
     ): RedirectResponse|JsonResponse {
-
-        if (
-            ! $item->cart
-            || $item->cart->user_id !== auth()->id()
-        ) {
-            abort(403);
-        }
+        $this->authorize('delete', $item);
 
         $item->delete();
 
@@ -183,6 +246,79 @@ class CartController extends Controller
         return back()->with(
             'success',
             'سبد خرید خالی شد.'
+        );
+    }
+
+    protected function resolveSelectedVariants(
+        Product $product,
+        ?array $submittedVariants,
+        ?int $legacyVariantId
+    ) {
+        $submitted = collect($submittedVariants ?? [])
+            ->filter(fn ($id) => filled($id))
+            ->map(fn ($id) => (int) $id)
+            ->values();
+
+        if (
+            $submitted->isEmpty()
+            && $legacyVariantId
+        ) {
+            $submitted = collect([(int) $legacyVariantId]);
+        }
+
+        if ($submitted->isEmpty()) {
+            return collect();
+        }
+
+        return $product->variants()
+            ->whereIn('id', $submitted->unique()->all())
+            ->get()
+            ->sortBy(function (ProductVariant $variant) use ($submitted) {
+                return $submitted->search(
+                    fn ($id) => (int) $id === (int) $variant->id
+                );
+            })
+            ->values();
+    }
+
+    protected function resolveVariantsFromCartItem(
+        CartItem $item
+    ) {
+        $ids = $item->selectedVariantIds();
+
+        if (empty($ids)) {
+            return collect();
+        }
+
+        return ProductVariant::query()
+            ->where('product_id', $item->product_id)
+            ->where('is_active', true)
+            ->whereIn('id', $ids)
+            ->get();
+    }
+
+    protected function buildVariantKey(
+        $variants,
+        Product $product
+    ): string {
+        if ($variants->isEmpty()) {
+            return 'base';
+        }
+
+        $parts = $variants
+            ->sortBy('type', SORT_NATURAL | SORT_FLAG_CASE)
+            ->map(
+                fn (ProductVariant $variant) =>
+                    Str::lower((string) $variant->type)
+                    . ':'
+                    . $variant->id
+            )
+            ->values()
+            ->all();
+
+        return hash(
+            'sha256',
+            $product->id . '|' . implode('|', $parts)
         );
     }
 
