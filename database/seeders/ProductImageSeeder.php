@@ -14,6 +14,7 @@ class ProductImageSeeder extends Seeder
             'luna-sofa' => [
                 '/images/seed/products/sofa-front.svg',
                 '/images/seed/products/sofa-detail.svg',
+                '/images/seed/products/sofa-front.svg',
             ],
             'siena-lounge-chair' => [
                 '/images/seed/products/chair-front.svg',
