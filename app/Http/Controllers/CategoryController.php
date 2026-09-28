@@ -27,14 +27,14 @@ class CategoryController extends Controller
     {
         abort_unless($category->is_active, 404);
 
-        $category->load('latestActiveProduct.images.media');
+        $category->load('latestActiveProduct.primaryImage');
 
         $products = $category
             ->products()
             ->active()
             ->with([
                 'category',
-                'images.media',
+                'primaryImage',
             ])
             ->latest()
             ->paginate(12)
