@@ -46,7 +46,7 @@ Route::get(
     [CategoryController::class, 'show']
 )->name('categories.show');
 
-Route::view('/about', 'about.index')
+Route::get('/about', [AboutController::class, 'index'])
     ->name('about');
 
 
