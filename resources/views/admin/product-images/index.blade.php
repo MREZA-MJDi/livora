@@ -44,62 +44,106 @@
     </div>
 
 
-    {{-- Filters --}}
+    {{-- Filter --}}
+
     <div class="admin-card mb-6 p-5">
 
         <form
             action="{{ route('admin.product-images.index') }}"
             method="GET"
-            class="grid grid-cols-1 gap-4 md:grid-cols-[1fr_auto_auto]"
+            class="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_auto]"
         >
 
             <div>
+
                 <label for="product_id" class="admin-label">
-                    فیلتر بر اساس محصول
+                    فیلتر محصول
                 </label>
 
-                <select
-                    id="product_id"
-                    name="product_id"
-                    class="admin-select"
+                <div
+                    data-admin-product-selector
+                    data-search-url="{{ route('admin.product-images.product-options') }}"
+                    data-selected-id="{{ $selectedProduct?->id ?? request('product_id') }}"
+                    data-selected-label="{{ $selectedProduct?->name ?? '' }}"
                 >
-                    <option value="">
-                        همه محصولات
-                    </option>
 
-                    @foreach($products as $product)
-                        <option
-                            value="{{ $product->id }}"
-                            @selected((string) request('product_id') === (string) $product->id)
+                    <div class="admin-search">
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.6"
+                            stroke="currentColor"
+                            class="admin-search-icon h-4 w-4"
                         >
-                        {{ $product->name }}
-                        </option>
-                    @endforeach
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="m21 21-4.35-4.35m1.35-5.4a6.75 6.75 0 1 1-13.5 0 6.75 6.75 0 0 1 13.5 0Z"
+                            />
+                        </svg>
 
-                </select>
+                        <input
+                            id="product-search"
+                            type="search"
+                            class="admin-search-input"
+                            value="{{ $selectedProduct?->name ?? (request('product_id') ? 'محصول شماره ' . request('product_id') : '') }}"
+                            placeholder="نام محصول یا SKU..."
+                            autocomplete="off"
+                            role="combobox"
+                            aria-expanded="false"
+                            aria-controls="admin-product-options"
+                        >
+
+                    </div>
+
+                    <input
+                        type="hidden"
+                        id="product_id"
+                        name="product_id"
+                        value="{{ $selectedProduct?->id ?? request('product_id') }}"
+                        data-product-value
+                    >
+
+                    <div
+                        id="admin-product-options"
+                        data-product-results
+                        class="absolute inset-x-0 z-40 mt-2 hidden max-h-72 overflow-y-auto rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-white)] p-2 shadow-[var(--admin-shadow-lg)]"
+                    ></div>
+
+                    <p
+                        data-product-status
+                        class="admin-help"
+                    >
+                        جستجوی محدود و سریع در کاتالوگ؛ همه محصولات یکجا لود نمی‌شوند.
+                    </p>
+
+                </div>
+
             </div>
 
-            <div class="flex items-end">
+            <div class="flex flex-col justify-end gap-2 sm:flex-row">
+
                 <button
                     type="submit"
-                    class="admin-btn admin-btn-secondary w-full md:w-auto"
+                    class="admin-btn admin-btn-secondary"
                 >
                     اعمال فیلتر
                 </button>
-            </div>
 
-            @if(request()->filled('product_id'))
+                @if(request()->filled('product_id'))
 
-                <div class="flex items-end">
                     <a
                         href="{{ route('admin.product-images.index') }}"
-                        class="admin-btn admin-btn-ghost w-full md:w-auto"
+                        class="admin-btn admin-btn-ghost"
                     >
                         حذف فیلتر
                     </a>
-                </div>
 
-            @endif
+                @endif
+
+            </div>
 
         </form>
 
