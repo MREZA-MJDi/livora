@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ProductImage extends Model
@@ -67,6 +68,12 @@ class ProductImage extends Model
             return $this->path;
         }
 
-        return asset('storage/' . ltrim($this->path, '/'));
+        $path = ltrim($this->path, '/');
+
+        if (! Storage::disk('public')->exists($path)) {
+            return $this->media?->url ?? '';
+        }
+
+        return Storage::disk('public')->url($path);
     }
 }
