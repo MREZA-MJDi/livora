@@ -251,14 +251,25 @@
         let dragOriginY = 0;
 
         const showPreview = (source) => {
+            /*
+             * Update the preview independently from the crop modal.
+             * The selected image must be visible even if the modal/canvas
+             * fails to initialize.
+             */
             preview.src = source;
+            preview.removeAttribute('hidden');
             preview.classList.remove('hidden');
-            placeholder.classList.add('hidden');
-            placeholder.classList.remove('flex');
+            preview.style.display = 'block';
+
+            if (placeholder) {
+                placeholder.classList.add('hidden');
+                placeholder.classList.remove('flex');
+            }
 
             if (openButton) {
                 openButton.disabled = false;
                 openButton.classList.remove('hidden');
+                openButton.removeAttribute('disabled');
             }
         };
 
@@ -294,10 +305,14 @@
             state.image = null;
         };
 
-        input.addEventListener('change', () => {
-            const file = input.files?.[0];
+        const handleSelectedFile = (file) => {
+            if (!file) {
+                return;
+            }
 
-            if (!file || !file.type.startsWith('image/')) {
+            if (!file.type.startsWith('image/')) {
+                window.alert('لطفاً یک فایل تصویری معتبر انتخاب کنید.');
+                input.value = '';
                 return;
             }
 
@@ -307,8 +322,27 @@
 
             objectUrl = URL.createObjectURL(file);
 
+            // Show the raw selected file immediately.
             showPreview(objectUrl);
-            openCrop(objectUrl, file);
+
+            // Then open the cropper; a cropper failure must not hide the preview.
+            void openCrop(objectUrl, file);
+        };
+
+        input.addEventListener('change', (event) => {
+            handleSelectedFile(event.target.files?.[0] || null);
+        });
+
+        /*
+         * Defensive delegated listener for admin forms that may be rendered
+         * dynamically or re-initialized after navigation.
+         */
+        document.addEventListener('change', (event) => {
+            if (event.target !== input) {
+                return;
+            }
+
+            handleSelectedFile(input.files?.[0] || null);
         });
 
         if (openButton) {
