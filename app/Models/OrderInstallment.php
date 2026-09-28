@@ -38,6 +38,14 @@ class OrderInstallment extends Model
         );
     }
 
+    public function paidBy(): BelongsTo
+    {
+        return $this->belongsTo(
+            User::class,
+            'paid_by_user_id'
+        );
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Helpers
