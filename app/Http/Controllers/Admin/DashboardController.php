@@ -271,6 +271,31 @@ class DashboardController extends Controller
     }
 
     /**
+     * Format a date using the Persian calendar when Intl is available.
+     */
+    protected function formatPersianDate(Carbon $date, string $pattern): string
+    {
+        if (class_exists(\\IntlDateFormatter::class)) {
+            $formatter = new \\IntlDateFormatter(
+                'fa_IR@calendar=persian',
+                \\IntlDateFormatter::NONE,
+                \\IntlDateFormatter::NONE,
+                $date->getTimezone()->getName(),
+                \\IntlDateFormatter::TRADITIONAL,
+                $pattern,
+            );
+
+            $formatted = $formatter->format($date->getTimestamp());
+
+            if ($formatted !== false) {
+                return $formatted;
+            }
+        }
+
+        return $date->format('Y/m/d');
+    }
+
+    /**
      * Get revenue for the latest six months.
      */
     protected function getMonthlyRevenue(): Collection
@@ -300,8 +325,8 @@ class DashboardController extends Controller
 
             $months->push([
                 'key' => $date->format('Y-m'),
-                'label' => $date->locale('fa')->translatedFormat('M'),
-                'full_label' => $date->locale('fa')->translatedFormat('F Y'),
+                'label' => $this->formatPersianDate($date, 'LLLL'),
+                'full_label' => $this->formatPersianDate($date, 'MMMM yyyy'),
                 'revenue' => (float) $revenue,
                 'orders' => $orders,
             ]);
