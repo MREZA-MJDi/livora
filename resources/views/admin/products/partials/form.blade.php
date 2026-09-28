@@ -1476,6 +1476,9 @@
             |--------------------------------------------------------------------------
             */
 
+            const imagePlaceholder =
+                document.getElementById('product-image-placeholder');
+
             if (imageInput && imagePreview) {
 
                 imageInput.addEventListener('change', function () {
@@ -1492,6 +1495,13 @@
 
                     imagePreview.src =
                         objectUrl;
+
+                    imagePreview.classList.remove('hidden');
+
+                    if (imagePlaceholder) {
+                        imagePlaceholder.classList.add('hidden');
+                        imagePlaceholder.classList.remove('flex');
+                    }
 
                     imagePreview.onload =
                         function () {
