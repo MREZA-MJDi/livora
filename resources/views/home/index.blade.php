@@ -106,25 +106,25 @@
     @endphp
 
 
-    <div class="overflow-hidden bg-[var(--livora-cream)]">
+    <div class="sila-home overflow-hidden bg-[var(--livora-cream)]">
 
 
         {{-- =========================================================
              HERO
         ========================================================== --}}
 
-        <section class="relative">
+        <section class="sila-home-hero relative">
 
             <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
 
-                <div class="grid min-h-[calc(100vh-76px)] grid-cols-1 gap-8 py-5 lg:grid-cols-[0.92fr_1.08fr] lg:py-7">
+                <div class="sila-home-hero-grid grid grid-cols-1 gap-6 py-4 sm:gap-7 lg:grid-cols-[0.92fr_1.08fr] lg:py-5">
 
 
                     {{-- =================================================
                          HERO CONTENT
                     ================================================== --}}
 
-                    <div class="relative flex flex-col justify-center rounded-[2rem] bg-[var(--livora-surface)] px-7 py-12 sm:px-10 lg:px-14 lg:py-16">
+                    <div class="sila-home-hero-content relative flex flex-col justify-center rounded-[2rem] bg-[var(--livora-surface)] px-6 py-10 sm:px-9 sm:py-11 lg:px-12 lg:py-12">
 
                         <div class="max-w-xl">
 
@@ -137,7 +137,7 @@
                             </div>
 
 
-                            <h1 class="mt-7 text-5xl font-semibold leading-[1.05] tracking-tight text-[var(--livora-ink)] sm:text-6xl xl:text-7xl">
+                            <h1 class="sila-home-hero-title mt-6 font-semibold leading-[1.06] tracking-tight text-[var(--livora-ink)]">
 
                                 خانه‌ای که
 
@@ -237,7 +237,7 @@
 
                     <div
                         id="livoraHeroSlider"
-                        class="relative min-h-[520px] overflow-hidden rounded-[2rem] bg-[var(--livora-white)] lg:min-h-full"
+                        class="sila-home-hero-slider relative min-h-[430px] overflow-hidden rounded-[2rem] bg-[var(--livora-white)] lg:min-h-0"
                     >
 
                         @if($heroProducts->isNotEmpty())
@@ -387,7 +387,7 @@
 
                         @else
 
-                            <div class="flex min-h-[520px] items-center justify-center bg-[var(--livora-surface)]">
+                            <div class="flex min-h-[430px] items-center justify-center bg-[var(--livora-surface)]">
 
                                 <span class="text-sm tracking-[0.2em] text-[var(--livora-stone)]">
                                     SilaGallery
@@ -457,16 +457,12 @@
 
                         @foreach($categories->take(4) as $category)
 
-                            @if($category->image)
-
-                                <x-shop.category-card
-                                    :name="$category->name"
-                                    :image="$category->image_url"
-                                    :href="route('categories.show', $category->slug)"
-                                    :count="$category->products_count"
-                                />
-
-                            @endif
+                            <x-shop.category-card
+                                :name="$category->name"
+                                :image="$category->image_url"
+                                :href="route('categories.show', $category->slug)"
+                                :count="$category->products_count"
+                            />
 
                         @endforeach
 

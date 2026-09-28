@@ -26,6 +26,26 @@ class HomeController extends Controller
             ->limit(8)
             ->get();
 
+        /*
+         * Featured products stay first. Any remaining homepage slots are
+         * filled with the latest active products so a product created or
+         * activated from admin becomes visible without requiring a separate
+         * "featured" or "new" flag.
+         */
+        if ($featuredProducts->count() < 8) {
+            $fallbackProducts = Product::query()
+                ->active()
+                ->whereNotIn('id', $featuredProducts->pluck('id'))
+                ->with(['category', 'images'])
+                ->latest()
+                ->limit(8 - $featuredProducts->count())
+                ->get();
+
+            $featuredProducts = $featuredProducts
+                ->concat($fallbackProducts)
+                ->values();
+        }
+
         $newProducts = Product::query()
             ->active()
             ->new()

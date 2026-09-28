@@ -1,6 +1,5 @@
 @import './font.css';
 @import './variables.css';
-@import './components.css';
 @import "tailwindcss";
 
 
@@ -784,10 +783,6 @@ h6 {
 
 @media (max-width: 640px) {
 
-    html {
-        font-size: 15px;
-    }
-
     .product-price__current strong {
         font-size: 1.15rem;
     }
@@ -950,4 +945,37 @@ a[class*="bg-[var(--livora-ink)]"][class*="text-white"]:focus-visible,
 button[class*="bg-[var(--livora-ink)]"][class*="text-white"]:hover,
 button[class*="bg-[var(--livora-ink)]"][class*="text-white"]:focus-visible {
     color: #fff !important;
+}
+
+
+/* =========================================================
+   HOMEPAGE SCALE NORMALIZATION
+   ========================================================= */
+
+.sila-home-hero-grid {
+    min-height: clamp(560px, calc(100svh - 170px), 680px);
+}
+
+.sila-home-hero-title {
+    font-size: clamp(2.75rem, 4vw, 4rem);
+}
+
+.sila-home-hero-slider {
+    min-height: 0;
+    height: 100%;
+}
+
+@media (max-width: 1023px) {
+    .sila-home-hero-grid {
+        min-height: 0;
+    }
+
+    .sila-home-hero-slider {
+        min-height: 430px;
+        height: auto;
+    }
+
+    .sila-home-hero-title {
+        font-size: clamp(2.25rem, 8vw, 3.5rem);
+    }
 }
