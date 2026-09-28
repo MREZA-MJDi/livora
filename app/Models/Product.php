@@ -85,6 +85,14 @@ class Product extends Model
             ->where('is_active', true);
     }
 
+    /**
+     * All product variants, including inactive admin-managed options.
+     */
+    public function allVariants(): HasMany
+    {
+        return $this->hasMany(ProductVariant::class);
+    }
+
     public function cartItems(): HasMany
     {
         return $this->hasMany(CartItem::class);
