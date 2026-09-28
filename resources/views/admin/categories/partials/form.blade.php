@@ -200,40 +200,39 @@
             </div>
 
 
-            <div
-                class="admin-image-preview aspect-square"
-            >
+            @php
+                $categoryImageUrl = $editing
+                    ? $category->image_url
+                    : null;
+            @endphp
 
-                @if($editing && !empty($category->image))
+            <div class="admin-image-preview aspect-square">
 
-                    <img
-                        id="category-image-preview"
-                        src="{{ $category->image_url }}"
-                        alt="{{ $category->name }}"
-                        class="admin-image"
-                    >
+                <img
+                    id="category-image-preview"
+                    src="{{ $categoryImageUrl ?: '' }}"
+                    alt="{{ $category->name ?? 'تصویر دسته‌بندی' }}"
+                    class="admin-image {{ $categoryImageUrl ? '' : 'hidden' }}"
+                >
 
-                @else
+                <div
+                    id="category-image-placeholder"
+                    class="{{ $categoryImageUrl ? 'hidden' : 'flex' }} h-full flex-col items-center justify-center p-6 text-center"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         fill="none" viewBox="0 0 24 24"
+                         stroke-width="1.5" stroke="currentColor"
+                         class="mb-3 h-10 w-10 text-[var(--admin-muted)]">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l2.659 2.659 1.5-1.5a2.25 2.25 0 0 1 3.182 0l3.068 3.068M3.75 19.5h16.5A1.5 1.5 0 0 0 20.25 18V6A1.5 1.5 0 0 0 20.25 4.5H3.75A1.5 1.5 0 0 0 2.25 6v12A1.5 1.5 0 0 0 3.75 19.5Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M8.25 8.25h.008v.008H8.25V8.25Z" />
+                    </svg>
 
-                    <div class="flex h-full flex-col items-center justify-center p-6 text-center text-[var(--admin-muted)]">
-
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                             fill="none" viewBox="0 0 24 24"
-                             stroke-width="1.5" stroke="currentColor"
-                             class="mb-3 h-10 w-10">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                  d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l2.659 2.659 1.5-1.5a2.25 2.25 0 0 1 3.182 0l3.068 3.068M3.75 19.5h16.5A1.5 1.5 0 0 0 21.75 18V6A1.5 1.5 0 0 0 20.25 4.5H3.75A1.5 1.5 0 0 0 2.25 6v12A1.5 1.5 0 0 0 3.75 19.5Z" />
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                  d="M8.25 8.25h.008v.008H8.25V8.25Z" />
-                        </svg>
-
-                        <span class="text-xs">
-                            تصویری انتخاب نشده است.
-                        </span>
-
-                    </div>
-
-                @endif
+                    <span class="text-xs text-[var(--admin-muted)]">
+                        {{ $editing ? 'تصویری برای این دسته‌بندی ثبت نشده است.' : 'هنوز تصویری انتخاب نشده است.' }}
+                    </span>
+                </div>
 
             </div>
 
