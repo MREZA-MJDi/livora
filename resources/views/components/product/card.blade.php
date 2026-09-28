@@ -41,7 +41,7 @@
             : 0;
 @endphp
 
-<article class="group relative min-w-0">
+<article class="group relative flex h-full min-w-0 flex-col">
 
     {{-- Image --}}
     <div class="relative overflow-hidden rounded-[1.5rem] bg-[var(--livora-surface)]">
@@ -151,12 +151,12 @@
 
 
     {{-- Product Information --}}
-    <div class="pt-4">
+    <div class="flex flex-1 flex-col pt-4">
 
         {{-- Category --}}
         @if($product->category)
 
-            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-stone)]">
+            <p class="min-h-[1rem] line-clamp-1 text-[10px] uppercase tracking-[0.18em] text-[var(--livora-stone)]">
                 {{ $product->category->name }}
             </p>
 
@@ -167,7 +167,7 @@
             href="{{ route('product.show', $product->slug) }}"
             class="mt-2 block"
         >
-            <h3 class="line-clamp-2 text-sm font-semibold leading-6 text-[var(--livora-ink)] transition duration-300 group-hover:text-[var(--livora-accent)] sm:text-[15px]">
+            <h3 class="min-h-[3rem] line-clamp-2 text-sm font-semibold leading-6 text-[var(--livora-ink)] transition duration-300 group-hover:text-[var(--livora-accent)] sm:text-[15px]">
                 {{ $product->name }}
             </h3>
         </a>
@@ -208,7 +208,7 @@
         {{-- Installment --}}
         @if($installmentEnabled && $cashAmount > 0)
 
-            <div class="mt-3 rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-surface)] p-3">
+            <div class="mt-3 min-h-[74px] rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-surface)] p-3">
 
                 <div class="flex items-center justify-between gap-3">
 
@@ -249,7 +249,7 @@
         {{-- CTA --}}
         <a
             href="{{ route('product.show', $product->slug) }}"
-            class="mt-4 inline-flex items-center text-xs font-medium text-[var(--livora-ink)] transition duration-300 group-hover:text-[var(--livora-accent)]"
+            class="mt-auto pt-4 inline-flex items-center text-xs font-medium text-[var(--livora-ink)] transition duration-300 group-hover:text-[var(--livora-accent)]"
         >
             مشاهده محصول
             <span class="mr-2 transition-transform duration-300 group-hover:-translate-x-1">
