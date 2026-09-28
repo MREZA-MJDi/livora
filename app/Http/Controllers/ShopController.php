@@ -102,6 +102,18 @@ class ShopController extends Controller
             $query->inStock();
         }
 
+        if (!empty($filters['installment'])) {
+            $query->where('installment_enabled', true);
+        }
+
+        if (!empty($filters['featured'])) {
+            $query->where('is_featured', true);
+        }
+
+        if (!empty($filters['new'])) {
+            $query->where('is_new', true);
+        }
+
         /*
         |--------------------------------------------------------------------------
         | Sorting
