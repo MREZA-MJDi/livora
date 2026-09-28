@@ -63,7 +63,7 @@
     @if($category->homepage_image_url)
         <meta
             name="twitter:image"
-            content="{{ $category->image_url }}"
+            content="{{ $category->homepage_image_url }}"
         >
     @endif
 
