@@ -60,7 +60,6 @@
 
     <x-layout.search-overlay />
 
-    <x-shop.filter-drawer />
 
     <main class="storefront-content">
         @yield('content')
