@@ -7,7 +7,7 @@
 
 @section(
     'description',
-    $category->meta_description
+    $category->description
         ?? ('مشاهده و خرید محصولات دسته‌بندی ' . $category->name . ' در SilaGallery؛ بررسی قیمت، مشخصات و شرایط خرید اقساطی.')
 )
 
@@ -30,7 +30,7 @@
 
     <meta
         property="og:description"
-        content="{{ $category->meta_description ?? ('محصولات ' . $category->name . ' در SilaGallery') }}"
+        content="{{ $category->description ?? ('محصولات ' . $category->name . ' در SilaGallery') }}"
     >
 
     <meta
@@ -38,10 +38,10 @@
         content="{{ route('categories.show', $category->slug) }}"
     >
 
-    @if($category->image)
+    @if($category->homepage_image_url)
         <meta
             property="og:image"
-            content="{{ $category->image_url }}"
+            content="{{ $category->homepage_image_url }}"
         >
     @endif
 
@@ -57,13 +57,13 @@
 
     <meta
         name="twitter:description"
-        content="{{ $category->meta_description ?? ('محصولات ' . $category->name . ' در SilaGallery') }}"
+        content="{{ $category->description ?? ('محصولات ' . $category->name . ' در SilaGallery') }}"
     >
 
-    @if($category->image)
+    @if($category->homepage_image_url)
         <meta
             name="twitter:image"
-            content="{{ $category->image_url }}"
+            content="{{ $category->homepage_image_url }}"
         >
     @endif
 
@@ -170,7 +170,7 @@
                             </span>
 
                                 <a
-                                    href="{{ route('shop.index', ['category' => $category->id]) }}"
+                                    href="{{ route('shop.index', ['category' => $category->slug]) }}"
                                     class="rounded-full bg-[var(--livora-ink)] px-4 py-2 text-[11px] font-medium text-white transition hover:bg-[var(--livora-accent)]"
                                 >
                                     مشاهده همه محصولات
@@ -183,10 +183,10 @@
                         {{-- Category image --}}
                         <div class="overflow-hidden rounded-[2rem] bg-[var(--livora-surface)]">
 
-                            @if($category->image)
+                            @if($category->homepage_image_url)
 
                                 <img
-                                    src="{{ $category->image_url }}"
+                                    src="{{ $category->homepage_image_url }}"
                                     alt="{{ $category->name }}"
                                     class="aspect-[4/3] h-full w-full object-cover transition duration-700 hover:scale-[1.03]"
                                 >

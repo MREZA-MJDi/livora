@@ -14,6 +14,7 @@ class CategoryController extends Controller
             ->withCount([
                 'products' => fn ($query) => $query->active(),
             ])
+            ->with('latestActiveProduct.images.media')
             ->orderBy('sort_order')
             ->get();
 
@@ -26,12 +27,14 @@ class CategoryController extends Controller
     {
         abort_unless($category->is_active, 404);
 
+        $category->load('latestActiveProduct.images.media');
+
         $products = $category
             ->products()
             ->active()
             ->with([
                 'category',
-                'images',
+                'images.media',
             ])
             ->latest()
             ->paginate(12)

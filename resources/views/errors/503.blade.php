@@ -1,14 +1,14 @@
 @extends('errors.layout')
 
-@section('title', 'دسترسی غیرمجاز | SilaGallery')
+@section('title', 'سرویس موقتاً در دسترس نیست | SilaGallery')
 
 @section('content')
 <div class="wrap">
     <main class="card">
         <div class="brand">SilaGallery</div>
-        <div class="code">403</div>
-        <h1>اجازه ورود به این بخش را ندارید.</h1>
-        <p>این درخواست نیاز به سطح دسترسی دیگری دارد یا این بخش برای حساب فعلی شما در دسترس نیست.</p>
+        <div class="code danger">503</div>
+        <h1>سرویس فعلاً در دسترس نیست.</h1>
+        <p>سیستم احتمالاً در حال بروزرسانی یا انجام عملیات موقت است. کمی بعد دوباره امتحان کنید.</p>
         <div class="actions">
             @if(url()->previous() !== url()->current())
                 <a href="{{ url()->previous() }}" class="btn secondary">بازگشت</a>

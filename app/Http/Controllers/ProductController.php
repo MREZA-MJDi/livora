@@ -12,8 +12,8 @@ class ProductController extends Controller
         $product = Product::query()
             ->with([
                 'category',
-                'images',
-                'variants.images',
+                'images.media',
+                'variants.images.media',
             ])
             ->active()
             ->where('slug', $slug)
@@ -23,7 +23,7 @@ class ProductController extends Controller
             ->active()
             ->with([
                 'category',
-                'images',
+                'images.media',
             ])
             ->where('id', '!=', $product->id)
             ->where('category_id', $product->category_id)

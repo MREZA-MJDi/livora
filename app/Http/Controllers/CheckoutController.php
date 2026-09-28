@@ -8,11 +8,13 @@ use App\Models\CartItem;
 use App\Models\ProductVariant;
 use App\Models\Order;
 use App\Services\Installments\InstallmentPlanService;
+use App\Services\Payments\PaymentManager;
 use App\Services\Payments\PaymentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Throwable;
@@ -22,7 +24,7 @@ class CheckoutController extends Controller
     /**
      * Show checkout page.
      */
-    public function index(): View
+    public function index(): View|RedirectResponse
     {
         $cart = $this->getActiveCart();
 
@@ -32,11 +34,14 @@ class CheckoutController extends Controller
             'items.variant',
         ]);
 
-        abort_if(
-            $cart->items->isEmpty(),
-            404,
-            'سبد خرید خالی است.'
-        );
+        if ($cart->items->isEmpty()) {
+            return redirect()
+                ->route('cart.index')
+                ->with(
+                    'warning',
+                    'سبد خرید شما خالی است. ابتدا یک محصول به سبد اضافه کنید.'
+                );
+        }
 
         $defaultAddress = Auth::user()
             ->defaultAddress()
@@ -317,7 +322,9 @@ class CheckoutController extends Controller
      * Show payment selection page.
      */
     public function payment(
-        Order $order
+        Order $order,
+        PaymentManager $paymentManager,
+        InstallmentPlanService $installmentPlanService
     ): View {
         abort_unless(
             $order->user_id === Auth::id(),
@@ -330,18 +337,33 @@ class CheckoutController extends Controller
             'installments',
         ]);
 
+        $installmentPreview = null;
+
+        try {
+            $installmentPreview = $installmentPlanService->preview($order);
+        } catch (Throwable $e) {
+            $installmentPreview = [
+                'enabled' => false,
+                'message' => $e->getMessage()
+                    ?: 'شرایط خرید اقساطی برای این سفارش قابل محاسبه نیست.',
+            ];
+        }
+
         return view('checkout.payment', [
             'order' => $order,
+            'gateways' => $paymentManager->onlineMethods(),
+            'installmentPreview' => $installmentPreview,
         ]);
     }
 
     /**
-     * Start DigiPay / SnapPay / TorobPay installment payment.
+     * Start an online payment through the selected gateway.
      */
-    public function startInstallmentPayment(
+    public function startOnlinePayment(
         Request $request,
         Order $order,
-        PaymentService $paymentService
+        PaymentService $paymentService,
+        PaymentManager $paymentManager
     ): RedirectResponse {
         abort_unless(
             $order->user_id === Auth::id(),
@@ -352,13 +374,18 @@ class CheckoutController extends Controller
             'gateway' => [
                 'required',
                 'string',
-                'in:digipay,snappay,torobpay',
+                Rule::in(
+                    collect($paymentManager->onlineMethods())
+                        ->where('enabled', true)
+                        ->pluck('key')
+                        ->all()
+                ),
             ],
         ]);
 
         try {
             $result = $paymentService
-                ->startInstallmentPayment(
+                ->startOnlinePayment(
                     $order,
                     $validated['gateway']
                 );
@@ -472,18 +499,11 @@ class CheckoutController extends Controller
     public function paymentCallback(
         Request $request,
         string $gateway,
-        PaymentService $paymentService
+        PaymentService $paymentService,
+        PaymentManager $paymentManager
     ): RedirectResponse {
         abort_unless(
-            in_array(
-                $gateway,
-                [
-                    'digipay',
-                    'snappay',
-                    'torobpay',
-                ],
-                true
-            ),
+            $paymentManager->supports($gateway),
             404
         );
 

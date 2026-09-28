@@ -3,11 +3,11 @@
 ])
 
 @php
-    $currentSort = request('sort', 'latest');
+    $currentSort = request('sort', 'newest');
 
     $sortOptions = [
-        'latest' => 'جدیدترین',
-        'oldest' => 'قدیمی‌ترین',
+        'newest' => 'جدیدترین',
+        'popular' => 'محبوب‌ترین',
         'price_asc' => 'ارزان‌ترین',
         'price_desc' => 'گران‌ترین',
         'name_asc' => 'الفبایی',
@@ -15,7 +15,7 @@
 
     $currentLabel =
         $sortOptions[$currentSort]
-        ?? $sortOptions['latest'];
+        ?? $sortOptions['newest'];
 
     /*
      |--------------------------------------------------------------------------

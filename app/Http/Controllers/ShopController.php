@@ -22,7 +22,7 @@ class ShopController extends Controller
         $query = Product::query()
             ->with([
                 'category',
-                'images',
+                'images.media',
             ])
             ->active();
 
@@ -100,6 +100,36 @@ class ShopController extends Controller
 
         if (!empty($filters['in_stock'])) {
             $query->inStock();
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Installment Filter
+        |--------------------------------------------------------------------------
+        */
+
+        if (!empty($filters['installment'])) {
+            $query->where('installment_enabled', true);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Featured Filter
+        |--------------------------------------------------------------------------
+        */
+
+        if (!empty($filters['featured'])) {
+            $query->where('is_featured', true);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | New Filter
+        |--------------------------------------------------------------------------
+        */
+
+        if (!empty($filters['new'])) {
+            $query->where('is_new', true);
         }
 
         /*

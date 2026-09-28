@@ -1,14 +1,14 @@
 @extends('errors.layout')
 
-@section('title', 'دسترسی غیرمجاز | SilaGallery')
+@section('title', 'درخواست منقضی شد | SilaGallery')
 
 @section('content')
 <div class="wrap">
     <main class="card">
         <div class="brand">SilaGallery</div>
-        <div class="code">403</div>
-        <h1>اجازه ورود به این بخش را ندارید.</h1>
-        <p>این درخواست نیاز به سطح دسترسی دیگری دارد یا این بخش برای حساب فعلی شما در دسترس نیست.</p>
+        <div class="code">419</div>
+        <h1>درخواست شما منقضی شده است.</h1>
+        <p>احتمالاً صفحه برای مدتی باز مانده بود. صفحه را تازه کنید و دوباره تلاش کنید.</p>
         <div class="actions">
             @if(url()->previous() !== url()->current())
                 <a href="{{ url()->previous() }}" class="btn secondary">بازگشت</a>

@@ -74,6 +74,26 @@ class ShopFilterRequest extends FormRequest
 
             /*
             |--------------------------------------------------------------------------
+            | Discovery filters
+            |--------------------------------------------------------------------------
+            */
+            'installment' => [
+                'nullable',
+                'boolean',
+            ],
+
+            'featured' => [
+                'nullable',
+                'boolean',
+            ],
+
+            'new' => [
+                'nullable',
+                'boolean',
+            ],
+
+            /*
+            |--------------------------------------------------------------------------
             | Sorting
             |--------------------------------------------------------------------------
             */
@@ -140,10 +160,13 @@ class ShopFilterRequest extends FormRequest
 
             /*
             |--------------------------------------------------------------------------
-            | Boolean
+            | Boolean filters
             |--------------------------------------------------------------------------
             */
             'in_stock' => $this->boolean('in_stock'),
+            'installment' => $this->boolean('installment'),
+            'featured' => $this->boolean('featured'),
+            'new' => $this->boolean('new'),
         ]);
     }
 }

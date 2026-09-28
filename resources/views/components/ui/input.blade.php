@@ -1,14 +1,26 @@
 @props([
-'label' => null,
-'hint' => null,
-'error' => null,
-'icon' => null,
-'type' => 'text',
+    'label' => null,
+    'hint' => null,
+    'error' => null,
+    'icon' => null,
+    'type' => 'text',
 ])
 
 @php
     $fieldName = $attributes->get('name');
-    $resolvedError = $error ?: ($fieldName ? $errors->first($fieldName) : null);
+    $fieldId = $attributes->get('id')
+        ?: ($fieldName ?: null);
+
+    $resolvedError = $error
+        ?: ($fieldName ? $errors->first($fieldName) : null);
+
+    $descriptionIds = [];
+
+    if ($resolvedError && $fieldId) {
+        $descriptionIds[] = $fieldId . '-error';
+    } elseif ($hint && $fieldId) {
+        $descriptionIds[] = $fieldId . '-hint';
+    }
 
     $inputClasses = implode(' ', [
         'w-full',
@@ -28,7 +40,7 @@
         'focus:ring-[var(--livora-ink)]/5',
         'disabled:cursor-not-allowed',
         'disabled:opacity-50',
-         $resolvedError
+        $resolvedError
             ? 'border-red-300 focus:border-red-500 focus:ring-red-500/5'
             : 'border-[var(--livora-border)]',
         $icon ? 'pr-11' : '',
@@ -40,8 +52,8 @@
     @if($label)
 
         <label
-            @if($attributes->has('id'))
-            for="{{ $attributes->get('id') }}"
+            @if($fieldId)
+            for="{{ $fieldId }}"
             @endif
             class="mb-2 block text-xs font-medium text-[var(--livora-ink)]"
         >
@@ -65,7 +77,16 @@
 
         <input
             type="{{ $type }}"
-            {{ $attributes->except(['class', 'type']) }}
+            @if($fieldId)
+            id="{{ $fieldId }}"
+            @endif
+            {{ $attributes->except(['class', 'type', 'id', 'aria-invalid', 'aria-describedby']) }}
+            @if($fieldId)
+            aria-invalid="{{ $resolvedError ? 'true' : 'false' }}"
+            @if($descriptionIds)
+            aria-describedby="{{ implode(' ', $descriptionIds) }}"
+            @endif
+            @endif
             class="{{ $inputClasses }}"
         >
 
@@ -74,6 +95,9 @@
     @if($resolvedError)
 
         <p
+            @if($fieldId)
+            id="{{ $fieldId }}-error"
+            @endif
             class="mt-2 flex items-start gap-2 text-[11px] leading-6 text-red-600"
             role="alert"
         >
@@ -99,7 +123,12 @@
 
     @elseif($hint)
 
-        <p class="mt-2 text-[11px] leading-6 text-[var(--livora-stone)]">
+        <p
+            @if($fieldId)
+            id="{{ $fieldId }}-hint"
+            @endif
+            class="mt-2 text-[11px] leading-6 text-[var(--livora-stone)]"
+        >
             {{ $hint }}
         </p>
 
