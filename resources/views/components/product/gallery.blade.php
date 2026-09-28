@@ -92,12 +92,12 @@
          MAIN IMAGE
     ========================================================== --}}
 
-    <div class="group relative overflow-hidden rounded-[2rem] bg-[var(--livora-surface)]">
+    <div class="product-gallery-shell group relative overflow-hidden rounded-[2rem] bg-[var(--livora-surface)]">
 
         @if($imageCount > 0)
 
             <div
-                class="relative aspect-[4/5] w-full cursor-zoom-in overflow-hidden"
+                class="product-gallery-stage relative aspect-[4/5] w-full cursor-zoom-in overflow-hidden lg:aspect-auto lg:h-[clamp(500px,calc(100svh-220px),720px)]"
                 @click="zoom = true"
             >
 
@@ -233,7 +233,7 @@
         @else
 
             {{-- No image --}}
-            <div class="flex aspect-[4/5] w-full items-center justify-center">
+            <div class="flex aspect-[4/5] w-full items-center justify-center lg:aspect-auto lg:h-[clamp(500px,calc(100svh-220px),720px)]">
 
                 <div class="text-center">
 
@@ -381,7 +381,7 @@
 
 
             {{-- Image --}}
-            <div class="flex h-full items-center justify-center">
+            <div class="flex h-full min-h-0 items-center justify-center">
 
                 <div class="relative max-h-full max-w-6xl">
 
