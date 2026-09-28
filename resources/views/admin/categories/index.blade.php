@@ -37,6 +37,55 @@
     </div>
 
 
+    <div class="admin-card mb-6 p-5">
+        <form
+            action="{{ route('admin.categories.index') }}"
+            method="GET"
+            class="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(10rem,.6fr)_minmax(10rem,.6fr)_auto]"
+        >
+            <div>
+                <label for="search" class="admin-label">جستجو</label>
+                <input
+                    id="search"
+                    name="search"
+                    type="search"
+                    value="{{ request('search') }}"
+                    class="admin-input"
+                    maxlength="120"
+                    placeholder="نام یا Slug دسته‌بندی..."
+                >
+            </div>
+
+            <div>
+                <label for="status" class="admin-label">وضعیت</label>
+                <select id="status" name="status" class="admin-select">
+                    <option value="">همه</option>
+                    <option value="active" @selected(request('status') === 'active')>فعال</option>
+                    <option value="inactive" @selected(request('status') === 'inactive')>غیرفعال</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="sort" class="admin-label">مرتب‌سازی</label>
+                <select id="sort" name="sort" class="admin-select">
+                    <option value="position" @selected(request('sort', 'position') === 'position')>ترتیب نمایش</option>
+                    <option value="name_asc" @selected(request('sort') === 'name_asc')>نام صعودی</option>
+                    <option value="name_desc" @selected(request('sort') === 'name_desc')>نام نزولی</option>
+                    <option value="newest" @selected(request('sort') === 'newest')>جدیدترین</option>
+                    <option value="oldest" @selected(request('sort') === 'oldest')>قدیمی‌ترین</option>
+                </select>
+            </div>
+
+            <div class="flex items-end gap-2">
+                <button type="submit" class="admin-btn admin-btn-secondary flex-1">اعمال</button>
+                @if(request()->hasAny(['search', 'status', 'sort']))
+                    <a href="{{ route('admin.categories.index') }}" class="admin-btn admin-btn-ghost">پاک</a>
+                @endif
+            </div>
+        </form>
+    </div>
+
+
     <div class="admin-table-wrap">
 
         <div class="overflow-x-auto">
@@ -49,6 +98,7 @@
                     <th>تصویر</th>
                     <th>نام</th>
                     <th>Slug</th>
+                    <th>محصولات</th>
                     <th>ترتیب</th>
                     <th>وضعیت</th>
                     <th class="text-left">عملیات</th>
@@ -107,6 +157,12 @@
 
                         <td class="font-mono text-xs">
                             {{ $category->slug ?? '—' }}
+                        </td>
+
+                        <td>
+                            <span class="admin-badge admin-badge-info">
+                                {{ number_format($category->products_count) }}
+                            </span>
                         </td>
 
                         <td>
@@ -194,7 +250,7 @@
                 @empty
 
                     <tr>
-                        <td colspan="7">
+                        <td colspan="8">
 
                             <div class="admin-empty">
 
