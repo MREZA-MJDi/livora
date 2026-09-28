@@ -100,11 +100,27 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category): RedirectResponse
     {
-        if ($category->image) {
-            Storage::disk('public')->delete($category->image);
+        if ($category->products()->exists()) {
+            return redirect()
+                ->route('admin.categories.index')
+                ->with(
+                    'error',
+                    'این دسته‌بندی هنوز محصول دارد و تا حذف یا انتقال محصولات قابل حذف نیست.'
+                );
         }
 
+        $image = $category->image;
+
         $category->delete();
+
+        if (
+            $image
+            && ! str_starts_with($image, 'http://')
+            && ! str_starts_with($image, 'https://')
+            && ! str_starts_with($image, '//')
+        ) {
+            Storage::disk('public')->delete($image);
+        }
 
         return redirect()
             ->route('admin.categories.index')
