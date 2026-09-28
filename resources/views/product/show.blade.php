@@ -99,6 +99,31 @@
         }
     }
 
+    $galleryImageIndexes = $product->images
+        ->values()
+        ->mapWithKeys(
+            fn ($image, $index) => [
+                (int) $image->id => (int) $index,
+            ]
+        )
+        ->all();
+
+    $variantImageMap = $product->variants
+        ->mapWithKeys(
+            fn ($variant) => [
+                (string) $variant->id => $variant->images
+                    ->map(
+                        fn ($image) =>
+                            $galleryImageIndexes[$image->id] ?? null
+                    )
+                    ->filter(fn ($index) => $index !== null)
+                    ->values()
+                    ->all(),
+            ]
+        )
+        ->all();
+
+
     $mainImage =
         $product->images?->first()?->url;
 
@@ -273,6 +298,7 @@
                         <div class="xl:sticky xl:top-24">
                             <x-product.gallery
                                 :product="$product"
+                                :variant-image-map="$variantImageMap"
                             />
                         </div>
 
