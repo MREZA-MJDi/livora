@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'علاقه‌مندی‌های من | LIVORA')
+@section('title', 'علاقه‌مندی‌های من | SilaGallery')
 
 @section(
     'description',
-    'محصولات مورد علاقه خود را در LIVORA ذخیره کنید و هر زمان برای خرید به آن‌ها برگردید.'
+    'محصولات مورد علاقه خود را در SilaGallery ذخیره کنید و هر زمان برای خرید به آن‌ها برگردید.'
 )
 
 @push('seo')
@@ -269,7 +269,7 @@
                             </h2>
 
                             <p class="mt-2 text-sm leading-7 text-[var(--livora-stone)]">
-                                مجموعه کامل LIVORA را بررسی کن.
+                                مجموعه کامل SilaGallery را بررسی کن.
                             </p>
 
                         </div>

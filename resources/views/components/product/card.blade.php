@@ -64,7 +64,7 @@
 
                 <div class="flex h-full w-full items-center justify-center">
                     <span class="text-xs tracking-[0.2em] text-[var(--livora-stone)]">
-                        LIVORA
+                        SilaGallery
                     </span>
                 </div>
 
