@@ -12,11 +12,30 @@ class AdminMiddleware
         Request $request,
         Closure $next
     ): Response {
-        abort_unless(
-            $request->user()?->isAdmin(),
-            403
-        );
+        $user = $request->user();
 
-        return $next($request);
+        if ($user?->isAdmin()) {
+            return $next($request);
+        }
+
+        if ($request->expectsJson()) {
+            abort(403);
+        }
+
+        if ($user?->isCustomer()) {
+            return redirect()
+                ->route('account.index')
+                ->with(
+                    'warning',
+                    'این بخش فقط برای حساب‌های مدیریتی در دسترس است.'
+                );
+        }
+
+        return redirect()
+            ->route('home')
+            ->with(
+                'warning',
+                'حساب فعلی اجازه دسترسی به پنل مدیریت را ندارد.'
+            );
     }
 }
