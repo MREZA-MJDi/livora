@@ -9,13 +9,6 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('categories', function (Blueprint $table) {
-            $table->index(
-                ['is_active', 'sort_order', 'name'],
-                'categories_active_position_name_index'
-            );
-        });
-
         $duplicate = DB::table('product_variants')
             ->select([
                 'product_id',
@@ -36,45 +29,106 @@ return new class extends Migration
             );
         }
 
-        Schema::table('product_variants', function (Blueprint $table) {
-            $table->index(
-                ['product_id', 'is_active', 'type'],
-                'product_variants_product_active_type_index'
-            );
+        $categoryIndexes = collect(
+            Schema::getIndexes('categories')
+        )->pluck('name')->all();
 
-            $table->index(
-                ['stock', 'is_active'],
-                'product_variants_stock_active_index'
-            );
+        if (! in_array('categories_active_position_name_index', $categoryIndexes, true)) {
+            Schema::table('categories', function (Blueprint $table) {
+                $table->index(
+                    ['is_active', 'sort_order', 'name'],
+                    'categories_active_position_name_index'
+                );
+            });
+        }
 
-            $table->unique(
-                ['product_id', 'type', 'value'],
-                'product_variants_product_type_value_unique'
-            );
-        });
+        $variantIndexes = collect(
+            Schema::getIndexes('product_variants')
+        )->pluck('name')->all();
 
-        Schema::table('product_variant_images', function (Blueprint $table) {
-            $table->index(
-                ['product_variant_id', 'sort_order'],
-                'pvi_variant_sort_index'
-            );
-        });
+        if (! in_array('product_variants_product_active_type_index', $variantIndexes, true)) {
+            Schema::table('product_variants', function (Blueprint $table) {
+                $table->index(
+                    ['product_id', 'is_active', 'type'],
+                    'product_variants_product_active_type_index'
+                );
+            });
+        }
+
+        if (! in_array('product_variants_stock_active_index', $variantIndexes, true)) {
+            Schema::table('product_variants', function (Blueprint $table) {
+                $table->index(
+                    ['stock', 'is_active'],
+                    'product_variants_stock_active_index'
+                );
+            });
+        }
+
+        if (! in_array('product_variants_product_type_value_unique', $variantIndexes, true)) {
+            Schema::table('product_variants', function (Blueprint $table) {
+                $table->unique(
+                    ['product_id', 'type', 'value'],
+                    'product_variants_product_type_value_unique'
+                );
+            });
+        }
+
+        $pivotIndexes = collect(
+            Schema::getIndexes('product_variant_images')
+        )->pluck('name')->all();
+
+        if (! in_array('pvi_variant_sort_index', $pivotIndexes, true)) {
+            Schema::table('product_variant_images', function (Blueprint $table) {
+                $table->index(
+                    ['product_variant_id', 'sort_order'],
+                    'pvi_variant_sort_index'
+                );
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('categories', function (Blueprint $table) {
-            $table->dropIndex('categories_active_position_name_index');
-        });
+        $categoryIndexes = collect(
+            Schema::getIndexes('categories')
+        )->pluck('name')->all();
 
-        Schema::table('product_variants', function (Blueprint $table) {
-            $table->dropIndex('product_variants_product_active_type_index');
-            $table->dropIndex('product_variants_stock_active_index');
-            $table->dropUnique('product_variants_product_type_value_unique');
-        });
+        if (in_array('categories_active_position_name_index', $categoryIndexes, true)) {
+            Schema::table('categories', function (Blueprint $table) {
+                $table->dropIndex('categories_active_position_name_index');
+            });
+        }
 
-        Schema::table('product_variant_images', function (Blueprint $table) {
-            $table->dropIndex('pvi_variant_sort_index');
-        });
+        $variantIndexes = collect(
+            Schema::getIndexes('product_variants')
+        )->pluck('name')->all();
+
+        if (in_array('product_variants_product_active_type_index', $variantIndexes, true)) {
+            Schema::table('product_variants', function (Blueprint $table) {
+                $table->dropIndex('product_variants_product_active_type_index');
+            });
+        }
+
+        if (in_array('product_variants_stock_active_index', $variantIndexes, true)) {
+            Schema::table('product_variants', function (Blueprint $table) {
+                $table->dropIndex('product_variants_stock_active_index');
+            });
+        }
+
+        if (in_array('product_variants_product_type_value_unique', $variantIndexes, true)) {
+            Schema::table('product_variants', function (Blueprint $table) {
+                $table->dropUnique('product_variants_product_type_value_unique');
+            });
+        }
+
+        $pivotIndexes = collect(
+            Schema::getIndexes('product_variant_images')
+        )->pluck('name')->all();
+
+        if (in_array('pvi_variant_sort_index', $pivotIndexes, true)) {
+            Schema::table('product_variant_images', function (Blueprint $table) {
+                $table->dropIndex('pvi_variant_sort_index');
+            });
+        }
     }
 };
