@@ -309,6 +309,9 @@
         const imagePreview =
             document.getElementById('category-image-preview');
 
+        const imagePlaceholder =
+            document.getElementById('category-image-placeholder');
+
         if (!imageInput || !imagePreview) {
             return;
         }
@@ -327,6 +330,13 @@
 
             imagePreview.src =
                 objectUrl;
+
+            imagePreview.classList.remove('hidden');
+
+            if (imagePlaceholder) {
+                imagePlaceholder.classList.add('hidden');
+                imagePlaceholder.classList.remove('flex');
+            }
 
             imagePreview.onload =
                 function () {
