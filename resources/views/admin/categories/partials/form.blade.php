@@ -207,9 +207,8 @@
                 @if($editing && !empty($category->image))
 
                     <img
-                        src="{{ str_starts_with($category->image, 'http://') || str_starts_with($category->image, 'https://') || str_starts_with($category->image, '//')
-                            ? $category->image
-                            : asset('storage/' . ltrim($category->image, '/')) }}"
+                        id="category-image-preview"
+                        src="{{ $category->image_url }}"
                         alt="{{ $category->name }}"
                         class="admin-image"
                     >
@@ -299,3 +298,44 @@
     </div>
 
 </div>
+
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const imageInput =
+            document.getElementById('image');
+
+        const imagePreview =
+            document.getElementById('category-image-preview');
+
+        if (!imageInput || !imagePreview) {
+            return;
+        }
+
+        imageInput.addEventListener('change', function () {
+
+            const file =
+                imageInput.files?.[0];
+
+            if (!file || !file.type.startsWith('image/')) {
+                return;
+            }
+
+            const objectUrl =
+                URL.createObjectURL(file);
+
+            imagePreview.src =
+                objectUrl;
+
+            imagePreview.onload =
+                function () {
+                    URL.revokeObjectURL(objectUrl);
+                };
+
+        });
+
+    });
+</script>
+@endpush
