@@ -1,9 +1,9 @@
 <?php
 
-namespace AppHttpRequestsAdminProductVariant;
+namespace App\Http\Requests\Admin\ProductVariant;
 
-use IlluminateFoundationHttpFormRequest;
-use IlluminateValidationRule;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreProductVariantRequest extends FormRequest
 {
