@@ -4,7 +4,9 @@
     $selectedImageIds = collect(
         old(
             'image_ids',
-            $productVariant?->images?->pluck('id')->all() ?? []
+            isset($productVariant)
+                ? $productVariant->images?->pluck('id')->all()
+                : []
         )
     )
         ->map(fn ($id) => (int) $id)
