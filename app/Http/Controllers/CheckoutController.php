@@ -491,18 +491,11 @@ class CheckoutController extends Controller
     public function paymentCallback(
         Request $request,
         string $gateway,
-        PaymentService $paymentService
+        PaymentService $paymentService,
+        PaymentManager $paymentManager
     ): RedirectResponse {
         abort_unless(
-            in_array(
-                $gateway,
-                [
-                    'digipay',
-                    'snappay',
-                    'torobpay',
-                ],
-                true
-            ),
+            $paymentManager->supports($gateway),
             404
         );
 
