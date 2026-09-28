@@ -251,23 +251,61 @@ class UpdateProductRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'category_id.required' => 'انتخاب دسته‌بندی الزامی است.',
+            'category_id.integer' => 'دسته‌بندی انتخاب‌شده نامعتبر است.',
+            'category_id.exists' => 'دسته‌بندی انتخاب‌شده وجود ندارد.',
+
+            'name.required' => 'نام محصول الزامی است.',
+            'name.string' => 'نام محصول باید متنی باشد.',
+            'name.max' => 'نام محصول نباید بیشتر از ۲۵۵ کاراکتر باشد.',
+
+            'slug.required' => 'Slug محصول الزامی است.',
+            'slug.string' => 'Slug محصول باید متنی باشد.',
+            'slug.max' => 'Slug محصول نباید بیشتر از ۲۵۵ کاراکتر باشد.',
+            'slug.unique' => 'این Slug قبلاً استفاده شده است.',
+
+            'sku.required' => 'SKU محصول الزامی است.',
+            'sku.string' => 'SKU محصول باید متنی باشد.',
+            'sku.max' => 'SKU نباید بیشتر از ۲۵۵ کاراکتر باشد.',
+            'sku.unique' => 'این SKU قبلاً استفاده شده است.',
+
+            'short_description.max' => 'توضیح کوتاه نباید بیشتر از ۲۵۵ کاراکتر باشد.',
+
             'price.required' => 'وارد کردن قیمت محصول الزامی است.',
             'price.numeric' => 'قیمت محصول باید یک عدد معتبر باشد.',
             'price.min' => 'قیمت محصول نمی‌تواند منفی باشد.',
             'price.decimal' => 'قیمت محصول باید حداکثر دو رقم اعشار داشته باشد.',
+
             'compare_at_price.numeric' => 'قیمت قبل باید یک عدد معتبر باشد.',
             'compare_at_price.min' => 'قیمت قبل نمی‌تواند منفی باشد.',
             'compare_at_price.decimal' => 'قیمت قبل باید حداکثر دو رقم اعشار داشته باشد.',
             'compare_at_price.gte' => 'قیمت قبل باید بیشتر یا مساوی قیمت فعلی باشد.',
 
-            'category_id.required' => 'انتخاب دسته‌بندی الزامی است.',
-            'category_id.exists' => 'دسته‌بندی انتخاب‌شده معتبر نیست.',
-            'name.required' => 'نام محصول الزامی است.',
-            'slug.unique' => 'این Slug قبلاً استفاده شده است.',
-            'sku.unique' => 'این SKU قبلاً استفاده شده است.',
             'stock.integer' => 'موجودی باید عدد صحیح باشد.',
             'stock.min' => 'موجودی نمی‌تواند منفی باشد.',
+
+            'status.required' => 'وضعیت محصول را انتخاب کنید.',
             'status.in' => 'وضعیت محصول نامعتبر است.',
+
+            'is_featured.boolean' => 'وضعیت محصول ویژه نامعتبر است.',
+            'is_new.boolean' => 'وضعیت محصول جدید نامعتبر است.',
+
+            'installment_enabled.boolean' => 'وضعیت خرید اقساطی نامعتبر است.',
+            'installment_cash_percent.integer' => 'درصد پیش‌پرداخت باید عدد صحیح باشد.',
+            'installment_cash_percent.between' => 'درصد پیش‌پرداخت باید بین ۱ تا ۹۹ باشد.',
+            'installment_cash_percent.required_if' => 'درصد پیش‌پرداخت الزامی است.',
+            'installment_remainder_method.in' => 'روش تسویه انتخاب‌شده نامعتبر است.',
+            'installment_remainder_method.required_if' => 'روش تسویه باقی‌مانده الزامی است.',
+            'installment_cheque_count.integer' => 'تعداد چک باید عدد صحیح باشد.',
+            'installment_cheque_count.min' => 'تعداد چک باید حداقل ۱ باشد.',
+            'installment_cheque_count.max' => 'تعداد چک نمی‌تواند بیشتر از ۳۰ باشد.',
+            'installment_cheque_count.required_if' => 'تعداد چک الزامی است.',
+            'installment_interval_months.integer' => 'فاصله سررسید باید عدد صحیح باشد.',
+            'installment_interval_months.min' => 'فاصله سررسید باید حداقل ۱ ماه باشد.',
+            'installment_interval_months.max' => 'فاصله سررسید نمی‌تواند بیشتر از ۲۴ ماه باشد.',
+            'installment_interval_months.required_if' => 'فاصله سررسید الزامی است.',
+
+            'meta_title.max' => 'عنوان SEO نباید بیشتر از ۲۵۵ کاراکتر باشد.',
         ];
     }
 
@@ -278,10 +316,18 @@ class UpdateProductRequest extends FormRequest
             'name' => 'نام محصول',
             'slug' => 'Slug',
             'sku' => 'SKU',
+            'short_description' => 'توضیح کوتاه',
+            'description' => 'توضیحات',
             'price' => 'قیمت',
             'compare_at_price' => 'قیمت قبل',
             'stock' => 'موجودی',
             'status' => 'وضعیت',
+            'installment_enabled' => 'خرید اقساطی',
+            'installment_cash_percent' => 'درصد پیش‌پرداخت',
+            'installment_remainder_method' => 'روش تسویه',
+            'installment_cheque_count' => 'تعداد چک',
+            'installment_interval_months' => 'فاصله سررسید',
+            'meta_title' => 'عنوان SEO',
+            'meta_description' => 'توضیحات SEO',
         ];
-    }
-}
+    }}
