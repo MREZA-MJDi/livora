@@ -29,8 +29,7 @@
     >
 
         @include('admin.product-images.partials.form', [
-            'products' => $products,
-            'selectedProductId' => $selectedProductId ?? null,
+            'selectedProduct' => $selectedProduct,
         ])
 
     </form>
