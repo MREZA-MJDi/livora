@@ -190,13 +190,21 @@
         <div class="admin-card p-6">
 
             <div class="mb-5">
-                <h3 class="text-base font-bold text-[var(--admin-text)]">
-                    تصویر دسته‌بندی
-                </h3>
+                <div class="flex items-center justify-between gap-3">
+                    <div>
+                        <h3 class="text-base font-bold text-[var(--admin-text)]">
+                            تصویر دسته‌بندی
+                        </h3>
 
-                <p class="mt-1 text-xs text-[var(--admin-muted)]">
-                    تصویر اصلی دسته‌بندی را انتخاب کنید.
-                </p>
+                        <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">
+                            همین قاب در کارت دسته‌بندی فروشگاه استفاده می‌شود.
+                        </p>
+                    </div>
+
+                    <span class="admin-badge admin-badge-info">
+                        قاب فروشگاه
+                    </span>
+                </div>
             </div>
 
 
@@ -206,7 +214,7 @@
                     : null;
             @endphp
 
-            <div class="admin-image-preview aspect-square">
+            <div class="admin-image-preview aspect-[4/5]">
 
                 <img
                     id="category-image-preview"
@@ -217,7 +225,8 @@
 
                 <div
                     id="category-image-placeholder"
-                    class="{{ $categoryImageUrl ? 'hidden' : 'flex' }} h-full flex-col items-center justify-center p-6 text-center"
+                    data-image-preview-placeholder
+                    class="{{ $categoryImageUrl ? 'hidden' : 'flex' }} h-full flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--admin-border)] bg-[var(--admin-surface-soft)] p-6 text-center"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg"
                          fill="none" viewBox="0 0 24 24"
@@ -249,6 +258,8 @@
                     type="file"
                     accept="image/*"
                     class="admin-input p-2"
+                    data-image-preview-target="#category-image-preview"
+                    data-image-preview-placeholder="#category-image-placeholder"
                 >
 
                 <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">
