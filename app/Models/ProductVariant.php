@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Models;
+namespace App\\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\\Database\\Eloquent\\Factories\\HasFactory;
+use Illuminate\\Database\\Eloquent\\Model;
+use Illuminate\\Database\\Eloquent\\Relations\\BelongsTo;
+use Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany;
+use Illuminate\\Database\\Eloquent\\Relations\\HasMany;
 
 class ProductVariant extends Model
 {
@@ -16,6 +17,7 @@ class ProductVariant extends Model
         'type',
         'name',
         'value',
+        'color_hex',
         'sku',
         'price_adjustment',
         'stock',
@@ -34,6 +36,19 @@ class ProductVariant extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function images(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            ProductImage::class,
+            'product_variant_images',
+            'product_variant_id',
+            'product_image_id'
+        )
+            ->withPivot('sort_order')
+            ->orderByPivot('sort_order')
+            ->orderBy('product_images.sort_order');
     }
 
     public function cartItems(): HasMany
