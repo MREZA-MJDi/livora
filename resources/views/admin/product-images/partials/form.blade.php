@@ -76,19 +76,33 @@
             </div>
 
 
-            @if($editing && $productImage->url)
+            <div class="admin-image-preview mb-5 aspect-[4/5] w-full max-w-[380px] overflow-hidden rounded-2xl">
 
-                <div class="admin-image-preview mb-5 aspect-video max-w-xl">
+                <img
+                    id="product-image-preview"
+                    src="{{ $editing && $productImage->url ? $productImage->url : '' }}"
+                    alt="{{ $productImage->alt ?: 'Product image' }}"
+                    class="admin-image {{ $editing && $productImage->url ? '' : 'hidden' }}"
+                >
 
-                    <img
-                        src="{{ $productImage->url }}"
-                        alt="{{ $productImage->alt ?: 'Product image' }}"
-                        class="admin-image"
-                    >
+                <div
+                    id="product-image-placeholder"
+                    class="{{ $editing && $productImage->url ? 'hidden' : 'flex' }} h-full w-full flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--admin-border)] bg-[var(--admin-surface-soft)] p-6 text-center"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         fill="none" viewBox="0 0 24 24"
+                         stroke-width="1.5" stroke="currentColor"
+                         class="mb-3 h-9 w-9 text-[var(--admin-muted)]">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l2.659 2.659 1.5-1.5a2.25 2.25 0 0 1 3.182 0l3.068 3.068M3.75 19.5h16.5A1.5 1.5 0 0 1 21.75 18V6A1.5 1.5 0 0 1 20.25 4.5H3.75A1.5 1.5 0 0 1 2.25 6v12A1.5 1.5 0 0 1 3.75 19.5Z" />
+                    </svg>
 
+                    <span class="text-xs text-[var(--admin-muted)]">
+                        {{ $editing ? 'تصویر جدیدی انتخاب نشده است.' : 'هنوز تصویری انتخاب نشده است.' }}
+                    </span>
                 </div>
 
-            @endif
+            </div>
 
 
             <label for="image" class="admin-label">
@@ -100,7 +114,9 @@
                 name="image"
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
-                class="admin-input p-2"
+                data-image-preview-target="product-image-preview"
+                data-image-preview-placeholder="product-image-placeholder"
+                class="admin-input"
                 {{ $editing ? '' : 'required' }}
             >
 
