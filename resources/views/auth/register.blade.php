@@ -126,12 +126,9 @@
 
                                 <span class="text-xs leading-6 text-[var(--livora-stone)]">
                                     با ایجاد حساب، با
-                                    <a
-                                        href="#"
-                                        class="font-medium text-[var(--livora-accent)]"
-                                    >
+                                    <span class="font-medium text-[var(--livora-ink)]">
                                         قوانین و شرایط
-                                    </a>
+                                    </span>
                                     SilaGallery موافقم.
                                 </span>
 
