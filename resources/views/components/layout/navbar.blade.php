@@ -17,8 +17,8 @@
                     aria-label="SilaGallery"
                 >
                     <span class="silagallery-wordmark" aria-hidden="true">
-    <span class="silagallery-wordmark__main">Sila</span><span class="silagallery-wordmark__sub">Gallery</span>
-</span>
+                        <span class="silagallery-wordmark__main">Sila</span><span class="silagallery-wordmark__sub">Gallery</span>
+                    </span>
                 </a>
 
             </div>
@@ -111,6 +111,253 @@
                 RIGHT ACTIONS
             ========================================================== --}}
             <div class="flex items-center gap-1">
+
+                {{-- Search --}}
+                <button
+                    type="button"
+                    aria-label="جستجو"
+                    :aria-expanded="searchOpen.toString()"
+                    @click="
+                        mobileOpen = false;
+                        searchOpen = true;
+
+                        $nextTick(() => {
+                            $refs.searchInput?.focus();
+                        });
+                    "
+                    class="group flex h-10 w-10 items-center justify-center rounded-full text-[var(--livora-ink)] transition duration-300 hover:bg-[var(--livora-white)]"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="h-[19px] w-[19px] transition duration-300 group-hover:scale-105"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="m21 21-4.35-4.35m1.35-5.4a6.75 6.75 0 1 1-13.5 0 6.75 6.75 0 0 1 13.5 0Z"
+                        />
+                    </svg>
+                </button>
+
+
+                {{-- Wishlist --}}
+                @auth
+
+                    @if(auth()->user()->isCustomer())
+
+                        <a
+                            href="{{ route('account.wishlist.index') }}"
+                            aria-label="علاقه‌مندی‌ها"
+                            @class([
+                                'group hidden h-10 w-10 items-center justify-center rounded-full transition duration-300 sm:flex',
+                                'bg-[var(--livora-white)] text-[var(--livora-accent)]' => request()->routeIs('account.wishlist.*'),
+                                'text-[var(--livora-ink)] hover:bg-[var(--livora-white)]' => !request()->routeIs('account.wishlist.*'),
+                            ])
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke-width="1.5"
+                                stroke="currentColor"
+                                class="h-[19px] w-[19px] transition duration-300 group-hover:scale-105"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M21.75 8.25c0 6-9.75 11.25-9.75 11.25S2.25 14.25 2.25 8.25A5.25 5.25 0 0 1 12 5.58a5.25 5.25 0 0 1 9.75 2.67Z"
+                                />
+                            </svg>
+                        </a>
+
+                    @else
+
+                        <a
+                            href="{{ route('login') }}"
+                            aria-label="ورود برای مشاهده علاقه‌مندی‌ها"
+                            class="group hidden h-10 w-10 items-center justify-center rounded-full text-[var(--livora-ink)] transition duration-300 hover:bg-[var(--livora-white)] sm:flex"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke-width="1.5"
+                                stroke="currentColor"
+                                class="h-[19px] w-[19px] transition duration-300 group-hover:scale-105"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M21.75 8.25c0 6-9.75 11.25-9.75 11.25S2.25 14.25 2.25 8.25A5.25 5.25 0 0 1 12 5.58a5.25 5.25 0 0 1 9.75 2.67Z"
+                                />
+                            </svg>
+                        </a>
+
+                    @endif
+
+                @else
+
+                    <a
+                        href="{{ route('login') }}"
+                        aria-label="ورود برای مشاهده علاقه‌مندی‌ها"
+                        class="group hidden h-10 w-10 items-center justify-center rounded-full text-[var(--livora-ink)] transition duration-300 hover:bg-[var(--livora-white)] sm:flex"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.5"
+                            stroke="currentColor"
+                            class="h-[19px] w-[19px] transition duration-300 group-hover:scale-105"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M21.75 8.25c0 6-9.75 11.25-9.75 11.25S2.25 14.25 2.25 8.25A5.25 5.25 0 0 1 12 5.58a5.25 5.25 0 0 1 9.75 2.67Z"
+                            />
+                        </svg>
+                    </a>
+
+                @endauth
+
+
+                {{-- =====================================================
+                    CART
+                ====================================================== --}}
+                @php
+                    $cartCount = 0;
+
+                    if (
+                        auth()->check()
+                        && auth()->user()->isCustomer()
+                    ) {
+                        $cart = auth()->user()->activeCart;
+
+                        if ($cart) {
+                            $cartCount = $cart->itemCount();
+                        }
+                    }
+                @endphp
+
+                <a
+                    href="{{ route('cart.index') }}"
+                    aria-label="سبد خرید"
+                    class="group relative flex h-10 w-10 items-center justify-center rounded-full text-[var(--livora-ink)] transition duration-300 hover:bg-[var(--livora-white)]"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="h-[19px] w-[19px] transition duration-300 group-hover:scale-105"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M2.25 3h1.386c.51 0 .955.343 1.087.836L5.75 7.5h13.5l1.125-4.5M5.75 7.5l1.5 6h9.5l1.5-6M8.25 19.5a.75.75 0 1 1-1.5 0Zm9.75 0a.75.75 0 1 1-1.5 0Z"
+                        />
+                    </svg>
+
+                    @if($cartCount > 0)
+
+                        <span
+                            class="absolute -right-0.5 -top-0.5 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-[var(--livora-accent)] px-1 text-[9px] font-semibold leading-none text-white"
+                        >
+                            {{ $cartCount }}
+                        </span>
+
+                    @endif
+
+                </a>
+
+
+                {{-- =====================================================
+                    ACCOUNT
+                ====================================================== --}}
+                @auth
+
+                    @if(auth()->user()->isAdmin())
+
+                        <a
+                            href="{{ route('admin.dashboard') }}"
+                            aria-label="پنل مدیریت"
+                            class="group hidden h-10 w-10 items-center justify-center rounded-full text-[var(--livora-ink)] transition duration-300 hover:bg-[var(--livora-white)] sm:flex"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke-width="1.5"
+                                stroke="currentColor"
+                                class="h-[19px] w-[19px] transition duration-300 group-hover:scale-105"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M15.75 6a3.75 3.75 0 1 1-7.5 0A3.75 3.75 0 0 1 15.75 6ZM4.5 20.25a8.25 8.25 0 0 1 15 0"
+                                />
+                            </svg>
+                        </a>
+
+                    @else
+
+                        <a
+                            href="{{ route('account.index') }}"
+                            aria-label="حساب کاربری"
+                            @class([
+                                'group hidden h-10 w-10 items-center justify-center rounded-full transition duration-300 sm:flex',
+                                'bg-[var(--livora-white)] text-[var(--livora-accent)]' => request()->routeIs('account.*'),
+                                'text-[var(--livora-ink)] hover:bg-[var(--livora-white)]' => !request()->routeIs('account.*'),
+                            ])
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke-width="1.5"
+                                stroke="currentColor"
+                                class="h-[19px] w-[19px] transition duration-300 group-hover:scale-105"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M15.75 6a3.75 3.75 0 1 1-7.5 0A3.75 3.75 0 0 1 15.75 6ZM4.5 20.25a8.25 8.25 0 0 1 15 0"
+                                />
+                            </svg>
+                        </a>
+
+                    @endif
+
+                @else
+
+                    <a
+                        href="{{ route('login') }}"
+                        aria-label="ورود"
+                        class="group hidden h-10 w-10 items-center justify-center rounded-full text-[var(--livora-ink)] transition duration-300 hover:bg-[var(--livora-white)] sm:flex"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.5"
+                            stroke="currentColor"
+                            class="h-[19px] w-[19px] transition duration-300 group-hover:scale-105"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M15.75 6a3.75 3.75 0 1 1-7.5 0A3.75 3.75 0 0 1 15.75 6ZM4.5 20.25a8.25 8.25 0 0 1 15 0"
+                            />
+                        </svg>
+                    </a>
+
+                @endauth
+
 
             </div>
 
