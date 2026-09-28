@@ -23,7 +23,7 @@ class ProductController extends Controller
             ->active()
             ->with([
                 'category',
-                'images.media',
+                'primaryImage',
             ])
             ->where('id', '!=', $product->id)
             ->where('category_id', $product->category_id)
