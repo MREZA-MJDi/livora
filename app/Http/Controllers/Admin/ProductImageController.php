@@ -91,8 +91,8 @@ class ProductImageController extends Controller
 
             $query->where(function ($productQuery) use ($search) {
                 $productQuery
-                    ->where('name', 'like', `%{$search}%`)
-                    ->orWhere('sku', 'like', `%{$search}%`);
+                    ->where('name', 'like', "%{$search}%")
+                    ->orWhere('sku', 'like', "%{$search}%");
             });
         }
 
