@@ -12,12 +12,12 @@ class UserSeeder extends Seeder
     {
         User::updateOrCreate(
             [
-                'email' => 'admin@livora.test',
+                'email' => env('ADMIN_EMAIL', 'admin@silagallery.test'),
             ],
             [
-                'name' => 'LIVORA Admin',
+                'name' => env('ADMIN_NAME', 'SilaGallery Admin'),
                 'role' => 'admin',
-                'password' => Hash::make('password'),
+                'password' => Hash::make(env('ADMIN_PASSWORD', 'change-this-before-production')),
                 'email_verified_at' => now(),
             ]
         );
