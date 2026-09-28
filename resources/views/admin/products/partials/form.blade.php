@@ -55,18 +55,26 @@
         <div class="admin-card p-6">
 
             <div class="mb-6">
-                <h3 class="text-base font-bold text-[var(--admin-text)]">
-                    تصویر اصلی محصول
-                </h3>
+                <div class="flex items-center justify-between gap-3">
+                    <div>
+                        <h3 class="text-base font-bold text-[var(--admin-text)]">
+                            تصویر اصلی محصول
+                        </h3>
 
-                <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">
-                    {{ $editing
-                        ? 'تصویر اصلی را عوض کنید؛ تصاویر دیگر و اتصال Variantها حفظ می‌شوند.'
-                        : 'برای محصول جدید یک تصویر اصلی انتخاب کنید. اتصال تصاویر Variantها بعداً در مدیریت Variant انجام می‌شود.' }}
-                </p>
+                        <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">
+                            {{ $editing
+                                ? 'همان قاب تصویری را می‌بینید که در کارت محصول فروشگاه نمایش داده می‌شود.'
+                                : 'پیش‌نمایش دقیق قاب کارت محصول؛ تصاویر دیگر و اتصال Variantها بعداً مدیریت می‌شوند.' }}
+                        </p>
+                    </div>
+
+                    <span class="admin-badge admin-badge-info">
+                        قاب فروشگاه
+                    </span>
+                </div>
             </div>
 
-            <div class="admin-image-preview mb-5 aspect-[4/3]">
+            <div class="admin-image-preview mb-5 aspect-[4/5]">
 
                 <img
                     id="product-image-preview"
@@ -77,6 +85,7 @@
 
                 <div
                     id="product-image-placeholder"
+                    data-image-preview-placeholder
                     class="{{ $productImageUrl ? 'hidden' : 'flex' }} h-full flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--admin-border)] bg-[var(--admin-surface-soft)] p-6 text-center"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg"
@@ -108,6 +117,8 @@
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
                 class="admin-input p-2"
+                data-image-preview-target="#product-image-preview"
+                data-image-preview-placeholder="#product-image-placeholder"
             >
 
             <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">
