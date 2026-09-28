@@ -8,11 +8,11 @@
     */
 
     $pageTitle = $product->meta_title
-        ?: ($product->name . ' | SilaGallery');
+        ?: ($product->name . ' | سیلاگالری');
 
     $pageDescription = $product->meta_description
         ?: ($product->short_description
-            ?: ('خرید ' . $product->name . ' با مشاهده قیمت، مشخصات و شرایط خرید در SilaGallery.'));
+            ?: ('خرید ' . $product->name . ' با مشاهده قیمت، مشخصات و شرایط خرید در سیلاگالری.'));
 
     /*
     |--------------------------------------------------------------------------
@@ -165,7 +165,7 @@
 {
     "@@context": "https://schema.org",
     "@@type": "WebSite",
-    "name": "SilaGallery",
+    "name": "سیلاگالری",
     "url": @json(url('/')),
     "potentialAction": {
         "@@type": "SearchAction",
@@ -179,7 +179,7 @@
 {
     "@@context": "https://schema.org",
     "@@type": "Organization",
-    "name": "SilaGallery",
+    "name": "سیلاگالری",
     "url": @json(url('/'))
         }
 </script>
@@ -288,7 +288,7 @@
                             @if($product->is_featured)
 
                                 <span class="rounded-full border border-[var(--livora-border)] bg-[var(--livora-white)] px-3 py-1.5 text-[10px] font-medium text-[var(--livora-ink)]">
-                                منتخب SilaGallery
+                                منتخب سیلاگالری
                             </span>
 
                             @endif
