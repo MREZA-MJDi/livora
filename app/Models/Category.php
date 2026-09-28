@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -25,6 +26,23 @@ class Category extends Model
             'is_active' => 'boolean',
             'sort_order' => 'integer',
         ];
+    }
+
+    public function getImageUrlAttribute(): ?string
+    {
+        if (! $this->image) {
+            return null;
+        }
+
+        if (Str::startsWith($this->image, [
+            'http://',
+            'https://',
+            '//',
+        ])) {
+            return $this->image;
+        }
+
+        return asset('storage/' . ltrim($this->image, '/'));
     }
 
     public function products(): HasMany
