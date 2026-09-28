@@ -92,6 +92,9 @@
 
     </div>
 
+    {{-- Mobile admin navigation --}}
+    @include('admin.layouts.partials.mobile-bottom-bar')
+
 
     {{-- =========================================================
          GLOBAL LOADING
