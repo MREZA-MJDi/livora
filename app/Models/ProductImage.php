@@ -78,10 +78,6 @@ class ProductImage extends Model
 
         $path = ltrim($this->path, '/');
 
-        if (! Storage::disk('public')->exists($path)) {
-            return '';
-        }
-
         return Storage::disk('public')->url($path);
     }
 }
