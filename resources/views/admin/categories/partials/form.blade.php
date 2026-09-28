@@ -247,8 +247,10 @@
                     id="image"
                     name="image"
                     type="file"
-                    accept="image/*"
-                    class="admin-input p-2"
+                    accept="image/jpeg,image/png,image/webp"
+                    data-image-preview-target="category-image-preview"
+                    data-image-preview-placeholder="category-image-placeholder"
+                    class="admin-input"
                 >
 
                 <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">
@@ -299,52 +301,4 @@
 </div>
 
 
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
 
-        const imageInput =
-            document.getElementById('image');
-
-        const imagePreview =
-            document.getElementById('category-image-preview');
-
-        const imagePlaceholder =
-            document.getElementById('category-image-placeholder');
-
-        if (!imageInput || !imagePreview) {
-            return;
-        }
-
-        imageInput.addEventListener('change', function () {
-
-            const file =
-                imageInput.files?.[0];
-
-            if (!file || !file.type.startsWith('image/')) {
-                return;
-            }
-
-            const objectUrl =
-                URL.createObjectURL(file);
-
-            imagePreview.src =
-                objectUrl;
-
-            imagePreview.classList.remove('hidden');
-
-            if (imagePlaceholder) {
-                imagePlaceholder.classList.add('hidden');
-                imagePlaceholder.classList.remove('flex');
-            }
-
-            imagePreview.onload =
-                function () {
-                    URL.revokeObjectURL(objectUrl);
-                };
-
-        });
-
-    });
-</script>
-@endpush
