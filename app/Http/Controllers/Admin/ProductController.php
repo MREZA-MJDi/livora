@@ -117,7 +117,7 @@ class ProductController extends Controller
                 ]);
 
                 $product->images()
-                    ->whereKeyNot($primaryImage->id)
+                    ->where('id', '!=', $primaryImage->id)
                     ->update(['is_primary' => false]);
             } else {
                 ProductImage::create([
