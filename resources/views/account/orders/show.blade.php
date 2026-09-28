@@ -295,6 +295,11 @@
 
                                         <div class="min-w-0 flex-1">
 
+                                            @php
+                                                $variantOptions =
+                                                    collect($item->variant_options ?? []);
+                                            @endphp
+
                                             <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
 
                                                 <div>
@@ -303,7 +308,28 @@
                                                         {{ $item->product_name }}
                                                     </p>
 
-                                                    <p class="mt-1 text-xs text-[var(--livora-stone)]">
+                                                    @if($variantOptions->isNotEmpty())
+
+                                                        <div class="mt-2 flex flex-wrap gap-1.5">
+
+                                                            @foreach($variantOptions as $option)
+
+                                                                <span class="rounded-full border border-[var(--livora-border)] bg-[var(--livora-surface)] px-2.5 py-1 text-[9px] text-[var(--livora-stone)]">
+
+                                                                    {{ $option['name'] ?? $option['type'] ?? 'ویژگی' }}:
+                                                                    <span class="font-medium text-[var(--livora-ink)]">
+                                                                        {{ $option['value'] ?? '—' }}
+                                                                    </span>
+
+                                                                </span>
+
+                                                            @endforeach
+
+                                                        </div>
+
+                                                    @endif
+
+                                                    <p class="mt-2 text-xs text-[var(--livora-stone)]">
                                                         تعداد:
                                                         {{ number_format($item->quantity) }}
                                                     </p>
