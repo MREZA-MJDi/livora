@@ -854,3 +854,44 @@ a:hover .silagallery-wordmark {
         min-width: 0;
     }
 }
+
+
+/* Product detail layout */
+.product-detail-container {
+    max-width: 1320px;
+}
+
+.product-detail-grid {
+    width: 100%;
+}
+
+.product-gallery-shell,
+.product-gallery-stage {
+    min-width: 0;
+}
+
+.product-gallery-shell img {
+    max-width: 100%;
+}
+
+@media (max-width: 1023px) {
+    .product-detail-container {
+        max-width: 100%;
+    }
+
+    .product-detail-grid {
+        gap: 2rem;
+    }
+}
+
+@media (max-width: 639px) {
+    .product-detail-grid {
+        gap: 1.5rem;
+        padding-block: 1.25rem;
+    }
+
+    .product-gallery-stage {
+        min-height: 0;
+        max-height: none;
+    }
+}
