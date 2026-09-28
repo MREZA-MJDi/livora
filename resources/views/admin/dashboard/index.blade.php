@@ -325,7 +325,7 @@
                     <div class="min-w-0">
 
                         <p class="admin-stat-label">
-                            درآمد کل
+                            خالص دریافتی
                         </p>
 
                         <p class="mt-2 truncate text-2xl font-bold text-[var(--admin-text)]">
@@ -382,6 +382,90 @@
 
 
         {{-- =========================================================
+             ACTION CENTER
+        ========================================================== --}}
+        <section class="admin-card overflow-hidden">
+
+            <div class="border-b border-[var(--admin-border)] p-5 sm:p-6">
+
+                <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+
+                    <div>
+                        <p class="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--admin-accent)]">
+                            OWNER ACTION CENTER
+                        </p>
+
+                        <h2 class="mt-2 text-lg font-bold text-[var(--admin-text)]">
+                            امروز چه چیزی نیاز به توجه دارد؟
+                        </h2>
+                    </div>
+
+                    <p class="text-xs text-[var(--admin-muted)]">
+                        هر کارت یک وضعیت واقعی و یک مسیر عملی دارد.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="grid grid-cols-1 divide-y divide-[var(--admin-border)] sm:grid-cols-2 sm:divide-x sm:divide-y-0 xl:grid-cols-4">
+
+                @foreach($attentionItems as $item)
+
+                    @php
+                        $tone = match($item['tone']) {
+                            'danger' => [
+                                'bg' => 'bg-red-50',
+                                'text' => 'text-red-700',
+                            ],
+                            'warning' => [
+                                'bg' => 'bg-amber-50',
+                                'text' => 'text-amber-700',
+                            ],
+                            default => [
+                                'bg' => 'bg-sky-50',
+                                'text' => 'text-sky-700',
+                            ],
+                        };
+                    @endphp
+
+                    <a
+                        href="{{ $item['href'] }}"
+                        class="group min-w-0 p-5 transition hover:bg-[var(--admin-surface)] sm:p-6"
+                    >
+
+                        <div class="flex items-start justify-between gap-4">
+
+                            <div class="min-w-0">
+                                <p class="truncate text-xs font-semibold text-[var(--admin-text)]">
+                                    {{ $item['label'] }}
+                                </p>
+
+                                <p class="mt-2 text-[11px] leading-6 text-[var(--admin-muted)]">
+                                    {{ $item['description'] }}
+                                </p>
+                            </div>
+
+                            <span class="{{ $tone['bg'] }} {{ $tone['text'] }} shrink-0 rounded-xl px-3 py-2 text-sm font-bold">
+                                {{ number_format($item['count']) }}
+                            </span>
+
+                        </div>
+
+                        <div class="mt-4 text-[10px] font-semibold text-[var(--admin-accent)] transition group-hover:translate-x-0.5">
+                            بررسی و اقدام ←
+                        </div>
+
+                    </a>
+
+                @endforeach
+
+            </div>
+
+        </section>
+
+
+        {{-- =========================================================
              MAIN ANALYTICS
         ========================================================== --}}
         <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
@@ -400,11 +484,11 @@
                             </p>
 
                             <h2 class="mt-2 text-lg font-bold text-[var(--admin-text)]">
-                                درآمد ۶ ماه اخیر
+                                روند خالص دریافتی
                             </h2>
 
                             <p class="mt-1 text-xs text-[var(--admin-muted)]">
-                                فقط سفارش‌هایی که پرداخت موفق داشته‌اند.
+                                بر پایه تراکنش‌های موفق منهای بازپرداخت‌ها.
                             </p>
 
                         </div>
@@ -412,7 +496,7 @@
                         <div class="text-right">
 
                             <p class="text-[10px] text-[var(--admin-muted)]">
-                                میانگین هر سفارش
+                                میانگین ارزش سفارش پرداخت‌شده
                             </p>
 
                             <p class="mt-1 text-sm font-bold text-[var(--admin-text)]">
@@ -896,25 +980,43 @@
 
 
                     {{-- Installment --}}
-                    <div class="rounded-2xl bg-[var(--admin-surface)] p-4">
+                    <a
+                        href="{{ route('admin.installments.index', ['status' => 'overdue']) }}"
+                        class="block rounded-2xl bg-[var(--admin-surface)] p-4 transition hover:bg-[var(--admin-surface-soft)]"
+                    >
 
-                        <div class="flex items-center justify-between">
+                        <div class="flex items-center justify-between gap-3">
 
-                        <span class="text-xs font-semibold text-[var(--admin-text)]">
-                            سفارش اقساطی
-                        </span>
+                            <span class="text-xs font-semibold text-[var(--admin-text)]">
+                                وصول اقساط
+                            </span>
 
                             <span class="text-sm font-bold text-[var(--admin-accent)]">
-                            {{ number_format($installmentOrders) }}
-                        </span>
+                                {{ number_format($installments['orders']) }}
+                                سفارش
+                            </span>
 
                         </div>
 
-                        <p class="mt-2 text-[10px] text-[var(--admin-muted)]">
-                            {{ number_format($installmentPaidPercent) }}٪ از سفارش‌های اقساطی پرداخت شده‌اند.
-                        </p>
+                        <div class="mt-3 flex items-end justify-between gap-3">
 
-                    </div>
+                            <div>
+                                <p class="text-[10px] text-[var(--admin-muted)]">
+                                    سررسید گذشته
+                                </p>
+
+                                <p class="mt-1 text-lg font-bold {{ $installments['overdue'] > 0 ? 'text-red-600' : 'text-[var(--admin-text)]' }}">
+                                    {{ number_format($installments['overdue']) }}
+                                </p>
+                            </div>
+
+                            <span class="text-[10px] font-semibold text-[var(--admin-accent)]">
+                                مدیریت وصول ←
+                            </span>
+
+                        </div>
+
+                    </a>
 
 
                     {{-- Inventory --}}
