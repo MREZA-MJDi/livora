@@ -62,7 +62,7 @@
 
     <x-shop.filter-drawer />
 
-    <main>
+    <main class="storefront-content">
         @yield('content')
     </main>
 
