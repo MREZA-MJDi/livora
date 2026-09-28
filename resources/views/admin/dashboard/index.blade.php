@@ -122,7 +122,7 @@
             <div class="flex flex-wrap items-center gap-3">
 
             <span class="rounded-full border border-[var(--admin-border)] bg-[var(--admin-surface)] px-4 py-2 text-xs text-[var(--admin-muted)]">
-                {{ now()->translatedFormat('l، d F Y') }}
+                {{ app()->make(\App\Http\Controllers\Admin\DashboardController::class)->dashboardDate(now()) }}
             </span>
 
                 <a
@@ -187,17 +187,21 @@
 
                 <div class="mt-4 flex items-center gap-2 text-[11px]">
 
-                <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-emerald-700">
-                    {{ number_format($installmentProductsCount) }}
-                    اقساطی
-                </span>
+                <a
+                    href="{{ route('admin.products.index', ['installment' => 1]) }}"
+                    class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-emerald-700 transition hover:bg-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
+                >
+                    {{ number_format($installmentProductsCount) }} اقساطی
+                </a>
 
                     @if($lowStockProducts > 0)
 
-                        <span class="rounded-full bg-amber-50 px-2.5 py-1 text-amber-700">
-                        {{ number_format($lowStockProducts) }}
-                        کم‌موجودی
-                    </span>
+                        <a
+                            href="{{ route('admin.products.index', ['stock' => 'low']) }}"
+                            class="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-1 text-amber-700 transition hover:bg-amber-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
+                        >
+                            {{ number_format($lowStockProducts) }} کم‌موجودی
+                        </a>
 
                     @endif
 
@@ -301,9 +305,12 @@
 
                 <div class="mt-4 flex items-center gap-2 text-[11px]">
 
-                <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-emerald-700">
+                <a
+                    href="{{ route('admin.orders.index', ['payment_status' => 'paid']) }}"
+                    class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-emerald-700 transition hover:bg-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
+                >
                     {{ number_format($paidOrderPercent) }}٪ پرداخت‌شده
-                </span>
+                </a>
 
                 </div>
 
@@ -913,7 +920,10 @@
                     {{-- Inventory --}}
                     <div class="grid grid-cols-2 gap-3">
 
-                        <div class="rounded-2xl border border-[var(--admin-border)] p-4">
+                        <a
+                            href="{{ route('admin.products.index', ['stock' => 'out']) }}"
+                            class="rounded-2xl border border-[var(--admin-border)] p-4 transition hover:border-red-200 hover:bg-red-50/50"
+                        >
 
                             <p class="text-[10px] text-[var(--admin-muted)]">
                                 بدون موجودی
@@ -923,9 +933,12 @@
                                 {{ number_format($outOfStockProducts) }}
                             </p>
 
-                        </div>
+                        </a>
 
-                        <div class="rounded-2xl border border-[var(--admin-border)] p-4">
+                        <a
+                            href="{{ route('admin.products.index', ['featured' => 1]) }}"
+                            class="rounded-2xl border border-[var(--admin-border)] p-4 transition hover:border-[var(--admin-accent)] hover:bg-[var(--admin-surface)]"
+                        >
 
                             <p class="text-[10px] text-[var(--admin-muted)]">
                                 ویژه
@@ -935,7 +948,7 @@
                                 {{ number_format($featuredProductsCount) }}
                             </p>
 
-                        </div>
+                        </a>
 
                     </div>
 
