@@ -107,7 +107,9 @@
                 name="image"
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
-                class="admin-input p-2"
+                data-image-preview-target="product-image-preview"
+                data-image-preview-placeholder="product-image-placeholder"
+                class="admin-input"
             >
 
             <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">
@@ -1468,49 +1470,6 @@
                 stockInput,
                 false
             );
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Instant Image Preview
-            |--------------------------------------------------------------------------
-            */
-
-            const imagePlaceholder =
-                document.getElementById('product-image-placeholder');
-
-            if (imageInput && imagePreview) {
-
-                imageInput.addEventListener('change', function () {
-
-                    const file =
-                        imageInput.files?.[0];
-
-                    if (!file || !file.type.startsWith('image/')) {
-                        return;
-                    }
-
-                    const objectUrl =
-                        URL.createObjectURL(file);
-
-                    imagePreview.src =
-                        objectUrl;
-
-                    imagePreview.classList.remove('hidden');
-
-                    if (imagePlaceholder) {
-                        imagePlaceholder.classList.add('hidden');
-                        imagePlaceholder.classList.remove('flex');
-                    }
-
-                    imagePreview.onload =
-                        function () {
-                            URL.revokeObjectURL(objectUrl);
-                        };
-
-                });
-
-            }
 
 
             /*
