@@ -191,6 +191,59 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             };
 
+            const hydrateSelectedProduct = async () => {
+                const selectedId = root.dataset.selectedId;
+
+                if (!selectedId || selectedLabel?.textContent?.trim()) {
+                    return;
+                }
+
+                const endpoint = new URL(
+                    url,
+                    window.location.origin
+                );
+
+                endpoint.searchParams.set('id', selectedId);
+
+                try {
+                    const response = await fetch(endpoint, {
+                        headers: {
+                            Accept: 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                        credentials: 'same-origin',
+                    });
+
+                    if (!response.ok) {
+                        return;
+                    }
+
+                    const payload = await response.json();
+                    const product = payload.data?.[0];
+
+                    if (!product) {
+                        return;
+                    }
+
+                    hidden.value = String(product.id);
+                    input.value = product.label;
+
+                    if (selectedLabel) {
+                        selectedLabel.textContent = product.label;
+                    }
+
+                    selected?.classList.remove('hidden');
+                    status.textContent = product.sku
+                        ? `SKU: ${product.sku}`
+                        : 'محصول انتخاب شد.';
+                } catch {
+                    status.textContent =
+                        'محصول انتخاب‌شده را دوباره جستجو کنید.';
+                }
+            };
+
+            hydrateSelectedProduct();
+
             input.addEventListener('input', () => {
                 if (
                     hidden.value
