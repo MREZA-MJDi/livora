@@ -189,7 +189,7 @@
 @section('content')
 
     <div
-        class="bg-[var(--livora-cream)]"
+        class="bg-[var(--livora-cream)] pb-28 lg:pb-0"
         x-data="{
         quantity: {{ max(1, min((int) $product->stock, 1)) }},
         showInstallmentDetails: false
@@ -542,6 +542,7 @@
 
                         {{-- Product / Cart --}}
                         <form
+                            id="product-purchase"
                             action="{{ route('cart.add', $product) }}"
                             method="POST"
                             class="mt-8 space-y-7"
@@ -932,7 +933,7 @@
         {{-- =========================================================
              MOBILE STICKY CTA
         ========================================================== --}}
-        <div class="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--livora-border)] bg-[var(--livora-white)]/95 p-3 backdrop-blur-xl lg:hidden">
+        <div class="fixed inset-x-0 bottom-[5.5rem] z-[80] border-y border-[var(--livora-border)] bg-[var(--livora-white)]/95 p-3 shadow-[0_-10px_30px_rgba(24,23,21,.08)] backdrop-blur-xl lg:hidden">
 
             <x-layout.container>
 
