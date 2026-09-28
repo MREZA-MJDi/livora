@@ -19,6 +19,8 @@ class UpdateProductRequest extends FormRequest
             $this->boolean('installment_enabled');
 
         $this->merge([
+            'price' => $this->normalizeNumericInput($this->input('price')),
+            'compare_at_price' => $this->normalizeNumericInput($this->input('compare_at_price')),
             'slug' =>
                 $this->slug
                     ?: Str::slug($this->name),
@@ -55,6 +57,53 @@ class UpdateProductRequest extends FormRequest
                     ? ($this->installment_interval_months ?? 2)
                     : null,
         ]);
+    }
+
+    /**
+     * Normalize Persian/Arabic digits and formatted money values
+     * before Laravel numeric validation runs.
+     */
+    private function normalizeNumericInput(mixed $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $value = trim((string) $value);
+
+        if ($value === '') {
+            return null;
+        }
+
+        $persian = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+        $arabic = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+
+        $value = str_replace(
+            $persian,
+            ['0','1','2','3','4','5','6','7','8','9'],
+            $value
+        );
+
+        $value = str_replace(
+            $arabic,
+            ['0','1','2','3','4','5','6','7','8','9'],
+            $value
+        );
+
+        $value = str_replace(
+            [',', '٬', ' ', '٫'],
+            ['', '', '', '.'],
+            $value
+        );
+
+        $value = preg_replace('/[^0-9.\-]/u', '', $value) ?? '';
+
+        if (substr_count($value, '.') > 1) {
+            $parts = explode('.', $value);
+            $value = array_shift($parts) . '.' . implode('', $parts);
+        }
+
+        return $value !== '' ? $value : null;
     }
 
     public function rules(): array
@@ -113,6 +162,7 @@ class UpdateProductRequest extends FormRequest
                 'numeric',
                 'min:0',
                 'decimal:0,2',
+                'gte:price',
             ],
 
             'stock' => [
@@ -198,3 +248,41 @@ class UpdateProductRequest extends FormRequest
         ];
     }
 }
+
+    public function messages(): array
+    {
+        return [
+            'price.required' => 'وارد کردن قیمت محصول الزامی است.',
+            'price.numeric' => 'قیمت محصول باید یک عدد معتبر باشد.',
+            'price.min' => 'قیمت محصول نمی‌تواند منفی باشد.',
+            'price.decimal' => 'قیمت محصول باید حداکثر دو رقم اعشار داشته باشد.',
+            'compare_at_price.numeric' => 'قیمت قبل باید یک عدد معتبر باشد.',
+            'compare_at_price.min' => 'قیمت قبل نمی‌تواند منفی باشد.',
+            'compare_at_price.decimal' => 'قیمت قبل باید حداکثر دو رقم اعشار داشته باشد.',
+            'compare_at_price.gte' => 'قیمت قبل باید بیشتر یا مساوی قیمت فعلی باشد.',
+
+            'category_id.required' => 'انتخاب دسته‌بندی الزامی است.',
+            'category_id.exists' => 'دسته‌بندی انتخاب‌شده معتبر نیست.',
+            'name.required' => 'نام محصول الزامی است.',
+            'slug.unique' => 'این Slug قبلاً استفاده شده است.',
+            'sku.unique' => 'این SKU قبلاً استفاده شده است.',
+            'stock.integer' => 'موجودی باید عدد صحیح باشد.',
+            'stock.min' => 'موجودی نمی‌تواند منفی باشد.',
+            'status.in' => 'وضعیت محصول نامعتبر است.',
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'category_id' => 'دسته‌بندی',
+            'name' => 'نام محصول',
+            'slug' => 'Slug',
+            'sku' => 'SKU',
+            'price' => 'قیمت',
+            'compare_at_price' => 'قیمت قبل',
+            'stock' => 'موجودی',
+            'status' => 'وضعیت',
+        ];
+    }
+
