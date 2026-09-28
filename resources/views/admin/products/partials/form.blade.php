@@ -127,10 +127,6 @@
 
             </div>
 
-            <label for="image" class="admin-label">
-                {{ $editing ? 'تغییر تصویر' : 'انتخاب تصویر اصلی' }}
-            </label>
-
             <input
                 id="image"
                 data-crop-input
