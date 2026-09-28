@@ -38,7 +38,7 @@ class HomeController extends Controller
         $newProducts = Product::query()
             ->active()
             ->new()
-            ->with(['category', 'images.media'])
+            ->with(['category', 'primaryImage'])
             ->latest()
             ->limit(8)
             ->get();
