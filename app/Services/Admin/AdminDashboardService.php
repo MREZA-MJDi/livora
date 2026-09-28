@@ -41,7 +41,7 @@ class AdminDashboardService
         $recentOrders = Order::query()
             ->with([
                 'user:id,name,email',
-                'latestPayment:id,order_id,status,gateway,transaction_id,paid_at',
+                'latestPayment',
             ])
             ->latest('id')
             ->limit(8)
