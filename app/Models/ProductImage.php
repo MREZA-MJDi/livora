@@ -49,11 +49,9 @@ class ProductImage extends Model
                 'http://',
                 'https://',
                 '//',
-                '/',
-                'images/',
             ])
         ) {
-            return asset(ltrim($this->path, '/'));
+            return $this->path;
         }
 
         return asset('storage/' . ltrim($this->path, '/'));
