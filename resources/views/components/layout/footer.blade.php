@@ -315,23 +315,6 @@
 
                 @endauth
 
-                {{-- Social --}}
-                <a
-                    href="#"
-                    aria-label="Instagram"
-                    class="text-xs text-white/40 transition hover:text-white"
-                >
-                    Instagram
-                </a>
-
-                <a
-                    href="#"
-                    aria-label="Telegram"
-                    class="text-xs text-white/40 transition hover:text-white"
-                >
-                    Telegram
-                </a>
-
             </div>
 
         </div>
