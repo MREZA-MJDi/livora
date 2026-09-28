@@ -13,7 +13,7 @@ class ProductController extends Controller
             ->with([
                 'category',
                 'images',
-                'variants',
+                'variants.images',
             ])
             ->active()
             ->where('slug', $slug)
