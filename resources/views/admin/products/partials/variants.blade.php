@@ -22,7 +22,7 @@
     </div>
 
 
-    @if($product->variants->count())
+    @if($product->allVariants->count())
 
         <div class="admin-table-wrap">
 
@@ -43,14 +43,26 @@
 
                     <tbody>
 
-                    @foreach($product->variants as $variant)
+                    @foreach($product->allVariants as $variant)
 
                         <tr>
 
                             <td>
                                 <div class="font-semibold text-[var(--admin-text)]">
-                                    {{ $variant->name ?? $variant->title ?? 'تنوع محصول' }}
+                                    {{ $variant->name ?? 'تنوع محصول' }}
                                 </div>
+
+                                <div class="mt-1 text-xs text-[var(--admin-muted)]">
+                                    {{ $variant->value }}
+                                </div>
+
+                                @if($variant->color_hex)
+                                    <span
+                                        class="mt-2 inline-block h-4 w-4 rounded-full border border-black/10 align-middle"
+                                        style="background-color: {{ $variant->color_hex }};"
+                                        title="{{ $variant->color_hex }}"
+                                    ></span>
+                                @endif
                             </td>
 
                             <td>
@@ -60,13 +72,22 @@
                             </td>
 
                             <td>
-                                @if(isset($variant->price))
-                                    {{ number_format((float) $variant->price) }}
+                                @php
+                                    $priceAdjustment = (float) $variant->price_adjustment;
+                                @endphp
+
+                                @if($priceAdjustment > 0)
+                                    +{{ number_format($priceAdjustment) }}
                                     <span class="text-xs text-[var(--admin-muted)]">
-                                            تومان
-                                        </span>
+                                        تومان
+                                    </span>
+                                @elseif($priceAdjustment < 0)
+                                    {{ number_format($priceAdjustment) }}
+                                    <span class="text-xs text-[var(--admin-muted)]">
+                                        تومان
+                                    </span>
                                 @else
-                                    —
+                                    بدون تغییر
                                 @endif
                             </td>
 
