@@ -122,7 +122,7 @@
             <div class="flex flex-wrap items-center gap-3">
 
             <span class="rounded-full border border-[var(--admin-border)] bg-[var(--admin-surface)] px-4 py-2 text-xs text-[var(--admin-muted)]">
-                {{ now()->translatedFormat('l، d F Y') }}
+                {{ $todayLabel }}
             </span>
 
                 <a
