@@ -1,24 +1,16 @@
 @extends('admin.layouts.app')
 
 @section('title', 'داشبورد')
-
 @section('page_title', 'داشبورد')
 
 @section(
     'meta_description',
-    'داشبورد مدیریت فروشگاه SilaGallery'
+    'مرکز کنترل فروشگاه SilaGallery'
 )
 
 @section('content')
 
     @php
-
-        /*
-        |--------------------------------------------------------------------------
-        | Dashboard Helpers
-        |--------------------------------------------------------------------------
-        */
-
         $statusLabels = [
             'pending' => 'در انتظار',
             'processing' => 'در پردازش',
@@ -27,457 +19,500 @@
             'cancelled' => 'لغو شده',
         ];
 
-        $statusColors = [
-            'pending' => [
-                'text' => 'text-amber-600',
-                'bg' => 'bg-amber-50',
-            ],
-
-            'processing' => [
-                'text' => 'text-sky-600',
-                'bg' => 'bg-sky-50',
-            ],
-
-            'shipped' => [
-                'text' => 'text-indigo-600',
-                'bg' => 'bg-indigo-50',
-            ],
-
-            'delivered' => [
-                'text' => 'text-emerald-600',
-                'bg' => 'bg-emerald-50',
-            ],
-
-            'cancelled' => [
-                'text' => 'text-red-600',
-                'bg' => 'bg-red-50',
-            ],
+        $statusStyles = [
+            'pending' => 'bg-amber-50 text-amber-700',
+            'processing' => 'bg-sky-50 text-sky-700',
+            'shipped' => 'bg-indigo-50 text-indigo-700',
+            'delivered' => 'bg-emerald-50 text-emerald-700',
+            'cancelled' => 'bg-red-50 text-red-700',
         ];
 
-        $statusTotal =
-            array_sum($orderStatus);
+        $statusTotal = array_sum($orderStatus);
 
-        $deliveredOrders =
-            $orderStatus['delivered'] ?? 0;
+        $deliveredPercent = $statusTotal > 0
+            ? round(
+                (($orderStatus['delivered'] ?? 0) / $statusTotal) * 100
+            )
+            : 0;
 
-        $deliveredPercent =
-            $statusTotal > 0
-                ? round(
-                    ($deliveredOrders / $statusTotal) * 100
-                )
-                : 0;
+        $monthPaidRate = $currentMonthOrders > 0
+            ? round(
+                ($currentMonthPaidOrders / $currentMonthOrders) * 100
+            )
+            : 0;
 
-        $paidOrderPercent =
-            $totalOrders > 0
-                ? round(
-                    ($paidOrders / $totalOrders) * 100
-                )
-                : 0;
+        $installmentPaidPercent = $installmentOrders > 0
+            ? round(
+                ($installmentPaidOrders / $installmentOrders) * 100
+            )
+            : 0;
 
-        $installmentPaidPercent =
-            $installmentOrders > 0
-                ? round(
-                    ($installmentPaidOrders / $installmentOrders) * 100
-                )
-                : 0;
+        $maxMonthlyRevenue = max(
+            1,
+            (float) $monthlyRevenue->max('revenue')
+        );
 
-        $maxMonthlyRevenue =
-            max(
-                1,
-                $monthlyRevenue->max('revenue')
-            );
+        $attentionItems = collect([
+            [
+                'count' => $pendingOrders,
+                'label' => 'سفارش نیازمند پردازش',
+                'description' => 'سفارش‌های در انتظار یا در حال پردازش',
+                'route' => route('admin.orders.index', ['status' => 'processing']),
+                'tone' => 'warning',
+            ],
+            [
+                'count' => $pendingPaymentOrders,
+                'label' => 'پرداخت در انتظار',
+                'description' => 'سفارش‌هایی که هنوز پرداخت نهایی ندارند',
+                'route' => route('admin.orders.index', ['payment_status' => 'pending']),
+                'tone' => 'danger',
+            ],
+            [
+                'count' => $lowStockProducts,
+                'label' => 'محصول کم‌موجودی',
+                'description' => 'موجودی بین ۱ تا ۵ عدد',
+                'route' => route('admin.products.index', ['stock' => 'low_stock']),
+                'tone' => 'warning',
+            ],
+            [
+                'count' => $outOfStockProducts,
+                'label' => 'محصول ناموجود',
+                'description' => 'محصولاتی که موجودی صفر یا کمتر دارند',
+                'route' => route('admin.products.index', ['stock' => 'out_of_stock']),
+                'tone' => 'danger',
+            ],
+            [
+                'count' => $unreadContactMessages,
+                'label' => 'پیام خوانده‌نشده',
+                'description' => 'پیام‌هایی که هنوز بررسی نشده‌اند',
+                'route' => route('admin.contact-messages.index', ['status' => 'unread']),
+                'tone' => 'info',
+            ],
+        ])->filter(
+            fn ($item) => (int) $item['count'] > 0
+        );
 
-        $maxProductQuantity =
-            max(
-                1,
-                $topProducts->max('quantity')
-            );
-
+        $toneClasses = [
+            'warning' => 'border-amber-200 bg-amber-50 text-amber-800',
+            'danger' => 'border-red-200 bg-red-50 text-red-800',
+            'info' => 'border-sky-200 bg-sky-50 text-sky-800',
+        ];
     @endphp
 
 
-    <div class="space-y-8">
+    <div class="space-y-6 lg:space-y-8">
 
         {{-- =========================================================
              HEADER
         ========================================================== --}}
-        <div class="flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
+        <header class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
 
-            <div>
+            <div class="min-w-0">
 
-                <div class="mb-2 text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--admin-accent)]">
-                    SilaGallery / ADMIN
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="rounded-full bg-[var(--admin-surface)] px-3 py-1 text-[9px] font-bold uppercase tracking-[0.18em] text-[var(--admin-accent)]">
+                        SILAGALLERY / CONTROL CENTER
+                    </span>
+
+                    <span class="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[9px] font-semibold text-emerald-700">
+                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                        داده زنده
+                    </span>
                 </div>
 
-                <h1 class="admin-title">
-                    داشبورد مدیریت
+                <h1 class="admin-title mt-3">
+                    مرکز کنترل فروشگاه
                 </h1>
 
-                <p class="admin-subtitle mt-2">
-                    نمای زنده فروشگاه، سفارش‌ها، درآمد و عملکرد محصولات.
+                <p class="admin-subtitle mt-2 max-w-3xl">
+                    تصویر عملیاتی امروز، درآمد، سفارش‌ها، موجودی و نقاطی که
+                    همین حالا نیاز به اقدام دارند.
                 </p>
 
             </div>
 
+
             <div class="flex flex-wrap items-center gap-3">
 
-            <span class="rounded-full border border-[var(--admin-border)] bg-[var(--admin-surface)] px-4 py-2 text-xs text-[var(--admin-muted)]">
-                {{ $todayLabel }}
-            </span>
+                <span class="rounded-full border border-[var(--admin-border)] bg-[var(--admin-surface)] px-4 py-2 text-xs text-[var(--admin-muted)]">
+                    {{ $todayLabel }}
+                </span>
+
+                <a
+                    href="{{ route('admin.orders.index') }}"
+                    class="admin-btn admin-btn-secondary"
+                >
+                    سفارش‌ها
+                </a>
 
                 <a
                     href="{{ route('admin.products.create') }}"
                     class="admin-btn admin-btn-primary"
                 >
-                    + افزودن محصول
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         fill="none"
+                         viewBox="0 0 24 24"
+                         stroke-width="1.7"
+                         stroke="currentColor"
+                         class="h-4 w-4">
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M12 5.25v13.5M5.25 12h13.5"
+                        />
+                    </svg>
+
+                    محصول جدید
                 </a>
 
             </div>
 
-        </div>
+        </header>
 
 
         {{-- =========================================================
-             KPI CARDS
+             KPI STRIP
         ========================================================== --}}
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
 
-            {{-- Products --}}
-            <div class="admin-stat admin-card-hover p-5">
-
-                <div class="flex items-start justify-between gap-4">
-
-                    <div>
-
-                        <p class="admin-stat-label">
-                            کل محصولات
-                        </p>
-
-                        <p class="mt-2 text-3xl font-bold text-[var(--admin-text)]">
-                            {{ number_format($totalProducts) }}
-                        </p>
-
-                        <p class="mt-2 text-xs text-[var(--admin-muted)]">
-                            {{ number_format($activeProducts) }}
-                            فعال
-                        </p>
-
-                    </div>
-
-                    <div class="admin-stat-icon">
-
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            class="h-5 w-5"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="m21 8.25-9-5.25-9 5.25m18 0-9 5.25m9-5.25V15l-9 5.25M3 8.25l9 5.25m-9-5.25V15l9 5.25m0-6.75V20.25"
-                            />
-                        </svg>
-
-                    </div>
-
-                </div>
-
-                <div class="mt-4 flex items-center gap-2 text-[11px]">
-
-                <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-emerald-700">
-                    {{ number_format($installmentProductsCount) }}
-                    اقساطی
-                </span>
-
-                    @if($lowStockProducts > 0)
-
-                        <span class="rounded-full bg-amber-50 px-2.5 py-1 text-amber-700">
-                        {{ number_format($lowStockProducts) }}
-                        کم‌موجودی
-                    </span>
-
-                    @endif
-
-                </div>
-
-            </div>
-
-
-            {{-- Customers --}}
-            <div class="admin-stat admin-card-hover p-5">
+            <article class="admin-stat admin-card-hover p-5">
 
                 <div class="flex items-start justify-between gap-4">
 
                     <div>
-
                         <p class="admin-stat-label">
-                            مشتریان
+                            فروش امروز
                         </p>
 
-                        <p class="mt-2 text-3xl font-bold text-[var(--admin-text)]">
-                            {{ number_format($totalCustomers) }}
-                        </p>
-
-                        <p class="mt-2 text-xs text-[var(--admin-muted)]">
-                            ثبت‌نام‌شده
-                        </p>
-
-                    </div>
-
-                    <div class="admin-stat-icon">
-
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            class="h-5 w-5"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M15.75 6a3.75 3.75 0 1 1-7.5 0ZM4.5 20.25a8.25 8.25 0 0 1 15 0ZM19.5 20.25a4.5 4.5 0 0 0-3.75-4.44"
-                            />
-                        </svg>
-
-                    </div>
-
-                </div>
-
-                <div class="mt-4 text-xs text-[var(--admin-muted)]">
-                    {{ $recentCustomers->count() }}
-                    مشتری جدید در لیست اخیر
-                </div>
-
-            </div>
-
-
-            {{-- Orders --}}
-            <div class="admin-stat admin-card-hover p-5">
-
-                <div class="flex items-start justify-between gap-4">
-
-                    <div>
-
-                        <p class="admin-stat-label">
-                            سفارش‌ها
-                        </p>
-
-                        <p class="mt-2 text-3xl font-bold text-[var(--admin-text)]">
-                            {{ number_format($totalOrders) }}
-                        </p>
-
-                        <p class="mt-2 text-xs text-[var(--admin-muted)]">
-                            {{ number_format($pendingOrders) }}
-                            در انتظار / پردازش
-                        </p>
-
-                    </div>
-
-                    <div class="admin-stat-icon">
-
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            class="h-5 w-5"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M6.75 6.75h10.5M6.75 10.5h7.5m-7.5 3.75h7.5M4.5 3.75h15A1.5 1.5 0 0 1 21 5.25v13.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.75V5.25a1.5 1.5 0 0 1 1.5-1.5Z"
-                            />
-                        </svg>
-
-                    </div>
-
-                </div>
-
-                <div class="mt-4 flex items-center gap-2 text-[11px]">
-
-                <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-emerald-700">
-                    {{ number_format($paidOrderPercent) }}٪ پرداخت‌شده
-                </span>
-
-                </div>
-
-            </div>
-
-
-            {{-- Revenue --}}
-            <div class="admin-stat admin-card-hover overflow-hidden p-5">
-
-                <div class="flex items-start justify-between gap-4">
-
-                    <div class="min-w-0">
-
-                        <p class="admin-stat-label">
-                            درآمد کل
-                        </p>
-
-                        <p class="mt-2 truncate text-2xl font-bold text-[var(--admin-text)]">
-                            {{ number_format($totalRevenue) }}
+                        <p class="mt-2 text-2xl font-bold text-[var(--admin-text)]">
+                            {{ number_format($todayRevenue) }}
                         </p>
 
                         <p class="mt-1 text-[11px] text-[var(--admin-muted)]">
                             تومان
                         </p>
-
                     </div>
 
                     <div class="admin-stat-icon">
-
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            class="h-5 w-5"
-                        >
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke-width="1.5"
+                             stroke="currentColor"
+                             class="h-5 w-5">
                             <path
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
                                 d="M12 6v12m4.5-9.75c0-1.243-1.007-2.25-2.25-2.25h-4.5A2.25 2.25 0 0 0 7.5 8.25v.75a2.25 2.25 0 0 0 2.25 2.25h4.5A2.25 2.25 0 0 1 16.5 13.5v.75a2.25 2.25 0 0 1-2.25 2.25h-4.5a2.25 2.25 0 0 1-2.25-2.25"
                             />
                         </svg>
+                    </div>
 
+                </div>
+
+                <div class="mt-4 flex items-center justify-between gap-3 text-[11px]">
+
+                    <span class="text-[var(--admin-muted)]">
+                        {{ number_format($todayOrders) }}
+                        سفارش امروز
+                    </span>
+
+                    <span class="font-semibold text-[var(--admin-accent)]">
+                        میانگین:
+                        {{ number_format($averageOrderValue) }}
+                    </span>
+
+                </div>
+
+            </article>
+
+
+            <article class="admin-stat admin-card-hover p-5">
+
+                <div class="flex items-start justify-between gap-4">
+
+                    <div>
+                        <p class="admin-stat-label">
+                            فروش این ماه
+                        </p>
+
+                        <p class="mt-2 text-2xl font-bold text-[var(--admin-text)]">
+                            {{ number_format($currentMonthRevenue) }}
+                        </p>
+
+                        <p class="mt-1 text-[11px] text-[var(--admin-muted)]">
+                            تومان
+                        </p>
+                    </div>
+
+                    <div class="admin-stat-icon">
+                        %
                     </div>
 
                 </div>
 
                 <div class="mt-4 flex items-center justify-between gap-3">
 
-                <span class="text-[11px] text-[var(--admin-muted)]">
-                    این ماه:
-                    {{ number_format($currentMonthRevenue) }}
-                    تومان
-                </span>
+                    <span class="text-[11px] text-[var(--admin-muted)]">
+                        {{ number_format($currentMonthOrders) }}
+                        سفارش
+                    </span>
 
-                    <span
-                        class="{{ $revenueGrowthPercent >= 0 ? 'text-emerald-600' : 'text-red-600' }} text-[11px] font-semibold"
-                    >
-                    {{ $revenueGrowthPercent > 0 ? '+' : '' }}
-                        {{ number_format($revenueGrowthPercent, 1) }}٪
-                </span>
+                    <span class="{{ $revenueGrowthPercent >= 0 ? 'text-emerald-600' : 'text-red-600' }} text-[11px] font-bold">
+                        {{ $revenueGrowthPercent > 0 ? '+' : '' }}{{ number_format($revenueGrowthPercent, 1) }}٪
+                    </span>
 
                 </div>
 
-            </div>
+            </article>
 
-        </div>
+
+            <article class="admin-stat admin-card-hover p-5">
+
+                <div class="flex items-start justify-between gap-4">
+
+                    <div>
+                        <p class="admin-stat-label">
+                            سفارش نیازمند اقدام
+                        </p>
+
+                        <p class="mt-2 text-2xl font-bold text-[var(--admin-text)]">
+                            {{ number_format($pendingOrders) }}
+                        </p>
+
+                        <p class="mt-1 text-[11px] text-[var(--admin-muted)]">
+                            در انتظار / در پردازش
+                        </p>
+                    </div>
+
+                    <div class="admin-stat-icon">
+                        !
+                    </div>
+
+                </div>
+
+                <div class="mt-4 flex items-center justify-between gap-3 text-[11px]">
+
+                    <span class="text-[var(--admin-muted)]">
+                        پرداخت‌های معلق
+                    </span>
+
+                    <span class="font-bold text-amber-700">
+                        {{ number_format($pendingPaymentOrders) }}
+                    </span>
+
+                </div>
+
+            </article>
+
+
+            <article class="admin-stat admin-card-hover p-5">
+
+                <div class="flex items-start justify-between gap-4">
+
+                    <div>
+                        <p class="admin-stat-label">
+                            کاتالوگ
+                        </p>
+
+                        <p class="mt-2 text-2xl font-bold text-[var(--admin-text)]">
+                            {{ number_format($totalProducts) }}
+                        </p>
+
+                        <p class="mt-1 text-[11px] text-[var(--admin-muted)]">
+                            محصول
+                        </p>
+                    </div>
+
+                    <div class="admin-stat-icon">
+                        #
+                    </div>
+
+                </div>
+
+                <div class="mt-4 flex items-center justify-between gap-3 text-[11px]">
+
+                    <span class="text-[var(--admin-muted)]">
+                        فعال:
+                        {{ number_format($activeProducts) }}
+                    </span>
+
+                    <span class="{{ $outOfStockProducts > 0 ? 'text-red-600' : 'text-emerald-600' }} font-bold">
+                        ناموجود:
+                        {{ number_format($outOfStockProducts) }}
+                    </span>
+
+                </div>
+
+            </article>
+
+        </section>
 
 
         {{-- =========================================================
-             MAIN ANALYTICS
+             ATTENTION QUEUE
         ========================================================== --}}
-        <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
+        @if($attentionItems->isNotEmpty())
 
-            {{-- Revenue Chart --}}
-            <section class="admin-card xl:col-span-2">
+            <section class="admin-card overflow-hidden">
 
-                <div class="border-b border-[var(--admin-border)] p-6">
+                <div class="flex flex-col gap-2 border-b border-[var(--admin-border)] p-5 sm:flex-row sm:items-center sm:justify-between">
 
-                    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                        <p class="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--admin-accent)]">
+                            ATTENTION QUEUE
+                        </p>
 
-                        <div>
+                        <h2 class="mt-2 text-lg font-bold text-[var(--admin-text)]">
+                            اولویت‌های امروز
+                        </h2>
 
-                            <p class="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--admin-accent)]">
-                                REVENUE ANALYTICS
+                        <p class="mt-1 text-xs text-[var(--admin-muted)]">
+                            مواردی که بهتر است قبل از پایان روز بررسی شوند.
+                        </p>
+                    </div>
+
+                    <span class="text-xs text-[var(--admin-muted)]">
+                        {{ number_format($attentionItems->count()) }}
+                        مورد
+                    </span>
+
+                </div>
+
+
+                <div class="grid grid-cols-1 divide-y divide-[var(--admin-border)] sm:grid-cols-2 sm:divide-x sm:divide-y-0 xl:grid-cols-5 xl:divide-x xl:divide-y-0">
+
+                    @foreach($attentionItems as $item)
+
+                        <a
+                            href="{{ $item['route'] }}"
+                            class="group p-5 transition hover:bg-[var(--admin-surface)]"
+                        >
+
+                            <div class="flex items-start justify-between gap-3">
+
+                                <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl border {{ $toneClasses[$item['tone']] }}">
+                                    {{ number_format($item['count']) }}
+                                </span>
+
+                                <span class="text-xs text-[var(--admin-muted)] transition group-hover:text-[var(--admin-accent)]">
+                                    مشاهده ←
+                                </span>
+
+                            </div>
+
+                            <h3 class="mt-4 text-sm font-semibold text-[var(--admin-text)]">
+                                {{ $item['label'] }}
+                            </h3>
+
+                            <p class="mt-1 text-[10px] leading-6 text-[var(--admin-muted)]">
+                                {{ $item['description'] }}
                             </p>
 
-                            <h2 class="mt-2 text-lg font-bold text-[var(--admin-text)]">
-                                درآمد ۶ ماه اخیر
-                            </h2>
+                        </a>
 
-                            <p class="mt-1 text-xs text-[var(--admin-muted)]">
-                                فقط سفارش‌هایی که پرداخت موفق داشته‌اند.
-                            </p>
+                    @endforeach
 
-                        </div>
+                </div>
 
-                        <div class="text-right">
+            </section>
 
-                            <p class="text-[10px] text-[var(--admin-muted)]">
-                                میانگین هر سفارش
-                            </p>
+        @endif
 
-                            <p class="mt-1 text-sm font-bold text-[var(--admin-text)]">
-                                {{ number_format($averageOrderValue) }}
-                                تومان
-                            </p>
 
-                        </div>
+        {{-- =========================================================
+             REVENUE + ORDER PIPELINE
+        ========================================================== --}}
+        <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.65fr)_minmax(20rem,.8fr)]">
+
+            <section class="admin-card overflow-hidden">
+
+                <div class="flex flex-col gap-4 border-b border-[var(--admin-border)] p-6 sm:flex-row sm:items-end sm:justify-between">
+
+                    <div>
+
+                        <p class="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--admin-accent)]">
+                            REVENUE
+                        </p>
+
+                        <h2 class="mt-2 text-lg font-bold text-[var(--admin-text)]">
+                            روند فروش ۶ ماه اخیر
+                        </h2>
+
+                        <p class="mt-1 text-xs text-[var(--admin-muted)]">
+                            فقط سفارش‌هایی که پرداخت موفق داشته‌اند.
+                        </p>
+
+                    </div>
+
+                    <div class="text-left">
+
+                        <p class="text-[10px] text-[var(--admin-muted)]">
+                            میانگین ارزش سفارش
+                        </p>
+
+                        <p class="mt-1 text-sm font-bold text-[var(--admin-text)]">
+                            {{ number_format($averageOrderValue) }}
+                            تومان
+                        </p>
 
                     </div>
 
                 </div>
 
+
                 <div class="p-6">
 
-                    <div class="relative h-[300px]">
+                    <div class="relative h-[290px]">
 
-                        {{-- Grid --}}
                         <div class="pointer-events-none absolute inset-0 flex flex-col justify-between">
-
                             @for($i = 0; $i < 5; $i++)
-
                                 <div class="border-t border-dashed border-[var(--admin-border)]"></div>
-
                             @endfor
-
                         </div>
 
-
-                        {{-- Bars --}}
-                        <div class="absolute inset-0 flex items-end gap-3 sm:gap-5">
+                        <div class="absolute inset-0 flex items-end gap-2 sm:gap-4">
 
                             @foreach($monthlyRevenue as $month)
 
                                 @php
-                                    $height =
-                                        $month['revenue'] > 0
-                                            ? max(
-                                                4,
-                                                ($month['revenue'] / $maxMonthlyRevenue) * 100
-                                            )
-                                            : 2;
+                                    $height = $month['revenue'] > 0
+                                        ? max(
+                                            4,
+                                            ($month['revenue'] / $maxMonthlyRevenue) * 100
+                                        )
+                                        : 2;
                                 @endphp
 
-                                <div class="group relative flex h-full flex-1 flex-col justify-end">
+                                <div class="group relative flex h-full min-w-0 flex-1 flex-col justify-end">
 
-                                    {{-- Tooltip --}}
-                                    <div class="pointer-events-none absolute bottom-[calc({{ $height }}%+12px)] left-1/2 z-20 hidden -translate-x-1/2 whitespace-nowrap rounded-xl bg-[var(--admin-text)] px-3 py-2 text-[10px] text-white shadow-xl group-hover:block">
+                                    <div
+                                        class="pointer-events-none absolute bottom-[calc({{ $height }}%+14px)] left-1/2 z-20 hidden -translate-x-1/2 whitespace-nowrap rounded-xl bg-[var(--admin-text)] px-3 py-2 text-[9px] font-medium text-white shadow-xl group-hover:block"
+                                    >
+                                        <div>
+                                            {{ number_format($month['revenue']) }}
+                                            تومان
+                                        </div>
 
-                                        {{ number_format($month['revenue']) }}
-                                        تومان
-
+                                        <div class="mt-1 text-white/60">
+                                            {{ number_format($month['orders']) }}
+                                            سفارش
+                                        </div>
                                     </div>
 
-                                    {{-- Bar --}}
                                     <div
-                                        class="mx-auto w-full max-w-14 rounded-t-2xl bg-gradient-to-t from-[var(--admin-accent)] to-[#d5b28f] transition duration-500 hover:from-[var(--admin-text)] hover:to-[var(--admin-accent)]"
+                                        class="mx-auto w-full max-w-12 rounded-t-2xl bg-gradient-to-t from-[var(--admin-accent-dark)] to-[var(--admin-accent)] transition duration-500 group-hover:from-[var(--admin-text)] group-hover:to-[var(--admin-accent)]"
                                         style="height: {{ $height }}%;"
                                     ></div>
 
-                                    <div class="mt-3 text-center">
+                                    <p class="mt-3 truncate text-center text-[9px] font-semibold text-[var(--admin-text-soft)]">
+                                        {{ $month['label'] }}
+                                    </p>
 
-                                        <p class="text-[10px] font-medium text-[var(--admin-text-soft)]">
-                                            {{ $month['label'] }}
-                                        </p>
-
-                                        <p class="mt-1 text-[9px] text-[var(--admin-muted)]">
-                                            {{ number_format($month['orders']) }}
-                                            سفارش
-                                        </p>
-
-                                    </div>
+                                    <p class="mt-1 text-center text-[8px] text-[var(--admin-muted)]">
+                                        {{ number_format($month['orders']) }}
+                                        سفارش
+                                    </p>
 
                                 </div>
 
@@ -492,159 +527,89 @@
             </section>
 
 
-            {{-- Order Status Donut --}}
             <section class="admin-card">
 
                 <div class="border-b border-[var(--admin-border)] p-6">
 
                     <p class="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--admin-accent)]">
-                        ORDER HEALTH
+                        ORDER PIPELINE
                     </p>
 
                     <h2 class="mt-2 text-lg font-bold text-[var(--admin-text)]">
-                        وضعیت سفارش‌ها
+                        قیف سفارش‌ها
                     </h2>
 
                     <p class="mt-1 text-xs text-[var(--admin-muted)]">
-                        توزیع وضعیت سفارش‌های ثبت‌شده.
+                        وضعیت فعلی تمام سفارش‌های ثبت‌شده.
                     </p>
 
                 </div>
 
-                <div class="p-6">
+                <div class="space-y-4 p-6">
 
-                    <div class="relative mx-auto h-52 w-52">
+                    @foreach($statusLabels as $status => $label)
 
                         @php
-                            $statusSegments = [
-                                [
-                                    'value' => $orderStatus['delivered'] ?? 0,
-                                    'color' => '#15803d',
-                                ],
-                                [
-                                    'value' => $orderStatus['processing'] ?? 0,
-                                    'color' => '#0284c7',
-                                ],
-                                [
-                                    'value' => $orderStatus['shipped'] ?? 0,
-                                    'color' => '#4f46e5',
-                                ],
-                                [
-                                    'value' => $orderStatus['pending'] ?? 0,
-                                    'color' => '#d97706',
-                                ],
-                                [
-                                    'value' => $orderStatus['cancelled'] ?? 0,
-                                    'color' => '#dc2626',
-                                ],
-                            ];
+                            $count = (int) ($orderStatus[$status] ?? 0);
 
-                            $circumference = 502.65;
-
-                            $offset = 0;
+                            $percent = $statusTotal > 0
+                                ? round(
+                                    ($count / $statusTotal) * 100
+                                )
+                                : 0;
                         @endphp
 
-                        <svg
-                            viewBox="0 0 200 200"
-                            class="h-full w-full -rotate-90"
-                        >
+                        <div>
 
-                            <circle
-                                cx="100"
-                                cy="100"
-                                r="80"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="22"
-                                class="text-[var(--admin-surface)]"
-                            />
+                            <div class="flex items-center justify-between gap-3">
 
-                            @if($statusTotal > 0)
-
-                                @foreach($statusSegments as $segment)
-
-                                    @php
-                                        if ($segment['value'] <= 0) {
-                                            continue;
-                                        }
-
-                                        $segmentLength =
-                                            ($segment['value'] / $statusTotal)
-                                            * $circumference;
-                                    @endphp
-
-                                    <circle
-                                        cx="100"
-                                        cy="100"
-                                        r="80"
-                                        fill="none"
-                                        stroke="{{ $segment['color'] }}"
-                                        stroke-width="22"
-                                        stroke-dasharray="{{ $segmentLength }} {{ $circumference - $segmentLength }}"
-                                        stroke-dashoffset="-{{ $offset }}"
-                                    />
-
-                                    @php
-                                        $offset += $segmentLength;
-                                    @endphp
-
-                                @endforeach
-
-                            @endif
-
-                        </svg>
-
-                        <div class="absolute inset-0 flex flex-col items-center justify-center">
-
-                            <p class="text-3xl font-bold text-[var(--admin-text)]">
-                                {{ number_format($statusTotal) }}
-                            </p>
-
-                            <p class="mt-1 text-[10px] text-[var(--admin-muted)]">
-                                سفارش
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="mt-7 grid grid-cols-2 gap-3">
-
-                        @foreach($statusLabels as $status => $label)
-
-                            @php
-                                $count =
-                                    $orderStatus[$status]
-                                    ?? 0;
-
-                                $color =
-                                    $statusColors[$status]
-                                    ?? [
-                                        'text' => 'text-gray-600',
-                                        'bg' => 'bg-gray-50',
-                                    ];
-                            @endphp
-
-                            <div class="flex items-center justify-between gap-2 rounded-2xl {{ $color['bg'] }} px-3 py-2.5">
-
-                            <span class="flex items-center gap-2">
-
-                                <span class="h-2 w-2 rounded-full {{ str_replace('text-', 'bg-', $color['text']) }}"></span>
-
-                                <span class="text-[10px] {{ $color['text'] }}">
+                                <span class="inline-flex items-center gap-2 text-xs font-semibold text-[var(--admin-text-soft)]">
+                                    <span class="h-2 w-2 rounded-full {{ str_contains($statusStyles[$status], 'amber') ? 'bg-amber-500' : (str_contains($statusStyles[$status], 'sky') ? 'bg-sky-500' : (str_contains($statusStyles[$status], 'indigo') ? 'bg-indigo-500' : (str_contains($statusStyles[$status], 'emerald') ? 'bg-emerald-500' : 'bg-red-500'))) }}"></span>
                                     {{ $label }}
                                 </span>
 
-                            </span>
-
-                                <span class="text-[10px] font-bold {{ $color['text'] }}">
-                                {{ number_format($count) }}
-                            </span>
+                                <span class="text-xs font-bold text-[var(--admin-text)]">
+                                    {{ number_format($count) }}
+                                </span>
 
                             </div>
 
-                        @endforeach
+                            <div class="mt-2 h-2 overflow-hidden rounded-full bg-[var(--admin-surface)]">
+
+                                <div
+                                    class="h-full rounded-full bg-[var(--admin-accent)] transition-all duration-700"
+                                    style="width: {{ min(100, $percent) }}%;"
+                                ></div>
+
+                            </div>
+
+                        </div>
+
+                    @endforeach
+
+
+                    <div class="mt-6 rounded-2xl bg-[var(--admin-surface)] p-4">
+
+                        <div class="flex items-center justify-between gap-3">
+
+                            <span class="text-xs text-[var(--admin-muted)]">
+                                نرخ تحویل
+                            </span>
+
+                            <span class="text-sm font-bold text-[var(--admin-text)]">
+                                {{ number_format($deliveredPercent) }}٪
+                            </span>
+
+                        </div>
+
+                        <div class="mt-3 h-2 overflow-hidden rounded-full bg-white">
+
+                            <div
+                                class="h-full rounded-full bg-emerald-600"
+                                style="width: {{ min(100, $deliveredPercent) }}%;"
+                            ></div>
+
+                        </div>
 
                     </div>
 
@@ -656,42 +621,36 @@
 
 
         {{-- =========================================================
-             TOP PRODUCTS + QUICK METRICS
+             SELLERS + BUSINESS SNAPSHOT
         ========================================================== --}}
-        <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
+        <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(20rem,.65fr)]">
 
-            {{-- Top Products --}}
-            <section class="admin-card xl:col-span-2">
+            <section class="admin-card overflow-hidden">
 
-                <div class="border-b border-[var(--admin-border)] p-6">
+                <div class="flex items-center justify-between gap-4 border-b border-[var(--admin-border)] p-6">
 
-                    <div class="flex items-center justify-between gap-4">
+                    <div>
 
-                        <div>
+                        <p class="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--admin-accent)]">
+                            BEST SELLERS
+                        </p>
 
-                            <p class="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--admin-accent)]">
-                                BEST SELLERS
-                            </p>
+                        <h2 class="mt-2 text-lg font-bold text-[var(--admin-text)]">
+                            پرفروش‌ترین محصولات
+                        </h2>
 
-                            <h2 class="mt-2 text-lg font-bold text-[var(--admin-text)]">
-                                محصولات پرفروش
-                            </h2>
-
-                            <p class="mt-1 text-xs text-[var(--admin-muted)]">
-                                بر اساس تعداد فروش سفارش‌های پرداخت‌شده.
-                            </p>
-
-                        </div>
-
-                        <a
-                            href="{{ route('admin.products.index') }}"
-                            class="text-xs font-medium text-[var(--admin-accent)]"
-                        >
-                            مدیریت محصولات
-                            ←
-                        </a>
+                        <p class="mt-1 text-xs text-[var(--admin-muted)]">
+                            بر اساس تعداد اقلام فروخته‌شده در سفارش‌های پرداخت‌شده.
+                        </p>
 
                     </div>
+
+                    <a
+                        href="{{ route('admin.products.index') }}"
+                        class="text-xs font-medium text-[var(--admin-accent)]"
+                    >
+                        همه محصولات ←
+                    </a>
 
                 </div>
 
@@ -704,83 +663,57 @@
 
                             @foreach($topProducts as $index => $product)
 
-                                @php
-                                    $percentage =
-                                        max(
-                                            3,
-                                            ($product['quantity'] / $maxProductQuantity)
-                                            * 100
-                                        );
-                                @endphp
+                                <div class="flex items-center gap-4">
 
-                                <div class="group">
+                                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-xs font-bold text-[var(--admin-text)]">
+                                        {{ number_format($index + 1) }}
+                                    </div>
 
-                                    <div class="flex items-center gap-4">
+                                    <div class="admin-image-thumb shrink-0">
+                                        @if($product['image'])
+                                            <img
+                                                src="{{ $product['image'] }}"
+                                                alt="{{ $product['name'] }}"
+                                                class="admin-image"
+                                                loading="lazy"
+                                            >
+                                        @else
+                                            <div class="flex h-full w-full items-center justify-center text-[9px] tracking-widest text-[var(--admin-muted)]">
+                                                LV
+                                            </div>
+                                        @endif
+                                    </div>
 
-                                        {{-- Rank --}}
-                                        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-xs font-bold text-[var(--admin-text)]">
-                                            {{ number_format($index + 1) }}
-                                        </div>
+                                    <div class="min-w-0 flex-1">
 
+                                        <div class="flex items-start justify-between gap-4">
 
-                                        {{-- Image --}}
-                                        <div class="h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-[var(--admin-surface)]">
+                                            <div class="min-w-0">
 
-                                            @if($product['image'])
+                                                <p class="truncate text-sm font-semibold text-[var(--admin-text)]">
+                                                    {{ $product['name'] }}
+                                                </p>
 
-                                                <img
-                                                    src="{{ $product['image'] }}"
-                                                    alt="{{ $product['name'] }}"
-                                                    class="h-full w-full object-cover"
-                                                    loading="lazy"
-                                                >
-
-                                            @else
-
-                                                <div class="flex h-full w-full items-center justify-center text-[9px] tracking-widest text-[var(--admin-muted)]">
-                                                    LV
-                                                </div>
-
-                                            @endif
-
-                                        </div>
-
-
-                                        {{-- Product --}}
-                                        <div class="min-w-0 flex-1">
-
-                                            <div class="flex items-start justify-between gap-3">
-
-                                                <div class="min-w-0">
-
-                                                    <p class="truncate text-sm font-semibold text-[var(--admin-text)]">
-                                                        {{ $product['name'] }}
-                                                    </p>
-
-                                                    <p class="mt-1 text-[10px] text-[var(--admin-muted)]">
-                                                        {{ number_format($product['quantity']) }}
-                                                        عدد فروخته شده
-                                                    </p>
-
-                                                </div>
-
-                                                <p class="shrink-0 text-xs font-semibold text-[var(--admin-text)]">
-                                                    {{ number_format($product['revenue']) }}
-                                                    تومان
+                                                <p class="mt-1 text-[10px] text-[var(--admin-muted)]">
+                                                    {{ number_format($product['quantity']) }}
+                                                    عدد فروش
                                                 </p>
 
                                             </div>
 
+                                            <span class="shrink-0 text-xs font-bold text-[var(--admin-text)]">
+                                                {{ number_format($product['revenue']) }}
+                                                تومان
+                                            </span>
 
-                                            {{-- Progress --}}
-                                            <div class="mt-3 h-2 overflow-hidden rounded-full bg-[var(--admin-surface)]">
+                                        </div>
 
-                                                <div
-                                                    class="h-full rounded-full bg-gradient-to-l from-[var(--admin-accent)] to-[#d5b28f] transition-all duration-700"
-                                                    style="width: {{ $percentage }}%;"
-                                                ></div>
+                                        <div class="mt-3 h-1.5 overflow-hidden rounded-full bg-[var(--admin-surface)]">
 
-                                            </div>
+                                            <div
+                                                class="h-full rounded-full bg-gradient-to-l from-[var(--admin-accent)] to-[#d5b28f]"
+                                                style="width: {{ max(4, ($product['quantity'] / max(1, $topProducts->max('quantity'))) * 100) }}%;"
+                                            ></div>
 
                                         </div>
 
@@ -795,15 +728,13 @@
                     @else
 
                         <div class="py-12 text-center">
-
                             <p class="text-sm font-semibold text-[var(--admin-text)]">
-                                هنوز فروش ثبت نشده است.
+                                هنوز فروش پرداخت‌شده‌ای ثبت نشده است.
                             </p>
 
-                            <p class="mt-2 text-xs text-[var(--admin-muted)]">
-                                بعد از ثبت سفارش‌های پرداخت‌شده، محصولات پرفروش اینجا نمایش داده می‌شوند.
+                            <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">
+                                بعد از اولین تراکنش موفق، این بخش به‌صورت خودکار پر می‌شود.
                             </p>
-
                         </div>
 
                     @endif
@@ -813,7 +744,6 @@
             </section>
 
 
-            {{-- Quick Business Metrics --}}
             <section class="admin-card">
 
                 <div class="border-b border-[var(--admin-border)] p-6">
@@ -823,64 +753,38 @@
                     </p>
 
                     <h2 class="mt-2 text-lg font-bold text-[var(--admin-text)]">
-                        وضعیت کسب‌وکار
+                        نبض کسب‌وکار
                     </h2>
 
                 </div>
 
-                <div class="p-6 space-y-3">
+                <div class="space-y-3 p-6">
 
-                    {{-- Current Month --}}
                     <div class="rounded-2xl bg-[var(--admin-surface)] p-4">
 
                         <div class="flex items-center justify-between gap-3">
 
                             <div>
-
                                 <p class="text-[10px] text-[var(--admin-muted)]">
-                                    درآمد این ماه
+                                    محصولات فعال
                                 </p>
 
-                                <p class="mt-2 text-lg font-bold text-[var(--admin-text)]">
-                                    {{ number_format($currentMonthRevenue) }}
+                                <p class="mt-2 text-xl font-bold text-[var(--admin-text)]">
+                                    {{ number_format($activeProducts) }}
                                 </p>
-
                             </div>
 
                             <span class="rounded-xl bg-white px-3 py-2 text-[10px] font-semibold text-[var(--admin-accent)]">
-                            تومان
-                        </span>
+                                از {{ number_format($totalProducts) }}
+                            </span>
 
                         </div>
 
-                        <p class="mt-3 text-[10px] text-[var(--admin-muted)]">
-                            {{ number_format($currentMonthOrders) }}
-                            سفارش در این ماه
-                        </p>
-
-                    </div>
-
-
-                    {{-- Delivered --}}
-                    <div class="rounded-2xl bg-emerald-50 p-4">
-
-                        <div class="flex items-center justify-between">
-
-                        <span class="text-xs font-semibold text-emerald-800">
-                            نرخ تحویل
-                        </span>
-
-                            <span class="text-sm font-bold text-emerald-700">
-                            {{ number_format($deliveredPercent) }}٪
-                        </span>
-
-                        </div>
-
-                        <div class="mt-3 h-2 overflow-hidden rounded-full bg-emerald-100">
+                        <div class="mt-3 h-2 overflow-hidden rounded-full bg-white">
 
                             <div
-                                class="h-full rounded-full bg-emerald-600"
-                                style="width: {{ min(100, $deliveredPercent) }}%;"
+                                class="h-full rounded-full bg-[var(--admin-accent)]"
+                                style="width: {{ $totalProducts > 0 ? min(100, ($activeProducts / $totalProducts) * 100) : 0 }}%;"
                             ></div>
 
                         </div>
@@ -888,54 +792,81 @@
                     </div>
 
 
-                    {{-- Installment --}}
-                    <div class="rounded-2xl bg-[var(--admin-surface)] p-4">
+                    <div class="grid grid-cols-2 gap-3">
 
-                        <div class="flex items-center justify-between">
+                        <a
+                            href="{{ route('admin.products.index', ['stock' => 'low_stock']) }}"
+                            class="rounded-2xl border border-[var(--admin-border)] p-4 transition hover:border-amber-300 hover:bg-amber-50/40"
+                        >
+                            <p class="text-[10px] text-[var(--admin-muted)]">
+                                کم‌موجودی
+                            </p>
 
-                        <span class="text-xs font-semibold text-[var(--admin-text)]">
-                            سفارش اقساطی
-                        </span>
+                            <p class="mt-2 text-xl font-bold text-amber-700">
+                                {{ number_format($lowStockProducts) }}
+                            </p>
+                        </a>
 
-                            <span class="text-sm font-bold text-[var(--admin-accent)]">
-                            {{ number_format($installmentOrders) }}
-                        </span>
+                        <a
+                            href="{{ route('admin.products.index', ['status' => 'draft']) }}"
+                            class="rounded-2xl border border-[var(--admin-border)] p-4 transition hover:border-sky-300 hover:bg-sky-50/40"
+                        >
+                            <p class="text-[10px] text-[var(--admin-muted)]">
+                                پیش‌نویس
+                            </p>
+
+                            <p class="mt-2 text-xl font-bold text-sky-700">
+                                {{ number_format($draftProductsCount) }}
+                            </p>
+                        </a>
+
+                    </div>
+
+
+                    <div class="rounded-2xl border border-[var(--admin-border)] p-4">
+
+                        <div class="flex items-center justify-between gap-3">
+
+                            <span class="text-xs font-semibold text-[var(--admin-text)]">
+                                پرداخت‌های این ماه
+                            </span>
+
+                            <span class="text-xs font-bold text-[var(--admin-accent)]">
+                                {{ number_format($monthPaidRate) }}٪
+                            </span>
 
                         </div>
 
-                        <p class="mt-2 text-[10px] text-[var(--admin-muted)]">
-                            {{ number_format($installmentPaidPercent) }}٪ از سفارش‌های اقساطی پرداخت شده‌اند.
+                        <p class="mt-2 text-[10px] leading-6 text-[var(--admin-muted)]">
+                            {{ number_format($currentMonthPaidOrders) }}
+                            پرداخت موفق از
+                            {{ number_format($currentMonthOrders) }}
+                            سفارش این ماه.
                         </p>
 
                     </div>
 
 
-                    {{-- Inventory --}}
-                    <div class="grid grid-cols-2 gap-3">
+                    <div class="rounded-2xl border border-[var(--admin-border)] p-4">
 
-                        <div class="rounded-2xl border border-[var(--admin-border)] p-4">
+                        <div class="flex items-center justify-between gap-3">
 
-                            <p class="text-[10px] text-[var(--admin-muted)]">
-                                بدون موجودی
-                            </p>
+                            <span class="text-xs font-semibold text-[var(--admin-text)]">
+                                فروش اقساطی
+                            </span>
 
-                            <p class="mt-2 text-xl font-bold text-red-600">
-                                {{ number_format($outOfStockProducts) }}
-                            </p>
-
-                        </div>
-
-                        <div class="rounded-2xl border border-[var(--admin-border)] p-4">
-
-                            <p class="text-[10px] text-[var(--admin-muted)]">
-                                ویژه
-                            </p>
-
-                            <p class="mt-2 text-xl font-bold text-[var(--admin-text)]">
-                                {{ number_format($featuredProductsCount) }}
-                            </p>
+                            <span class="text-xs font-bold text-[var(--admin-accent)]">
+                                {{ number_format($installmentPaidPercent) }}٪
+                            </span>
 
                         </div>
+
+                        <p class="mt-2 text-[10px] leading-6 text-[var(--admin-muted)]">
+                            {{ number_format($installmentPaidOrders) }}
+                            پرداخت شده از
+                            {{ number_format($installmentOrders) }}
+                            سفارش اقساطی.
+                        </p>
 
                     </div>
 
@@ -949,137 +880,195 @@
         {{-- =========================================================
              RECENT ORDERS + CUSTOMERS
         ========================================================== --}}
-        <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.3fr)_minmax(20rem,.7fr)]">
 
-            {{-- Recent Orders --}}
             <section class="admin-card overflow-hidden">
 
-                <div class="border-b border-[var(--admin-border)] p-6">
+                <div class="flex items-center justify-between gap-4 border-b border-[var(--admin-border)] p-6">
 
-                    <div class="flex items-center justify-between">
+                    <div>
 
-                        <div>
+                        <p class="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--admin-accent)]">
+                            RECENT ORDERS
+                        </p>
 
-                            <p class="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--admin-accent)]">
-                                RECENT ORDERS
-                            </p>
+                        <h2 class="mt-2 text-lg font-bold text-[var(--admin-text)]">
+                            آخرین سفارش‌ها
+                        </h2>
 
-                            <h2 class="mt-2 text-lg font-bold text-[var(--admin-text)]">
-                                آخرین سفارش‌ها
-                            </h2>
-
-                        </div>
-
-                        <a
-                            href="{{ route('admin.orders.index') }}"
-                            class="text-xs font-medium text-[var(--admin-accent)]"
-                        >
-                            همه
-                        </a>
+                        <p class="mt-1 text-xs text-[var(--admin-muted)]">
+                            آخرین عملیات ثبت‌شده در فروشگاه.
+                        </p>
 
                     </div>
 
+                    <a
+                        href="{{ route('admin.orders.index') }}"
+                        class="text-xs font-medium text-[var(--admin-accent)]"
+                    >
+                        همه ←
+                    </a>
+
                 </div>
 
-                <div class="divide-y divide-[var(--admin-border)]">
 
-                    @forelse($recentOrders as $order)
+                <div class="overflow-x-auto">
 
-                        @php
-                            $orderStatus =
-                                $statusLabels[$order->status]
-                                ?? $order->status;
+                    <table class="admin-table min-w-[720px]">
 
-                            $statusColor =
-                                $statusColors[$order->status]
-                                ?? $statusColors['pending'];
-                        @endphp
+                        <thead>
+                        <tr>
+                            <th>سفارش</th>
+                            <th>مشتری</th>
+                            <th>مبلغ</th>
+                            <th>پرداخت</th>
+                            <th>وضعیت</th>
+                        </tr>
+                        </thead>
 
-                        <a
-                            href="{{ route('admin.orders.show', $order) }}"
-                            class="flex items-center justify-between gap-4 p-5 transition hover:bg-[var(--admin-surface)]"
-                        >
+                        <tbody>
 
-                            <div class="min-w-0">
+                        @forelse($recentOrders as $order)
 
-                                <div class="flex flex-wrap items-center gap-2">
+                            <tr>
 
-                                    <p class="text-sm font-semibold text-[var(--admin-text)]">
+                                <td>
+                                    <a
+                                        href="{{ route('admin.orders.show', $order) }}"
+                                        class="font-mono text-xs font-bold text-[var(--admin-accent)]"
+                                    >
                                         {{ $order->order_number }}
+                                    </a>
+
+                                    <p class="mt-1 text-[9px] text-[var(--admin-muted)]">
+                                        {{ $order->created_at?->format('Y/m/d H:i') }}
+                                    </p>
+                                </td>
+
+                                <td>
+
+                                    <p class="max-w-[14rem] truncate text-xs font-semibold text-[var(--admin-text)]">
+                                        {{ $order->full_name ?: ($order->user?->name ?? 'بدون نام') }}
                                     </p>
 
-                                    <span class="rounded-full {{ $statusColor['bg'] }} px-2.5 py-1 text-[9px] {{ $statusColor['text'] }}">
-                                    {{ $orderStatus }}
-                                </span>
+                                    <p class="mt-1 max-w-[14rem] truncate text-[9px] text-[var(--admin-muted)]">
+                                        {{ $order->email ?: ($order->user?->email ?? '—') }}
+                                    </p>
 
-                                </div>
+                                </td>
 
-                                <p class="mt-2 truncate text-[10px] text-[var(--admin-muted)]">
-                                    {{ $order->user?->name ?? $order->first_name . ' ' . $order->last_name }}
-                                </p>
+                                <td>
+                                    <span class="whitespace-nowrap text-xs font-bold text-[var(--admin-text)]">
+                                        {{ number_format((float) $order->total) }}
+                                    </span>
 
-                            </div>
+                                    <span class="mr-1 text-[9px] text-[var(--admin-muted)]">
+                                        تومان
+                                    </span>
+                                </td>
 
-                            <div class="shrink-0 text-left">
+                                <td>
 
-                                <p class="text-xs font-bold text-[var(--admin-text)]">
-                                    {{ number_format($order->total) }}
-                                </p>
+                                    @switch($order->payment_status)
 
-                                <p class="mt-1 text-[9px] text-[var(--admin-muted)]">
-                                    تومان
-                                </p>
+                                        @case('paid')
+                                            <span class="admin-badge admin-badge-success">
+                                                پرداخت شده
+                                            </span>
+                                            @break
 
-                            </div>
+                                        @case('pending')
+                                            <span class="admin-badge admin-badge-warning">
+                                                در انتظار
+                                            </span>
+                                            @break
 
-                        </a>
+                                        @case('failed')
+                                            <span class="admin-badge admin-badge-danger">
+                                                ناموفق
+                                            </span>
+                                            @break
 
-                    @empty
+                                        @case('refunded')
+                                            <span class="admin-badge admin-badge-info">
+                                                بازپرداخت
+                                            </span>
+                                            @break
 
-                        <div class="px-6 py-12 text-center">
+                                        @default
+                                            <span class="admin-badge admin-badge-neutral">
+                                                {{ $order->payment_status ?: '—' }}
+                                            </span>
 
-                            <p class="text-sm font-semibold">
-                                سفارش جدیدی وجود ندارد.
-                            </p>
+                                    @endswitch
 
-                        </div>
+                                </td>
 
-                    @endforelse
+                                <td>
+
+                                    <a
+                                        href="{{ route('admin.orders.show', $order) }}"
+                                        class="inline-flex rounded-full px-3 py-1.5 text-[9px] font-semibold {{ $statusStyles[$order->status] ?? 'bg-gray-50 text-gray-700' }}"
+                                    >
+                                        {{ $statusLabels[$order->status] ?? $order->status }}
+                                    </a>
+
+                                </td>
+
+                            </tr>
+
+                        @empty
+
+                            <tr>
+                                <td colspan="5">
+                                    <div class="admin-empty py-14">
+                                        <p class="text-sm font-semibold text-[var(--admin-text)]">
+                                            هنوز سفارشی ثبت نشده است.
+                                        </p>
+
+                                        <p class="mt-2 text-xs text-[var(--admin-muted)]">
+                                            با اولین سفارش، عملیات فروش اینجا نمایش داده می‌شود.
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+
+                        @endforelse
+
+                        </tbody>
+
+                    </table>
 
                 </div>
 
             </section>
 
 
-            {{-- Recent Customers --}}
             <section class="admin-card overflow-hidden">
 
-                <div class="border-b border-[var(--admin-border)] p-6">
+                <div class="flex items-center justify-between gap-4 border-b border-[var(--admin-border)] p-6">
 
-                    <div class="flex items-center justify-between">
+                    <div>
 
-                        <div>
+                        <p class="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--admin-accent)]">
+                            CUSTOMERS
+                        </p>
 
-                            <p class="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--admin-accent)]">
-                                CUSTOMERS
-                            </p>
-
-                            <h2 class="mt-2 text-lg font-bold text-[var(--admin-text)]">
-                                مشتریان اخیر
-                            </h2>
-
-                        </div>
-
-                        <a
-                            href="{{ route('admin.customers.index') }}"
-                            class="text-xs font-medium text-[var(--admin-accent)]"
-                        >
-                            همه
-                        </a>
+                        <h2 class="mt-2 text-lg font-bold text-[var(--admin-text)]">
+                            مشتریان اخیر
+                        </h2>
 
                     </div>
 
+                    <a
+                        href="{{ route('admin.customers.index') }}"
+                        class="text-xs font-medium text-[var(--admin-accent)]"
+                    >
+                        همه ←
+                    </a>
+
                 </div>
+
 
                 <div class="divide-y divide-[var(--admin-border)]">
 
@@ -1101,12 +1090,12 @@
                                 </p>
 
                                 <p class="mt-1 truncate text-[10px] text-[var(--admin-muted)]">
-                                    {{ $customer->email }}
+                                    {{ $customer->email ?: 'ایمیل ثبت نشده' }}
                                 </p>
 
                             </div>
 
-                            <div class="text-left">
+                            <div class="shrink-0 text-left">
 
                                 <p class="text-[9px] text-[var(--admin-muted)]">
                                     ثبت‌نام
@@ -1122,12 +1111,10 @@
 
                     @empty
 
-                        <div class="px-6 py-12 text-center">
-
-                            <p class="text-sm font-semibold">
-                                مشتری جدیدی وجود ندارد.
+                        <div class="px-6 py-14 text-center">
+                            <p class="text-sm font-semibold text-[var(--admin-text)]">
+                                هنوز مشتری جدیدی ثبت نشده است.
                             </p>
-
                         </div>
 
                     @endforelse
@@ -1151,122 +1138,91 @@
                 </p>
 
                 <h2 class="mt-2 text-lg font-bold text-[var(--admin-text)]">
-                    دسترسی سریع
+                    عملیات سریع
                 </h2>
 
             </div>
+
 
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
 
                 <a
                     href="{{ route('admin.products.create') }}"
-                    class="admin-card admin-card-hover group p-5"
+                    class="admin-card admin-card-hover p-5"
                 >
-
                     <div class="flex items-center gap-4">
-
-                        <div class="admin-stat-icon">
-                            +
-                        </div>
+                        <div class="admin-stat-icon">+</div>
 
                         <div>
-
                             <h3 class="text-sm font-semibold text-[var(--admin-text)]">
                                 افزودن محصول
                             </h3>
 
                             <p class="mt-1 text-xs text-[var(--admin-muted)]">
-                                ثبت محصول جدید
+                                ثبت کالا و قیمت جدید
                             </p>
-
                         </div>
-
                     </div>
-
                 </a>
 
 
                 <a
-                    href="{{ route('admin.categories.create') }}"
-                    class="admin-card admin-card-hover group p-5"
+                    href="{{ route('admin.product-images.create') }}"
+                    class="admin-card admin-card-hover p-5"
                 >
-
                     <div class="flex items-center gap-4">
-
-                        <div class="admin-stat-icon">
-                            +
-                        </div>
+                        <div class="admin-stat-icon">◈</div>
 
                         <div>
-
                             <h3 class="text-sm font-semibold text-[var(--admin-text)]">
-                                افزودن دسته‌بندی
+                                افزودن تصویر
                             </h3>
 
                             <p class="mt-1 text-xs text-[var(--admin-muted)]">
-                                ساخت دسته‌بندی جدید
+                                اتصال تصویر به محصول
                             </p>
-
                         </div>
-
                     </div>
-
                 </a>
 
 
                 <a
-                    href="{{ route('admin.orders.index') }}"
-                    class="admin-card admin-card-hover group p-5"
+                    href="{{ route('admin.orders.index', ['status' => 'processing']) }}"
+                    class="admin-card admin-card-hover p-5"
                 >
-
                     <div class="flex items-center gap-4">
-
-                        <div class="admin-stat-icon">
-                            ↗
-                        </div>
+                        <div class="admin-stat-icon">↗</div>
 
                         <div>
-
                             <h3 class="text-sm font-semibold text-[var(--admin-text)]">
-                                مدیریت سفارش‌ها
+                                پردازش سفارش
                             </h3>
 
                             <p class="mt-1 text-xs text-[var(--admin-muted)]">
-                                بررسی و پردازش سفارش‌ها
+                                {{ number_format($pendingOrders) }} مورد در صف
                             </p>
-
                         </div>
-
                     </div>
-
                 </a>
 
 
                 <a
-                    href="{{ route('admin.customers.index') }}"
-                    class="admin-card admin-card-hover group p-5"
+                    href="{{ route('admin.contact-messages.index', ['status' => 'unread']) }}"
+                    class="admin-card admin-card-hover p-5"
                 >
-
                     <div class="flex items-center gap-4">
-
-                        <div class="admin-stat-icon">
-                            ◎
-                        </div>
+                        <div class="admin-stat-icon">@</div>
 
                         <div>
-
                             <h3 class="text-sm font-semibold text-[var(--admin-text)]">
-                                مدیریت مشتریان
+                                پیام‌های جدید
                             </h3>
 
                             <p class="mt-1 text-xs text-[var(--admin-muted)]">
-                                مشاهده مشتریان و سفارش‌هایشان
+                                {{ number_format($unreadContactMessages) }} پیام خوانده‌نشده
                             </p>
-
                         </div>
-
                     </div>
-
                 </a>
 
             </div>
