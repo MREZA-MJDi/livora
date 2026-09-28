@@ -32,6 +32,37 @@ return Application::configure(
             'admin' => AdminMiddleware::class,
             'customer' => CustomerMiddleware::class,
         ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Authentication Redirects
+        |--------------------------------------------------------------------------
+        |
+        | Keep authentication redirects explicit and role-aware.
+        | Guests always go to login. Authenticated users who hit a guest
+        | route are sent to the correct area for their role.
+        |
+        */
+
+        $middleware->redirectGuestsTo(
+            fn (Request $request) => route('login')
+        );
+
+        $middleware->redirectUsersTo(
+            function (Request $request) {
+                $user = $request->user();
+
+                if ($user?->isAdmin()) {
+                    return route('admin.dashboard');
+                }
+
+                if ($user?->isCustomer()) {
+                    return route('account.index');
+                }
+
+                return route('home');
+            }
+        );
     })
 
     ->withExceptions(function (
