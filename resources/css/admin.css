@@ -1037,6 +1037,81 @@ p {
 
 
 /* =========================================================
+   ADMIN IMAGE PREVIEW / THUMBNAIL
+   ========================================================= */
+
+.admin-image-thumb {
+    width: 4rem;
+    height: 4rem;
+
+    flex:
+        0 0 4rem;
+
+    overflow: hidden;
+
+    border:
+        1px solid
+        var(--admin-border);
+
+    border-radius: 0.9rem;
+
+    background:
+        var(--admin-surface);
+
+    position: relative;
+}
+
+.admin-image-thumb.aspect-square {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+
+    flex-basis: auto;
+}
+
+.admin-image-thumb .admin-image,
+.admin-image {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    max-width: none;
+
+    object-fit: cover;
+
+    background:
+        var(--admin-surface);
+}
+
+.admin-image-preview {
+    width: 100%;
+
+    overflow: hidden;
+
+    border:
+        1px solid
+        var(--admin-border);
+
+    border-radius: 1.25rem;
+
+    background:
+        var(--admin-surface);
+
+    position: relative;
+}
+
+.admin-image-preview .admin-image {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    min-height: 0;
+}
+
+
+/* =========================================================
    PRODUCT IMAGE GRID
    ========================================================= */
 
