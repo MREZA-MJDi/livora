@@ -31,27 +31,13 @@ class AdminDashboardService
             ->with(['user', 'latestPayment'])
             ->latest()
             ->limit(6)
-            ->get()
-            ->map(fn (Order $order) => [
-                'model' => $order,
-                'date_label' => $this->persianDate(
-                    $order->created_at,
-                    'EEEE، d MMMM yyyy'
-                ),
-            ]);
+            ->get();
 
         $recentCustomers = User::query()
             ->where('role', 'customer')
             ->latest()
             ->limit(5)
-            ->get()
-            ->map(fn (User $customer) => [
-                'model' => $customer,
-                'date_label' => $this->persianDate(
-                    $customer->created_at,
-                    'yyyy/MM/dd'
-                ),
-            ]);
+            ->get();
 
         $unreadMessages = ContactMessage::query()
             ->where('status', 'unread')
@@ -79,10 +65,33 @@ class AdminDashboardService
             'rangeMonths' => $months,
             'sales' => $sales,
             'monthlyRevenue' => $monthlyRevenue,
+
+            // Backward-compatible view keys.
+            'totalProducts' => $inventory['totalProducts'],
+            'activeProducts' => $inventory['activeProducts'],
+            'lowStockProducts' => $inventory['lowStockProducts'],
+            'outOfStockProducts' => $inventory['outOfStockProducts'],
+            'totalCustomers' => User::query()
+                ->where('role', 'customer')
+                ->count(),
+            'totalOrders' => Order::query()->count(),
+            'pendingOrders' => $pendingOrders,
+            'paidOrders' => $sales['paidOrderCount'],
+            'totalRevenue' => $sales['netRevenue'],
+            'currentMonthRevenue' => $sales['currentMonthRevenue'],
+            'currentMonthOrders' => $sales['currentMonthOrders'],
+            'previousMonthRevenue' => $sales['previousMonthRevenue'],
+            'revenueGrowthPercent' => $sales['revenueGrowthPercent'],
+            'averageOrderValue' => $sales['averageOrderValue'],
             'orderStatus' => $orderStatus,
             'deliveredPercent' => $deliveredPercent,
             'inventory' => $inventory,
             'installments' => $installments,
+            'installmentOrders' => $installments['orders'],
+            'installmentPaidOrders' => Order::query()
+                ->where('payment_method', 'installment')
+                ->where('payment_status', 'paid')
+                ->count(),
             'totalCustomers' => User::query()
                 ->where('role', 'customer')
                 ->count(),
@@ -263,10 +272,14 @@ class AdminDashboardService
                         WHEN status = 'refunded' THEN -amount
                         ELSE amount
                     END
-                ) as revenue"
+                ) as revenue,
+                COUNT(
+                    DISTINCT order_id
+                ) as orders"
             )
             ->groupBy('period')
-            ->pluck('revenue', 'period');
+            ->get()
+            ->keyBy('period');
 
         return collect(range(0, $months - 1))
             ->map(function (int $offset) use ($start, $rows) {
@@ -277,7 +290,8 @@ class AdminDashboardService
                     'key' => $key,
                     'label' => $this->persianDate($date, 'LLLL'),
                     'full_label' => $this->persianDate($date, 'MMMM yyyy'),
-                    'revenue' => (float) ($rows->get($key) ?? 0),
+                    'revenue' => (float) ($rows->get($key)['revenue'] ?? 0),
+                    'orders' => (int) ($rows->get($key)['orders'] ?? 0),
                 ];
             });
     }
