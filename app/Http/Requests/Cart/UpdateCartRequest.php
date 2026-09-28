@@ -1,8 +1,8 @@
 <?php
 
-namespace AppHttpRequestsCart;
+namespace App\Http\Requests\Cart;
 
-use IlluminateFoundationHttpFormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateCartRequest extends FormRequest
 {
