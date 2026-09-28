@@ -10,6 +10,7 @@ export default defineConfig({
                 'resources/css/admin.css',
                 'resources/js/app.js',
                 'resources/js/admin-image-cropper.js',
+                'resources/js/admin-product-selector.js',
             ],
             refresh: true,
         }),
