@@ -1,16 +1,16 @@
 <?php
 
-namespace AppHttpControllersAdmin;
+namespace App\Http\Controllers\Admin;
 
-use AppHttpControllersController;
-use AppHttpRequestsAdminProductVariantStoreProductVariantRequest;
-use AppHttpRequestsAdminProductVariantUpdateProductVariantRequest;
-use AppModelsProduct;
-use AppModelsProductImage;
-use AppModelsProductVariant;
-use IlluminateHttpRedirectResponse;
-use IlluminateHttpRequest;
-use IlluminateViewView;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\ProductVariant\StoreProductVariantRequest;
+use App\Http\Requests\Admin\ProductVariant\UpdateProductVariantRequest;
+use App\Models\Product;
+use App\Models\ProductImage;
+use App\Models\ProductVariant;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class ProductVariantController extends Controller
 {
