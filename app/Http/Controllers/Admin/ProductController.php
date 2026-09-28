@@ -44,7 +44,27 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request): RedirectResponse
     {
-        Product::create($request->validated());
+        $data = $request->validated();
+
+        $uploadedImage = $request->file('image');
+        unset($data['image']);
+
+        $product = Product::create($data);
+
+        if ($uploadedImage) {
+            $path = $uploadedImage->store(
+                'products/images',
+                'public'
+            );
+
+            ProductImage::create([
+                'product_id' => $product->id,
+                'path' => $path,
+                'alt' => $product->name,
+                'sort_order' => 0,
+                'is_primary' => true,
+            ]);
+        }
 
         return redirect()
             ->route('admin.products.index')
