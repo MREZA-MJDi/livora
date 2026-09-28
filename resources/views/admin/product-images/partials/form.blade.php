@@ -66,29 +66,64 @@
         <div class="admin-card p-6">
 
             <div class="mb-6">
-                <h3 class="text-base font-bold text-[var(--admin-text)]">
-                    تصویر
-                </h3>
+                <div class="flex items-center justify-between gap-3">
+                    <div>
+                        <h3 class="text-base font-bold text-[var(--admin-text)]">
+                            تصویر
+                        </h3>
 
-                <p class="mt-1 text-xs text-[var(--admin-muted)]">
-                    تصویر محصول را انتخاب یا در حالت ویرایش جایگزین کنید.
-                </p>
+                        <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">
+                            پیش‌نمایش با همان نسبت تصویری که در کارت محصول فروشگاه دیده می‌شود.
+                        </p>
+                    </div>
+
+                    <span class="admin-badge admin-badge-info">
+                        4:5
+                    </span>
+                </div>
             </div>
 
+            <div class="admin-image-preview mb-5 aspect-[4/5] max-w-xl">
 
-            @if($editing && $productImage->url)
-
-                <div class="admin-image-preview mb-5 aspect-video max-w-xl">
+                @if($editing && $productImage->url)
 
                     <img
+                        id="product-detail-image-preview"
                         src="{{ $productImage->url }}"
                         alt="{{ $productImage->alt ?: 'Product image' }}"
                         class="admin-image"
                     >
 
-                </div>
+                    <div
+                        id="product-detail-image-placeholder"
+                        data-image-preview-placeholder
+                        class="hidden h-full flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--admin-border)] bg-[var(--admin-surface-soft)] p-6 text-center"
+                    >
+                        <span class="text-xs text-[var(--admin-muted)]">
+                            تصویر جدیدی انتخاب نشده است.
+                        </span>
+                    </div>
 
-            @endif
+                @else
+
+                    <img
+                        id="product-detail-image-preview"
+                        src=""
+                        alt="پیش‌نمایش تصویر محصول"
+                        class="admin-image hidden"
+                    >
+
+                    <div
+                        id="product-detail-image-placeholder"
+                        data-image-preview-placeholder
+                        class="flex h-full flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--admin-border)] bg-[var(--admin-surface-soft)] p-6 text-center"
+                    >
+                        <span class="text-xs text-[var(--admin-muted)]">
+                            هنوز تصویری انتخاب نشده است.
+                        </span>
+                    </div>
+
+                @endif
 
 
             <label for="image" class="admin-label">
@@ -101,6 +136,8 @@
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
                 class="admin-input p-2"
+                data-image-preview-target="#product-detail-image-preview"
+                data-image-preview-placeholder="#product-detail-image-placeholder"
                 {{ $editing ? '' : 'required' }}
             >
 
