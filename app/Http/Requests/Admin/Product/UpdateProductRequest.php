@@ -154,6 +154,7 @@ class UpdateProductRequest extends FormRequest
                 'required',
                 'numeric',
                 'min:0',
+                'max:9999999999999.99',
                 'decimal:0,2',
             ],
 
@@ -161,6 +162,7 @@ class UpdateProductRequest extends FormRequest
                 'nullable',
                 'numeric',
                 'min:0',
+                'max:9999999999999.99',
                 'decimal:0,2',
                 'gte:price',
             ],
@@ -274,10 +276,12 @@ class UpdateProductRequest extends FormRequest
             'price.required' => 'وارد کردن قیمت محصول الزامی است.',
             'price.numeric' => 'قیمت محصول باید یک عدد معتبر باشد.',
             'price.min' => 'قیمت محصول نمی‌تواند منفی باشد.',
+            'price.max' => 'قیمت محصول بیش از سقف مجاز است.',
             'price.decimal' => 'قیمت محصول باید حداکثر دو رقم اعشار داشته باشد.',
 
             'compare_at_price.numeric' => 'قیمت قبل باید یک عدد معتبر باشد.',
             'compare_at_price.min' => 'قیمت قبل نمی‌تواند منفی باشد.',
+            'compare_at_price.max' => 'قیمت قبل بیش از سقف مجاز است.',
             'compare_at_price.decimal' => 'قیمت قبل باید حداکثر دو رقم اعشار داشته باشد.',
             'compare_at_price.gte' => 'قیمت قبل باید بیشتر یا مساوی قیمت فعلی باشد.',
 
