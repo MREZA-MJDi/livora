@@ -281,7 +281,7 @@
                             <img
                                 src="{{ $image->url }}"
                                 alt="{{ $image->alt ?? 'تصویر محصول' }}"
-                                class="aspect-[4/3] w-full object-cover transition duration-200 group-hover:scale-[1.02]"
+                                class="aspect-[4/5] w-full object-cover transition duration-200 group-hover:scale-[1.02]"
                             >
 
                             <span class="absolute inset-0 hidden bg-black/10 peer-checked:block"></span>
