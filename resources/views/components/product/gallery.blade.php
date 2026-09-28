@@ -1,6 +1,7 @@
 @props([
 'product' => null,
 'images' => null,
+'variantImageMap' => [],
 ])
 
 @php
@@ -55,6 +56,8 @@
     x-data="{
         active: 0,
         zoom: false,
+        selectedVariantId: null,
+        variantImageMap: @js($variantImageMap),
 
         images: @js(
             $resolvedImages->map(function ($image) use ($productName) {
@@ -82,8 +85,50 @@
             this.active =
                 (this.active - 1 + this.images.length)
                 % this.images.length;
+        },
+
+        selectVariant(event) {
+            const detail = event?.detail ?? {};
+            const id = detail.id ?? null;
+
+            if (!id) {
+                return;
+            }
+
+            this.selectedVariantId = String(id);
+
+            const indexes =
+                this.variantImageMap[String(id)]
+                ?? this.variantImageMap[id]
+                ?? [];
+
+            if (indexes.length) {
+                this.active = Number(indexes[0]) || 0;
+            } else if (
+                ['color', 'colour', 'رنگ'].includes(
+                    String(detail.type ?? '').toLowerCase()
+                )
+            ) {
+                this.active = 0;
+            }
+        },
+
+        variantImageIndexes() {
+            if (!this.selectedVariantId) {
+                return [];
+            }
+
+            const indexes =
+                this.variantImageMap[String(this.selectedVariantId)]
+                ?? this.variantImageMap[this.selectedVariantId]
+                ?? [];
+
+            return indexes
+                .map(index => Number(index))
+                .filter(index => this.images[index]);
         }
     }"
+    @product-variant-selected.window="selectVariant($event)"
     class="w-full"
 >
 
@@ -295,6 +340,65 @@
         </div>
 
     @endif
+
+
+    {{-- =========================================================
+         SELECTED VARIANT IMAGES
+    ========================================================== --}}
+
+    <template x-if="variantImageIndexes().length">
+
+        <div class="mt-5 rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-surface)] p-4">
+
+            <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+
+                <div>
+                    <p class="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                        VARIANT GALLERY
+                    </p>
+
+                    <p class="mt-1 text-xs text-[var(--livora-stone)]">
+                        تصاویر مرتبط با گزینه انتخاب‌شده
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="mt-3 flex gap-3 overflow-x-auto pb-1">
+
+                <template
+                    x-for="(imageIndex, index) in variantImageIndexes()"
+                    :key="'variant-' + selectedVariantId + '-' + imageIndex"
+                >
+
+                    <button
+                        type="button"
+                        @click="active = imageIndex"
+                        class="group h-16 w-14 shrink-0 overflow-hidden rounded-xl bg-[var(--livora-white)]"
+                        :class="
+                            active === imageIndex
+                            ? 'ring-2 ring-[var(--livora-ink)] ring-offset-1'
+                            : 'opacity-70 hover:opacity-100'
+                        "
+                        :aria-label="'نمایش تصویر ' + (index + 1) + ' از گزینه انتخاب‌شده'"
+                    >
+
+                        <img
+                            :src="images[imageIndex].url"
+                            :alt="images[imageIndex].alt"
+                            loading="lazy"
+                            class="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                        >
+
+                    </button>
+
+                </template>
+
+            </div>
+
+        </div>
+
+    </template>
 
 
     {{-- =========================================================
