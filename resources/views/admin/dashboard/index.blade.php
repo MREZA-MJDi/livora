@@ -813,7 +813,7 @@
                     </div>
 
 
-                    <div class="grid grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
 
                         <a
                             href="{{ route('admin.products.index', ['stock' => 'low_stock']) }}"
@@ -838,6 +838,23 @@
 
                             <p class="mt-2 text-xl font-bold text-sky-700">
                                 {{ number_format($draftProductsCount) }}
+                            </p>
+                        </a>
+
+                        <a
+                            href="{{ route('admin.product-variants.index') }}"
+                            class="rounded-2xl border border-[var(--admin-border)] p-4 transition hover:border-[var(--admin-accent)] hover:bg-[var(--admin-surface)]"
+                        >
+                            <p class="text-[10px] text-[var(--admin-muted)]">
+                                تنوع‌های فعال
+                            </p>
+
+                            <p class="mt-2 text-xl font-bold text-[var(--admin-text)]">
+                                {{ number_format($activeVariants) }}
+                            </p>
+
+                            <p class="mt-1 text-[9px] text-[var(--admin-muted)]">
+                                از {{ number_format($totalVariants) }} تنوع · {{ number_format($lowStockVariants) }} کم‌موجودی
                             </p>
                         </a>
 
