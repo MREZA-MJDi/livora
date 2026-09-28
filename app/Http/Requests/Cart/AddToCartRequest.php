@@ -1,10 +1,10 @@
 <?php
 
-namespace AppHttpRequestsCart;
+namespace App\Http\Requests\Cart;
 
-use AppModelsProduct;
-use IlluminateFoundationHttpFormRequest;
-use IlluminateValidationRule;
+use App\Models\Product;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class AddToCartRequest extends FormRequest
 {
