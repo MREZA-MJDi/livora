@@ -114,7 +114,19 @@ class CategoryController extends Controller
      */
     public function show(Category $category): View
     {
-        return view('admin.categories.show', compact('category'));
+        $products = $category
+            ->products()
+            ->with([
+                'primaryImage',
+            ])
+            ->latest('id')
+            ->paginate(12, ['*'], 'products_page')
+            ->withQueryString();
+
+        return view(
+            'admin.categories.show',
+            compact('category', 'products')
+        );
     }
 
     /**
