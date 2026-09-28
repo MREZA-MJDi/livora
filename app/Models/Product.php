@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Product extends Model
 {
@@ -78,6 +79,20 @@ class Product extends Model
         return $this->hasMany(ProductImage::class)
             ->orderByDesc('is_primary')
             ->orderBy('sort_order');
+    }
+
+    /**
+     * The explicitly selected primary image.
+     *
+     * This relation is intentionally separate from the full image gallery
+     * so admin listings can eager-load a single image instead of triggering
+     * an N+1 query per product row.
+     */
+    public function primaryImage(): HasOne
+    {
+        return $this->hasOne(ProductImage::class)
+            ->where('is_primary', true)
+            ->with('media');
     }
 
     public function variants(): HasMany
