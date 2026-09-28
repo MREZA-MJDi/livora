@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Checkout\PlaceOrderRequest;
 use App\Models\Cart;
+use App\Models\CartItem;
+use App\Models\ProductVariant;
 use App\Models\Order;
 use App\Services\Installments\InstallmentPlanService;
 use App\Services\Payments\PaymentService;
@@ -128,12 +130,23 @@ class CheckoutController extends Controller
 
                 foreach ($cart->items as $item) {
 
-                    $stock =
-                        $item->variant?->stock
-                        ?? $item->product->stock;
+                    $variants = $this->resolveCartItemVariants($item);
 
                     if (
-                        $stock === null
+                        count($item->selectedVariantIds())
+                        !== $variants->count()
+                    ) {
+                        throw new \RuntimeException(
+                            "یکی از گزینه‌های انتخاب‌شده برای «{$item->product->name}» دیگر در دسترس نیست."
+                        );
+                    }
+
+                    $stock = $variants->isNotEmpty()
+                        ? (int) $variants->min('stock')
+                        : (int) $item->product->stock;
+
+                    if (
+                        $stock < 1
                         || $item->quantity > $stock
                     ) {
                         throw new \RuntimeException(
@@ -227,8 +240,16 @@ class CheckoutController extends Controller
                         'product_id' =>
                             $item->product_id,
 
+                        /*
+                         * Keep the existing single-variant relation for
+                         * backwards compatibility; the full selection is
+                         * preserved below in variant_options.
+                         */
                         'product_variant_id' =>
                             $item->product_variant_id,
+
+                        'variant_options' =>
+                            $item->variant_options,
 
                         'product_name' =>
                             $item->product->name,
@@ -291,6 +312,7 @@ class CheckoutController extends Controller
                 );
         }
     }
+
     /**
      * Show payment selection page.
      */
@@ -514,6 +536,28 @@ class CheckoutController extends Controller
                     'خطایی در تأیید پرداخت رخ داد.'
                 );
         }
+    }
+
+    /**
+     * Resolve all active variants represented by a cart item.
+     *
+     * The JSON snapshot keeps the historical selection even if a variant
+     * is later deleted, while this lookup validates live availability.
+     */
+    protected function resolveCartItemVariants(
+        CartItem $item
+    ) {
+        $ids = $item->selectedVariantIds();
+
+        if (empty($ids)) {
+            return collect();
+        }
+
+        return ProductVariant::query()
+            ->where('product_id', $item->product_id)
+            ->where('is_active', true)
+            ->whereIn('id', $ids)
+            ->get();
     }
 
     /**
