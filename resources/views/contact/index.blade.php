@@ -176,7 +176,7 @@
                                         PHONE
                                     </p>
 
-                                    <h2 class="mt-2 text-base font-semibold">
+                                    <h2 class="mt-2 min-w-0 break-words text-base font-semibold">
                                         {{ $contactSetting?->phone_label ?? 'تماس تلفنی' }}
                                     </h2>
 
@@ -220,7 +220,7 @@
                                     EMAIL
                                 </p>
 
-                                <h2 class="mt-2 text-base font-semibold">
+                                <h2 class="mt-2 min-w-0 break-words text-base font-semibold">
                                     {{ $contactSetting?->email_label ?? 'ایمیل' }}
                                 </h2>
 
@@ -251,11 +251,11 @@
             SUPPORT
         </p>
 
-        <h2 class="mt-2 text-base font-semibold">
+        <h2 class="mt-2 min-w-0 break-words text-base font-semibold">
             {{ $contactSetting?->support_label ?? 'پشتیبانی' }}
         </h2>
 
-        <p class="mt-3 text-xs leading-6 text-[var(--livora-stone)]">
+        <p class="mt-3 min-w-0 break-words text-xs leading-6 text-[var(--livora-stone)]">
             {{ $contactSetting?->support_description ?? 'پاسخ‌گویی به پرسش‌های خرید و سفارش.' }}
         </p>
 
@@ -274,11 +274,11 @@
             ONLINE
         </p>
 
-        <h2 class="mt-2 text-base font-semibold">
+        <h2 class="mt-2 min-w-0 break-words text-base font-semibold">
             {{ $contactSetting?->online_label ?? 'ارتباط آنلاین' }}
         </h2>
 
-        <p class="mt-3 text-xs leading-6 text-[var(--livora-stone)]">
+        <p class="mt-3 min-w-0 break-words text-xs leading-6 text-[var(--livora-stone)]">
             {{ $contactSetting?->online_description ?? 'پیام خود را ارسال کنید تا با شما تماس بگیریم.' }}
         </p>
 
@@ -329,7 +329,7 @@
                                 ADDRESS
                             </p>
 
-                            <p class="mt-3 text-sm leading-8 text-[var(--livora-stone)]">
+                            <p class="mt-3 min-w-0 max-w-prose break-words text-sm leading-8 text-[var(--livora-stone)]">
                                 {{ $contactSetting?->address ?? 'آدرس فروشگاه ثبت نشده است.' }}
                             </p>
 
@@ -344,7 +344,7 @@
                                 HOURS
                             </p>
 
-                            <p class="mt-3 text-sm leading-8 text-[var(--livora-stone)]">
+                            <p class="mt-3 min-w-0 max-w-prose break-words text-sm leading-8 text-[var(--livora-stone)]">
                                 {{ $contactSetting?->hours ?? 'ساعات کاری فروشگاه ثبت نشده است.' }}
                             </p>
 
@@ -359,7 +359,7 @@
                                 INSTALLMENT
                             </p>
 
-                            <p class="mt-3 text-sm leading-8 text-[var(--livora-stone)]">
+                            <p class="mt-3 min-w-0 max-w-prose break-words text-sm leading-8 text-[var(--livora-stone)]">
                                 برای اطلاع از شرایط اقساط هر محصول،
                                 صفحه همان محصول را بررسی کنید یا از طریق فرم با ما تماس بگیرید.
                             </p>
