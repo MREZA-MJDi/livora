@@ -85,7 +85,7 @@
         $heroProducts = $featuredProducts
             ->filter(
                 fn ($product) =>
-                    $product->images?->first()?->url
+                    $product->primaryImage?->url
             )
             ->values();
 
@@ -247,7 +247,7 @@
                                 @foreach($heroProducts as $index => $product)
 
                                     @php
-                                        $image = $product->images?->first()?->url;
+                                        $image = $product->primaryImage?->url;
                                     @endphp
 
                                     <div
