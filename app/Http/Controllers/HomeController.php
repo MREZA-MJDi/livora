@@ -18,33 +18,17 @@ class HomeController extends Controller
             ->orderBy('sort_order')
             ->get();
 
+        /*
+         * The homepage is kept in sync with admin CRUD by ordering active
+         * products by updated_at. Creating or editing a product therefore
+         * moves it into the homepage collection without requiring flags.
+         */
         $featuredProducts = Product::query()
             ->active()
-            ->featured()
             ->with(['category', 'images'])
-            ->latest()
+            ->orderByDesc('updated_at')
             ->limit(8)
             ->get();
-
-        /*
-         * Featured products stay first. Any remaining homepage slots are
-         * filled with the latest active products so a product created or
-         * activated from admin becomes visible without requiring a separate
-         * "featured" or "new" flag.
-         */
-        if ($featuredProducts->count() < 8) {
-            $fallbackProducts = Product::query()
-                ->active()
-                ->whereNotIn('id', $featuredProducts->pluck('id'))
-                ->with(['category', 'images'])
-                ->latest()
-                ->limit(8 - $featuredProducts->count())
-                ->get();
-
-            $featuredProducts = $featuredProducts
-                ->concat($fallbackProducts)
-                ->values();
-        }
 
         $newProducts = Product::query()
             ->active()
