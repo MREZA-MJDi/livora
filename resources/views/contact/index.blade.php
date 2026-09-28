@@ -451,7 +451,7 @@
 
                                 <label
                                     for="name"
-                                    class="admin-label"
+                                    class="block text-xs font-semibold text-[var(--livora-ink)]"
                                 >
                                     نام و نام خانوادگی
                                 </label>
@@ -461,7 +461,7 @@
                                     name="name"
                                     type="text"
                                     value="{{ old('name', auth()->user()?->name) }}"
-                                    class="admin-input mt-2 w-full @error('name') border-[var(--livora-danger)] @enderror"
+                                    class="rounded-[0.9rem] border border-[var(--livora-border)] bg-[var(--livora-white)] px-3.5 py-2.5 text-sm text-[var(--livora-ink)] outline-none transition placeholder:text-[var(--livora-stone)] focus:border-[var(--livora-accent)] focus:ring-4 focus:ring-[var(--livora-accent)]/10 disabled:cursor-not-allowed disabled:opacity-55 mt-2 w-full @error('name') border-[var(--livora-danger)] @enderror"
                                     autocomplete="name"
                                     placeholder="نام شما"
                                 >
@@ -483,7 +483,7 @@
 
                                 <label
                                     for="phone"
-                                    class="admin-label"
+                                    class="block text-xs font-semibold text-[var(--livora-ink)]"
                                 >
                                     شماره تماس
                                 </label>
@@ -493,7 +493,7 @@
                                     name="phone"
                                     type="tel"
                                     value="{{ old('phone', auth()->user()?->phone) }}"
-                                    class="admin-input mt-2 w-full @error('phone') border-[var(--livora-danger)] @enderror"
+                                    class="rounded-[0.9rem] border border-[var(--livora-border)] bg-[var(--livora-white)] px-3.5 py-2.5 text-sm text-[var(--livora-ink)] outline-none transition placeholder:text-[var(--livora-stone)] focus:border-[var(--livora-accent)] focus:ring-4 focus:ring-[var(--livora-accent)]/10 disabled:cursor-not-allowed disabled:opacity-55 mt-2 w-full @error('phone') border-[var(--livora-danger)] @enderror"
                                     autocomplete="tel"
                                     dir="ltr"
                                     placeholder="09xxxxxxxxx"
@@ -518,7 +518,7 @@
 
                             <label
                                 for="email"
-                                class="admin-label"
+                                class="block text-xs font-semibold text-[var(--livora-ink)]"
                             >
                                 ایمیل
                             </label>
@@ -528,7 +528,7 @@
                                 name="email"
                                 type="email"
                                 value="{{ old('email', auth()->user()?->email) }}"
-                                class="admin-input mt-2 w-full @error('email') border-[var(--livora-danger)] @enderror"
+                                class="rounded-[0.9rem] border border-[var(--livora-border)] bg-[var(--livora-white)] px-3.5 py-2.5 text-sm text-[var(--livora-ink)] outline-none transition placeholder:text-[var(--livora-stone)] focus:border-[var(--livora-accent)] focus:ring-4 focus:ring-[var(--livora-accent)]/10 disabled:cursor-not-allowed disabled:opacity-55 mt-2 w-full @error('email') border-[var(--livora-danger)] @enderror"
                                 autocomplete="email"
                                 dir="ltr"
                                 placeholder="you@example.com"
@@ -551,7 +551,7 @@
 
                             <label
                                 for="subject"
-                                class="admin-label"
+                                class="block text-xs font-semibold text-[var(--livora-ink)]"
                             >
                                 موضوع
                             </label>
@@ -559,7 +559,7 @@
                             <select
                                 id="subject"
                                 name="subject"
-                                class="admin-select mt-2 w-full @error('subject') border-[var(--livora-danger)] @enderror"
+                                class="rounded-[0.9rem] border border-[var(--livora-border)] bg-[var(--livora-white)] px-3.5 py-2.5 text-sm text-[var(--livora-ink)] outline-none transition placeholder:text-[var(--livora-stone)] focus:border-[var(--livora-accent)] focus:ring-4 focus:ring-[var(--livora-accent)]/10 disabled:cursor-not-allowed disabled:opacity-55 mt-2 w-full @error('subject') border-[var(--livora-danger)] @enderror"
                             >
 
                                 <option value="">
@@ -620,7 +620,7 @@
 
                             <label
                                 for="message"
-                                class="admin-label"
+                                class="block text-xs font-semibold text-[var(--livora-ink)]"
                             >
                                 پیام
                             </label>
@@ -629,7 +629,7 @@
                                 id="message"
                                 name="message"
                                 rows="7"
-                                class="admin-textarea mt-2 w-full @error('message') border-[var(--livora-danger)] @enderror"
+                                class="min-h-32 resize-y rounded-[0.9rem] border border-[var(--livora-border)] bg-[var(--livora-white)] px-3.5 py-2.5 text-sm text-[var(--livora-ink)] outline-none transition placeholder:text-[var(--livora-stone)] focus:border-[var(--livora-accent)] focus:ring-4 focus:ring-[var(--livora-accent)]/10 disabled:cursor-not-allowed disabled:opacity-55 mt-2 w-full @error('message') border-[var(--livora-danger)] @enderror"
                                 placeholder="پیام خود را بنویسید..."
                             >{{ old('message') }}</textarea>
 
