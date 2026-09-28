@@ -5,10 +5,6 @@
         $selectedProduct
         ?? ($productImage?->product ?? null);
 
-    $selectedProductId = old(
-        'product_id',
-        $resolvedSelectedProduct?->id ?? ''
-    );
 @endphp
 
 @csrf
