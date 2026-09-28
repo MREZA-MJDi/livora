@@ -78,17 +78,28 @@ class CategoryController extends Controller
     ): RedirectResponse {
         $data = $request->validated();
 
-        if ($request->hasFile('image')) {
-            if ($category->image) {
-                Storage::disk('public')->delete($category->image);
-            }
+        $oldImage = $category->image;
+        $newImage = null;
 
-            $data['image'] = $request
+        if ($request->hasFile('image')) {
+            $newImage = $request
                 ->file('image')
                 ->store('categories', 'public');
+
+            $data['image'] = $newImage;
         }
 
         $category->update($data);
+
+        if (
+            $newImage
+            && $oldImage
+            && ! str_starts_with($oldImage, 'http://')
+            && ! str_starts_with($oldImage, 'https://')
+            && ! str_starts_with($oldImage, '//')
+        ) {
+            Storage::disk('public')->delete($oldImage);
+        }
 
         return redirect()
             ->route('admin.categories.index')
