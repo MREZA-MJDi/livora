@@ -57,6 +57,7 @@
                     src="{{ $image }}"
                     alt="{{ $product->name }}"
                     loading="lazy"
+                    decoding="async"
                     class="h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.045]"
                 >
 
