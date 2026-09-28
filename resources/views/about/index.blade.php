@@ -153,7 +153,7 @@
 
             <x-layout.container>
 
-                <div class="grid gap-10 py-16 sm:py-20 lg:grid-cols-[0.7fr_1.3fr] lg:py-24">
+                <div class="grid gap-10 py-12 sm:py-16 lg:grid-cols-[0.7fr_1.3fr] lg:py-24">
 
                     <div>
 
@@ -197,7 +197,7 @@
 
             <x-layout.container>
 
-                <div class="py-16 sm:py-20 lg:py-24">
+                <div class="py-12 sm:py-16 lg:py-24">
 
                     <div class="max-w-2xl">
 
@@ -293,7 +293,7 @@
 
             <x-layout.container>
 
-                <div class="grid gap-10 py-16 sm:py-20 lg:grid-cols-[0.65fr_1.35fr] lg:py-24">
+                <div class="grid gap-10 py-12 sm:py-16 lg:grid-cols-[0.65fr_1.35fr] lg:py-24">
 
                     <div>
 
@@ -426,7 +426,7 @@
 
             <x-layout.container>
 
-                <div class="grid gap-10 py-16 sm:py-20 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:py-24">
+                <div class="grid gap-10 py-12 sm:py-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:py-24">
 
                     <div>
 
@@ -452,50 +452,44 @@
 
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
 
                         <div class="rounded-3xl border border-white/10 bg-white/5 p-5 sm:p-6">
-
                             <p class="text-[10px] uppercase tracking-[0.18em] text-white/40">
-                                TODAY
+                                PRODUCT
                             </p>
 
-                            <p class="mt-4 text-3xl font-semibold">
-                                50٪
+                            <p class="mt-4 text-base font-semibold">
+                                اطلاعات واقعی
                             </p>
 
                             <p class="mt-2 text-xs leading-6 text-white/40">
-                                نمونه پیش‌پرداخت
+                                شرایط هر محصول بر اساس اطلاعات ثبت‌شده همان محصول نمایش داده می‌شود.
                             </p>
-
                         </div>
 
                         <div class="rounded-3xl border border-white/10 bg-white/5 p-5 sm:p-6">
-
                             <p class="text-[10px] uppercase tracking-[0.18em] text-white/40">
-                                SCHEDULE
+                                PAYMENT
                             </p>
 
-                            <p class="mt-4 text-3xl font-semibold">
-                                2+
+                            <p class="mt-4 text-base font-semibold">
+                                پرداخت شفاف
                             </p>
 
                             <p class="mt-2 text-xs leading-6 text-white/40">
-                                فقره چک قابل تنظیم
+                                مبلغ و برنامه پرداخت قبل از ثبت سفارش قابل بررسی است.
                             </p>
-
                         </div>
 
-                        <div class="col-span-2 rounded-3xl border border-white/10 bg-white/[0.07] p-5 sm:p-6">
-
+                        <div class="sm:col-span-2 rounded-3xl border border-white/10 bg-white/[0.07] p-5 sm:p-6">
                             <p class="text-sm font-semibold">
-                                شرایط هر محصول در صفحه خودش نمایش داده می‌شود.
+                                انتخاب آگاهانه، بدون عددهای نمایشی
                             </p>
 
                             <p class="mt-2 text-xs leading-7 text-white/45">
-                                قبل از افزودن محصول به سبد، مبلغ پیش‌پرداخت و برنامه تسویه را بررسی کنید.
+                                جزئیات را روی خود محصول می‌بینید؛ این صفحه فقط مسیر تصمیم‌گیری را ساده‌تر می‌کند.
                             </p>
-
                         </div>
 
                     </div>
@@ -514,7 +508,7 @@
 
             <x-layout.container>
 
-                <div class="py-20 sm:py-28">
+                <div class="py-16 sm:py-24">
 
                     <div class="mx-auto max-w-3xl text-center">
 
