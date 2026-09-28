@@ -378,6 +378,7 @@ class AdminDashboardService
                     'paid'
                 )
             )
+            ->whereHas('product')
             ->selectRaw(
                 'product_id,
                  product_name,
