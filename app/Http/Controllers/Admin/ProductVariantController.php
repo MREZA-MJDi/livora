@@ -129,15 +129,40 @@ class ProductVariantController extends Controller
     /**
      * Show the form for creating a new product variant.
      */
+    /**
+     * Return the current product image set for the variant image picker.
+     */
+    public function productImages(Request $request)
+    {
+        $validated = $request->validate([
+            'product_id' => [
+                'required',
+                'integer',
+                'exists:products,id',
+            ],
+        ]);
+
+        $images = ProductImage::query()
+            ->with('media')
+            ->where('product_id', $validated['product_id'])
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->limit(100)
+            ->get();
+
+        return response()->json([
+            'data' => $images->map(fn (ProductImage $image) => [
+                'id' => $image->id,
+                'url' => $image->url,
+                'alt' => $image->alt,
+                'sort_order' => $image->sort_order,
+            ])->values(),
+            'has_more' => $images->count() === 100,
+        ]);
+    }
+
     public function create(Request $request): View
     {
-        $products = Product::query()
-            ->orderBy('name')
-            ->get([
-                'id',
-                'name',
-            ]);
-
         $selectedProductId = $request->filled('product_id')
             ? $request->integer('product_id')
             : null;
@@ -178,7 +203,7 @@ class ProductVariantController extends Controller
         $imageIds = $data['image_ids'] ?? [];
         unset($data['image_ids']);
 
-        DB::transaction(function () use ($data, $imageIds, &$productVariant) {
+        DB::transaction(function () use ($data, $imageIds) {
             $productVariant = ProductVariant::create($data);
             $productVariant->images()->sync($imageIds);
         });
