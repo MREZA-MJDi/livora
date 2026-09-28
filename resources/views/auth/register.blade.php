@@ -137,6 +137,16 @@
 
                             </label>
 
+                            @if($errors->first('terms'))
+                                <p
+                                    class="mt-2 flex items-start gap-2 text-[11px] leading-6 text-red-600"
+                                    role="alert"
+                                >
+                                    <span aria-hidden="true">!</span>
+                                    <span>{{ $errors->first('terms') }}</span>
+                                </p>
+                            @endif
+
 
                             <x-ui.button
                                 type="submit"
