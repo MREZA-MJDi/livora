@@ -124,14 +124,6 @@ class Product extends Model
         return $this->hasMany(OrderItem::class);
     }
 
-    public function primaryImage(): ?ProductImage
-    {
-        return $this->images()
-                ->where('is_primary', true)
-                ->first()
-            ?? $this->images()->first();
-    }
-
     public function getDiscountPercentageAttribute(): ?int
     {
         if (
