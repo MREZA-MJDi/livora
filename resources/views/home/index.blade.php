@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'SilaGallery | مبلمان و لوازم خانه')
+@section('title', 'سیلا گالری | مبلمان و لوازم خانه')
 
 @section(
     'description',
