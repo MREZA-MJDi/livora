@@ -332,6 +332,42 @@
                 </a>
 
 
+                {{-- Installments --}}
+                <a
+                    href="{{ route('admin.installments.index') }}"
+                    @class([
+                        'group flex items-center gap-3 rounded-2xl px-3 py-3 text-xs font-medium transition',
+                        'bg-[var(--admin-accent-soft)] text-[var(--admin-accent-dark)]' => request()->routeIs('admin.installments.*'),
+                        'text-[var(--admin-text-soft)] hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text)]' => !request()->routeIs('admin.installments.*'),
+                    ])
+                >
+                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.5"
+                            stroke="currentColor"
+                            class="h-4 w-4"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M12 3v18m9-9H3m14.25-6.75h-10.5A2.25 2.25 0 0 0 4.5 7.5v9a2.25 2.25 0 0 0 2.25 2.25h10.5A2.25 2.25 0 0 0 19.5 16.5v-9a2.25 2.25 0 0 0-2.25-2.25Z"
+                            />
+                        </svg>
+                    </span>
+
+                    <span class="flex-1">
+                        اقساط و وصول
+                    </span>
+
+                    @if(request()->routeIs('admin.installments.*'))
+                        <span class="h-1.5 w-1.5 rounded-full bg-[var(--admin-accent)]"></span>
+                    @endif
+                </a>
+
+
                 {{-- Customers --}}
                 <a
                     href="{{ route('admin.customers.index') }}"
