@@ -73,10 +73,10 @@
                                     </label>
 
                                     <a
-                                        href="#"
+                                        href="{{ route('contact') }}"
                                         class="text-xs text-[var(--livora-accent)]"
                                     >
-                                        رمز عبور را فراموش کرده‌اید؟
+                                        برای بازیابی رمز با پشتیبانی تماس بگیرید
                                     </a>
 
                                 </div>
