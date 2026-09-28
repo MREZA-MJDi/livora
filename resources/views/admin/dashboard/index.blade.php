@@ -82,6 +82,20 @@
                 'tone' => 'danger',
             ],
             [
+                'count' => $outOfStockVariants,
+                'label' => 'تنوع ناموجود',
+                'description' => 'تنوع‌هایی که موجودی صفر یا کمتر دارند',
+                'route' => route('admin.product-variants.index', ['stock' => 'out_of_stock']),
+                'tone' => 'danger',
+            ],
+            [
+                'count' => $lowStockVariants,
+                'label' => 'تنوع کم‌موجودی',
+                'description' => 'تنوع‌هایی با موجودی ۱ تا ۳ عدد',
+                'route' => route('admin.product-variants.index', ['stock' => 'low_stock']),
+                'tone' => 'warning',
+            ],
+            [
                 'count' => $unreadContactMessages,
                 'label' => 'پیام خوانده‌نشده',
                 'description' => 'پیام‌هایی که هنوز بررسی نشده‌اند',
@@ -312,7 +326,7 @@
 
                     <div>
                         <p class="admin-stat-label">
-                            کاتالوگ
+                            کاتالوگ و تنوع
                         </p>
 
                         <p class="mt-2 text-2xl font-bold text-[var(--admin-text)]">
@@ -320,7 +334,7 @@
                         </p>
 
                         <p class="mt-1 text-[11px] text-[var(--admin-muted)]">
-                            محصول
+                            محصول · {{ number_format($totalVariants) }} تنوع
                         </p>
                     </div>
 
@@ -337,10 +351,17 @@
                         {{ number_format($activeProducts) }}
                     </span>
 
-                    <span class="{{ $outOfStockProducts > 0 ? 'text-red-600' : 'text-emerald-600' }} font-bold">
-                        ناموجود:
-                        {{ number_format($outOfStockProducts) }}
-                    </span>
+                    <div class="flex items-center gap-3">
+                        <span class="{{ $outOfStockProducts > 0 ? 'text-red-600' : 'text-emerald-600' }} font-bold">
+                            محصول ناموجود:
+                            {{ number_format($outOfStockProducts) }}
+                        </span>
+
+                        <span class="{{ $outOfStockVariants > 0 ? 'text-red-600' : 'text-emerald-600' }} font-bold">
+                            تنوع ناموجود:
+                            {{ number_format($outOfStockVariants) }}
+                        </span>
+                    </div>
 
                 </div>
 
