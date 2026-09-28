@@ -102,6 +102,15 @@ class UpdateProductVariantRequest extends FormRequest
     {
         $colorHex = trim((string) ($this->color_hex ?? ''));
 
+        $productVariant =
+            $this->route('productVariant')
+            ?? $this->route('product_variant');
+
+        $productChanged =
+            $productVariant
+            && (int) $this->input('product_id')
+            !== (int) $productVariant->product_id;
+
         $this->merge([
             'color_hex' => $colorHex !== ''
                 ? $colorHex
@@ -110,6 +119,14 @@ class UpdateProductVariantRequest extends FormRequest
             'price_adjustment' => $this->price_adjustment ?? 0,
             'stock' => $this->stock ?? 0,
             'is_active' => $this->boolean('is_active'),
+
+            /*
+             * Existing image IDs belong to the previous product.
+             * They must not be carried into a different product.
+             */
+            'image_ids' => $productChanged
+                ? []
+                : $this->input('image_ids', []),
         ]);
     }
 
