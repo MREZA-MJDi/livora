@@ -124,6 +124,63 @@
 
 
 {{-- =========================================================
+     IMAGE PREVIEW
+     Shared by product, category, and product-image forms.
+========================================================= --}}
+
+<script>
+    document.addEventListener('change', (event) => {
+
+        const input =
+            event.target.closest('[data-image-preview-target]');
+
+        if (!input || !input.files?.[0]) {
+            return;
+        }
+
+        const target =
+            document.querySelector(
+                input.dataset.imagePreviewTarget
+            );
+
+        if (!target) {
+            return;
+        }
+
+        const file = input.files[0];
+
+        if (!file.type.startsWith('image/')) {
+            return;
+        }
+
+        const objectUrl =
+            URL.createObjectURL(file);
+
+        target.src = objectUrl;
+        target.classList.remove('hidden');
+
+        const placeholderSelector =
+            input.dataset.imagePreviewPlaceholder;
+
+        if (placeholderSelector) {
+            const placeholder =
+                document.querySelector(
+                    placeholderSelector
+                );
+
+            placeholder?.classList.add('hidden');
+        }
+
+        target.addEventListener(
+            'load',
+            () => URL.revokeObjectURL(objectUrl),
+            { once: true }
+        );
+    });
+</script>
+
+
+{{-- =========================================================
      PAGE SPECIFIC SCRIPTS
 ========================================================= --}}
 
