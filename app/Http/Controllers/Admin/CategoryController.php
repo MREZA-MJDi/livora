@@ -15,12 +15,67 @@ class CategoryController extends Controller
     /**
      * Display a listing of categories.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
-        $categories = Category::query()
-            ->orderBy('sort_order')
-            ->orderBy('name')
-            ->paginate(15);
+        $validated = $request->validate([
+            'search' => [
+                'nullable',
+                'string',
+                'max:120',
+            ],
+            'status' => [
+                'nullable',
+                'in:active,inactive',
+            ],
+            'sort' => [
+                'nullable',
+                'in:position,name_asc,name_desc,newest,oldest',
+            ],
+        ]);
+
+        $query = Category::query()
+            ->withCount('products');
+
+        if (! empty($validated['search'])) {
+            $search = trim($validated['search']);
+
+            $query->where(function ($categoryQuery) use ($search) {
+                $categoryQuery
+                    ->where('name', 'like', "%{$search}%")
+                    ->orWhere('slug', 'like', "%{$search}%");
+            });
+        }
+
+        if (($validated['status'] ?? null) === 'active') {
+            $query->where('is_active', true);
+        }
+
+        if (($validated['status'] ?? null) === 'inactive') {
+            $query->where('is_active', false);
+        }
+
+        match ($validated['sort'] ?? 'position') {
+            'name_asc' => $query
+                ->orderBy('name')
+                ->orderBy('id'),
+
+            'name_desc' => $query
+                ->orderByDesc('name')
+                ->orderByDesc('id'),
+
+            'newest' => $query->latest('id'),
+
+            'oldest' => $query->oldest('id'),
+
+            default => $query
+                ->orderBy('sort_order')
+                ->orderBy('name')
+                ->orderBy('id'),
+        };
+
+        $categories = $query
+            ->paginate(20)
+            ->withQueryString();
 
         return view('admin.categories.index', compact('categories'));
     }
