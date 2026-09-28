@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Models;
+namespace App\\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Str;
+use Illuminate\\Database\\Eloquent\\Factories\\HasFactory;
+use Illuminate\\Database\\Eloquent\\Model;
+use Illuminate\\Database\\Eloquent\\Relations\\BelongsTo;
+use Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany;
+use Illuminate\\Support\\Str;
 
 class ProductImage extends Model
 {
@@ -40,6 +41,18 @@ class ProductImage extends Model
     public function media(): BelongsTo
     {
         return $this->belongsTo(Media::class);
+    }
+
+    public function variants(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            ProductVariant::class,
+            'product_variant_images',
+            'product_image_id',
+            'product_variant_id'
+        )
+            ->withPivot('sort_order')
+            ->orderByPivot('sort_order');
     }
 
     public function getUrlAttribute(): string
