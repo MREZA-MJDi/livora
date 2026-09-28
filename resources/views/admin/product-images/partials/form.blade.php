@@ -142,7 +142,7 @@
                         maxlength="255"
                         value="{{ old('alt', $productImage->alt ?? '') }}"
                         class="admin-input"
-                        placeholder="مثلاً نمای روبه‌روی مبل LIVORA"
+                        placeholder="مثلاً نمای روبه‌روی مبل SilaGallery"
                     >
 
                     <p class="mt-2 text-xs text-[var(--admin-muted)]">

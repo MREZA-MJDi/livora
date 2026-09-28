@@ -166,8 +166,10 @@
 
         // Typography
         'font-medium',
-        'leading-none',
+        'leading-5',
         'whitespace-nowrap',
+        'max-w-full',
+        'overflow-visible',
         'select-none',
 
         // Border
@@ -237,7 +239,7 @@
         @endif
 
 
-        <span class="inline-flex items-center justify-center">
+        <span class="inline-flex max-w-full items-center justify-center text-center">
             {{ $slot }}
         </span>
 

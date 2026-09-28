@@ -2,9 +2,6 @@
 @import './variables.css';
 @import './components.css';
 @import "tailwindcss";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 
 /* =========================================================
@@ -780,3 +777,11 @@ h6 {
         transition-duration: 0.01ms !important;
     }
 }
+
+
+/* SilaGallery responsive safeguards */
+:root { --site-content-max: 1440px; }
+.livora-container { max-width: var(--site-content-max); }
+.livora-button, .admin-btn { white-space: nowrap; flex: 0 0 auto; }
+@media (max-width: 767px) { .livora-container { padding-inline: 1rem; } .livora-button { min-height: 2.875rem; padding-inline: 1rem; font-size: .8125rem; } }
+@media (min-width: 768px) { .livora-button { min-height: 3rem; } }

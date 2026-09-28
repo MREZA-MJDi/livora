@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'درباره LIVORA | مبلمان و سبک زندگی')
+@section('title', 'درباره SilaGallery | مبلمان و سبک زندگی')
 
 @section(
     'description',
-    'با LIVORA آشنا شوید؛ مجموعه‌ای برای انتخاب مبلمان و عناصر خانه با تمرکز بر طراحی، کیفیت، تجربه خرید و پرداخت منعطف.'
+    'با SilaGallery آشنا شوید؛ مجموعه‌ای برای انتخاب مبلمان و عناصر خانه با تمرکز بر طراحی، کیفیت، تجربه خرید و پرداخت منعطف.'
 )
 
 @section('canonical', route('about'))
@@ -18,12 +18,12 @@
 
     <meta
         property="og:title"
-        content="درباره LIVORA | مبلمان و سبک زندگی"
+        content="درباره SilaGallery | مبلمان و سبک زندگی"
     >
 
     <meta
         property="og:description"
-        content="LIVORA برای انتخاب دقیق‌تر، خرید ساده‌تر و ساختن خانه‌ای ماندگار شکل گرفته است."
+        content="SilaGallery برای انتخاب دقیق‌تر، خرید ساده‌تر و ساختن خانه‌ای ماندگار شکل گرفته است."
     >
 
     <meta
@@ -38,19 +38,19 @@
 
     <meta
         name="twitter:title"
-        content="درباره LIVORA"
+        content="درباره SilaGallery"
     >
 
     <meta
         name="twitter:description"
-        content="داستان، فلسفه و تجربه برند LIVORA."
+        content="داستان، فلسفه و تجربه برند SilaGallery."
     >
 
     <script type="application/ld+json">
 {
     "@@context": "https://schema.org",
     "@@type": "WebSite",
-    "name": "LIVORA",
+    "name": "SilaGallery",
     "url": @json(url('/')),
     "potentialAction": {
         "@@type": "SearchAction",
@@ -64,7 +64,7 @@
 {
     "@@context": "https://schema.org",
     "@@type": "Organization",
-    "name": "LIVORA",
+    "name": "SilaGallery",
     "url": @json(url('/'))
         }
 </script>
@@ -109,7 +109,7 @@
                         <div class="max-w-4xl">
 
                             <p class="text-[10px] font-medium uppercase tracking-[0.24em] text-[var(--livora-accent)]">
-                                ABOUT LIVORA
+                                ABOUT SilaGallery
                             </p>
 
                             <h1 class="mt-5 text-5xl font-semibold leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl">
@@ -124,7 +124,7 @@
                         <div>
 
                             <p class="text-sm leading-8 text-[var(--livora-stone)] sm:text-base">
-                                LIVORA با یک ایده ساده شکل گرفته است:
+                                SilaGallery با یک ایده ساده شکل گرفته است:
                                 انتخاب مبلمان نباید فقط خرید یک محصول باشد؛
                                 باید بخشی از ساختن فضایی باشد که هر روز در آن زندگی می‌کنیم.
                             </p>
@@ -133,7 +133,7 @@
                                 href="{{ route('shop.index') }}"
                                 class="mt-7 inline-flex items-center rounded-2xl bg-[var(--livora-ink)] px-6 py-4 text-sm font-medium !text-white transition-colors duration-300 hover:bg-[var(--livora-accent)] hover:!text-white"
                             >
-                                کشف مجموعه LIVORA
+                                کشف مجموعه SilaGallery
                             </a>
                         </div>
 
@@ -176,7 +176,7 @@
                         </p>
 
                         <p class="mt-6 text-sm leading-8 text-[var(--livora-stone)]">
-                            به همین دلیل در LIVORA تلاش می‌کنیم تجربه کشف و خرید را
+                            به همین دلیل در SilaGallery تلاش می‌کنیم تجربه کشف و خرید را
                             ساده، شفاف و بدون شلوغی نگه داریم؛ از اطلاعات محصول و قیمت
                             گرفته تا شرایط پرداخت و مسیر سفارش.
                         </p>
@@ -306,7 +306,7 @@
                         </h2>
 
                         <p class="mt-4 text-sm leading-8 text-[var(--livora-stone)]">
-                            تجربه LIVORA فقط به صفحه محصول محدود نمی‌شود.
+                            تجربه SilaGallery فقط به صفحه محصول محدود نمی‌شود.
                             تمام مسیر برای انتخاب راحت‌تر طراحی شده است.
                         </p>
 
@@ -439,7 +439,7 @@
                         </h2>
 
                         <p class="mt-5 max-w-2xl text-sm leading-8 text-white/55">
-                            برخی محصولات LIVORA می‌توانند با شرایط اقساطی تعریف‌شده توسط فروشگاه خریداری شوند.
+                            برخی محصولات SilaGallery می‌توانند با شرایط اقساطی تعریف‌شده توسط فروشگاه خریداری شوند.
                             درصد پیش‌پرداخت، تعداد چک و فاصله سررسید برای هر محصول مشخص است.
                         </p>
 
@@ -519,7 +519,7 @@
                     <div class="mx-auto max-w-3xl text-center">
 
                         <p class="text-[10px] font-medium uppercase tracking-[0.24em] text-[var(--livora-accent)]">
-                            LIVORA
+                            SilaGallery
                         </p>
 
                         <h2 class="mt-5 text-4xl font-semibold tracking-tight sm:text-5xl">
@@ -527,7 +527,7 @@
                         </h2>
 
                         <p class="mx-auto mt-5 max-w-2xl text-sm leading-8 text-[var(--livora-stone)]">
-                            مجموعه LIVORA را ببین و محصولی را پیدا کن که فقط خانه را پر نکند؛
+                            مجموعه SilaGallery را ببین و محصولی را پیدا کن که فقط خانه را پر نکند؛
                             بلکه بخشی از شخصیت آن شود.
                         </p>
 

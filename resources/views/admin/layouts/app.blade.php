@@ -14,9 +14,6 @@
 <body
     class="min-h-full bg-[var(--admin-bg)] text-[var(--admin-text)] antialiased"
 >
-@include(
-    'admin.layouts.partials.scripts'
-)
 <div
     x-data="{
         sidebarOpen: false,

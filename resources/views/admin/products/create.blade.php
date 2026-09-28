@@ -15,7 +15,7 @@
         </h2>
 
         <p class="admin-subtitle mt-2">
-            یک محصول جدید برای فروشگاه LIVORA ایجاد کنید.
+            یک محصول جدید برای فروشگاه SilaGallery ایجاد کنید.
         </p>
     </div>
 

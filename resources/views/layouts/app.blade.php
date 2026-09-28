@@ -10,12 +10,12 @@
     >
 
     <title>
-        @yield('title', 'LIVORA')
+        @yield('title', 'SilaGallery')
     </title>
 
     <meta
         name="description"
-        content="@yield('description', 'LIVORA — Furniture & Living')"
+        content="@yield('description', 'SilaGallery — Furniture & Living')"
     >
 
     @hasSection('keywords')

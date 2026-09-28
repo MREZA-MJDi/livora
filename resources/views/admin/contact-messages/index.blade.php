@@ -23,7 +23,7 @@
                 </h1>
 
                 <p class="mt-2 text-sm text-[var(--admin-muted)]">
-                    پیام‌های ارسال‌شده از فرم تماس سایت LIVORA.
+                    پیام‌های ارسال‌شده از فرم تماس سایت SilaGallery.
                 </p>
 
             </div>

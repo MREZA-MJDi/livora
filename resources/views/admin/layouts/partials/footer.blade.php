@@ -12,7 +12,7 @@
             <div>
 
                 <p class="text-[10px] font-semibold tracking-[0.16em] text-[var(--admin-text)]">
-                    LIVORA ADMIN
+                    SilaGallery ADMIN
                 </p>
 
                 <p class="mt-0.5 text-[9px] text-[var(--admin-muted)]">
@@ -46,7 +46,7 @@
             <span class="hidden h-4 w-px bg-[var(--admin-border)] sm:block"></span>
 
             <span class="text-[9px] text-[var(--admin-muted)]">
-                © {{ date('Y') }} LIVORA
+                © {{ date('Y') }} SilaGallery
             </span>
 
         </div>

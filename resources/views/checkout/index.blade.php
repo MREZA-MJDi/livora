@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'تسویه حساب | LIVORA')
+@section('title', 'تسویه حساب | SilaGallery')
 
 @section(
     'description',
-    'تکمیل اطلاعات سفارش و ادامه فرآیند پرداخت در LIVORA.'
+    'تکمیل اطلاعات سفارش و ادامه فرآیند پرداخت در SilaGallery.'
 )
 
 @section('content')
