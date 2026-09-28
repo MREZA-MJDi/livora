@@ -108,7 +108,9 @@ class ShopController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        match ($filters['sort'] ?? 'newest') {
+        match ($filters['sort'] ?? 'latest') {
+
+            'oldest' => $query->orderBy('created_at'),
 
             'price_asc' => $query->orderBy('price'),
 
