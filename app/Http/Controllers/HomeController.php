@@ -15,12 +15,12 @@ class HomeController extends Controller
             ->withCount([
                 'products' => fn ($query) => $query->active(),
             ])
-            ->with('latestActiveProduct.images.media')
+            ->with('latestActiveProduct.primaryImage')
             ->orderBy('sort_order')
             ->get();
 
         $featuredProducts = Product::query()
-            ->with(['category', 'images.media'])
+            ->with(['category', 'primaryImage'])
             ->featured()
             ->latest('updated_at')
             ->limit(8)
