@@ -57,7 +57,7 @@
                 'count' => $pendingOrders,
                 'label' => 'سفارش نیازمند پردازش',
                 'description' => 'سفارش‌های در انتظار یا در حال پردازش',
-                'route' => route('admin.orders.index', ['status' => 'processing']),
+                'route' => route('admin.orders.index'),
                 'tone' => 'warning',
             ],
             [
