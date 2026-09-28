@@ -310,6 +310,23 @@ class ProductVariantController extends Controller
     ): RedirectResponse {
         $productId = $productVariant->product_id;
 
+        if (
+            $productVariant->cartItems()->exists()
+            || $productVariant->orderItems()->exists()
+        ) {
+            return redirect()
+                ->route(
+                    'admin.product-variants.index',
+                    [
+                        'product_id' => $productId,
+                    ]
+                )
+                ->with(
+                    'error',
+                    'این تنوع در سبد خرید یا سابقه سفارش استفاده شده است؛ به‌جای حذف، آن را غیرفعال کنید.'
+                );
+        }
+
         $productVariant->delete();
 
         return redirect()
