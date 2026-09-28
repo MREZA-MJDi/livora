@@ -389,6 +389,11 @@ Route::middleware(['auth', 'admin'])
         |--------------------------------------------------------------------------
         */
 
+        Route::get(
+            'product-images/product-options',
+            [AdminProductImageController::class, 'productOptions']
+        )->name('product-images.product-options');
+
         Route::resource(
             'product-images',
             AdminProductImageController::class
