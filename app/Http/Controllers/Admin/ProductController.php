@@ -7,7 +7,9 @@ use App\Http\Requests\Admin\Product\StoreProductRequest;
 use App\Http\Requests\Admin\Product\UpdateProductRequest;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductImage;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ProductController extends Controller
@@ -68,6 +70,8 @@ class ProductController extends Controller
      */
     public function edit(Product $product): View
     {
+        $product->load('images');
+
         $categories = Category::query()
             ->orderBy('name')
             ->get();
@@ -85,10 +89,59 @@ class ProductController extends Controller
         UpdateProductRequest $request,
         Product $product
     ): RedirectResponse {
-        $product->update($request->validated());
+        $data = $request->validated();
+
+        $uploadedImage = $request->file('image');
+        unset($data['image']);
+
+        $product->update($data);
+
+        if ($uploadedImage) {
+            $primaryImage =
+                $product->images
+                    ->firstWhere('is_primary', true)
+                ?? $product->images->first();
+
+            $oldPath = $primaryImage?->path;
+
+            $newPath = $uploadedImage->store(
+                'products/images',
+                'public'
+            );
+
+            if ($primaryImage) {
+                $primaryImage->update([
+                    'path' => $newPath,
+                    'alt' => $product->name,
+                    'is_primary' => true,
+                ]);
+
+                $product->images()
+                    ->whereKeyNot($primaryImage->id)
+                    ->update(['is_primary' => false]);
+            } else {
+                ProductImage::create([
+                    'product_id' => $product->id,
+                    'path' => $newPath,
+                    'alt' => $product->name,
+                    'sort_order' => 0,
+                    'is_primary' => true,
+                ]);
+            }
+
+            if (
+                $oldPath
+                && ! str_starts_with($oldPath, 'http://')
+                && ! str_starts_with($oldPath, 'https://')
+                && ! str_starts_with($oldPath, '//')
+                && $oldPath !== $newPath
+            ) {
+                Storage::disk('public')->delete($oldPath);
+            }
+        }
 
         return redirect()
-            ->route('admin.products.index')
+            ->route('admin.products.edit', $product)
             ->with('success', 'محصول با موفقیت بروزرسانی شد.');
     }
 
