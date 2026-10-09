@@ -2,6 +2,9 @@
 
 LIVORA is a furniture and home-living e-commerce project built with Laravel. Its documented product direction includes catalogue browsing, product details, categories, filtering, cart and wishlist experiences, customer accounts, orders, payment-provider integration, and installment purchasing. Features and payment providers must be verified against the current implementation before being treated as live or production-ready.
 
+## Dedicated dashboard
+LIVORA includes its own dedicated administration dashboard for the store's operational workflow. The README describes the product scope; verify each management and payment operation against the current implementation before treating it as production-ready.
+
 ## Technology
 - PHP `^8.2`, Laravel `^12.0`
 - Blade, Tailwind CSS, Alpine.js, Vite
