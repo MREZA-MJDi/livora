@@ -1,185 +1,47 @@
 # LIVORA
 
-**LIVORA** is a modern furniture and home-living e-commerce platform built with Laravel. The project provides a complete shopping experience, including product discovery, filtering, cart management, customer accounts, orders, online payments, and installment purchasing.
+LIVORA is a furniture and home-living e-commerce project built with Laravel. Its documented product direction includes catalogue browsing, product details, categories, filtering, cart and wishlist experiences, customer accounts, orders, payment-provider integration, and installment purchasing. Features and payment providers must be verified against the current implementation before being treated as live or production-ready.
 
-## Features
+## Dedicated dashboard
+LIVORA includes its own dedicated administration dashboard for the store's operational workflow. The README describes the product scope; verify each management and payment operation against the current implementation before treating it as production-ready.
 
-* Product catalog with categories
-* Product details and image galleries
-* Advanced product filtering
-* Shopping cart
-* Wishlist
-* Customer authentication and account area
-* Checkout and order management
-* Online payment integration
-* Installment purchasing system
-* Installment plan management
-* Admin dashboard
-* Product, category, customer, order, and media management
-* Responsive RTL interface
-* SEO-friendly page structure
+## Technology
+- PHP `^8.2`, Laravel `^12.0`
+- Blade, Tailwind CSS, Alpine.js, Vite
+- Laravel database migrations and Eloquent
+- Frontend build managed by npm/Vite
 
-## Technology Stack
+## Requirements
+PHP 8.2+, Composer, Node.js/npm, and a configured Laravel-supported database.
 
-* **Backend:** PHP, Laravel
-* **Frontend:** Blade, Tailwind CSS, Alpine.js
-* **Database:** MySQL
-* **Build Tool:** Vite
-* **Architecture:** MVC
-* **Authentication:** Laravel Authentication
-* **Payments:** Gateway-based payment architecture
-
-## Payment Architecture
-
-The payment system is designed around a driver-based architecture, making it possible to support multiple payment providers without coupling the order system to a specific gateway.
-
-Supported integrations include:
-
-* DigiPay
-* SnapPay
-* TorobPay
-
-The project also includes a dedicated installment-payment flow for products that support installment sales.
-
-## Project Structure
-
-The application follows Laravel's standard MVC architecture with dedicated services, requests, models, controllers, and payment gateway drivers.
-
-Key areas include:
-
-```text
-app/
-├── Http/
-│   ├── Controllers/
-│   └── Requests/
-├── Models/
-└── Services/
-    └── Payment/
-
-resources/
-├── views/
-└── css/
-
-database/
-├── migrations/
-└── seeders/
-
-routes/
-└── web.php
-```
-
-## Main Modules
-
-### Storefront
-
-Handles product browsing, categories, filtering, product details, cart, wishlist, and checkout.
-
-### Customer Area
-
-Provides authenticated customers with access to their account and order information.
-
-### Admin Panel
-
-Provides management interfaces for:
-
-* Products
-* Product images
-* Product variants
-* Categories
-* Customers
-* Orders
-* Media
-
-### Payment System
-
-Payment processing is separated into gateway drivers and application services, allowing payment providers to be replaced or extended independently.
-
-## Installation
-
-Clone the repository:
-
+## Local setup
 ```bash
 git clone https://github.com/MREZA-MJDi/livora.git
 cd livora
-```
-
-Install PHP dependencies:
-
-```bash
 composer install
 ```
 
-Install frontend dependencies:
-
-```bash
-npm install
-```
-
-Create the environment file:
-
-```bash
-cp .env.example .env
-```
-
-Generate the application key:
+Copy `.env.example` to `.env` (`copy .env.example .env` in Windows CMD; `cp .env.example .env` on macOS/Linux), create a local database, and configure the `DB_*` values. Set payment credentials only in your local environment and only when the corresponding gateway is configured.
 
 ```bash
 php artisan key:generate
-```
-
-Configure the database and required environment variables in `.env`.
-
-Run migrations:
-
-```bash
 php artisan migrate
-```
-
-Optionally seed the database:
-
-```bash
-php artisan db:seed
-```
-
-Create the storage symlink:
-
-```bash
+npm install
+npm run build
 php artisan storage:link
-```
-
-Start the development server:
-
-```bash
 php artisan serve
 ```
 
-Run the frontend development server:
+Open `http://127.0.0.1:8000`. For Vite hot reload, run `npm run dev` in a separate terminal.
 
+## Tests
 ```bash
-npm run dev
+php artisan test
 ```
 
-## Environment Configuration
+## Payments and data safety
+Use gateway sandbox credentials for development. Never store secret keys in source control, and never claim that a payment succeeded based only on a browser redirect; payment status must be confirmed by the application's verified gateway flow. Review migrations and seeders before using them with non-disposable data.
 
-Payment credentials and other sensitive configuration values should be stored in `.env` and must not be committed to the repository.
-
-Example:
-
-```env
-PAYMENT_DEFAULT_GATEWAY=
-DIGIPAY_MERCHANT_ID=
-DIGIPAY_CLIENT_ID=
-DIGIPAY_CLIENT_SECRET=
-```
-
-## Development Status
-
-LIVORA is an actively developed e-commerce project focused on building a complete, maintainable, and scalable Laravel-based commerce platform.
-
-## Author
-
-**Mohammad Reza Majidi**
-
-Full-Stack Web Developer
-
-GitHub: [MREZA-MJDi](https://github.com/MREZA-MJDi)
+## Links
+- Repository: https://github.com/MREZA-MJDi/livora
+- Laravel documentation: https://laravel.com/docs/12.x
