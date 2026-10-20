@@ -15,12 +15,14 @@ class LoginRequest extends FormRequest
     {
         return [
             'email' => [
+                'bail',
                 'required',
                 'email:rfc',
                 'max:255',
             ],
 
             'password' => [
+                'bail',
                 'required',
                 'string',
                 'min:8',
@@ -39,8 +41,12 @@ class LoginRequest extends FormRequest
         return [
             'email.required' => 'وارد کردن ایمیل الزامی است.',
             'email.email' => 'فرمت ایمیل صحیح نیست.',
+            'email.max' => 'ایمیل نمی‌تواند بیشتر از ۲۵۵ کاراکتر باشد.',
+
             'password.required' => 'وارد کردن رمز عبور الزامی است.',
+            'password.string' => 'رمز عبور واردشده معتبر نیست.',
             'password.min' => 'رمز عبور باید حداقل ۸ کاراکتر باشد.',
+            'password.max' => 'رمز عبور نمی‌تواند بیشتر از ۲۵۵ کاراکتر باشد.',
         ];
     }
 
@@ -56,6 +62,9 @@ class LoginRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
+            'email' => mb_strtolower(
+                trim((string) $this->input('email'))
+            ),
             'remember' => $this->boolean('remember'),
         ]);
     }

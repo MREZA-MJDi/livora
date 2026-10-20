@@ -457,15 +457,15 @@
                         <div class="rounded-3xl border border-white/10 bg-white/5 p-5 sm:p-6">
 
                             <p class="text-[10px] uppercase tracking-[0.18em] text-white/40">
-                                TODAY
+                                INSTALLMENTS
                             </p>
 
                             <p class="mt-4 text-3xl font-semibold">
-                                50٪
+                                {{ $installmentProductCount > 0 ? number_format($installmentProductCount) : '—' }}
                             </p>
 
                             <p class="mt-2 text-xs leading-6 text-white/40">
-                                نمونه پیش‌پرداخت
+                                محصول دارای شرایط اقساطی
                             </p>
 
                         </div>
@@ -473,15 +473,30 @@
                         <div class="rounded-3xl border border-white/10 bg-white/5 p-5 sm:p-6">
 
                             <p class="text-[10px] uppercase tracking-[0.18em] text-white/40">
-                                SCHEDULE
+                                PAYMENT PLAN
                             </p>
 
                             <p class="mt-4 text-3xl font-semibold">
-                                2+
+                                {{ $minimumCashPercent ? number_format($minimumCashPercent) . '٪' : '—' }}
                             </p>
 
                             <p class="mt-2 text-xs leading-6 text-white/40">
-                                فقره چک قابل تنظیم
+                                حداقل پیش‌پرداخت ثبت‌شده
+                            </p>
+
+                        </div>
+
+                        <div class="col-span-2 rounded-3xl border border-white/10 bg-white/[0.07] p-5 sm:p-6">
+
+                            <p class="text-sm font-semibold">
+                                شرایط هر محصول در صفحه خودش نمایش داده می‌شود.
+                            </p>
+
+                            <p class="mt-2 text-xs leading-7 text-white/45">
+                                @if($maximumChequeCount)
+                                    بیشترین برنامه فعلی {{ number_format($maximumChequeCount) }} فقره چک است و
+                                @endif
+                                تنظیمات نهایی هر محصول در پنل مدیریت تعیین می‌شود.
                             </p>
 
                         </div>

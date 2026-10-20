@@ -68,6 +68,7 @@ class Category extends Model
     {
         return $this->hasOne(Product::class)
             ->where('status', 'active')
+            ->whereHas('images')
             ->latestOfMany('updated_at');
     }
 

@@ -25,7 +25,7 @@ class PaymentService
      * Livora internal cheque-based installment plans are handled
      * separately by InstallmentPlanService.
      */
-    public function startInstallmentPayment(
+    public function startOnlinePayment(
         Order $order,
         string $gateway
     ): array {
@@ -241,6 +241,16 @@ class PaymentService
                 'data' => [],
             ];
         }
+    }
+
+    /**
+     * Backward-compatible alias for integrations using the old method name.
+     */
+    public function startInstallmentPayment(
+        Order $order,
+        string $gateway
+    ): array {
+        return $this->startOnlinePayment($order, $gateway);
     }
 
     /**

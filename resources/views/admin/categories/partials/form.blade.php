@@ -206,49 +206,73 @@
                     : null;
             @endphp
 
-            <div class="admin-image-preview aspect-square">
+            <div
+                data-admin-image-cropper
+                class="admin-image-cropper-card"
+            >
 
-                <img
-                    id="category-image-preview"
-                    src="{{ $categoryImageUrl ?: '' }}"
-                    alt="{{ $category->name ?? 'تصویر دسته‌بندی' }}"
-                    class="admin-image {{ $categoryImageUrl ? '' : 'hidden' }}"
-                >
+                <div class="admin-image-preview admin-image-cropper-preview">
 
-                <div
-                    id="category-image-placeholder"
-                    class="{{ $categoryImageUrl ? 'hidden' : 'flex' }} h-full flex-col items-center justify-center p-6 text-center"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         fill="none" viewBox="0 0 24 24"
-                         stroke-width="1.5" stroke="currentColor"
-                         class="mb-3 h-10 w-10 text-[var(--admin-muted)]">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l2.659 2.659 1.5-1.5a2.25 2.25 0 0 1 3.182 0l3.068 3.068M3.75 19.5h16.5A1.5 1.5 0 0 0 20.25 18V6A1.5 1.5 0 0 0 20.25 4.5H3.75A1.5 1.5 0 0 0 2.25 6v12A1.5 1.5 0 0 0 3.75 19.5Z" />
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M8.25 8.25h.008v.008H8.25V8.25Z" />
-                    </svg>
+                    <img
+                        id="category-image-preview"
+                        data-crop-preview
+                        src="{{ $categoryImageUrl ?: '' }}"
+                        alt="{{ $category->name ?? 'تصویر دسته‌بندی' }}"
+                        class="admin-image {{ $categoryImageUrl ? '' : 'hidden' }}"
+                    >
 
-                    <span class="text-xs text-[var(--admin-muted)]">
-                        {{ $editing ? 'تصویری برای این دسته‌بندی ثبت نشده است.' : 'هنوز تصویری انتخاب نشده است.' }}
-                    </span>
+                    <div
+                        id="category-image-placeholder"
+                        data-crop-placeholder
+                        class="{{ $categoryImageUrl ? 'hidden' : 'flex' }} h-full flex-col items-center justify-center p-4 text-center"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             fill="none" viewBox="0 0 24 24"
+                             stroke-width="1.5" stroke="currentColor"
+                             class="mb-2 h-8 w-8 text-[var(--admin-muted)]">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l2.659 2.659 1.5-1.5a2.25 2.25 0 0 1 3.182 0l3.068 3.068M3.75 19.5h16.5A1.5 1.5 0 0 0 20.25 18V6A1.5 1.5 0 0 0 20.25 4.5H3.75A1.5 1.5 0 0 0 2.25 6v12A1.5 1.5 0 0 0 3.75 19.5Z" />
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M8.25 8.25h.008v.008H8.25V8.25Z" />
+                        </svg>
+
+                        <span class="text-[11px] leading-5 text-[var(--admin-muted)]">
+                            {{ $editing ? 'تصویری ثبت نشده است.' : 'هنوز تصویری انتخاب نشده است.' }}
+                        </span>
+                    </div>
+
+                </div>
+
+                                <div class="admin-image-cropper-actions">
+
+                    <label
+                        for="image"
+                        class="admin-btn admin-btn-secondary"
+                    >
+                        {{ $categoryImageUrl ? 'تعویض تصویر' : 'انتخاب تصویر' }}
+                    </label>
+
+                    <button
+                        type="button"
+                        data-crop-open
+                        class="admin-btn admin-btn-secondary"
+                        {{ $categoryImageUrl ? '' : 'disabled' }}
+                    >
+                        ویرایش قاب
+                    </button>
+
                 </div>
 
             </div>
 
 
-            <div class="mt-5">
-
-                <label for="image" class="admin-label">
-                    انتخاب تصویر
-                </label>
-
                 <input
                     id="image"
+                    data-crop-input
                     name="image"
                     type="file"
                     accept="image/*"
-                    class="admin-input p-2"
+                    class="sr-only"
                 >
 
                 <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">
@@ -297,54 +321,3 @@
     </div>
 
 </div>
-
-
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-
-        const imageInput =
-            document.getElementById('image');
-
-        const imagePreview =
-            document.getElementById('category-image-preview');
-
-        const imagePlaceholder =
-            document.getElementById('category-image-placeholder');
-
-        if (!imageInput || !imagePreview) {
-            return;
-        }
-
-        imageInput.addEventListener('change', function () {
-
-            const file =
-                imageInput.files?.[0];
-
-            if (!file || !file.type.startsWith('image/')) {
-                return;
-            }
-
-            const objectUrl =
-                URL.createObjectURL(file);
-
-            imagePreview.src =
-                objectUrl;
-
-            imagePreview.classList.remove('hidden');
-
-            if (imagePlaceholder) {
-                imagePlaceholder.classList.add('hidden');
-                imagePlaceholder.classList.remove('flex');
-            }
-
-            imagePreview.onload =
-                function () {
-                    URL.revokeObjectURL(objectUrl);
-                };
-
-        });
-
-    });
-</script>
-@endpush

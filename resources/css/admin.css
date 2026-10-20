@@ -1469,3 +1469,171 @@ p {
 .admin-page-header > * { min-width: 0; }
 .admin-table-wrapper { -webkit-overflow-scrolling: touch; }
 @media (max-width: 767px) { .admin-btn { min-height: 2.875rem; padding-inline: .875rem; font-size: .8125rem; } .admin-table { min-width: 680px; } .admin-page-title, .admin-title { font-size: clamp(1.4rem, 5vw, 1.7rem); } }
+
+
+/* =========================================================
+   IMAGE CROPPER
+   ========================================================= */
+
+.admin-image-cropper-card {
+    width: min(11rem, 100%);
+}
+
+.admin-image-cropper-preview {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+}
+
+.admin-image-cropper-preview .admin-image,
+.admin-image-cropper-preview > [data-crop-placeholder] {
+    width: 100%;
+    height: 100%;
+}
+
+.admin-image-cropper-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.65rem;
+}
+
+.admin-image-crop-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.admin-image-crop-modal.hidden {
+    display: none;
+}
+
+.admin-image-crop-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(28, 27, 25, 0.58);
+    backdrop-filter: blur(8px);
+}
+
+.admin-image-crop-modal__dialog {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 42rem);
+    max-height: min(92vh, 54rem);
+    overflow: hidden;
+    border: 1px solid var(--admin-border);
+    border-radius: 1.5rem;
+    background: var(--admin-white);
+    box-shadow: var(--admin-shadow-lg);
+}
+
+.admin-image-crop-modal__header,
+.admin-image-crop-modal__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+}
+
+.admin-image-crop-modal__header {
+    border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-image-crop-modal__footer {
+    border-top: 1px solid var(--admin-border);
+    background: var(--admin-surface);
+}
+
+.admin-image-crop-modal__body {
+    max-height: calc(92vh - 9.5rem);
+    overflow-y: auto;
+    padding: 1.25rem;
+}
+
+.admin-image-crop-stage {
+    position: relative;
+    width: min(100%, 30rem);
+    aspect-ratio: 4 / 5;
+    margin-inline: auto;
+    overflow: hidden;
+    border-radius: 1.25rem;
+    background: #111;
+    touch-action: none;
+    user-select: none;
+    cursor: grab;
+}
+
+.admin-image-crop-stage.is-dragging {
+    cursor: grabbing;
+}
+
+.admin-image-crop-stage canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.admin-image-crop-stage__frame {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border: 2px solid rgba(255,255,255,.82);
+    box-shadow:
+        inset 0 0 0 9999px rgba(0,0,0,.08),
+        inset 0 0 0 1px rgba(255,255,255,.18);
+    border-radius: 1.25rem;
+}
+
+.admin-image-crop-controls {
+    margin-top: 1rem;
+}
+
+.admin-image-crop-zoom {
+    display: grid;
+    gap: 0.5rem;
+    color: var(--admin-text-soft);
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+
+.admin-image-crop-zoom input[type="range"] {
+    width: 100%;
+    accent-color: var(--admin-accent);
+}
+
+body.admin-image-crop-open {
+    overflow: hidden;
+}
+
+@media (max-width: 640px) {
+    .admin-image-cropper-card {
+        width: min(10rem, 100%);
+    }
+
+    .admin-image-crop-modal {
+        align-items: flex-end;
+        padding: 0.5rem;
+    }
+
+    .admin-image-crop-modal__dialog {
+        width: 100%;
+        border-radius: 1.25rem;
+    }
+
+    .admin-image-crop-modal__body {
+        padding: 0.9rem;
+    }
+
+    .admin-image-crop-modal__header,
+    .admin-image-crop-modal__footer {
+        padding: 0.85rem 0.9rem;
+    }
+
+    .admin-image-crop-stage {
+        width: min(100%, 19rem);
+    }
+}

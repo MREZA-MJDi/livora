@@ -60,7 +60,7 @@
 
     <x-layout.search-overlay />
 
-    <x-shop.filter-drawer />
+    <x-ui.flash-messages />
 
     <main class="storefront-content">
         @yield('content')

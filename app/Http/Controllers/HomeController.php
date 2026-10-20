@@ -15,26 +15,30 @@ class HomeController extends Controller
             ->withCount([
                 'products' => fn ($query) => $query->active(),
             ])
-            ->with('latestActiveProduct.images')
+            ->with('latestActiveProduct.images.media')
             ->orderBy('sort_order')
             ->get();
 
-        /*
-         * The homepage is kept in sync with admin CRUD by ordering active
-         * products by updated_at. Creating or editing a product therefore
-         * moves it into the homepage collection without requiring flags.
-         */
         $featuredProducts = Product::query()
-            ->active()
-            ->with(['category', 'images'])
-            ->orderByDesc('updated_at')
+            ->with(['category', 'images.media'])
+            ->featured()
+            ->latest('updated_at')
             ->limit(8)
             ->get();
+
+        if ($featuredProducts->isEmpty()) {
+            $featuredProducts = Product::query()
+                ->with(['category', 'images.media'])
+                ->active()
+                ->latest('updated_at')
+                ->limit(8)
+                ->get();
+        }
 
         $newProducts = Product::query()
             ->active()
             ->new()
-            ->with(['category', 'images'])
+            ->with(['category', 'images.media'])
             ->latest()
             ->limit(8)
             ->get();

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AboutController;
 use App\Http\Controllers\Admin\ContactMessageController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\AuthController;
@@ -46,7 +47,7 @@ Route::get(
     [CategoryController::class, 'show']
 )->name('categories.show');
 
-Route::view('/about', 'about.index')
+Route::get('/about', [AboutController::class, 'index'])
     ->name('about');
 
 
@@ -209,9 +210,20 @@ Route::middleware(['auth', 'customer'])->group(function () {
             )->name('payment');
 
             Route::post(
+                '/payment/{order}/gateway',
+                [CheckoutController::class, 'startOnlinePayment']
+            )->name('payment.gateway');
+
+            // Backward-compatible alias for existing clients/forms.
+            Route::post(
                 '/payment/{order}/installment',
-                [CheckoutController::class, 'startInstallmentPayment']
+                [CheckoutController::class, 'startOnlinePayment']
             )->name('payment.installment');
+
+            Route::get(
+                '/installment/{order}/preview',
+                [CheckoutController::class, 'installmentPreview']
+            )->name('installment.preview');
 
             Route::get(
                 '/installment/{order}',

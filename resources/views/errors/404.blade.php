@@ -1,65 +1,27 @@
-@extends('admin.layouts.app')
+@extends('errors.layout')
 
-@section('title', 'صفحه پیدا نشد')
-@section('page_title', '404')
+@section('title', 'صفحه پیدا نشد | SilaGallery')
 
 @section('content')
-
-    <div class="flex min-h-[60vh] items-center justify-center">
-
-        <div class="admin-card w-full max-w-2xl p-8 text-center sm:p-12">
-
-            <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[rgba(176,138,99,0.10)] text-[var(--admin-accent)]">
-
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="h-10 w-10"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M9.75 9.75 14.25 14.25m0-4.5-4.5 4.5M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"
-                    />
-                </svg>
-
-            </div>
-
-            <p class="mt-8 text-6xl font-black text-[var(--admin-accent)]">
-                404
-            </p>
-
-            <h2 class="mt-4 text-xl font-bold text-[var(--admin-text)]">
-                صفحه پیدا نشد
-            </h2>
-
-            <p class="mx-auto mt-3 max-w-lg text-sm leading-8 text-[var(--admin-text-soft)]">
-                صفحه‌ای که به دنبال آن هستید وجود ندارد یا حذف شده است.
-            </p>
-
-            <div class="mt-8 flex flex-wrap justify-center gap-3">
-
-                <a
-                    href="{{ route('admin.dashboard') }}"
-                    class="admin-btn admin-btn-primary"
-                >
-                    داشبورد
-                </a>
-
-                <a
-                    href="{{ route('admin.products.index') }}"
-                    class="admin-btn admin-btn-secondary"
-                >
-                    محصولات
-                </a>
-
-            </div>
-
+<div class="wrap">
+    <main class="card">
+        <div class="brand">SilaGallery</div>
+        <div class="code">404</div>
+        <h1>این صفحه را پیدا نکردیم.</h1>
+        <p>ممکن است لینک تغییر کرده باشد، محصول حذف شده باشد یا آدرس اشتباه باشد.</p>
+        <div class="actions">
+            @if(url()->previous() !== url()->current())
+                <a href="{{ url()->previous() }}" class="btn secondary">بازگشت</a>
+            @endif
+            <a href="{{ route('home') }}" class="btn primary">بازگشت به فروشگاه</a>
+            @auth
+                @if(auth()->user()->isCustomer() && IlluminateSupportFacadesRoute::has('account.index'))
+                    <a href="{{ route('account.index') }}" class="btn secondary">حساب کاربری</a>
+                @elseif(auth()->user()->isAdmin() && IlluminateSupportFacadesRoute::has('admin.dashboard'))
+                    <a href="{{ route('admin.dashboard') }}" class="btn secondary">پنل مدیریت</a>
+                @endif
+            @endauth
         </div>
-
-    </div>
-
+    </main>
+</div>
 @endsection
