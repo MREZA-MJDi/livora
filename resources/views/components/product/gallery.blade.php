@@ -159,7 +159,7 @@
                         @if($index !== 0)
                         loading="lazy"
                         @endif
-                        class="absolute inset-0 h-full w-full object-cover"
+                        class="product-gallery-image absolute inset-0 h-full w-full object-contain"
                     >
 
                 @endforeach
@@ -278,7 +278,7 @@
         @else
 
             {{-- No image --}}
-            <div class="flex aspect-[4/5] w-full items-center justify-center lg:aspect-auto lg:h-[clamp(500px,calc(100svh-220px),720px)]">
+            <div class="product-gallery-stage flex aspect-[4/5] w-full items-center justify-center lg:aspect-auto lg:h-[clamp(500px,calc(100svh-220px),720px)]">
 
                 <div class="text-center">
 

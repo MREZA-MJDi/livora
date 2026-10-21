@@ -48,7 +48,7 @@
 
         <a
             href="{{ route('product.show', $product->slug) }}"
-            class="block aspect-[4/5] overflow-hidden"
+            class="product-card-media block aspect-[4/5] overflow-hidden"
         >
 
             @if($image)
@@ -57,7 +57,7 @@
                     src="{{ $image }}"
                     alt="{{ $product->name }}"
                     loading="lazy"
-                    class="h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.045]"
+                    class="product-card-image h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.045]"
                 >
 
             @else

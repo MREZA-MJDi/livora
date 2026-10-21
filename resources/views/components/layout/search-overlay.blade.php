@@ -7,7 +7,7 @@
     x-transition:leave="transition ease-in duration-200"
     x-transition:leave-start="opacity-100"
     x-transition:leave-end="opacity-0"
-    class="fixed inset-0 z-[70]"
+    class="fixed inset-0 z-[100]"
 >
 
     {{-- Backdrop --}}
@@ -28,7 +28,7 @@
         x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="translate-y-0 opacity-100"
         x-transition:leave-end="-translate-y-4 opacity-0"
-        class="relative mx-auto w-full max-w-4xl overflow-hidden rounded-b-[2rem] bg-[var(--livora-cream)] shadow-2xl"
+        class="search-overlay-panel relative mx-auto w-full max-w-4xl overflow-y-auto overscroll-contain rounded-b-[2rem] bg-[var(--livora-cream)] shadow-2xl"
     >
 
         {{-- Header --}}
@@ -41,7 +41,7 @@
                     <div>
 
                         <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--livora-accent)]">
-                            LIVORA SEARCH
+                            SILAGALLERY SEARCH
                         </p>
 
                         <p class="mt-1 text-xs text-[var(--livora-stone)]">
@@ -131,8 +131,8 @@
                         type="search"
                         x-model="searchValue"
                         autocomplete="off"
-                        placeholder="مثلاً: مبل راحتی، میز ناهارخوری، مبل چستر..."
-                        class="w-full rounded-[1.5rem] border border-[var(--livora-border)] bg-[var(--livora-white)] px-14 py-5 text-sm text-[var(--livora-ink)] outline-none transition placeholder:text-[var(--livora-stone)] focus:border-[var(--livora-ink)]"
+                        placeholder="جستجو بر اساس نام محصول، مدل یا کد کالا..."
+                        class="storefront-search-input w-full rounded-[1.5rem] border border-[var(--livora-border)] bg-[var(--livora-white)] px-14 py-5 text-sm text-[var(--livora-ink)] outline-none transition placeholder:text-[var(--livora-stone)] focus:border-[var(--livora-ink)]"
                     >
 
                     <svg
@@ -199,7 +199,7 @@
                             </p>
 
                             <p class="mt-1 text-xs text-[var(--livora-stone)]">
-                                جستجو را از دسته‌بندی‌های محبوب شروع کنید.
+                                دسته‌بندی‌های فعال فروشگاه را برای دیدن محصولات مرتبط انتخاب کنید.
                             </p>
 
                         </div>
@@ -216,74 +216,28 @@
 
 
                     <div class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-
-                        <a
-                            href="{{ route('shop.index', ['search' => 'مبل']) }}"
-                            @click="searchOpen = false"
-                            class="rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-4 transition hover:border-[var(--livora-ink)]"
-                        >
-
-                            <p class="text-sm font-medium">
-                                مبل
-                            </p>
-
-                            <p class="mt-1 text-[11px] text-[var(--livora-stone)]">
-                                Sofa
-                            </p>
-
-                        </a>
-
-
-                        <a
-                            href="{{ route('shop.index', ['search' => 'میز']) }}"
-                            @click="searchOpen = false"
-                            class="rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-4 transition hover:border-[var(--livora-ink)]"
-                        >
-
-                            <p class="text-sm font-medium">
-                                میز
-                            </p>
-
-                            <p class="mt-1 text-[11px] text-[var(--livora-stone)]">
-                                Tables
-                            </p>
-
-                        </a>
-
-
-                        <a
-                            href="{{ route('shop.index', ['search' => 'صندلی']) }}"
-                            @click="searchOpen = false"
-                            class="rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-4 transition hover:border-[var(--livora-ink)]"
-                        >
-
-                            <p class="text-sm font-medium">
-                                صندلی
-                            </p>
-
-                            <p class="mt-1 text-[11px] text-[var(--livora-stone)]">
-                                Chairs
-                            </p>
-
-                        </a>
-
-
-                        <a
-                            href="{{ route('shop.index', ['search' => 'تخت']) }}"
-                            @click="searchOpen = false"
-                            class="rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-4 transition hover:border-[var(--livora-ink)]"
-                        >
-
-                            <p class="text-sm font-medium">
-                                تخت
-                            </p>
-
-                            <p class="mt-1 text-[11px] text-[var(--livora-stone)]">
-                                Bedroom
-                            </p>
-
-                        </a>
-
+                        @forelse($searchCategories as $category)
+                            <a
+                                href="{{ route('categories.show', $category->slug) }}"
+                                @click="searchOpen = false"
+                                class="min-w-0 rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-3 transition hover:border-[var(--livora-ink)] sm:p-4"
+                            >
+                                <p class="truncate text-sm font-medium">
+                                    {{ $category->name }}
+                                </p>
+                                <p class="mt-1 text-[11px] text-[var(--livora-stone)]">
+                                    مشاهده محصولات
+                                </p>
+                            </a>
+                        @empty
+                            <a
+                                href="{{ route('shop.index') }}"
+                                @click="searchOpen = false"
+                                class="col-span-2 rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-4 text-sm font-medium transition hover:border-[var(--livora-ink)] sm:col-span-4"
+                            >
+                                مشاهده همه محصولات فروشگاه
+                            </a>
+                        @endforelse
                     </div>
 
                 </div>
@@ -305,8 +259,7 @@
                             </h2>
 
                             <p class="mt-2 max-w-xl text-xs leading-7 text-white/50">
-                                عبارت‌هایی مثل «مبل مدرن»، «مبل چستر»،
-                                «مبل راحتی» یا نام مدل را جستجو کن.
+                                نام محصول، کد کالا یا مدل موردنظر را وارد کن تا نتایج مرتبط را ببینی.
                             </p>
 
                         </div>

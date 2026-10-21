@@ -1,11 +1,11 @@
 <nav
-    class="fixed inset-x-3 bottom-3 z-[90] lg:hidden"
+    class="mobile-bottom-nav fixed inset-x-3 bottom-3 z-[90] lg:hidden"
     aria-label="ناوبری موبایل"
 >
     <div class="mx-auto grid max-w-md grid-cols-5 items-center rounded-[1.6rem] border border-[var(--livora-border)] bg-[color:var(--livora-cream)]/95 p-2 shadow-[0_16px_45px_rgba(24,23,21,.14)] backdrop-blur-2xl">
 
-        <a href="{{ route('home') }}" class="flex flex-col items-center justify-center gap-1.5 rounded-2xl px-2 py-2.5 text-[var(--livora-stone)] transition hover:text-[var(--livora-ink)]" aria-label="خانه">
-            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+        <a href="{{ route('home') }}" class="mobile-bottom-search flex flex-col items-center justify-center gap-1 rounded-2xl px-1 py-2.5 transition" aria-label="خانه">
+            <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>
             </svg>
             <span class="text-[9px] font-medium">خانه</span>
@@ -28,7 +28,7 @@
                 <circle cx="11" cy="11" r="6.5"/>
                 <path stroke-linecap="round" stroke-linejoin="round" d="m16 16 4.2 4.2"/>
             </svg>
-            <span class="text-[9px] font-medium">جستجو</span>
+            <span class="text-[10px] font-semibold">جستجو</span>
         </button>
 
         <a href="{{ route('cart.index') }}" class="relative flex flex-col items-center justify-center gap-1.5 rounded-2xl px-2 py-2.5 text-[var(--livora-stone)] transition hover:text-[var(--livora-ink)]" aria-label="سبد خرید">
