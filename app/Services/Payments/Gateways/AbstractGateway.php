@@ -295,18 +295,34 @@ abstract class AbstractGateway implements InstallmentPaymentGatewayInterface
 
             $paymentUrl = $this->extractPaymentUrl($response);
 
-            if (
-                app()->isProduction()
-                && strtolower((string) parse_url((string) $paymentUrl, PHP_URL_SCHEME)) !== 'https'
-            ) {
-                return [
-                    'success' => false,
-                    'payment_url' => null,
-                    'authority' => $this->extractAuthority($response),
-                    'transaction_id' => $this->extractTransactionId($response),
-                    'message' => 'درگاه پرداخت یک نشانی HTTPS معتبر برنگرداند.',
-                    'data' => $response,
-                ];
+            if (app()->isProduction()) {
+                $scheme = strtolower((string) parse_url((string) $paymentUrl, PHP_URL_SCHEME));
+                $host = strtolower((string) parse_url((string) $paymentUrl, PHP_URL_HOST));
+                $allowedHosts = array_values(array_filter(
+                    array_map(
+                        static fn ($allowedHost) => strtolower(trim((string) $allowedHost)),
+                        $config['allowed_redirect_hosts'] ?? []
+                    )
+                ));
+
+                if (
+                    $scheme !== 'https'
+                    || $host === ''
+                    || $allowedHosts === []
+                    || ! in_array($host, $allowedHosts, true)
+                ) {
+                    return [
+                        'success' => false,
+                        'payment_url' => null,
+                        'authority' => $this->extractAuthority($response),
+                        'transaction_id' => $this->extractTransactionId($response),
+                        'message' => 'نشانی بازگشت درگاه با فهرست دامنه‌های HTTPS تأییدشده مطابقت ندارد.',
+                        'data' => [
+                            'redirect_host' => $host ?: null,
+                            'allowlist_configured' => $allowedHosts !== [],
+                        ],
+                    ];
+                }
             }
 
             return [
