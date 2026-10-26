@@ -3,6 +3,13 @@
 return [
 
     /*
+     * The generic adapters are intentionally not production-approved until
+     * each provider's real merchant API contract and sandbox callback flow
+     * have been verified.
+     */
+    'production_ready' => (bool) env('PAYMENT_GATEWAYS_PRODUCTION_READY', false),
+
+    /*
     |--------------------------------------------------------------------------
     | Default Payment Gateway
     |--------------------------------------------------------------------------
