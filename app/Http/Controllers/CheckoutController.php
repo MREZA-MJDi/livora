@@ -598,7 +598,7 @@ class CheckoutController extends Controller
      */
     protected function activeVariantTypes(Product $product): array
     {
-        return $product->variants()
+        return $product->allVariants()
             ->select('type')
             ->distinct()
             ->pluck('type')
