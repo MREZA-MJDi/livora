@@ -42,7 +42,7 @@ class DatabaseSeeder extends Seeder
             return;
         }
 
-        throw new \\RuntimeException(
+        throw new \RuntimeException(
             'Database seeding is disabled for this environment. Use local/testing fixtures or the guarded production administrator bootstrap.'
         );
     }
