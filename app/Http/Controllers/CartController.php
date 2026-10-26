@@ -201,12 +201,14 @@ class CartController extends Controller
             ->orderBy('type')
             ->pluck('type')
             ->map(fn ($type) => (string) $type)
+            ->unique()
+            ->sort(SORT_STRING)
             ->values()
             ->all();
         $selectedTypes = $variants->pluck('type')
             ->map(fn ($type) => (string) $type)
             ->unique()
-            ->sort()
+            ->sort(SORT_STRING)
             ->values()
             ->all();
 
