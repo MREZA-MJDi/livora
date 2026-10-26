@@ -51,6 +51,8 @@ class AuthController extends Controller
                 ]);
         }
 
+        $guestCartSessionId = $request->session()->getId();
+
         if (! Auth::attempt([
             'email' => $email,
             'password' => $credentials['password'],
@@ -73,7 +75,7 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        $this->mergeGuestCartIntoUserCart($request);
+        $this->mergeGuestCartIntoUserCart($request, $guestCartSessionId);
 
         /*
         |--------------------------------------------------------------------------
@@ -106,6 +108,7 @@ class AuthController extends Controller
     public function register(
         RegisterRequest $request
     ): RedirectResponse {
+        $guestCartSessionId = $request->session()->getId();
         $validated = $request->validated();
 
         $user = DB::transaction(function () use (
@@ -139,7 +142,7 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        $this->mergeGuestCartIntoUserCart($request);
+        $this->mergeGuestCartIntoUserCart($request, $guestCartSessionId);
 
 
         if ($request->user()->isAdmin()) {
@@ -177,9 +180,10 @@ class AuthController extends Controller
     }
 
     protected function mergeGuestCartIntoUserCart(
-        Request $request
+        Request $request,
+        ?string $guestSessionId = null
     ): void {
-        $sessionId = $request->session()->getId();
+        $sessionId = $guestSessionId ?? $request->session()->getId();
 
         $guestCart = Cart::query()
             ->where(
@@ -210,39 +214,54 @@ class AuthController extends Controller
             );
 
         foreach ($guestCart->items as $guestItem) {
-            $existingItem = $userCart
-                ->items()
-                ->where(
-                    'product_id',
-                    $guestItem->product_id
-                )
-                ->where(
-                    'product_variant_id',
-                    $guestItem->product_variant_id
-                )
-                ->first();
+            $existingQuery = $userCart->items()
+                ->where('product_id', $guestItem->product_id);
+
+            if (filled($guestItem->variant_key)) {
+                $existingQuery->where(function ($query) use ($guestItem) {
+                    $query->where('variant_key', $guestItem->variant_key);
+
+                    // Convert the legacy base-product row into the current key.
+                    if ($guestItem->variant_key === 'base') {
+                        $query->orWhere(function ($legacy) {
+                            $legacy
+                                ->whereNull('variant_key')
+                                ->whereNull('variant_options')
+                                ->whereNull('product_variant_id');
+                        });
+                    }
+                });
+            } elseif ($guestItem->product_variant_id !== null) {
+                $existingQuery
+                    ->whereNull('variant_key')
+                    ->where('product_variant_id', $guestItem->product_variant_id);
+            } else {
+                $existingQuery
+                    ->whereNull('variant_key')
+                    ->whereNull('product_variant_id');
+            }
+
+            $existingItem = $existingQuery->first();
 
             if ($existingItem) {
-                $existingItem->increment(
-                    'quantity',
-                    $guestItem->quantity
-                );
+                $existingItem->update([
+                    'quantity' => (int) $existingItem->quantity + (int) $guestItem->quantity,
+                    'unit_price' => $guestItem->unit_price,
+                    'variant_key' => $guestItem->variant_key ?? 'base',
+                    'variant_options' => $guestItem->variant_options,
+                    'product_variant_id' => $guestItem->product_variant_id,
+                ]);
 
                 continue;
             }
 
             $userCart->items()->create([
-                'product_id' =>
-                    $guestItem->product_id,
-
-                'product_variant_id' =>
-                    $guestItem->product_variant_id,
-
-                'quantity' =>
-                    $guestItem->quantity,
-
-                'unit_price' =>
-                    $guestItem->unit_price,
+                'product_id' => $guestItem->product_id,
+                'product_variant_id' => $guestItem->product_variant_id,
+                'variant_key' => $guestItem->variant_key ?? 'base',
+                'variant_options' => $guestItem->variant_options,
+                'quantity' => $guestItem->quantity,
+                'unit_price' => $guestItem->unit_price,
             ]);
         }
 
