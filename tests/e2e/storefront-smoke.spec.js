@@ -96,7 +96,7 @@ test('mobile search opens, focuses its input and restores focus when closed', as
     await expect(searchOverlay).toBeVisible();
     await expect(page.locator('#global-search')).toBeFocused();
 
-    await page.locator('.farzin-search-overlay__panel button[aria-label="بستن جستجو"]').click();
+    await page.locator('.livora-search-panel button[aria-label="بستن جستجو"]').click();
     await expect(searchOverlay).toBeHidden();
     await expect(searchTrigger).toBeFocused();
 });
