@@ -106,7 +106,7 @@ class ShopController extends Controller
                 $stockQuery
                     ->where(function ($baseProductQuery) {
                         $baseProductQuery
-                            ->whereDoesntHave('variants')
+                            ->whereDoesntHave('allVariants')
                             ->where('stock', '>', 0);
                     })
                     ->orWhereHas('variants', fn ($variantQuery) => $variantQuery->where('stock', '>', 0));
