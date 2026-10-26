@@ -24,6 +24,7 @@
         role="dialog"
         aria-modal="true"
         aria-label="منوی موبایل"
+        data-livora-mobile-menu
         tabindex="-1"
         x-transition:enter="transition ease-out duration-300"
         x-transition:enter-start="translate-x-full"
