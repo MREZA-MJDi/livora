@@ -401,6 +401,8 @@ class CartController extends Controller
 
         return $product->variants()
             ->whereIn('id', $submitted->unique()->all())
+            ->orderBy('id')
+            ->lockForUpdate()
             ->get()
             ->sortBy(function (ProductVariant $variant) use ($submitted) {
                 return $submitted->search(
@@ -423,6 +425,8 @@ class CartController extends Controller
             ->where('product_id', $item->product_id)
             ->where('is_active', true)
             ->whereIn('id', $ids)
+            ->orderBy('id')
+            ->lockForUpdate()
             ->get();
     }
 
