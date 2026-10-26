@@ -54,7 +54,7 @@
                     <button
                         type="button"
                         aria-label="بستن جستجو"
-                        @click="searchOpen = false"
+                        @click="closeSearch()"
                         class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[var(--livora-ink)] transition hover:bg-[var(--livora-surface)]"
                     >
 
