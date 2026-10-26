@@ -359,7 +359,10 @@ class StorefrontReadinessTest extends TestCase
             'unit_price' => $product->price,
         ]);
 
-        $this->withCookie(
+        // The test helper bypasses EncryptCookies so the session store receives
+        // the exact raw ID persisted on the guest cart, just like the browser's
+        // decrypted server-side session context.
+        $this->withUnencryptedCookie(
             config('session.cookie'),
             (string) $cart->session_id
         )
