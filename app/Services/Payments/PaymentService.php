@@ -69,11 +69,43 @@ class PaymentService
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            if (
-                $lockedOrder->payment_status === 'paid'
-            ) {
+            if ($lockedOrder->payment_status === 'paid') {
                 throw new RuntimeException(
                     'این سفارش قبلاً پرداخت شده است.'
+                );
+            }
+
+            // Only one fresh external attempt may be active for an order.
+            // Old local attempts can expire after 20 minutes; a late verified
+            // callback is still reconciled by markPaymentAsPaid().
+            $staleCutoff = now()->subMinutes(20);
+
+            $staleAttempts = Payment::query()
+                ->where('order_id', $lockedOrder->id)
+                ->whereIn('status', ['pending', 'initiated'])
+                ->where('created_at', '<', $staleCutoff)
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->get();
+
+            foreach ($staleAttempts as $staleAttempt) {
+                $staleAttempt->update([
+                    'status' => 'failed',
+                    'metadata' => array_merge($staleAttempt->metadata ?? [], [
+                        'expired_before_retry' => true,
+                        'expired_at' => now()->toISOString(),
+                    ]),
+                ]);
+            }
+
+            $activeAttemptExists = Payment::query()
+                ->where('order_id', $lockedOrder->id)
+                ->whereIn('status', ['pending', 'initiated'])
+                ->exists();
+
+            if ($activeAttemptExists) {
+                throw new RuntimeException(
+                    'یک تلاش پرداخت برای این سفارش در حال انجام است. لطفاً همان صفحه پرداخت را ادامه دهید یا ۲۰ دقیقه پس از شروع دوباره تلاش کنید.'
                 );
             }
 
