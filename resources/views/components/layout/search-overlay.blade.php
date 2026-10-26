@@ -1,5 +1,6 @@
 <div
     x-show="searchOpen"
+    @keydown.escape.window="if (searchOpen) closeSearch()"
     x-cloak
     x-transition:enter="transition ease-out duration-300"
     x-transition:enter-start="opacity-0"
@@ -14,7 +15,7 @@
     <button
         type="button"
         aria-label="بستن جستجو"
-        @click="searchOpen = false"
+        @click="closeSearch()"
         class="absolute inset-0 bg-black/40 backdrop-blur-md"
     ></button>
 
