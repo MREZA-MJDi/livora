@@ -359,9 +359,9 @@ class StorefrontReadinessTest extends TestCase
             'unit_price' => $product->price,
         ]);
 
-        $this->withUnencryptedCookie(
+        $this->withCookie(
             config('session.cookie'),
-            $sessionCookie?->getValue() ?? ''
+            (string) $cart->session_id
         )
             ->patchJson(route('cart.update', $item), ['quantity' => 3])
             ->assertOk()
