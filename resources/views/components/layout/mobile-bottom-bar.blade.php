@@ -22,6 +22,7 @@
             @click="openSearch($event.currentTarget)"
             class="flex flex-col items-center justify-center gap-1.5 rounded-2xl px-2 py-2.5 text-[var(--livora-stone)] transition hover:text-[var(--livora-ink)]"
             aria-label="جستجو"
+            data-livora-search-trigger
             :aria-expanded="searchOpen.toString()"
         >
             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
