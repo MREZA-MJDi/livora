@@ -71,14 +71,7 @@
             {{-- Search --}}
             <button
                 type="button"
-                @click="
-                    mobileOpen = false;
-                    searchOpen = true;
-
-                    $nextTick(() => {
-                        $refs.searchInput?.focus();
-                    });
-                "
+                @click="openSearch($event.currentTarget)"
                 class="flex w-full items-center gap-3 rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] px-4 py-4 text-right"
             >
 
