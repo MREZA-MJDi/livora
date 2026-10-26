@@ -7,6 +7,7 @@ use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\ProductVariant;
 use App\Models\Order;
+use App\Models\Product;
 use App\Services\Installments\InstallmentPlanService;
 use App\Services\Payments\PaymentService;
 use Illuminate\Http\RedirectResponse;
@@ -129,34 +130,63 @@ class CheckoutController extends Controller
                 $subtotal = 0;
 
                 foreach ($cart->items as $item) {
-
-                    $variants = $this->resolveCartItemVariants($item);
+                    // Re-read and lock the catalogue row inside the order transaction.
+                    // A product/category may have been disabled since it entered the cart.
+                    $product = Product::query()
+                        ->whereKey($item->product_id)
+                        ->lockForUpdate()
+                        ->first();
 
                     if (
-                        count($item->selectedVariantIds())
-                        !== $variants->count()
+                        ! $product
+                        || $product->status !== 'active'
+                        || ! $product->category()->where('is_active', true)->exists()
                     ) {
                         throw new \RuntimeException(
-                            "یکی از گزینه‌های انتخاب‌شده برای «{$item->product->name}» دیگر در دسترس نیست."
+                            'یکی از محصولات سبد دیگر برای خرید فعال نیست؛ سبد را به‌روزرسانی کنید.'
+                        );
+                    }
+
+                    $item->setRelation('product', $product);
+                    $variants = $this->resolveCartItemVariants($item);
+                    $selectedVariantIds = $item->selectedVariantIds();
+
+                    if (
+                        count($selectedVariantIds) !== $variants->count()
+                        || $this->activeVariantTypes($product) !== $variants->pluck('type')->map(fn ($type) => (string) $type)->unique()->sort()->values()->all()
+                    ) {
+                        throw new \RuntimeException(
+                            "گزینه‌های محصول «{$product->name}» تغییر کرده‌اند؛ لطفاً محصول را از صفحه‌اش دوباره انتخاب کنید."
                         );
                     }
 
                     $stock = $variants->isNotEmpty()
                         ? (int) $variants->min('stock')
-                        : (int) $item->product->stock;
+                        : (int) $product->stock;
 
-                    if (
-                        $stock < 1
-                        || $item->quantity > $stock
-                    ) {
+                    if ($stock < 1 || $item->quantity > $stock) {
                         throw new \RuntimeException(
-                            "موجودی محصول «{$item->product->name}» کافی نیست."
+                            "موجودی محصول «{$product->name}» کافی نیست."
                         );
                     }
 
-                    $subtotal +=
-                        (float) $item->unit_price
-                        * (int) $item->quantity;
+                    $currentUnitPrice = max(
+                        0,
+                        (float) $product->price
+                        + (float) $variants->sum(
+                            fn (ProductVariant $variant) => (float) $variant->price_adjustment
+                        )
+                    );
+
+                    // Never silently charge a stale cart price. The customer must
+                    // revisit/update the item to acknowledge its new price first.
+                    if (round($currentUnitPrice, 2) !== round((float) $item->unit_price, 2)) {
+                        throw new \RuntimeException(
+                            "قیمت محصول «{$product->name}» تغییر کرده است؛ به سبد خرید برگردید و تعداد آن را دوباره تأیید کنید."
+                        );
+                    }
+
+                    $subtotal += $currentUnitPrice * (int) $item->quantity;
                 }
 
                 $shippingCost = 0;
@@ -557,7 +587,25 @@ class CheckoutController extends Controller
             ->where('product_id', $item->product_id)
             ->where('is_active', true)
             ->whereIn('id', $ids)
-            ->get();
+            ->lockForUpdate()
+            ->get()
+            ->sortBy(fn (ProductVariant $variant) => (int) $variant->id)
+            ->values();
+    }
+
+    /**
+     * Get all active option types as a sorted list.
+     */
+    protected function activeVariantTypes(Product $product): array
+    {
+        return $product->variants()
+            ->select('type')
+            ->distinct()
+            ->orderBy('type')
+            ->pluck('type')
+            ->map(fn ($type) => (string) $type)
+            ->values()
+            ->all();
     }
 
     /**
