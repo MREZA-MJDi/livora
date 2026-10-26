@@ -39,6 +39,9 @@ Open `http://127.0.0.1:8000`. For Vite hot reload, run `npm run dev` in a separa
 php artisan test
 ```
 
+## Production readiness
+See [docs/PRODUCTION-READINESS.md](docs/PRODUCTION-READINESS.md) for deployment commands, security settings, historical inventory reconciliation, rollback, and the payment-provider release gate.
+
 ## Payments and data safety
 Use gateway sandbox credentials for development. Never store secret keys in source control, and never claim that a payment succeeded based only on a browser redirect; payment status must be confirmed by the application's verified gateway flow. Review migrations and seeders before using them with non-disposable data.
 
