@@ -183,7 +183,41 @@ class CartController extends Controller
             'variant',
         ]);
 
+        if (
+            ! $item->product
+            || $item->product->status !== 'active'
+            || ! $item->product->category()->where('is_active', true)->exists()
+        ) {
+            return back()->withErrors([
+                'product' => 'این محصول دیگر برای خرید فعال نیست.',
+            ]);
+        }
+
         $variants = $this->resolveVariantsFromCartItem($item);
+        $selectedVariantIds = $item->selectedVariantIds();
+        $availableTypes = $item->product->variants()
+            ->select('type')
+            ->distinct()
+            ->orderBy('type')
+            ->pluck('type')
+            ->map(fn ($type) => (string) $type)
+            ->values()
+            ->all();
+        $selectedTypes = $variants->pluck('type')
+            ->map(fn ($type) => (string) $type)
+            ->unique()
+            ->sort()
+            ->values()
+            ->all();
+
+        if (
+            count($selectedVariantIds) !== $variants->count()
+            || $availableTypes !== $selectedTypes
+        ) {
+            return back()->withErrors([
+                'quantity' => 'گزینه‌های این محصول تغییر کرده‌اند؛ آن را از صفحه محصول دوباره انتخاب کنید.',
+            ]);
+        }
 
         $stock = $variants->isNotEmpty()
             ? (int) $variants->min('stock')
@@ -195,8 +229,19 @@ class CartController extends Controller
             ]);
         }
 
+        // Updating the cart quantity also acknowledges the latest server-side
+        // price, so checkout will not silently charge an old snapshot.
+        $unitPrice = max(
+            0,
+            (float) $item->product->price
+            + (float) $variants->sum(
+                fn (ProductVariant $variant) => (float) $variant->price_adjustment
+            )
+        );
+
         $item->update([
             'quantity' => (int) $validated['quantity'],
+            'unit_price' => $unitPrice,
         ]);
 
         $cart = $item->cart->fresh('items');
