@@ -14,12 +14,17 @@
         type="button"
         aria-label="بستن منو"
         @click="mobileOpen = false"
+        tabindex="-1"
         class="absolute inset-0 bg-black/30 backdrop-blur-sm"
     ></button>
 
     {{-- Panel --}}
     <div
         x-show="mobileOpen"
+        role="dialog"
+        aria-modal="true"
+        aria-label="منوی موبایل"
+        tabindex="-1"
         x-transition:enter="transition ease-out duration-300"
         x-transition:enter-start="translate-x-full"
         x-transition:enter-end="translate-x-0"
