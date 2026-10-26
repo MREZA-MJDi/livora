@@ -49,7 +49,7 @@
                 <section class="space-y-4" aria-labelledby="saved-addresses-heading">
                     <div class="flex items-center justify-between gap-3">
                         <h2 id="saved-addresses-heading" class="text-lg font-semibold">آدرس‌های ذخیره‌شده</h2>
-                        <span class="rounded-full border border-[var(--livora-border)] bg-[var(--livora-white)] px-3 py-1.5 text-xs text-[var(--livora-stone)]">{{ number_format($addresses->count()) }} آدرس</span>
+                        <span class="rounded-full border border-[var(--livora-border)] bg-[var(--livora-white)] px-3 py-1.5 text-xs text-[var(--livora-stone)]">{{ number_format($addresses->total()) }} آدرس</span>
                     </div>
 
                     @forelse($addresses as $address)
@@ -92,6 +92,12 @@
                             <p class="mt-2 text-sm leading-7 text-[var(--livora-stone)]">فرم کنار صفحه را پر کنید تا اولین نشانی ارسال شما ثبت شود.</p>
                         </div>
                     @endforelse
+
+                    @if($addresses->hasPages())
+                        <div class="pt-2">
+                            {{ $addresses->links() }}
+                        </div>
+                    @endif
                 </section>
 
                 <section class="h-fit rounded-[1.6rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-5 sm:p-6" aria-labelledby="add-address-heading">
