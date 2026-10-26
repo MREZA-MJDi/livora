@@ -130,6 +130,7 @@
                 <button
                     type="button"
                     aria-label="جستجو"
+                    data-livora-search-trigger
                     :aria-expanded="searchOpen.toString()"
                     @click="openSearch($event.currentTarget)"
                     class="group flex h-10 w-10 items-center justify-center rounded-full text-[var(--livora-ink)] transition duration-300 hover:bg-[var(--livora-white)]"
