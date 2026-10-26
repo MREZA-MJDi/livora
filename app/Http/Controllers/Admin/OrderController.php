@@ -34,6 +34,13 @@ class OrderController extends Controller
             );
         }
 
+        if ($request->boolean('inventory_review')) {
+            $query->whereIn('inventory_status', [
+                'stock_conflict',
+                'needs_reconciliation',
+            ]);
+        }
+
         if ($request->filled('search')) {
             $search = trim(
                 $request->string('search')->toString()
