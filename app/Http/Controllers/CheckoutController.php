@@ -126,10 +126,41 @@ class CheckoutController extends Controller
                 $cart,
                 $validated
             ) {
+                // Serialize checkout against other checkout/cart operations.
+                // A second request must never create a second order from the same cart.
+                $lockedCart = Cart::query()
+                    ->whereKey($cart->id)
+                    ->where('user_id', Auth::id())
+                    ->where('status', 'active')
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $lockedCart) {
+                    throw new \RuntimeException(
+                        'سبد خرید در حال پردازش یا قبلاً ثبت شده است؛ صفحه را تازه‌سازی کنید.'
+                    );
+                }
+
+                $lockedCart->load([
+                    'items.product',
+                    'items.variant',
+                ]);
+
+                if ($lockedCart->items->isEmpty()) {
+                    throw new \RuntimeException('سبد خرید شما خالی است.');
+                }
+
+                // Lock catalogue rows in a stable product order to reduce deadlocks.
+                $lockedCart->setRelation(
+                    'items',
+                    $lockedCart->items
+                        ->sortBy(fn (CartItem $item) => sprintf('%020d:%020d', $item->product_id, $item->id))
+                        ->values()
+                );
 
                 $subtotal = 0;
 
-                foreach ($cart->items as $item) {
+                foreach ($lockedCart->items as $item) {
                     // Re-read and lock the catalogue row inside the order transaction.
                     // A product/category may have been disabled since it entered the cart.
                     $product = Product::query()
@@ -264,7 +295,7 @@ class CheckoutController extends Controller
                         $validated['notes'] ?? null,
                 ]);
 
-                foreach ($cart->items as $item) {
+                foreach ($lockedCart->items as $item) {
 
                     $order->items()->create([
                         'product_id' =>
@@ -300,16 +331,13 @@ class CheckoutController extends Controller
                     ]);
                 }
 
+                // Consume the cart in the same transaction as order creation.
+                // This state transition is what makes repeated submissions idempotent.
+                $lockedCart->items()->delete();
+                $lockedCart->update(['status' => 'converted']);
+
                 return $order;
             });
-
-            /*
-            |--------------------------------------------------------------------------
-            | Empty active cart only after successful transaction
-            |--------------------------------------------------------------------------
-            */
-
-            $cart->items()->delete();
 
             return redirect()
                 ->route(
