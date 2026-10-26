@@ -196,7 +196,7 @@ class StorefrontReadinessTest extends TestCase
             'unit_price' => $product->price,
         ]);
 
-        $this->withCookie(
+        $this->withUnencryptedCookie(
             config('session.cookie'),
             $sessionCookie?->getValue() ?? ''
         )
