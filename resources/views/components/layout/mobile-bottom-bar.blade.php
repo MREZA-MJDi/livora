@@ -1,5 +1,5 @@
 <nav
-    class="fixed inset-x-3 bottom-3 z-[90] lg:hidden"
+    class="livora-mobile-nav fixed inset-x-3 bottom-3 z-[90] lg:hidden"
     aria-label="ناوبری موبایل"
 >
     <div class="mx-auto grid max-w-md grid-cols-5 items-center rounded-[1.6rem] border border-[var(--livora-border)] bg-[color:var(--livora-cream)]/95 p-2 shadow-[0_16px_45px_rgba(24,23,21,.14)] backdrop-blur-2xl">
