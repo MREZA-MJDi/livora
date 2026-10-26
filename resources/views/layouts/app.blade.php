@@ -49,7 +49,22 @@
     x-data="{
         mobileOpen: false,
         searchOpen: false,
-        filterOpen: false
+        filterOpen: false,
+        searchReturnFocus: null,
+        openSearch(trigger) {
+            this.searchReturnFocus = trigger || document.activeElement;
+            this.mobileOpen = false;
+            this.searchOpen = true;
+            this.$nextTick(() => {
+                document.getElementById('global-search')?.focus({ preventScroll: true });
+            });
+        },
+        closeSearch() {
+            this.searchOpen = false;
+            this.$nextTick(() => {
+                this.searchReturnFocus?.focus?.({ preventScroll: true });
+            });
+        }
     }"
     class="min-h-screen pb-24 lg:pb-0"
 >
