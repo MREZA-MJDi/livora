@@ -881,99 +881,6 @@ class PaymentService
         ?string $transactionId = null,
         array $extraMetadata = []
     ): void {
-        DB::transaction(
-            function () use (
-                $payment,
-                $transactionId,
-                $extraMetadata
-            ) {
-                $lockedPayment =
-                    Payment::query()
-                        ->whereKey(
-                            $payment->id
-                        )
-                        ->lockForUpdate()
-                        ->firstOrFail();
-
-                /*
-                 * Idempotency.
-                 */
-                if (
-                    $lockedPayment->status === 'paid'
-                ) {
-                    return;
-                }
-
-                /*
-                 * A refunded/cancelled payment must not
-                 * magically become paid without a new attempt.
-                 */
-                if (
-                    in_array(
-                        $lockedPayment->status,
-                        [
-                            'cancelled',
-                            'refunded',
-                        ],
-                        true
-                    )
-                ) {
-                    throw new RuntimeException(
-                        'این تلاش پرداخت دیگر قابل تأیید نیست.'
-                    );
-                }
-
-                $lockedPayment->update([
-                    'status' =>
-                        'paid',
-
-                    'transaction_id' =>
-                        $transactionId
-                        ?? $lockedPayment->transaction_id,
-
-                    'paid_at' =>
-                        now(),
-
-                    'metadata' =>
-                        array_merge(
-                            $lockedPayment->metadata ?? [],
-                            $extraMetadata,
-                            [
-                                'paid_at' =>
-                                    now()->toISOString(),
-                            ]
-                        ),
-                ]);
-
-                $order =
-                    $lockedPayment->order;
-
-                if (! $order) {
-                    throw new RuntimeException(
-                        'سفارش مربوط به پرداخت پیدا نشد.'
-                    );
-                }
-
-                /*
-                 * External gateways represent an online payment.
-                 */
-                $order->update([
-                    'payment_status' => 'paid',
-
-                    'payment_method' => 'online',
-
-                    'payment_provider' =>
-                        $lockedPayment->gateway,
-                ]);
-            }
-        );
-    }
-
-    protected function markPaymentAsPaid(
-        Payment $payment,
-        ?string $transactionId = null,
-        array $extraMetadata = []
-    ): void {
         DB::transaction(function () use ($payment, $transactionId, $extraMetadata) {
             // Use one lock order for payment callbacks: order first, payment second.
             $lockedOrder = Order::query()
@@ -1003,11 +910,7 @@ class PaymentService
                 ['paid_at' => now()->toISOString()]
             );
 
-            /*
-             * An old callback may arrive after another attempt already paid the
-             * order. Record the provider-confirmed capture, but never allocate
-             * the same order's inventory a second time.
-             */
+            // A delayed callback must not allocate the same order's stock twice.
             if ($lockedOrder->payment_status === 'paid') {
                 $lockedPayment->update([
                     'status' => 'paid',
@@ -1048,8 +951,7 @@ class PaymentService
             ]);
 
             if ($lockedOrder->status === 'cancelled') {
-                // Money was captured after cancellation. Preserve the payment
-                // record and alert staff; do not deduct or ship stock automatically.
+                // A successful capture after cancellation needs refund/reconciliation.
                 $lockedOrder->update([
                     'inventory_status' => 'stock_conflict',
                     'inventory_processed_at' => now(),
@@ -1062,7 +964,7 @@ class PaymentService
                 ]);
 
                 \Illuminate\Support\Facades\Log::critical(
-                    'Livora received a successful payment for a cancelled order; manual refund/reconciliation is required.',
+                    'Livora received a successful payment for a cancelled order; manual review is required.',
                     [
                         'order_id' => $lockedOrder->id,
                         'order_number' => $lockedOrder->order_number,
