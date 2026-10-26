@@ -246,6 +246,28 @@ class StorefrontReadinessTest extends TestCase
         ]);
     }
 
+    public function test_category_page_links_back_to_the_shop_using_its_slug(): void
+    {
+        $category = $this->category([
+            'name' => 'دسته لینک',
+            'slug' => 'category-link-slug',
+        ]);
+
+        $product = $this->product($category, [
+            'name' => 'محصول دسته لینک',
+            'slug' => 'category-link-product',
+        ]);
+
+        $this->get(route('categories.show', $category->slug))
+            ->assertOk()
+            ->assertSee(route('shop.index', ['category' => $category->slug]), false)
+            ->assertSee($product->name);
+
+        $this->get(route('shop.index', ['category' => $category->slug]))
+            ->assertOk()
+            ->assertSee($product->name);
+    }
+
     public function test_public_category_index_uses_bounded_pagination(): void
     {
         for ($i = 1; $i <= 13; $i++) {
