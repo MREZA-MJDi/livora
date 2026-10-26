@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\Address;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\ProductVariant;
@@ -451,6 +452,140 @@ class StorefrontReadinessTest extends TestCase
             ->assertForbidden();
 
         $this->assertDatabaseHas('cart_items', ['id' => $item->id]);
+    }
+
+    public function test_customer_account_profile_and_address_pages_are_real_and_work(): void
+    {
+        $customer = User::create([
+            'name' => 'Livora Account Customer',
+            'email' => 'account-customer@example.test',
+            'password' => Hash::make('test-password'),
+            'role' => 'customer',
+        ]);
+
+        $this->actingAs($customer)
+            ->get(route('account.profile.edit'))
+            ->assertOk()
+            ->assertSee('ویرایش پروفایل');
+
+        $this->actingAs($customer)
+            ->get(route('account.addresses.index'))
+            ->assertOk()
+            ->assertSee('افزودن آدرس جدید');
+
+        $this->actingAs($customer)
+            ->put(route('account.profile.update'), [
+                'name' => 'Updated Account Customer',
+                'email' => 'account-customer@example.test',
+            ])
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('users', [
+            'id' => $customer->id,
+            'name' => 'Updated Account Customer',
+        ]);
+
+        $this->actingAs($customer)
+            ->post(route('account.addresses.store'), [
+                'title' => 'خانه',
+                'first_name' => 'آزمون',
+                'last_name' => 'کاربر',
+                'phone' => '۰۹۱۲۳۴۵۶۷۸۹',
+                'province' => 'تهران',
+                'city' => 'تهران',
+                'address' => 'خیابان نمونه، کوچه یک، پلاک ده',
+                'postal_code' => '۱۲۳۴۵۶۷۸۹۰',
+                'unit' => '۲',
+                'is_default' => 1,
+            ])
+            ->assertRedirect();
+
+        $address = Address::query()
+            ->where('user_id', $customer->id)
+            ->firstOrFail();
+
+        $this->assertSame('09123456789', $address->phone);
+        $this->assertSame('1234567890', $address->postal_code);
+        $this->assertTrue($address->is_default);
+
+        $this->actingAs($customer)
+            ->get(route('account.addresses.edit', $address))
+            ->assertOk()
+            ->assertSee('ویرایش آدرس ارسال');
+
+        $this->actingAs($customer)
+            ->put(route('account.addresses.update', $address), [
+                'title' => 'خانه جدید',
+                'first_name' => 'آزمون',
+                'last_name' => 'کاربر',
+                'phone' => '09123456789',
+                'province' => 'تهران',
+                'city' => 'تهران',
+                'address' => 'خیابان نمونه، کوچه دو، پلاک یازده',
+                'postal_code' => '1234567890',
+                'unit' => '۳',
+                'is_default' => 1,
+            ])
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('addresses', [
+            'id' => $address->id,
+            'title' => 'خانه جدید',
+            'is_default' => true,
+        ]);
+    }
+
+    public function test_customer_cannot_view_or_modify_another_customers_address(): void
+    {
+        $owner = User::create([
+            'name' => 'Address Owner',
+            'email' => 'address-owner@example.test',
+            'password' => Hash::make('test-password'),
+            'role' => 'customer',
+        ]);
+        $otherCustomer = User::create([
+            'name' => 'Other Customer',
+            'email' => 'other-address-customer@example.test',
+            'password' => Hash::make('test-password'),
+            'role' => 'customer',
+        ]);
+
+        $address = Address::create([
+            'user_id' => $owner->id,
+            'title' => 'خصوصی',
+            'first_name' => 'صاحب',
+            'last_name' => 'آدرس',
+            'phone' => '09123456789',
+            'province' => 'تهران',
+            'city' => 'تهران',
+            'address' => 'نشانی خصوصی برای آزمون',
+            'postal_code' => '1234567890',
+            'is_default' => true,
+        ]);
+
+        $this->actingAs($otherCustomer)
+            ->get(route('account.addresses.edit', $address))
+            ->assertForbidden();
+
+        $this->actingAs($otherCustomer)
+            ->put(route('account.addresses.update', $address), [
+                'title' => 'دستکاری',
+                'first_name' => 'دستکاری',
+                'last_name' => 'دستکاری',
+                'phone' => '09111111111',
+                'province' => 'تهران',
+                'city' => 'تهران',
+                'address' => 'نشانی دستکاری شده',
+                'postal_code' => '1111111111',
+                'is_default' => 1,
+            ])
+            ->assertForbidden();
+
+        $this->assertDatabaseHas('addresses', [
+            'id' => $address->id,
+            'user_id' => $owner->id,
+            'title' => 'خصوصی',
+        ]);
     }
 
     private function inventoryOrder(): Order
