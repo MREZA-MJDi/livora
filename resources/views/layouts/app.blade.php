@@ -52,9 +52,9 @@
         filterOpen: false,
         searchReturnFocus: null,
         openSearch(trigger) {
-            const openedFromMenu = trigger?.closest?.('[role="dialog"][aria-label="منوی موبایل"]');
+            const openedFromMenu = trigger?.closest?.('[data-livora-mobile-menu]');
             this.searchReturnFocus = openedFromMenu
-                ? document.querySelector('.livora-mobile-nav button[aria-label="جستجو"]')
+                ? document.querySelector('[data-livora-search-trigger]')
                 : (trigger || document.activeElement);
             this.mobileOpen = false;
             this.searchOpen = true;
