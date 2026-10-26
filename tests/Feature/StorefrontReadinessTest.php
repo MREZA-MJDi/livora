@@ -15,6 +15,9 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Tests\TestCase;
 
 class StorefrontReadinessTest extends TestCase
@@ -32,6 +35,7 @@ class StorefrontReadinessTest extends TestCase
             '/cart',
             '/login',
             '/register',
+            '/forgot-password',
         ] as $uri) {
             $this->get($uri)
                 ->assertOk();
