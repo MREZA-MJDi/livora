@@ -19,7 +19,7 @@
         </a>
 
         <button type="button"
-            @click="searchOpen = true; mobileOpen = false"
+            @click="openSearch($event.currentTarget)"
             class="flex flex-col items-center justify-center gap-1.5 rounded-2xl px-2 py-2.5 text-[var(--livora-stone)] transition hover:text-[var(--livora-ink)]"
             aria-label="جستجو"
             :aria-expanded="searchOpen.toString()"
