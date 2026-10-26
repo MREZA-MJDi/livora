@@ -195,10 +195,9 @@ class CartController extends Controller
 
         $variants = $this->resolveVariantsFromCartItem($item);
         $selectedVariantIds = $item->selectedVariantIds();
-        $availableTypes = $item->product->variants()
+        $availableTypes = $item->product->allVariants()
             ->select('type')
             ->distinct()
-            ->orderBy('type')
             ->pluck('type')
             ->map(fn ($type) => (string) $type)
             ->unique()
