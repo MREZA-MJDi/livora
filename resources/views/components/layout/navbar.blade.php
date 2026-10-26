@@ -1,5 +1,6 @@
 <nav
     x-data
+    aria-label="ناوبری اصلی فروشگاه"
     class="sticky top-0 z-50 block w-full border-b border-[var(--livora-border)] bg-[var(--livora-cream)]/90 backdrop-blur-xl"
 >
     <x-layout.container>
