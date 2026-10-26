@@ -94,23 +94,17 @@ Route::prefix('cart')
         Route::patch(
             '/item/{item}',
             [CartController::class, 'update']
-        )
-            ->middleware('auth')
-            ->name('update');
+        )->name('update');
 
         Route::delete(
             '/item/{item}',
             [CartController::class, 'remove']
-        )
-            ->middleware('auth')
-            ->name('remove');
+        )->name('remove');
 
         Route::delete(
             '/',
             [CartController::class, 'clear']
-        )
-            ->middleware('auth')
-            ->name('clear');
+        )->name('clear');
     });
 
 
