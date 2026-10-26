@@ -7,7 +7,7 @@
     x-transition:leave="transition ease-in duration-200"
     x-transition:leave-start="opacity-100"
     x-transition:leave-end="opacity-0"
-    class="fixed inset-0 z-[70]"
+    class="livora-search-overlay fixed inset-0 z-[70]"
 >
 
     {{-- Backdrop --}}
@@ -28,7 +28,7 @@
         x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="translate-y-0 opacity-100"
         x-transition:leave-end="-translate-y-4 opacity-0"
-        class="relative mx-auto w-full max-w-4xl overflow-hidden rounded-b-[2rem] bg-[var(--livora-cream)] shadow-2xl"
+        class="livora-search-panel relative mx-auto w-full max-w-4xl overflow-hidden rounded-b-[2rem] bg-[var(--livora-cream)] shadow-2xl"
     >
 
         {{-- Header --}}
