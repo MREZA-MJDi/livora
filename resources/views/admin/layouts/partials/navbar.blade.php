@@ -56,6 +56,13 @@
         ->where('status', 'unread')
         ->count();
 
+    $inventoryReviewCount = \App\Models\Order::query()
+        ->whereIn('inventory_status', [
+            'stock_conflict',
+            'needs_reconciliation',
+        ])
+        ->count();
+
     /*
      * هر نوع اعلان یک notification محسوب می‌شود.
      *
@@ -68,6 +75,7 @@
     $totalNotificationCount =
         $unreadContactMessagesCount
         + $pendingOrdersCount
+        + $inventoryReviewCount
         + ($outOfStockCount > 0 ? 1 : 0);
 @endphp
 
@@ -382,6 +390,25 @@
 
                             </a>
 
+                        @endif
+
+
+                        @if($inventoryReviewCount > 0)
+                            <a
+                                href="{{ route('admin.orders.index', ['inventory_review' => 1]) }}"
+                                @click="notificationOpen = false"
+                                class="mt-1 flex gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3 transition hover:bg-amber-100"
+                            >
+                                <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-amber-800">!</span>
+                                <div class="min-w-0">
+                                    <p class="text-[10px] font-semibold text-[var(--admin-text)]">
+                                        بررسی موجودی سفارش‌های پرداخت‌شده
+                                    </p>
+                                    <p class="mt-1 text-[9px] leading-5 text-[var(--admin-muted)]">
+                                        {{ number_format($inventoryReviewCount) }} سفارش نیازمند تطبیق موجودی یا بررسی دستی است.
+                                    </p>
+                                </div>
+                            </a>
                         @endif
 
 
