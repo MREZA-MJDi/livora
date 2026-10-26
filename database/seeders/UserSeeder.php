@@ -11,7 +11,7 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         if (! app()->environment(['local', 'testing', 'production'])) {
-            throw new \\RuntimeException(
+            throw new \RuntimeException(
                 'User seeding is disabled outside local, testing, and production environments.'
             );
         }
