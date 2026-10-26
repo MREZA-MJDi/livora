@@ -47,6 +47,13 @@ class AccountController extends Controller
         ]);
     }
 
+    public function editProfile(): View
+    {
+        return view('account.profile.edit', [
+            'user' => Auth::user(),
+        ]);
+    }
+
     public function updateProfile(
         UpdateProfileRequest $request
     ): RedirectResponse {
