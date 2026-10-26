@@ -61,10 +61,4 @@ class LoginRequest extends FormRequest
         ];
     }
 
-    protected function prepareForValidation(): void
-    {
-        $this->merge([
-            'remember' => $this->boolean('remember'),
-        ]);
-    }
 }
