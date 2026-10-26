@@ -68,7 +68,7 @@ Route::get(
 Route::post(
     '/contact',
     [ContactController::class, 'store']
-)->name('contact.store');
+)->middleware('throttle:5,1')->name('contact.store');
 
 
 /*
@@ -140,7 +140,7 @@ Route::middleware('guest')->group(function () {
     Route::post(
         '/register',
         [AuthController::class, 'register']
-    )->name('register.store');
+    )->middleware('throttle:10,1')->name('register.store');
 });
 
 
