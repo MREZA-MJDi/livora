@@ -67,6 +67,7 @@ class PasswordResetController extends Controller
                 'max:255',
                 PasswordRule::min(8)->letters()->mixedCase()->numbers(),
             ],
+            'password_confirmation' => ['required', 'string', 'max:255'],
         ]);
 
         $status = Password::reset(
