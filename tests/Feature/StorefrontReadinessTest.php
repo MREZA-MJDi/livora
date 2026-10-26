@@ -171,6 +171,96 @@ class StorefrontReadinessTest extends TestCase
         ]);
     }
 
+    public function test_guest_can_update_remove_and_clear_only_their_own_session_cart(): void
+    {
+        $product = $this->product($this->category(), [
+            'name' => 'محصول سبد مهمان',
+            'slug' => 'guest-cart-product',
+            'stock' => 8,
+        ]);
+
+        $cartPage = $this->get(route('cart.index'))->assertOk();
+        $sessionCookie = $cartPage->getCookie(config('session.cookie'));
+        $cart = Cart::query()
+            ->whereNull('user_id')
+            ->where('status', 'active')
+            ->latest('id')
+            ->firstOrFail();
+        $item = CartItem::create([
+            'cart_id' => $cart->id,
+            'product_id' => $product->id,
+            'product_variant_id' => null,
+            'variant_key' => 'base',
+            'variant_options' => null,
+            'quantity' => 1,
+            'unit_price' => $product->price,
+        ]);
+
+        $this->withCookie(
+            config('session.cookie'),
+            $sessionCookie?->getValue() ?? ''
+        )
+            ->patchJson(route('cart.update', $item), ['quantity' => 3])
+            ->assertOk()
+            ->assertJsonPath('cart_count', 3);
+
+        $this->patchJson(route('cart.update', $item), ['quantity' => 4])
+            ->assertOk()
+            ->assertJsonPath('cart_count', 4);
+
+        $this->deleteJson(route('cart.remove', $item))
+            ->assertOk()
+            ->assertJsonPath('cart_count', 0);
+
+        $this->assertDatabaseMissing('cart_items', ['id' => $item->id]);
+
+        $secondItem = CartItem::create([
+            'cart_id' => $cart->id,
+            'product_id' => $product->id,
+            'product_variant_id' => null,
+            'variant_key' => 'base',
+            'variant_options' => null,
+            'quantity' => 1,
+            'unit_price' => $product->price,
+        ]);
+
+        $this->deleteJson(route('cart.clear'))
+            ->assertOk()
+            ->assertJsonPath('cart_count', 0);
+
+        $this->assertDatabaseMissing('cart_items', ['id' => $secondItem->id]);
+    }
+
+    public function test_guest_cannot_modify_another_browser_session_cart(): void
+    {
+        $product = $this->product($this->category(), [
+            'name' => 'محصول نشست دیگر',
+            'slug' => 'foreign-session-cart-product',
+        ]);
+
+        $cart = Cart::create([
+            'user_id' => null,
+            'session_id' => 'unrelated-browser-session',
+            'status' => 'active',
+        ]);
+        $item = CartItem::create([
+            'cart_id' => $cart->id,
+            'product_id' => $product->id,
+            'product_variant_id' => null,
+            'variant_key' => 'base',
+            'variant_options' => null,
+            'quantity' => 1,
+            'unit_price' => $product->price,
+        ]);
+
+        $this->patchJson(route('cart.update', $item), ['quantity' => 2])
+            ->assertForbidden();
+        $this->deleteJson(route('cart.remove', $item))
+            ->assertForbidden();
+
+        $this->assertDatabaseHas('cart_items', ['id' => $item->id]);
+    }
+
     private function category(array $attributes = []): Category
     {
         static $sequence = 0;
