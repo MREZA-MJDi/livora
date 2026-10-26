@@ -4,6 +4,7 @@ namespace App\Services\Payments;
 
 use App\Models\Order;
 use App\Models\Payment;
+use App\Services\Inventory\OrderInventoryService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -12,7 +13,8 @@ use Throwable;
 class PaymentService
 {
     public function __construct(
-        protected PaymentManager $paymentManager
+        protected PaymentManager $paymentManager,
+        protected OrderInventoryService $orderInventoryService
     ) {
     }
 
@@ -967,6 +969,115 @@ class PaymentService
         );
     }
 
+    protected function markPaymentAsPaid(
+        Payment $payment,
+        ?string $transactionId = null,
+        array $extraMetadata = []
+    ): void {
+        DB::transaction(function () use ($payment, $transactionId, $extraMetadata) {
+            // Use one lock order for payment callbacks: order first, payment second.
+            $lockedOrder = Order::query()
+                ->whereKey($payment->order_id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $lockedPayment = Payment::query()
+                ->whereKey($payment->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($lockedPayment->status === 'paid') {
+                // Provider callbacks are expected to be delivered more than once.
+                return;
+            }
+
+            if (in_array($lockedPayment->status, ['cancelled', 'refunded'], true)) {
+                throw new RuntimeException(
+                    'این تلاش پرداخت دیگر قابل تأیید نیست.'
+                );
+            }
+
+            $paymentMetadata = array_merge(
+                $lockedPayment->metadata ?? [],
+                $extraMetadata,
+                ['paid_at' => now()->toISOString()]
+            );
+
+            /*
+             * An old callback may arrive after another attempt already paid the
+             * order. Record the provider-confirmed capture, but never allocate
+             * the same order's inventory a second time.
+             */
+            if ($lockedOrder->payment_status === 'paid') {
+                $lockedPayment->update([
+                    'status' => 'paid',
+                    'transaction_id' => $transactionId ?? $lockedPayment->transaction_id,
+                    'paid_at' => now(),
+                    'metadata' => array_merge($paymentMetadata, [
+                        'duplicate_payment_detected' => true,
+                        'manual_review_required' => true,
+                        'manual_review_reason' => 'Another payment attempt had already paid this order.',
+                    ]),
+                ]);
+
+                \Illuminate\Support\Facades\Log::critical(
+                    'Livora received a second confirmed payment for an already-paid order.',
+                    [
+                        'order_id' => $lockedOrder->id,
+                        'order_number' => $lockedOrder->order_number,
+                        'payment_id' => $lockedPayment->id,
+                        'gateway' => $lockedPayment->gateway,
+                        'transaction_id' => $transactionId,
+                    ]
+                );
+
+                return;
+            }
+
+            $lockedPayment->update([
+                'status' => 'paid',
+                'transaction_id' => $transactionId ?? $lockedPayment->transaction_id,
+                'paid_at' => now(),
+                'metadata' => $paymentMetadata,
+            ]);
+
+            $lockedOrder->update([
+                'payment_status' => 'paid',
+                'payment_method' => 'online',
+                'payment_provider' => $lockedPayment->gateway,
+            ]);
+
+            if ($lockedOrder->status === 'cancelled') {
+                // Money was captured after cancellation. Preserve the payment
+                // record and alert staff; do not deduct or ship stock automatically.
+                $lockedOrder->update([
+                    'inventory_status' => 'stock_conflict',
+                    'inventory_processed_at' => now(),
+                    'inventory_metadata' => [
+                        'reason' => 'Payment was confirmed after the order had been cancelled.',
+                        'requires_admin_review' => true,
+                        'payment_id' => $lockedPayment->id,
+                        'detected_at' => now()->toISOString(),
+                    ],
+                ]);
+
+                \Illuminate\Support\Facades\Log::critical(
+                    'Livora received a successful payment for a cancelled order; manual refund/reconciliation is required.',
+                    [
+                        'order_id' => $lockedOrder->id,
+                        'order_number' => $lockedOrder->order_number,
+                        'payment_id' => $lockedPayment->id,
+                        'gateway' => $lockedPayment->gateway,
+                    ]
+                );
+
+                return;
+            }
+
+            $this->orderInventoryService->deductForPaidOrder($lockedOrder);
+        });
+    }
+
     /**
      * Mark payment as failed and synchronize order state.
      */
@@ -1344,8 +1455,7 @@ class PaymentService
         */
 
         if (
-            $payment->metadata['payment_method'] ?? null
-            === 'online'
+            ($payment->metadata['payment_method'] ?? null) === 'online'
         ) {
             $orderAmount =
                 $this->normalizeAmount(
