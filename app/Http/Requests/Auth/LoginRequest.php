@@ -34,6 +34,14 @@ class LoginRequest extends FormRequest
         ];
     }
 
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'email' => mb_strtolower(trim((string) $this->input('email', ''))),
+            'remember' => $this->boolean('remember'),
+        ]);
+    }
+
     public function messages(): array
     {
         return [
@@ -53,10 +61,4 @@ class LoginRequest extends FormRequest
         ];
     }
 
-    protected function prepareForValidation(): void
-    {
-        $this->merge([
-            'remember' => $this->boolean('remember'),
-        ]);
-    }
 }

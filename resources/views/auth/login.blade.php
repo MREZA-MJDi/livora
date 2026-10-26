@@ -73,8 +73,8 @@
                                     </label>
 
                                     <a
-                                        href="#"
-                                        class="text-xs text-[var(--livora-accent)]"
+                                        href="{{ route('password.request') }}"
+                                        class="text-xs text-[var(--livora-accent)] transition hover:underline"
                                     >
                                         رمز عبور را فراموش کرده‌اید؟
                                     </a>

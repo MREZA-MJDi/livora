@@ -11,6 +11,7 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
@@ -49,6 +50,9 @@ Route::get(
 Route::view('/about', 'about.index')
     ->name('about');
 
+Route::view('/terms', 'legal.terms')
+    ->name('terms');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -68,7 +72,7 @@ Route::get(
 Route::post(
     '/contact',
     [ContactController::class, 'store']
-)->name('contact.store');
+)->middleware('throttle:5,1')->name('contact.store');
 
 
 /*
@@ -94,23 +98,17 @@ Route::prefix('cart')
         Route::patch(
             '/item/{item}',
             [CartController::class, 'update']
-        )
-            ->middleware('auth')
-            ->name('update');
+        )->name('update');
 
         Route::delete(
             '/item/{item}',
             [CartController::class, 'remove']
-        )
-            ->middleware('auth')
-            ->name('remove');
+        )->name('remove');
 
         Route::delete(
             '/',
             [CartController::class, 'clear']
-        )
-            ->middleware('auth')
-            ->name('clear');
+        )->name('clear');
     });
 
 
@@ -140,7 +138,27 @@ Route::middleware('guest')->group(function () {
     Route::post(
         '/register',
         [AuthController::class, 'register']
-    )->name('register.store');
+    )->middleware('throttle:10,1')->name('register.store');
+
+    Route::get(
+        '/forgot-password',
+        [PasswordResetController::class, 'requestForm']
+    )->name('password.request');
+
+    Route::post(
+        '/forgot-password',
+        [PasswordResetController::class, 'sendLink']
+    )->middleware('throttle:5,1')->name('password.email');
+
+    Route::get(
+        '/reset-password/{token}',
+        [PasswordResetController::class, 'resetForm']
+    )->name('password.reset');
+
+    Route::post(
+        '/reset-password',
+        [PasswordResetController::class, 'reset']
+    )->middleware('throttle:5,1')->name('password.update');
 });
 
 
@@ -269,6 +287,11 @@ Route::middleware(['auth', 'customer'])->group(function () {
                 '/addresses',
                 [AccountController::class, 'storeAddress']
             )->name('addresses.store');
+
+            Route::get(
+                '/addresses/{address}/edit',
+                [AccountController::class, 'editAddress']
+            )->name('addresses.edit');
 
             Route::put(
                 '/addresses/{address}',

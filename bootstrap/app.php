@@ -2,12 +2,14 @@
 
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\CustomerMiddleware;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
-
 
 return Application::configure(
     basePath: dirname(__DIR__)
@@ -17,55 +19,50 @@ return Application::configure(
         commands: __DIR__ . '/../routes/console.php',
         health: '/up',
     )
-
-    ->withMiddleware(function (
-        Middleware $middleware
-    ) {
-
-        /*
-        |--------------------------------------------------------------------------
-        | Middleware Aliases
-        |--------------------------------------------------------------------------
-        */
-
+    ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'admin' => AdminMiddleware::class,
             'customer' => CustomerMiddleware::class,
         ]);
+
+        // External payment providers cannot send browser CSRF tokens. The callback
+        // remains safe only because PaymentService verifies the transaction
+        // directly with the provider before updating local payment state.
+        $middleware->validateCsrfTokens(except: [
+            'checkout/payment/callback/*',
+        ]);
     })
-
-    ->withExceptions(function (
-        Exceptions $exceptions
-    ) {
-
-        /*
-        |--------------------------------------------------------------------------
-        | JSON / AJAX
-        |--------------------------------------------------------------------------
-        */
-
+    ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (
             Throwable $e,
             Request $request
         ) {
-            if (! $request->expectsJson()) {
+            if (
+                ! $request->expectsJson()
+                || $e instanceof ValidationException
+                || $e instanceof AuthenticationException
+                || $e instanceof AuthorizationException
+                || ($e instanceof HttpExceptionInterface && $e->getStatusCode() < 500)
+            ) {
+                // Keep Laravel's native 401/403/404/419/422 responses and payloads.
                 return null;
             }
 
+            report($e);
+
+            $status = $e instanceof HttpExceptionInterface
+                ? $e->getStatusCode()
+                : 500;
+
+            $message = config('app.debug') && ! app()->isProduction()
+                ? $e->getMessage()
+                : 'در پردازش درخواست مشکلی پیش آمد. لطفاً دوباره تلاش کنید.';
+
             return response()->json([
                 'success' => false,
-                'message' => app()->isProduction()
-                    ? 'در پردازش درخواست مشکلی پیش آمد. لطفاً دوباره تلاش کنید.'
-                    : $e->getMessage(),
-            ], 500);
+                'message' => $message,
+            ], $status);
         });
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | HTTP Error Pages
-        |--------------------------------------------------------------------------
-        */
 
         $exceptions->render(function (
             HttpExceptionInterface $e,
@@ -87,38 +84,20 @@ return Application::configure(
                 return null;
             }
 
-            return response()->view(
-                $view,
-                [],
-                $e->getStatusCode()
-            );
+            return response()->view($view, [], $e->getStatusCode());
         });
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Production Fallback
-        |--------------------------------------------------------------------------
-        */
 
         $exceptions->render(function (
             Throwable $e,
             Request $request
         ) {
-            if (
-                ! app()->isProduction()
-                || $request->expectsJson()
-            ) {
+            if (! app()->isProduction() || $request->expectsJson()) {
                 return null;
             }
 
             report($e);
 
-            return response()->view(
-                'errors.500',
-                [],
-                500
-            );
+            return response()->view('errors.500', [], 500);
         });
     })
     ->create();

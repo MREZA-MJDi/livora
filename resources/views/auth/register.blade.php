@@ -127,8 +127,8 @@
                                 <span class="text-xs leading-6 text-[var(--livora-stone)]">
                                     با ایجاد حساب، با
                                     <a
-                                        href="#"
-                                        class="font-medium text-[var(--livora-accent)]"
+                                        href="{{ route('terms') }}"
+                                        class="font-medium text-[var(--livora-accent)] hover:underline"
                                     >
                                         قوانین و شرایط
                                     </a>

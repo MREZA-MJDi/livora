@@ -57,6 +57,28 @@ class RegisterRequest extends FormRequest
         ];
     }
 
+    protected function prepareForValidation(): void
+    {
+        $digits = [
+            '۰' => '0', '۱' => '1', '۲' => '2', '۳' => '3', '۴' => '4',
+            '۵' => '5', '۶' => '6', '۷' => '7', '۸' => '8', '۹' => '9',
+            '٠' => '0', '١' => '1', '٢' => '2', '٣' => '3', '٤' => '4',
+            '٥' => '5', '٦' => '6', '٧' => '7', '٨' => '8', '٩' => '9',
+        ];
+
+        $phone = trim((string) $this->input('phone', ''));
+        $phone = strtr($phone, $digits);
+        $phone = preg_replace('/\\s+/u', '', $phone) ?? '';
+
+        $this->merge([
+            'first_name' => trim((string) $this->input('first_name', '')),
+            'last_name' => trim((string) $this->input('last_name', '')),
+            'email' => mb_strtolower(trim((string) $this->input('email', ''))),
+            'phone' => $phone !== '' ? $phone : null,
+            'terms' => $this->boolean('terms'),
+        ]);
+    }
+
     public function messages(): array
     {
         return [

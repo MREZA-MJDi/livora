@@ -18,6 +18,7 @@ class CustomerController extends Controller
     {
         $query = User::query()
             ->where('role', 'customer')
+            ->withCount('orders')
             ->latest();
 
         if ($request->filled('search')) {
@@ -52,16 +53,20 @@ class CustomerController extends Controller
             404
         );
 
-        $customer->load([
-            'addresses',
-            'orders',
-            'wishlists',
-        ]);
+        $customer->load('addresses');
+        $customer->loadCount(['orders', 'wishlists']);
 
-        return view(
-            'admin.customers.show',
-            compact('customer')
-        );
+        // The detail screen displays at most ten recent orders. Do not hydrate
+        // the customer's entire order history just to render that short list.
+        $recentOrders = $customer->orders()
+            ->latest()
+            ->limit(10)
+            ->get();
+
+        return view('admin.customers.show', [
+            'customer' => $customer,
+            'recentOrders' => $recentOrders,
+        ]);
     }
 
     /**

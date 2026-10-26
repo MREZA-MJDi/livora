@@ -51,6 +51,8 @@ class AuthController extends Controller
                 ]);
         }
 
+        $guestCartSessionId = $request->session()->getId();
+
         if (! Auth::attempt([
             'email' => $email,
             'password' => $credentials['password'],
@@ -73,29 +75,9 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        $this->mergeGuestCartIntoUserCart($request);
+        $this->mergeGuestCartIntoUserCart($request, $guestCartSessionId);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Role Based Redirect
-        |--------------------------------------------------------------------------
-        */
-
-        if ($request->user()->isAdmin()) {
-            return redirect()
-                ->route('admin.dashboard')
-                ->with(
-                    'success',
-                    'به پنل مدیریت خوش آمدید.'
-                );
-        }
-
-        return redirect()
-            ->intended(route('account.index'))
-            ->with(
-                'success',
-                'با موفقیت وارد شدید.'
-            );
+        return $this->redirectAfterAuthentication($request);
     }
 
     public function showRegister(): View
@@ -106,6 +88,7 @@ class AuthController extends Controller
     public function register(
         RegisterRequest $request
     ): RedirectResponse {
+        $guestCartSessionId = $request->session()->getId();
         $validated = $request->validated();
 
         $user = DB::transaction(function () use (
@@ -121,6 +104,8 @@ class AuthController extends Controller
                 'email' => Str::lower(
                     $validated['email']
                 ),
+
+                'phone' => $validated['phone'] ?? null,
 
                 'password' => Hash::make(
                     $validated['password']
@@ -139,24 +124,132 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        $this->mergeGuestCartIntoUserCart($request);
+        $this->mergeGuestCartIntoUserCart($request, $guestCartSessionId);
 
 
-        if ($request->user()->isAdmin()) {
+        return $this->redirectAfterAuthentication(
+            $request,
+            'حساب کاربری با موفقیت ایجاد شد.'
+        );
+    }
+
+    protected function redirectAfterAuthentication(
+        Request $request,
+        string $successMessage = 'با موفقیت وارد شدید.'
+    ): RedirectResponse {
+        $user = $request->user();
+
+        if (! $user) {
             return redirect()
-                ->route('admin.dashboard')
-                ->with(
-                    'success',
-                    'به پنل مدیریت خوش آمدید.'
-                );
+                ->route('login')
+                ->withErrors([
+                    'email' => 'احراز هویت انجام نشد. دوباره تلاش کنید.',
+                ]);
+        }
+
+        $fallbackRoute = match (true) {
+            $user->isAdmin() => 'admin.dashboard',
+            $user->isCustomer() => 'account.index',
+            default => 'home',
+        };
+
+        $intended = $request->session()->pull('url.intended');
+
+        if (
+            is_string($intended)
+            && $this->isSafeIntendedUrl($request, $intended)
+        ) {
+            $path = parse_url($intended, PHP_URL_PATH) ?: '/';
+
+            if (
+                $user->isAdmin()
+                && $this->matchesPathPrefix($path, ['/admin'])
+            ) {
+                return redirect()->to($intended)->with('success', $successMessage);
+            }
+
+            if (
+                $user->isCustomer()
+                && $this->matchesPathPrefix($path, ['/account', '/checkout'])
+            ) {
+                return redirect()->to($intended)->with('success', $successMessage);
+            }
         }
 
         return redirect()
-            ->intended(route('account.index'))
-            ->with(
-                'success',
-                'حساب کاربری با موفقیت ایجاد شد.'
-            );
+            ->route($fallbackRoute)
+            ->with('success', $successMessage);
+    }
+
+    /**
+     * Do not allow session-stored intended URLs to redirect to external hosts,
+     * protocol-relative URLs, non-web schemes, or a different scheme.
+     */
+    protected function isSafeIntendedUrl(
+        Request $request,
+        string $intended
+    ): bool {
+        if (
+            str_contains($intended, '\\')
+            || preg_match('/[\\r\\n]/', $intended)
+        ) {
+            return false;
+        }
+
+        $parsed = parse_url($intended);
+
+        if (
+            $parsed === false
+            || isset($parsed['user'])
+            || isset($parsed['pass'])
+        ) {
+            return false;
+        }
+
+        $scheme = strtolower((string) ($parsed['scheme'] ?? $request->getScheme()));
+
+        if (
+            ! in_array($scheme, ['http', 'https'], true)
+            || $scheme !== strtolower($request->getScheme())
+        ) {
+            return false;
+        }
+
+        $host = $parsed['host'] ?? null;
+        $port = $parsed['port'] ?? null;
+
+        if ($host === null) {
+            return str_starts_with($intended, '/')
+                && ! str_starts_with($intended, '//');
+        }
+
+        return hash_equals(
+            strtolower($request->getHost()),
+            strtolower($host)
+        ) && (
+            $port === null
+            || (int) $port === (int) $request->getPort()
+        );
+    }
+
+    protected function matchesPathPrefix(
+        string $path,
+        array $prefixes
+    ): bool {
+        $normalizedPath = rtrim($path, '/') ?: '/';
+
+        foreach ($prefixes as $prefix) {
+            $normalizedPrefix = rtrim($prefix, '/') ?: '/';
+
+            if (
+                $normalizedPath === $normalizedPrefix
+                || str_starts_with($normalizedPath, $normalizedPrefix . '/')
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function logout(
@@ -177,79 +270,115 @@ class AuthController extends Controller
     }
 
     protected function mergeGuestCartIntoUserCart(
-        Request $request
+        Request $request,
+        ?string $guestSessionId = null
     ): void {
-        $sessionId = $request->session()->getId();
+        $sessionId = $guestSessionId ?? $request->session()->getId();
 
-        $guestCart = Cart::query()
-            ->where(
-                'session_id',
-                $sessionId
-            )
-            ->whereNull('user_id')
-            ->where(
-                'status',
-                'active'
-            )
-            ->with('items')
-            ->first();
+        DB::transaction(function () use ($sessionId) {
+            // Serialize concurrent logins/cart merges for the same account.
+            User::query()
+                ->whereKey(Auth::id())
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        if (! $guestCart) {
-            return;
-        }
-
-        $userCart = Cart::query()
-            ->firstOrCreate(
-                [
-                    'user_id' => Auth::id(),
-                    'status' => 'active',
-                ],
-                [
-                    'session_id' => null,
-                ]
-            );
-
-        foreach ($guestCart->items as $guestItem) {
-            $existingItem = $userCart
-                ->items()
-                ->where(
-                    'product_id',
-                    $guestItem->product_id
-                )
-                ->where(
-                    'product_variant_id',
-                    $guestItem->product_variant_id
-                )
+            $guestCart = Cart::query()
+                ->where('session_id', $sessionId)
+                ->whereNull('user_id')
+                ->where('status', 'active')
+                ->lockForUpdate()
                 ->first();
 
-            if ($existingItem) {
-                $existingItem->increment(
-                    'quantity',
-                    $guestItem->quantity
-                );
-
-                continue;
+            if (! $guestCart) {
+                return;
             }
 
-            $userCart->items()->create([
-                'product_id' =>
-                    $guestItem->product_id,
+            $guestCart->load('items');
 
-                'product_variant_id' =>
-                    $guestItem->product_variant_id,
+            $userCart = Cart::query()
+                ->where('user_id', Auth::id())
+                ->where('status', 'active')
+                ->lockForUpdate()
+                ->first();
 
-                'quantity' =>
-                    $guestItem->quantity,
+            if (! $userCart) {
+                $userCart = Cart::create([
+                    'user_id' => Auth::id(),
+                    'session_id' => null,
+                    'status' => 'active',
+                ]);
+            }
 
-                'unit_price' =>
-                    $guestItem->unit_price,
-            ]);
-        }
+            foreach ($guestCart->items as $guestItem) {
+                $selectedIds = $guestItem->selectedVariantIds();
+                $variantKey = $guestItem->variant_key;
 
-        $guestCart->items()->delete();
+                $existingQuery = $userCart->items()
+                    ->where('product_id', $guestItem->product_id);
 
-        $guestCart->update([
-            'status' => 'converted',
-        ]);
+                if (filled($variantKey)) {
+                    $existingQuery->where(function ($query) use (
+                        $variantKey,
+                        $guestItem,
+                        $selectedIds
+                    ) {
+                        $query->where('variant_key', $variantKey);
+
+                        // Merge legacy one-variant rows only when the selection
+                        // is unambiguous; never merge two different combinations
+                        // just because they share the primary variant ID.
+                        if (count($selectedIds) === 1) {
+                            $query->orWhere(function ($legacy) use ($selectedIds) {
+                                $legacy
+                                    ->whereNull('variant_key')
+                                    ->whereNull('variant_options')
+                                    ->where('product_variant_id', $selectedIds[0]);
+                            });
+                        } elseif ($variantKey === 'base' || $selectedIds === []) {
+                            $query->orWhere(function ($legacy) {
+                                $legacy
+                                    ->whereNull('variant_key')
+                                    ->whereNull('variant_options')
+                                    ->whereNull('product_variant_id');
+                            });
+                        }
+                    });
+                } elseif ($guestItem->product_variant_id !== null) {
+                    $existingQuery
+                        ->whereNull('variant_key')
+                        ->where('product_variant_id', $guestItem->product_variant_id);
+                } else {
+                    $existingQuery
+                        ->whereNull('variant_key')
+                        ->whereNull('variant_options')
+                        ->whereNull('product_variant_id');
+                }
+
+                $existingItem = $existingQuery->lockForUpdate()->first();
+
+                $payload = [
+                    'product_variant_id' => $guestItem->product_variant_id,
+                    'variant_key' => $variantKey ?? 'base',
+                    'variant_options' => $guestItem->variant_options,
+                    'unit_price' => $guestItem->unit_price,
+                ];
+
+                if ($existingItem) {
+                    $existingItem->update(array_merge($payload, [
+                        'quantity' => (int) $existingItem->quantity + (int) $guestItem->quantity,
+                    ]));
+
+                    continue;
+                }
+
+                $userCart->items()->create(array_merge($payload, [
+                    'product_id' => $guestItem->product_id,
+                    'quantity' => $guestItem->quantity,
+                ]));
+            }
+
+            $guestCart->items()->delete();
+            $guestCart->update(['status' => 'converted']);
+        });
     }
 }

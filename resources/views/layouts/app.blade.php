@@ -49,7 +49,30 @@
     x-data="{
         mobileOpen: false,
         searchOpen: false,
-        filterOpen: false
+        filterOpen: false,
+        searchReturnFocus: null,
+        openSearch(trigger) {
+            const openedFromMenu = trigger?.closest?.('[data-livora-mobile-menu]');
+            this.searchReturnFocus = openedFromMenu
+                ? document.querySelector('[data-livora-search-trigger]')
+                : (trigger || document.activeElement);
+            this.mobileOpen = false;
+            this.searchOpen = true;
+            this.$nextTick(() => {
+                document.getElementById('global-search')?.focus({ preventScroll: true });
+            });
+        },
+        closeSearch() {
+            this.searchOpen = false;
+            this.$nextTick(() => {
+                const target = this.searchReturnFocus;
+                if (target?.isConnected && target.offsetParent !== null) {
+                    target.focus?.({ preventScroll: true });
+                } else {
+                    document.querySelector('[data-livora-search-trigger]')?.focus({ preventScroll: true });
+                }
+            });
+        }
     }"
     class="min-h-screen pb-24 lg:pb-0"
 >

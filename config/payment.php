@@ -3,6 +3,13 @@
 return [
 
     /*
+     * The generic adapters are intentionally not production-approved until
+     * each provider's real merchant API contract and sandbox callback flow
+     * have been verified.
+     */
+    'production_ready' => (bool) env('PAYMENT_GATEWAYS_PRODUCTION_READY', false),
+
+    /*
     |--------------------------------------------------------------------------
     | Default Payment Gateway
     |--------------------------------------------------------------------------
@@ -24,6 +31,13 @@ return [
     */
 
     'digipay' => [
+        // Exact HTTPS hostnames that a production customer may be redirected to.
+        // Leave empty until the merchant's official payment host is verified.
+        'allowed_redirect_hosts' => array_values(array_filter(array_map(
+            static fn (string $host): string => strtolower(trim($host)),
+            explode(',', (string) env('DIGIPAY_ALLOWED_REDIRECT_HOSTS', ''))
+        ))),
+
         'enabled' => (bool) env(
             'DIGIPAY_ENABLED',
             false
@@ -98,6 +112,13 @@ return [
     */
 
     'snappay' => [
+        // Exact HTTPS hostnames that a production customer may be redirected to.
+        // Leave empty until the merchant's official payment host is verified.
+        'allowed_redirect_hosts' => array_values(array_filter(array_map(
+            static fn (string $host): string => strtolower(trim($host)),
+            explode(',', (string) env('SNAPPAY_ALLOWED_REDIRECT_HOSTS', ''))
+        ))),
+
         'enabled' => (bool) env(
             'SNAPPAY_ENABLED',
             false
@@ -172,6 +193,13 @@ return [
     */
 
     'torobpay' => [
+        // Exact HTTPS hostnames that a production customer may be redirected to.
+        // Leave empty until the merchant's official payment host is verified.
+        'allowed_redirect_hosts' => array_values(array_filter(array_map(
+            static fn (string $host): string => strtolower(trim($host)),
+            explode(',', (string) env('TOROBPAY_ALLOWED_REDIRECT_HOSTS', ''))
+        ))),
+
         'enabled' => (bool) env(
             'TOROBPAY_ENABLED',
             false

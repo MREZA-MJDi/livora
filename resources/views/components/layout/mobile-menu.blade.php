@@ -14,12 +14,18 @@
         type="button"
         aria-label="بستن منو"
         @click="mobileOpen = false"
+        tabindex="-1"
         class="absolute inset-0 bg-black/30 backdrop-blur-sm"
     ></button>
 
     {{-- Panel --}}
     <div
         x-show="mobileOpen"
+        role="dialog"
+        aria-modal="true"
+        aria-label="منوی موبایل"
+        data-livora-mobile-menu
+        tabindex="-1"
         x-transition:enter="transition ease-out duration-300"
         x-transition:enter-start="translate-x-full"
         x-transition:enter-end="translate-x-0"
@@ -71,14 +77,7 @@
             {{-- Search --}}
             <button
                 type="button"
-                @click="
-                    mobileOpen = false;
-                    searchOpen = true;
-
-                    $nextTick(() => {
-                        $refs.searchInput?.focus();
-                    });
-                "
+                @click="openSearch($event.currentTarget)"
                 class="flex w-full items-center gap-3 rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] px-4 py-4 text-right"
             >
 

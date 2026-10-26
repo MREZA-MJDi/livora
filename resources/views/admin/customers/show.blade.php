@@ -89,7 +89,7 @@
             </p>
 
             <p class="admin-stat-value">
-                {{ $customer->orders->count() }}
+                {{ $customer->orders_count }}
             </p>
 
         </div>
@@ -102,7 +102,7 @@
             </p>
 
             <p class="admin-stat-value">
-                {{ $customer->wishlists->count() }}
+                {{ $customer->wishlists_count }}
             </p>
 
         </div>
@@ -289,11 +289,11 @@
                 </div>
 
 
-                @if($customer->orders->count())
+                @if($customer->orders_count)
 
                     <div class="space-y-3">
 
-                        @foreach($customer->orders->sortByDesc('created_at')->take(10) as $order)
+                        @foreach($recentOrders as $order)
 
                             <a
                                 href="{{ route('admin.orders.show', $order) }}"

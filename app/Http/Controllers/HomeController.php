@@ -17,6 +17,7 @@ class HomeController extends Controller
             ])
             ->with('latestActiveProduct.images')
             ->orderBy('sort_order')
+            ->limit(8)
             ->get();
 
         /*
@@ -26,6 +27,7 @@ class HomeController extends Controller
          */
         $featuredProducts = Product::query()
             ->active()
+            ->whereHas('category', fn ($query) => $query->where('is_active', true))
             ->with(['category', 'images'])
             ->orderByDesc('updated_at')
             ->limit(8)
@@ -34,6 +36,7 @@ class HomeController extends Controller
         $newProducts = Product::query()
             ->active()
             ->new()
+            ->whereHas('category', fn ($query) => $query->where('is_active', true))
             ->with(['category', 'images'])
             ->latest()
             ->limit(8)

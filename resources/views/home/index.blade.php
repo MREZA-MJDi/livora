@@ -258,7 +258,7 @@
                                         <img
                                             src="{{ $image }}"
                                             alt="{{ $product->name }}"
-                                            class="h-full w-full object-cover"
+                                            class="livora-hero-product-image h-full w-full object-cover"
                                         >
 
 

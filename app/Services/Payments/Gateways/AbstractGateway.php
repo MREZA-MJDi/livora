@@ -103,6 +103,15 @@ abstract class AbstractGateway implements InstallmentPaymentGatewayInterface
             );
         }
 
+        if (
+            app()->isProduction()
+            && strtolower((string) parse_url($baseUrl, PHP_URL_SCHEME)) !== 'https'
+        ) {
+            throw new RuntimeException(
+                "{$this->gateway} must use HTTPS in production."
+            );
+        }
+
         $request = Http::acceptJson()
             ->asJson()
             ->timeout(
@@ -218,6 +227,17 @@ abstract class AbstractGateway implements InstallmentPaymentGatewayInterface
     ): array {
         $config = $this->config();
 
+        if (app()->isProduction() && ! config('payment.production_ready', false)) {
+            return [
+                'success' => false,
+                'payment_url' => null,
+                'authority' => null,
+                'transaction_id' => null,
+                'message' => 'این اتصال درگاه تا زمان تأیید قرارداد واقعی API و تست محیط آزمایشی برای تولید فعال نشده است.',
+                'data' => [],
+            ];
+        }
+
         if (($config['enabled'] ?? false) !== true) {
             return [
                 'success' => false,
@@ -273,10 +293,37 @@ abstract class AbstractGateway implements InstallmentPaymentGatewayInterface
             $response =
                 $result['data'];
 
-            $paymentUrl =
-                $this->extractPaymentUrl(
-                    $response
-                );
+            $paymentUrl = $this->extractPaymentUrl($response);
+
+            if (app()->isProduction()) {
+                $scheme = strtolower((string) parse_url((string) $paymentUrl, PHP_URL_SCHEME));
+                $host = strtolower((string) parse_url((string) $paymentUrl, PHP_URL_HOST));
+                $allowedHosts = array_values(array_filter(
+                    array_map(
+                        static fn ($allowedHost) => strtolower(trim((string) $allowedHost)),
+                        $config['allowed_redirect_hosts'] ?? []
+                    )
+                ));
+
+                if (
+                    $scheme !== 'https'
+                    || $host === ''
+                    || $allowedHosts === []
+                    || ! in_array($host, $allowedHosts, true)
+                ) {
+                    return [
+                        'success' => false,
+                        'payment_url' => null,
+                        'authority' => $this->extractAuthority($response),
+                        'transaction_id' => $this->extractTransactionId($response),
+                        'message' => 'نشانی بازگشت درگاه با فهرست دامنه‌های HTTPS تأییدشده مطابقت ندارد.',
+                        'data' => [
+                            'redirect_host' => $host ?: null,
+                            'allowlist_configured' => $allowedHosts !== [],
+                        ],
+                    ];
+                }
+            }
 
             return [
                 'success' =>
