@@ -13,7 +13,9 @@ use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class StorefrontReadinessTest extends TestCase
@@ -342,13 +344,20 @@ class StorefrontReadinessTest extends TestCase
             'stock' => 8,
         ]);
 
-        $cartPage = $this->get(route('cart.index'))->assertOk();
-        $sessionCookie = $cartPage->getCookie(config('session.cookie'));
-        $cart = Cart::query()
-            ->whereNull('user_id')
-            ->where('status', 'active')
-            ->latest('id')
-            ->firstOrFail();
+        // Send the same encrypted session cookie a real browser stores.
+        // Using a raw "unencrypted" cookie can bypass Laravel's normal cookie
+        // handling and accidentally generate a different request session.
+        $sessionId = Str::random(40);
+        $this->withCookie(
+            config('session.cookie'),
+            Crypt::encryptString($sessionId)
+        );
+
+        $cart = Cart::create([
+            'user_id' => null,
+            'session_id' => $sessionId,
+            'status' => 'active',
+        ]);
         $item = CartItem::create([
             'cart_id' => $cart->id,
             'product_id' => $product->id,
@@ -359,14 +368,7 @@ class StorefrontReadinessTest extends TestCase
             'unit_price' => $product->price,
         ]);
 
-        // The test helper bypasses EncryptCookies so the session store receives
-        // the exact raw ID persisted on the guest cart, just like the browser's
-        // decrypted server-side session context.
-        $this->withUnencryptedCookie(
-            config('session.cookie'),
-            (string) $cart->session_id
-        )
-            ->patchJson(route('cart.update', $item), ['quantity' => 3])
+        $this->patchJson(route('cart.update', $item), ['quantity' => 3])
             ->assertOk()
             ->assertJsonPath('cart_count', 3);
 
