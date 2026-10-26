@@ -173,7 +173,7 @@ class CartController extends Controller
         UpdateCartRequest $request,
         CartItem $item
     ): RedirectResponse|JsonResponse {
-        $this->authorize('update', $item);
+        $this->ensureCartItemAccessible($request, $item);
 
         $validated = $request->validated();
 
@@ -264,9 +264,20 @@ class CartController extends Controller
         Request $request,
         CartItem $item
     ): RedirectResponse|JsonResponse {
-        $this->authorize('delete', $item);
+        $this->ensureCartItemAccessible($request, $item);
 
+        $cart = $item->cart()->firstOrFail();
         $item->delete();
+
+        if ($request->expectsJson()) {
+            $cart->load('items');
+
+            return response()->json([
+                'message' => 'محصول از سبد حذف شد.',
+                'cart_count' => $cart->itemCount(),
+                'subtotal' => $cart->subtotal(),
+            ]);
+        }
 
         return back()->with(
             'success',
@@ -368,9 +379,37 @@ class CartController extends Controller
         );
     }
 
+    /**
+     * A cart item is mutable only by its authenticated customer owner or
+     * by the browser session that created an active guest cart.
+     */
+    protected function ensureCartItemAccessible(Request $request, CartItem $item): void
+    {
+        $cart = $item->cart()->first();
+
+        abort_unless($cart && $cart->status === 'active', 404);
+
+        if (
+            Auth::check()
+            && Auth::user()->isCustomer()
+            && (int) $cart->user_id === (int) Auth::id()
+        ) {
+            return;
+        }
+
+        $sessionId = (string) $request->session()->getId();
+
+        abort_unless(
+            $cart->user_id === null
+                && filled($cart->session_id)
+                && hash_equals((string) $cart->session_id, $sessionId),
+            403
+        );
+    }
+
     protected function getCart(Request $request): Cart
     {
-        if (Auth::check()) {
+        if (Auth::check() && Auth::user()->isCustomer()) {
             return Cart::query()->firstOrCreate(
                 [
                     'user_id' => Auth::id(),
