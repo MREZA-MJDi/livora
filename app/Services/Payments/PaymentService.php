@@ -938,11 +938,13 @@ class PaymentService
                 return;
             }
 
-            if (in_array($lockedPayment->status, ['cancelled', 'refunded'], true)) {
+            if ($lockedPayment->status === 'refunded') {
                 throw new RuntimeException(
-                    'این تلاش پرداخت دیگر قابل تأیید نیست.'
+                    'پرداخت بازپرداخت‌شده قابل تأیید مجدد نیست.'
                 );
             }
+
+            $wasCancelledAttempt = $lockedPayment->status === 'cancelled';
 
             $paymentMetadata = array_merge(
                 $lockedPayment->metadata ?? [],
@@ -990,26 +992,32 @@ class PaymentService
                 'payment_provider' => $lockedPayment->gateway,
             ]);
 
-            if ($lockedOrder->status === 'cancelled') {
-                // A successful capture after cancellation needs refund/reconciliation.
+            if ($lockedOrder->status === 'cancelled' || $wasCancelledAttempt) {
+                // The provider confirmed a capture after local cancellation.
+                // Record it accurately, but do not auto-ship or allocate stock.
+                $reason = $wasCancelledAttempt
+                    ? 'Payment was confirmed after the local payment attempt had been cancelled.'
+                    : 'Payment was confirmed after the order had been cancelled.';
+
                 $lockedOrder->update([
                     'inventory_status' => 'stock_conflict',
                     'inventory_processed_at' => now(),
                     'inventory_metadata' => [
-                        'reason' => 'Payment was confirmed after the order had been cancelled.',
+                        'reason' => $reason,
                         'requires_admin_review' => true,
                         'payment_id' => $lockedPayment->id,
                         'detected_at' => now()->toISOString(),
                     ],
                 ]);
 
-                \Illuminate\Support\Facades\Log::critical(
-                    'Livora received a successful payment for a cancelled order; manual review is required.',
+                \\Illuminate\\Support\\Facades\\Log::critical(
+                    'Livora received a successful payment after local cancellation; manual refund/reconciliation is required.',
                     [
                         'order_id' => $lockedOrder->id,
                         'order_number' => $lockedOrder->order_number,
                         'payment_id' => $lockedPayment->id,
                         'gateway' => $lockedPayment->gateway,
+                        'previous_payment_status' => $wasCancelledAttempt ? 'cancelled' : null,
                     ]
                 );
 
