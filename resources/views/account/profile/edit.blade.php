@@ -55,6 +55,14 @@
                         </div>
 
                         <div>
+                            <label for="profile-phone" class="mb-2 block text-sm font-medium">شماره موبایل (اختیاری)</label>
+                            <input id="profile-phone" name="phone" type="tel" inputmode="tel" dir="ltr" value="{{ old('phone', $user->phone) }}" maxlength="11" autocomplete="tel" placeholder="09123456789" class="w-full rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-cream)] px-4 py-3.5 text-left text-sm outline-none transition focus:border-[var(--livora-ink)] @error('phone') border-red-500 @enderror" aria-invalid="{{ $errors->has('phone') ? 'true' : 'false' }}" aria-describedby="profile-phone-error">
+                            @error('phone')
+                                <p id="profile-phone-error" class="mt-2 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div>
                             <label for="profile-email" class="mb-2 block text-sm font-medium">ایمیل</label>
                             <input id="profile-email" name="email" type="email" value="{{ old('email', $user->email) }}" required maxlength="255" autocomplete="email" dir="ltr" class="w-full rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-cream)] px-4 py-3.5 text-left text-sm outline-none transition focus:border-[var(--livora-ink)] @error('email') border-red-500 @enderror" aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}" aria-describedby="profile-email-error">
                             @error('email')
