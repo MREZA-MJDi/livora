@@ -77,27 +77,7 @@ class AuthController extends Controller
 
         $this->mergeGuestCartIntoUserCart($request, $guestCartSessionId);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Role Based Redirect
-        |--------------------------------------------------------------------------
-        */
-
-        if ($request->user()->isAdmin()) {
-            return redirect()
-                ->route('admin.dashboard')
-                ->with(
-                    'success',
-                    'به پنل مدیریت خوش آمدید.'
-                );
-        }
-
-        return redirect()
-            ->intended(route('account.index'))
-            ->with(
-                'success',
-                'با موفقیت وارد شدید.'
-            );
+        return $this->redirectAfterAuthentication($request);
     }
 
     public function showRegister(): View
@@ -147,21 +127,129 @@ class AuthController extends Controller
         $this->mergeGuestCartIntoUserCart($request, $guestCartSessionId);
 
 
-        if ($request->user()->isAdmin()) {
+        return $this->redirectAfterAuthentication(
+            $request,
+            'حساب کاربری با موفقیت ایجاد شد.'
+        );
+    }
+
+    protected function redirectAfterAuthentication(
+        Request $request,
+        string $successMessage = 'با موفقیت وارد شدید.'
+    ): RedirectResponse {
+        $user = $request->user();
+
+        if (! $user) {
             return redirect()
-                ->route('admin.dashboard')
-                ->with(
-                    'success',
-                    'به پنل مدیریت خوش آمدید.'
-                );
+                ->route('login')
+                ->withErrors([
+                    'email' => 'احراز هویت انجام نشد. دوباره تلاش کنید.',
+                ]);
+        }
+
+        $fallbackRoute = match (true) {
+            $user->isAdmin() => 'admin.dashboard',
+            $user->isCustomer() => 'account.index',
+            default => 'home',
+        };
+
+        $intended = $request->session()->pull('url.intended');
+
+        if (
+            is_string($intended)
+            && $this->isSafeIntendedUrl($request, $intended)
+        ) {
+            $path = parse_url($intended, PHP_URL_PATH) ?: '/';
+
+            if (
+                $user->isAdmin()
+                && $this->matchesPathPrefix($path, ['/admin'])
+            ) {
+                return redirect()->to($intended)->with('success', $successMessage);
+            }
+
+            if (
+                $user->isCustomer()
+                && $this->matchesPathPrefix($path, ['/account', '/checkout'])
+            ) {
+                return redirect()->to($intended)->with('success', $successMessage);
+            }
         }
 
         return redirect()
-            ->intended(route('account.index'))
-            ->with(
-                'success',
-                'حساب کاربری با موفقیت ایجاد شد.'
-            );
+            ->route($fallbackRoute)
+            ->with('success', $successMessage);
+    }
+
+    /**
+     * Do not allow session-stored intended URLs to redirect to external hosts,
+     * protocol-relative URLs, non-web schemes, or a different scheme.
+     */
+    protected function isSafeIntendedUrl(
+        Request $request,
+        string $intended
+    ): bool {
+        if (
+            str_contains($intended, '\\')
+            || preg_match('/[\\r\\n]/', $intended)
+        ) {
+            return false;
+        }
+
+        $parsed = parse_url($intended);
+
+        if (
+            $parsed === false
+            || isset($parsed['user'])
+            || isset($parsed['pass'])
+        ) {
+            return false;
+        }
+
+        $scheme = strtolower((string) ($parsed['scheme'] ?? $request->getScheme()));
+
+        if (
+            ! in_array($scheme, ['http', 'https'], true)
+            || $scheme !== strtolower($request->getScheme())
+        ) {
+            return false;
+        }
+
+        $host = $parsed['host'] ?? null;
+        $port = $parsed['port'] ?? null;
+
+        if ($host === null) {
+            return str_starts_with($intended, '/')
+                && ! str_starts_with($intended, '//');
+        }
+
+        return hash_equals(
+            strtolower($request->getHost()),
+            strtolower($host)
+        ) && (
+            $port === null
+            || (int) $port === (int) $request->getPort()
+        );
+    }
+
+    protected function matchesPathPrefix(
+        string $path,
+        array $prefixes
+    ): bool {
+        $normalizedPath = rtrim($path, '/') ?: '/';
+
+        foreach ($prefixes as $prefix) {
+            $normalizedPrefix = rtrim($prefix, '/') ?: '/';
+
+            if (
+                $normalizedPath === $normalizedPrefix
+                || str_starts_with($normalizedPath, $normalizedPrefix . '/')
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function logout(
