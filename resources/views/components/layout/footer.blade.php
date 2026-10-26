@@ -190,23 +190,29 @@
 
                 <div class="mt-5 space-y-4">
 
-                    <a
-                        href="tel:{{ config('app.contact.phone') }}"
-                        class="block break-all text-sm text-white/55 transition hover:text-white"
-                    >
-                        {{ config('app.contact.phone', '+98 00 000 0000') }}
-                    </a>
+                    @if(filled(config('app.contact.phone')))
+                        <a
+                            href="tel:{{ preg_replace('/[^0-9+]/', '', (string) config('app.contact.phone')) }}"
+                            class="block break-all text-sm text-white/55 transition hover:text-white"
+                        >
+                            {{ config('app.contact.phone') }}
+                        </a>
+                    @endif
 
-                    <a
-                        href="mailto:{{ config('app.contact.email') }}"
-                        class="block break-all text-sm text-white/55 transition hover:text-white"
-                    >
-                        {{ config('app.contact.email', 'hello@livora.ir') }}
-                    </a>
+                    @if(filled(config('app.contact.email')))
+                        <a
+                            href="mailto:{{ config('app.contact.email') }}"
+                            class="block break-all text-sm text-white/55 transition hover:text-white"
+                        >
+                            {{ config('app.contact.email') }}
+                        </a>
+                    @endif
 
-                    <p class="text-sm leading-7 text-white/45">
-                        {{ config('app.contact.address', 'تهران، ایران') }}
-                    </p>
+                    @if(filled(config('app.contact.address')))
+                        <p class="text-sm leading-7 text-white/45">
+                            {{ config('app.contact.address') }}
+                        </p>
+                    @endif
 
                 </div>
 
@@ -315,22 +321,29 @@
 
                 @endauth
 
-                {{-- Social --}}
-                <a
-                    href="#"
-                    aria-label="Instagram"
-                    class="text-xs text-white/40 transition hover:text-white"
-                >
-                    Instagram
-                </a>
+                @if(filled(config('app.contact.instagram_url')))
+                    <a
+                        href="{{ config('app.contact.instagram_url') }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Instagram"
+                        class="text-xs text-white/40 transition hover:text-white"
+                    >
+                        Instagram
+                    </a>
+                @endif
 
-                <a
-                    href="#"
-                    aria-label="Telegram"
-                    class="text-xs text-white/40 transition hover:text-white"
-                >
-                    Telegram
-                </a>
+                @if(filled(config('app.contact.telegram_url')))
+                    <a
+                        href="{{ config('app.contact.telegram_url') }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Telegram"
+                        class="text-xs text-white/40 transition hover:text-white"
+                    >
+                        Telegram
+                    </a>
+                @endif
 
             </div>
 
