@@ -77,28 +77,57 @@ class AddToCartRequest extends FormRequest
                 return;
             }
 
+            $allVariantsByType = $product->allVariants()
+                ->get()
+                ->groupBy('type');
+
             $availableVariants = $product->variants()
                 ->get()
                 ->groupBy('type');
 
-            $submittedVariants = collect(
-                $this->input('variants', [])
-            )
-                ->filter(fn ($id) => filled($id))
-                ->mapWithKeys(
-                    fn ($id, $type) => [
-                        (string) $type => (int) $id,
-                    ]
-                );
+            $submittedInput = collect($this->input('variants', []))
+                ->filter(fn ($id) => filled($id));
+
+            // Legacy clients can submit product_variant_id only when it
+            // represents a valid active option. Additional option types remain
+            // required and cannot be bypassed with the legacy field.
+            if ($submittedInput->isEmpty() && $this->filled('product_variant_id')) {
+                $legacyVariant = $product->variants()
+                    ->whereKey((int) $this->input('product_variant_id'))
+                    ->first();
+
+                if ($legacyVariant) {
+                    $submittedInput = collect([
+                        (string) $legacyVariant->type => (int) $legacyVariant->id,
+                    ]);
+                }
+            }
+
+            $submittedVariants = $submittedInput->mapWithKeys(
+                fn ($id, $type) => [
+                    (string) $type => (int) $id,
+                ]
+            );
 
             /*
              * Each configured variant type must have one selected value.
              */
-            foreach ($availableVariants as $type => $options) {
+            foreach ($allVariantsByType as $type => $allOptions) {
+                $activeOptions = $availableVariants->get($type, collect());
+
+                if ($activeOptions->isEmpty()) {
+                    $validator->errors()->add(
+                        "variants.$type",
+                        "در حال حاضر هیچ گزینه فعالی برای {$allOptions->first()->name} وجود ندارد."
+                    );
+
+                    continue;
+                }
+
                 if (! $submittedVariants->has($type)) {
                     $validator->errors()->add(
                         "variants.$type",
-                        "انتخاب {$options->first()->name} الزامی است."
+                        "انتخاب {$activeOptions->first()->name} الزامی است."
                     );
                 }
             }
@@ -153,7 +182,7 @@ class AddToCartRequest extends FormRequest
              * Products without variants still use the product-level stock.
              */
             if (
-                $availableVariants->isEmpty()
+                $allVariantsByType->isEmpty()
                 && (int) $product->stock < 1
             ) {
                 $validator->errors()->add(
@@ -166,7 +195,7 @@ class AddToCartRequest extends FormRequest
              * Backwards-compatible single-variant requests.
              */
             if (
-                $availableVariants->isEmpty()
+                $allVariantsByType->isEmpty()
                 && ! empty($this->input('product_variant_id'))
             ) {
                 $validator->errors()->add(
