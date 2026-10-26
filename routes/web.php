@@ -264,6 +264,11 @@ Route::middleware(['auth', 'customer'])->group(function () {
                 [AccountController::class, 'storeAddress']
             )->name('addresses.store');
 
+            Route::get(
+                '/addresses/{address}/edit',
+                [AccountController::class, 'editAddress']
+            )->name('addresses.edit');
+
             Route::put(
                 '/addresses/{address}',
                 [AccountController::class, 'updateAddress']
