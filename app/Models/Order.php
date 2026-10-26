@@ -18,6 +18,9 @@ class Order extends Model
 
         'status',
         'payment_status',
+        'inventory_status',
+        'inventory_processed_at',
+        'inventory_metadata',
 
         'payment_method',
         'payment_provider',
@@ -59,6 +62,8 @@ class Order extends Model
             'shipping_cost' => 'decimal:2',
             'discount' => 'decimal:2',
             'total' => 'decimal:2',
+            'inventory_processed_at' => 'datetime',
+            'inventory_metadata' => 'array',
 
             'installment_enabled' => 'boolean',
 
