@@ -988,67 +988,44 @@ class PaymentService
         ?string $message = null,
         array $data = []
     ): void {
-        DB::transaction(
-            function () use (
-                $payment,
-                $message,
-                $data
-            ) {
-                $lockedPayment =
-                    Payment::query()
-                        ->whereKey(
-                            $payment->id
-                        )
-                        ->lockForUpdate()
-                        ->first();
+        DB::transaction(function () use ($payment, $message, $data) {
+            $lockedOrder = Order::query()
+                ->whereKey($payment->order_id)
+                ->lockForUpdate()
+                ->first();
 
-                if (! $lockedPayment) {
-                    return;
-                }
-
-                /*
-                 * Do not overwrite a successful payment.
-                 */
-                if (
-                    $lockedPayment->status === 'paid'
-                ) {
-                    return;
-                }
-
-                /*
-                 * A refunded payment stays refunded.
-                 */
-                if (
-                    $lockedPayment->status === 'refunded'
-                ) {
-                    return;
-                }
-
-                $lockedPayment->update([
-                    'status' =>
-                        'failed',
-
-                    'metadata' =>
-                        array_merge(
-                            $lockedPayment->metadata ?? [],
-                            [
-                                'failure_message' =>
-                                    $message,
-
-                                'failure_response' =>
-                                    $data,
-
-                                'failed_at' =>
-                                    now()->toISOString(),
-                            ]
-                        ),
-                ]);
-
-                $this->syncOrderPaymentStatus(
-                    $lockedPayment->order
-                );
+            if (! $lockedOrder) {
+                return;
             }
-        );
+
+            $lockedPayment = Payment::query()
+                ->whereKey($payment->id)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $lockedPayment) {
+                return;
+            }
+
+            // A provider-confirmed payment or refund must never be overwritten.
+            if (in_array($lockedPayment->status, ['paid', 'refunded'], true)) {
+                return;
+            }
+
+            $lockedPayment->update([
+                'status' => 'failed',
+                'metadata' => array_merge(
+                    $lockedPayment->metadata ?? [],
+                    [
+                        'failure_message' => $message,
+                        'failure_response' => $data,
+                        'failed_at' => now()->toISOString(),
+                    ]
+                ),
+            ]);
+
+            $this->syncOrderPaymentStatus($lockedOrder);
+        });
     }
 
     /**
