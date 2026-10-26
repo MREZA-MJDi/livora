@@ -149,6 +149,12 @@ jobs:
           coverage: none
           tools: composer:v2
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
       - name: Install PHP dependencies
         run: composer install --prefer-dist --no-interaction --no-progress
 
@@ -156,6 +162,12 @@ jobs:
         run: |
           cp .env.example .env
           php artisan key:generate
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build frontend assets for Blade rendering
+        run: npm run build
 
       - name: Run Laravel feature and unit tests against MariaDB
         env:
