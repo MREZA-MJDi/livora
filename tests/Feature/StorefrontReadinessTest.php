@@ -364,11 +364,9 @@ class StorefrontReadinessTest extends TestCase
             'stock' => 8,
         ]);
 
-        // Start a real guest browser session and reuse the encrypted session
-        // cookie emitted by Laravel, including its cookie-name validation prefix.
-        $cartPage = $this->get(route('cart.index'))->assertOk();
-        $sessionCookie = $cartPage->getCookie(config('session.cookie'));
-        $this->assertNotNull($sessionCookie);
+        // The test client encrypts raw cookie values before sending them,
+        // matching the framework's real encrypted session-cookie contract.
+        $this->get(route('cart.index'))->assertOk();
 
         $cart = Cart::query()
             ->whereNull('user_id')
@@ -378,7 +376,7 @@ class StorefrontReadinessTest extends TestCase
 
         $this->withCookie(
             config('session.cookie'),
-            $sessionCookie->getValue()
+            (string) $cart->session_id
         );
         $item = CartItem::create([
             'cart_id' => $cart->id,
