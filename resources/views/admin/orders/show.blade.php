@@ -34,6 +34,47 @@
     </div>
 
 
+    @if(in_array($order->inventory_status, ['stock_conflict', 'needs_reconciliation'], true))
+        <div role="alert" class="mb-6 rounded-2xl border border-amber-300 bg-amber-50 p-5 text-amber-950">
+            <div class="flex items-start gap-3">
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-100 font-bold">!</span>
+                <div class="min-w-0">
+                    <h3 class="text-sm font-bold">
+                        @if($order->inventory_status === 'stock_conflict')
+                            موجودی این سفارش نیاز به بررسی فوری دارد
+                        @else
+                            موجودی سفارش قدیمی هنوز تطبیق داده نشده است
+                        @endif
+                    </h3>
+                    <p class="mt-2 text-xs leading-6">
+                        پرداخت این سفارش ثبت شده، اما تخصیص موجودی به‌صورت خودکار تکمیل نشده است.
+                        قبل از آماده‌سازی یا ارسال، موجودی واقعی را بررسی و وضعیت سفارش را با تصمیم مشتری/مدیر تطبیق دهید.
+                    </p>
+                    @if(is_array($order->inventory_metadata) && !empty($order->inventory_metadata['issues']))
+                        <ul class="mt-3 list-inside list-disc space-y-1 text-xs">
+                            @foreach($order->inventory_metadata['issues'] as $issue)
+                                <li>{{ $issue['reason'] ?? 'نیاز به بررسی موجودی' }}@if(!empty($issue['product_name'])) — {{ $issue['product_name'] }}@endif</li>
+                            @endforeach
+                        </ul>
+                    @endif
+                    @if(!empty($order->inventory_metadata['reason']))
+                        <p class="mt-3 text-xs">{{ $order->inventory_metadata['reason'] }}</p>
+                    @endif
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @if(($order->latestPayment?->metadata['manual_review_required'] ?? false) === true)
+        <div role="alert" class="mb-6 rounded-2xl border border-red-300 bg-red-50 p-5 text-red-950">
+            <h3 class="text-sm font-bold">تلاش پرداخت نیازمند تطبیق دستی است</h3>
+            <p class="mt-2 text-xs leading-6">
+                درگاه پرداخت تأیید کرده که این تلاش هم موفق بوده، در حالی که سفارش قبلاً پرداخت شده است.
+                شناسه تراکنش را با گزارش درگاه تطبیق دهید و در صورت نیاز بازپرداخت را از مسیر رسمی درگاه انجام دهید.
+            </p>
+        </div>
+    @endif
+
     {{-- Order Summary --}}
     <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
 
