@@ -32,10 +32,18 @@ class DatabaseSeeder extends Seeder
             return;
         }
 
-        // Production seeding is limited to safe administrator bootstrap.
-        // UserSeeder preserves an existing admin and rejects unsafe defaults.
-        $this->call([
-            UserSeeder::class,
-        ]);
+        if (app()->environment('production')) {
+            // Production seeding is limited to safe administrator bootstrap.
+            // UserSeeder preserves an existing admin and rejects unsafe defaults.
+            $this->call([
+                UserSeeder::class,
+            ]);
+
+            return;
+        }
+
+        throw new \\RuntimeException(
+            'Database seeding is disabled for this environment. Use local/testing fixtures or the guarded production administrator bootstrap.'
+        );
     }
 }
