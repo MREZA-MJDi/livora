@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -37,277 +38,347 @@ class CartController extends Controller
         Product $product
     ): RedirectResponse|JsonResponse {
         $validated = $request->validated();
+        $candidateCart = $this->getCart($request);
 
-        $cart = $this->getCart($request);
+        return DB::transaction(function () use ($request, $product, $validated, $candidateCart) {
+            $cart = Cart::query()
+                ->whereKey($candidateCart->id)
+                ->lockForUpdate()
+                ->first();
 
-        $variants = $this->resolveSelectedVariants(
-            $product,
-            $validated['variants'] ?? null,
-            $validated['product_variant_id'] ?? null
-        );
+            // Checkout may have converted this cart after the request began.
+            // Start a fresh active cart rather than writing into a completed one.
+            if (! $cart || $cart->status !== 'active') {
+                $cart = $this->getCart($request);
+                $cart = Cart::query()
+                    ->whereKey($cart->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+            }
 
-        $availableStock = $variants->isNotEmpty()
-            ? (int) $variants->min('stock')
-            : (int) $product->stock;
+            $product = Product::query()
+                ->whereKey($product->id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        $quantity = (int) $validated['quantity'];
-
-        if ($quantity > $availableStock) {
-            return back()->withErrors([
-                'quantity' => 'موجودی کافی نیست.',
-            ]);
-        }
-
-        $unitPrice = max(
-            0,
-            (float) $product->price
-            + (float) $variants->sum(
-                fn (ProductVariant $variant) =>
-                    (float) $variant->price_adjustment
-            )
-        );
-
-        $variantOptions = $variants
-            ->sortBy('type', SORT_NATURAL | SORT_FLAG_CASE)
-            ->map(fn (ProductVariant $variant) => [
-                'id' => (int) $variant->id,
-                'type' => (string) $variant->type,
-                'name' => (string) $variant->name,
-                'value' => (string) $variant->value,
-                'sku' => $variant->sku,
-                'color_hex' => $variant->color_hex,
-                'price_adjustment' => (float) $variant->price_adjustment,
-                'stock' => (int) $variant->stock,
-            ])
-            ->values()
-            ->all();
-
-        $variantKey = $this->buildVariantKey(
-            $variants,
-            $product
-        );
-
-        $primaryVariantId = $variants->first()?->id;
-
-        $item = $cart->items()
-            ->where('product_id', $product->id)
-            ->where(function ($query) use (
-                $variantKey,
-                $primaryVariantId,
-                $variants
+            if (
+                $product->status !== 'active'
+                || ! $product->category()->where('is_active', true)->exists()
             ) {
-                $query->where('variant_key', $variantKey);
+                return back()->withErrors([
+                    'product' => 'این محصول دیگر برای خرید فعال نیست.',
+                ]);
+            }
 
-                /*
-                 * Merge legacy one-variant cart rows created before the
-                 * multi-variant snapshot fields were introduced.
-                 */
-                if ($variants->count() === 1) {
-                    $query->orWhere(function ($legacy) use (
-                        $primaryVariantId
-                    ) {
-                        $legacy
-                            ->whereNull('variant_key')
-                            ->whereNull('variant_options')
-                            ->where(
-                                'product_variant_id',
-                                $primaryVariantId
-                            );
-                    });
-                }
-
-                if ($variants->isEmpty()) {
-                    $query->orWhere(function ($legacy) {
-                        $legacy
-                            ->whereNull('variant_key')
-                            ->whereNull('variant_options')
-                            ->whereNull('product_variant_id');
-                    });
-                }
-            })
-            ->first();
-
-        if ($item) {
-            $quantity += (int) $item->quantity;
-        }
-
-        if ($quantity > $availableStock) {
-            return back()->withErrors([
-                'quantity' => 'موجودی کافی نیست.',
-            ]);
-        }
-
-        $payload = [
-            'product_id' => $product->id,
-            'product_variant_id' => $primaryVariantId,
-            'variant_key' => $variantKey,
-            'variant_options' => $variantOptions ?: null,
-            'quantity' => $quantity,
-            'unit_price' => $unitPrice,
-        ];
-
-        if ($item) {
-            $item->update($payload);
-        } else {
-            $cart->items()->create(
-                $payload
+            $variants = $this->resolveSelectedVariants(
+                $product,
+                $validated['variants'] ?? null,
+                $validated['product_variant_id'] ?? null
             );
-        }
 
-        $cart->load('items');
+            $requiredTypes = $product->allVariants()
+                ->select('type')
+                ->distinct()
+                ->pluck('type')
+                ->map(fn ($type) => (string) $type)
+                ->unique()
+                ->sort(SORT_STRING)
+                ->values()
+                ->all();
 
-        if ($request->expectsJson()) {
-            return response()->json([
-                'message' => 'محصول به سبد اضافه شد.',
-                'cart_count' => $cart->itemCount(),
-                'subtotal' => $cart->subtotal(),
-            ]);
-        }
+            $selectedTypes = $variants->pluck('type')
+                ->map(fn ($type) => (string) $type)
+                ->unique()
+                ->sort(SORT_STRING)
+                ->values()
+                ->all();
 
-        return redirect()
-            ->route('cart.index')
-            ->with('success', 'محصول به سبد خرید اضافه شد.');
+            if ($requiredTypes !== $selectedTypes) {
+                return back()->withErrors([
+                    'variants' => 'گزینه‌های محصول تغییر کرده‌اند؛ لطفاً محصول را دوباره انتخاب کنید.',
+                ]);
+            }
+
+            $availableStock = $variants->isNotEmpty()
+                ? (int) $variants->min('stock')
+                : (int) $product->stock;
+
+            $quantity = (int) $validated['quantity'];
+
+            if ($quantity > $availableStock) {
+                return back()->withErrors([
+                    'quantity' => 'موجودی کافی نیست.',
+                ]);
+            }
+
+            $unitPrice = max(
+                0,
+                (float) $product->price
+                + (float) $variants->sum(
+                    fn (ProductVariant $variant) => (float) $variant->price_adjustment
+                )
+            );
+
+            $variantOptions = $variants
+                ->sortBy('type', SORT_NATURAL | SORT_FLAG_CASE)
+                ->map(fn (ProductVariant $variant) => [
+                    'id' => (int) $variant->id,
+                    'type' => (string) $variant->type,
+                    'name' => (string) $variant->name,
+                    'value' => (string) $variant->value,
+                    'sku' => $variant->sku,
+                    'color_hex' => $variant->color_hex,
+                    'price_adjustment' => (float) $variant->price_adjustment,
+                    'stock' => (int) $variant->stock,
+                ])
+                ->values()
+                ->all();
+
+            $variantKey = $this->buildVariantKey($variants, $product);
+            $primaryVariantId = $variants->first()?->id;
+
+            $itemQuery = $cart->items()
+                ->where('product_id', $product->id)
+                ->where(function ($query) use ($variantKey, $primaryVariantId, $variants) {
+                    $query->where('variant_key', $variantKey);
+
+                    if ($variants->count() === 1) {
+                        $query->orWhere(function ($legacy) use ($primaryVariantId) {
+                            $legacy
+                                ->whereNull('variant_key')
+                                ->whereNull('variant_options')
+                                ->where('product_variant_id', $primaryVariantId);
+                        });
+                    }
+
+                    if ($variants->isEmpty()) {
+                        $query->orWhere(function ($legacy) {
+                            $legacy
+                                ->whereNull('variant_key')
+                                ->whereNull('variant_options')
+                                ->whereNull('product_variant_id');
+                        });
+                    }
+                });
+
+            $item = $itemQuery->lockForUpdate()->first();
+
+            if ($item) {
+                $quantity += (int) $item->quantity;
+            }
+
+            if ($quantity > 99) {
+                return back()->withErrors([
+                    'quantity' => 'تعداد یک محصول در سبد نمی‌تواند بیشتر از ۹۹ باشد.',
+                ]);
+            }
+
+            if ($quantity > $availableStock) {
+                return back()->withErrors([
+                    'quantity' => 'موجودی کافی نیست.',
+                ]);
+            }
+
+            $payload = [
+                'product_id' => $product->id,
+                'product_variant_id' => $primaryVariantId,
+                'variant_key' => $variantKey,
+                'variant_options' => $variantOptions ?: null,
+                'quantity' => $quantity,
+                'unit_price' => $unitPrice,
+            ];
+
+            if ($item) {
+                $item->update($payload);
+            } else {
+                $cart->items()->create($payload);
+            }
+
+            $cart->setRelation('items', $cart->items()->get());
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'محصول به سبد اضافه شد.',
+                    'cart_count' => $cart->itemCount(),
+                    'subtotal' => $cart->subtotal(),
+                ]);
+            }
+
+            return redirect()
+                ->route('cart.index')
+                ->with('success', 'محصول به سبد خرید اضافه شد.');
+        });
     }
 
-    public function update(
+        public function update(
         UpdateCartRequest $request,
         CartItem $item
     ): RedirectResponse|JsonResponse {
-        $this->ensureCartItemAccessible($request, $item);
+        return DB::transaction(function () use ($request, $item) {
+            $cart = Cart::query()
+                ->whereKey($item->cart_id)
+                ->lockForUpdate()
+                ->first();
 
-        $validated = $request->validated();
+            abort_unless($cart && $cart->status === 'active', 404);
 
-        $item->load([
-            'cart',
-            'product',
-            'variant',
-        ]);
+            $lockedItem = CartItem::query()
+                ->whereKey($item->id)
+                ->where('cart_id', $cart->id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        if (
-            ! $item->product
-            || $item->product->status !== 'active'
-            || ! $item->product->category()->where('is_active', true)->exists()
-        ) {
-            return back()->withErrors([
-                'product' => 'این محصول دیگر برای خرید فعال نیست.',
+            $this->ensureCartItemAccessible($request, $lockedItem);
+            $validated = $request->validated();
+
+            $lockedItem->load(['product', 'variant']);
+
+            if (
+                ! $lockedItem->product
+                || $lockedItem->product->status !== 'active'
+                || ! $lockedItem->product->category()->where('is_active', true)->exists()
+            ) {
+                return back()->withErrors([
+                    'product' => 'این محصول دیگر برای خرید فعال نیست.',
+                ]);
+            }
+
+            $variants = $this->resolveVariantsFromCartItem($lockedItem);
+            $selectedVariantIds = $lockedItem->selectedVariantIds();
+
+            $availableTypes = $lockedItem->product->allVariants()
+                ->select('type')
+                ->distinct()
+                ->pluck('type')
+                ->map(fn ($type) => (string) $type)
+                ->unique()
+                ->sort(SORT_STRING)
+                ->values()
+                ->all();
+
+            $selectedTypes = $variants->pluck('type')
+                ->map(fn ($type) => (string) $type)
+                ->unique()
+                ->sort(SORT_STRING)
+                ->values()
+                ->all();
+
+            if (
+                count($selectedVariantIds) !== $variants->count()
+                || $availableTypes !== $selectedTypes
+            ) {
+                return back()->withErrors([
+                    'quantity' => 'گزینه‌های این محصول تغییر کرده‌اند؛ آن را از صفحه محصول دوباره انتخاب کنید.',
+                ]);
+            }
+
+            $stock = $variants->isNotEmpty()
+                ? (int) $variants->min('stock')
+                : (int) $lockedItem->product->stock;
+
+            if ((int) $validated['quantity'] > $stock) {
+                return back()->withErrors([
+                    'quantity' => 'موجودی کافی نیست.',
+                ]);
+            }
+
+            $unitPrice = max(
+                0,
+                (float) $lockedItem->product->price
+                + (float) $variants->sum(
+                    fn (ProductVariant $variant) => (float) $variant->price_adjustment
+                )
+            );
+
+            $lockedItem->update([
+                'quantity' => (int) $validated['quantity'],
+                'unit_price' => $unitPrice,
             ]);
-        }
 
-        $variants = $this->resolveVariantsFromCartItem($item);
-        $selectedVariantIds = $item->selectedVariantIds();
-        $availableTypes = $item->product->allVariants()
-            ->select('type')
-            ->distinct()
-            ->pluck('type')
-            ->map(fn ($type) => (string) $type)
-            ->unique()
-            ->sort(SORT_STRING)
-            ->values()
-            ->all();
-        $selectedTypes = $variants->pluck('type')
-            ->map(fn ($type) => (string) $type)
-            ->unique()
-            ->sort(SORT_STRING)
-            ->values()
-            ->all();
+            $cart->setRelation('items', $cart->items()->get());
 
-        if (
-            count($selectedVariantIds) !== $variants->count()
-            || $availableTypes !== $selectedTypes
-        ) {
-            return back()->withErrors([
-                'quantity' => 'گزینه‌های این محصول تغییر کرده‌اند؛ آن را از صفحه محصول دوباره انتخاب کنید.',
-            ]);
-        }
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'سبد به‌روزرسانی شد.',
+                    'cart_count' => $cart->itemCount(),
+                    'subtotal' => $cart->subtotal(),
+                ]);
+            }
 
-        $stock = $variants->isNotEmpty()
-            ? (int) $variants->min('stock')
-            : (int) $item->product->stock;
-
-        if ((int) $validated['quantity'] > $stock) {
-            return back()->withErrors([
-                'quantity' => 'موجودی کافی نیست.',
-            ]);
-        }
-
-        // Updating the cart quantity also acknowledges the latest server-side
-        // price, so checkout will not silently charge an old snapshot.
-        $unitPrice = max(
-            0,
-            (float) $item->product->price
-            + (float) $variants->sum(
-                fn (ProductVariant $variant) => (float) $variant->price_adjustment
-            )
-        );
-
-        $item->update([
-            'quantity' => (int) $validated['quantity'],
-            'unit_price' => $unitPrice,
-        ]);
-
-        $cart = $item->cart->fresh('items');
-
-        if ($request->expectsJson()) {
-            return response()->json([
-                'message' => 'سبد به‌روزرسانی شد.',
-                'cart_count' => $cart->itemCount(),
-                'subtotal' => $cart->subtotal(),
-            ]);
-        }
-
-        return back()->with(
-            'success',
-            'سبد خرید به‌روزرسانی شد.'
-        );
+            return back()->with('success', 'سبد خرید به‌روزرسانی شد.');
+        });
     }
 
-    public function remove(
+        public function remove(
         Request $request,
         CartItem $item
     ): RedirectResponse|JsonResponse {
-        $this->ensureCartItemAccessible($request, $item);
+        return DB::transaction(function () use ($request, $item) {
+            $cart = Cart::query()
+                ->whereKey($item->cart_id)
+                ->lockForUpdate()
+                ->first();
 
-        $cart = $item->cart()->firstOrFail();
-        $item->delete();
+            abort_unless($cart && $cart->status === 'active', 404);
 
-        if ($request->expectsJson()) {
-            $cart->load('items');
+            $lockedItem = CartItem::query()
+                ->whereKey($item->id)
+                ->where('cart_id', $cart->id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-            return response()->json([
-                'message' => 'محصول از سبد حذف شد.',
-                'cart_count' => $cart->itemCount(),
-                'subtotal' => $cart->subtotal(),
-            ]);
-        }
+            $this->ensureCartItemAccessible($request, $lockedItem);
+            $lockedItem->delete();
 
-        return back()->with(
-            'success',
-            'محصول از سبد حذف شد.'
-        );
+            $cart->setRelation('items', $cart->items()->get());
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'محصول از سبد حذف شد.',
+                    'cart_count' => $cart->itemCount(),
+                    'subtotal' => $cart->subtotal(),
+                ]);
+            }
+
+            return back()->with('success', 'محصول از سبد حذف شد.');
+        });
     }
 
-    public function clear(
+        public function clear(
         Request $request
     ): RedirectResponse|JsonResponse {
-        $cart = $this->getCart($request);
+        $candidateCart = $this->getCart($request);
 
-        $cart->items()->delete();
+        return DB::transaction(function () use ($request, $candidateCart) {
+            $cart = Cart::query()
+                ->whereKey($candidateCart->id)
+                ->lockForUpdate()
+                ->first();
 
-        if ($request->expectsJson()) {
-            return response()->json([
-                'message' => 'سبد خرید خالی شد.',
-                'cart_count' => 0,
-                'subtotal' => 0,
-            ]);
-        }
+            if (! $cart || $cart->status !== 'active') {
+                $cart = $this->getCart($request);
+                $cart = Cart::query()
+                    ->whereKey($cart->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+            }
 
-        return back()->with(
-            'success',
-            'سبد خرید خالی شد.'
-        );
+            $cart->items()->delete();
+            $cart->setRelation('items', collect());
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'سبد خرید خالی شد.',
+                    'cart_count' => 0,
+                    'subtotal' => 0,
+                ]);
+            }
+
+            return back()->with('success', 'سبد خرید خالی شد.');
+        });
     }
 
-    protected function resolveSelectedVariants(
+        protected function resolveSelectedVariants(
         Product $product,
         ?array $submittedVariants,
         ?int $legacyVariantId
