@@ -388,7 +388,11 @@ class StorefrontReadinessTest extends TestCase
             'unit_price' => $product->price,
         ]);
 
-        $this->patchJson(route('cart.update', $item), ['quantity' => 3])
+        // Laravel's test client omits cookies on JSON requests unless
+        // credentials are explicitly enabled. Preserve the same guest session
+        // for this request and subsequent JSON mutations.
+        $this->withCredentials()
+            ->patchJson(route('cart.update', $item), ['quantity' => 3])
             ->assertOk()
             ->assertJsonPath('cart_count', 3);
 
