@@ -24,7 +24,8 @@ class ShopController extends Controller
                 'category',
                 'images',
             ])
-            ->active();
+            ->active()
+            ->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('is_active', true));
 
         /*
         |--------------------------------------------------------------------------
@@ -99,7 +100,17 @@ class ShopController extends Controller
         */
 
         if (!empty($filters['in_stock'])) {
-            $query->inStock();
+            // Variant-enabled products are available when at least one active
+            // option has stock; base-product stock must not override option stock.
+            $query->where(function ($stockQuery) {
+                $stockQuery
+                    ->where(function ($baseProductQuery) {
+                        $baseProductQuery
+                            ->whereDoesntHave('variants')
+                            ->where('stock', '>', 0);
+                    })
+                    ->orWhereHas('variants', fn ($variantQuery) => $variantQuery->where('stock', '>', 0));
+            });
         }
 
         /*
