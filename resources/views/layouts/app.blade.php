@@ -52,7 +52,10 @@
         filterOpen: false,
         searchReturnFocus: null,
         openSearch(trigger) {
-            this.searchReturnFocus = trigger || document.activeElement;
+            const openedFromMenu = trigger?.closest?.('[role="dialog"][aria-label="منوی موبایل"]');
+            this.searchReturnFocus = openedFromMenu
+                ? document.querySelector('.livora-mobile-nav button[aria-label="جستجو"]')
+                : (trigger || document.activeElement);
             this.mobileOpen = false;
             this.searchOpen = true;
             this.$nextTick(() => {
@@ -62,7 +65,12 @@
         closeSearch() {
             this.searchOpen = false;
             this.$nextTick(() => {
-                this.searchReturnFocus?.focus?.({ preventScroll: true });
+                const target = this.searchReturnFocus;
+                if (target?.isConnected && target.offsetParent !== null) {
+                    target.focus?.({ preventScroll: true });
+                } else {
+                    document.querySelector('.livora-mobile-nav button[aria-label="جستجو"]')?.focus({ preventScroll: true });
+                }
             });
         }
     }"
