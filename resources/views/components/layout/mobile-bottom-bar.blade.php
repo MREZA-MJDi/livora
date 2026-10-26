@@ -1,5 +1,5 @@
 <nav
-    class="livora-mobile-nav fixed inset-x-3 bottom-3 z-[90] lg:hidden"
+    class="livora-mobile-nav mobile-bottom-nav fixed inset-x-3 bottom-3 z-[90] lg:hidden"
     aria-label="ناوبری موبایل"
 >
     <div class="mx-auto grid max-w-md grid-cols-5 items-center rounded-[1.6rem] border border-[var(--livora-border)] bg-[color:var(--livora-cream)]/95 p-2 shadow-[0_16px_45px_rgba(24,23,21,.14)] backdrop-blur-2xl">
@@ -20,7 +20,7 @@
 
         <button type="button"
             @click="openSearch($event.currentTarget)"
-            class="flex flex-col items-center justify-center gap-1.5 rounded-2xl px-2 py-2.5 text-[var(--livora-stone)] transition hover:text-[var(--livora-ink)]"
+            class="mobile-bottom-search flex flex-col items-center justify-center gap-1.5 rounded-2xl px-2 py-2.5 transition"
             aria-label="جستجو"
             data-livora-search-trigger
             :aria-expanded="searchOpen.toString()"
