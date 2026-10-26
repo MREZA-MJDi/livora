@@ -123,4 +123,21 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Public Contact Details
+    |--------------------------------------------------------------------------
+    |
+    | Leave a value empty until the store owner provides a verified contact.
+    | The storefront hides unset channels instead of showing placeholder links.
+    |
+    */
+    'contact' => [
+        'phone' => env('CONTACT_PHONE'),
+        'email' => env('CONTACT_EMAIL'),
+        'address' => env('CONTACT_ADDRESS'),
+        'instagram_url' => env('CONTACT_INSTAGRAM_URL'),
+        'telegram_url' => env('CONTACT_TELEGRAM_URL'),
+    ],
+
 ];
