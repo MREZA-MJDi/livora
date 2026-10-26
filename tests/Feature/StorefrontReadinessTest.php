@@ -517,6 +517,27 @@ class StorefrontReadinessTest extends TestCase
         $this->assertDatabaseHas('cart_items', ['id' => $item->id]);
     }
 
+    public function test_registration_persists_the_normalized_mobile_number(): void
+    {
+        $this->post(route('register.store'), [
+            'first_name' => 'کاربر',
+            'last_name' => 'آزمایشی',
+            'email' => 'registration-phone@example.test',
+            'phone' => '۰۹۱۲۳۴۵۶۷۸۹',
+            'password' => 'Livora123Ab',
+            'password_confirmation' => 'Livora123Ab',
+            'terms' => '1',
+        ])
+            ->assertRedirect(route('account.index'));
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'registration-phone@example.test',
+            'name' => 'کاربر آزمایشی',
+            'phone' => '09123456789',
+            'role' => 'customer',
+        ]);
+    }
+
     public function test_customer_account_profile_and_address_pages_are_real_and_work(): void
     {
         $customer = User::create([
@@ -540,12 +561,14 @@ class StorefrontReadinessTest extends TestCase
             ->put(route('account.profile.update'), [
                 'name' => 'Updated Account Customer',
                 'email' => 'account-customer@example.test',
+                'phone' => '۰۹۱۲۳۴۵۶۷۸۹',
             ])
             ->assertRedirect();
 
         $this->assertDatabaseHas('users', [
             'id' => $customer->id,
             'name' => 'Updated Account Customer',
+            'phone' => '09123456789',
         ]);
 
         $this->actingAs($customer)
