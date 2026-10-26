@@ -673,13 +673,19 @@ class PaymentService
                         $payment,
                         $result
                     ) {
-                        $lockedPayment =
-                            Payment::query()
-                                ->whereKey(
-                                    $payment->id
-                                )
-                                ->lockForUpdate()
-                                ->firstOrFail();
+                        $lockedOrder = Order::query()
+                            ->whereKey($payment->order_id)
+                            ->lockForUpdate()
+                            ->first();
+
+                        if (! $lockedOrder) {
+                            return;
+                        }
+
+                        $lockedPayment = Payment::query()
+                            ->whereKey($payment->id)
+                            ->lockForUpdate()
+                            ->firstOrFail();
 
                         if (
                             $lockedPayment->status === 'paid'
@@ -704,9 +710,7 @@ class PaymentService
                                 ),
                         ]);
 
-                        $this->syncOrderPaymentStatus(
-                            $lockedPayment->order
-                        );
+                        $this->syncOrderPaymentStatus($lockedOrder);
                     }
                 );
             }
