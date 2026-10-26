@@ -185,90 +185,110 @@ class AuthController extends Controller
     ): void {
         $sessionId = $guestSessionId ?? $request->session()->getId();
 
-        $guestCart = Cart::query()
-            ->where(
-                'session_id',
-                $sessionId
-            )
-            ->whereNull('user_id')
-            ->where(
-                'status',
-                'active'
-            )
-            ->with('items')
-            ->first();
+        DB::transaction(function () use ($sessionId) {
+            // Serialize concurrent logins/cart merges for the same account.
+            User::query()
+                ->whereKey(Auth::id())
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        if (! $guestCart) {
-            return;
-        }
+            $guestCart = Cart::query()
+                ->where('session_id', $sessionId)
+                ->whereNull('user_id')
+                ->where('status', 'active')
+                ->lockForUpdate()
+                ->first();
 
-        $userCart = Cart::query()
-            ->firstOrCreate(
-                [
+            if (! $guestCart) {
+                return;
+            }
+
+            $guestCart->load('items');
+
+            $userCart = Cart::query()
+                ->where('user_id', Auth::id())
+                ->where('status', 'active')
+                ->lockForUpdate()
+                ->first();
+
+            if (! $userCart) {
+                $userCart = Cart::create([
                     'user_id' => Auth::id(),
-                    'status' => 'active',
-                ],
-                [
                     'session_id' => null,
-                ]
-            );
-
-        foreach ($guestCart->items as $guestItem) {
-            $existingQuery = $userCart->items()
-                ->where('product_id', $guestItem->product_id);
-
-            if (filled($guestItem->variant_key)) {
-                $existingQuery->where(function ($query) use ($guestItem) {
-                    $query->where('variant_key', $guestItem->variant_key);
-
-                    // Convert the legacy base-product row into the current key.
-                    if ($guestItem->variant_key === 'base') {
-                        $query->orWhere(function ($legacy) {
-                            $legacy
-                                ->whereNull('variant_key')
-                                ->whereNull('variant_options')
-                                ->whereNull('product_variant_id');
-                        });
-                    }
-                });
-            } elseif ($guestItem->product_variant_id !== null) {
-                $existingQuery
-                    ->whereNull('variant_key')
-                    ->where('product_variant_id', $guestItem->product_variant_id);
-            } else {
-                $existingQuery
-                    ->whereNull('variant_key')
-                    ->whereNull('product_variant_id');
-            }
-
-            $existingItem = $existingQuery->first();
-
-            if ($existingItem) {
-                $existingItem->update([
-                    'quantity' => (int) $existingItem->quantity + (int) $guestItem->quantity,
-                    'unit_price' => $guestItem->unit_price,
-                    'variant_key' => $guestItem->variant_key ?? 'base',
-                    'variant_options' => $guestItem->variant_options,
-                    'product_variant_id' => $guestItem->product_variant_id,
+                    'status' => 'active',
                 ]);
-
-                continue;
             }
 
-            $userCart->items()->create([
-                'product_id' => $guestItem->product_id,
-                'product_variant_id' => $guestItem->product_variant_id,
-                'variant_key' => $guestItem->variant_key ?? 'base',
-                'variant_options' => $guestItem->variant_options,
-                'quantity' => $guestItem->quantity,
-                'unit_price' => $guestItem->unit_price,
-            ]);
-        }
+            foreach ($guestCart->items as $guestItem) {
+                $selectedIds = $guestItem->selectedVariantIds();
+                $variantKey = $guestItem->variant_key;
 
-        $guestCart->items()->delete();
+                $existingQuery = $userCart->items()
+                    ->where('product_id', $guestItem->product_id);
 
-        $guestCart->update([
-            'status' => 'converted',
-        ]);
+                if (filled($variantKey)) {
+                    $existingQuery->where(function ($query) use (
+                        $variantKey,
+                        $guestItem,
+                        $selectedIds
+                    ) {
+                        $query->where('variant_key', $variantKey);
+
+                        // Merge legacy one-variant rows only when the selection
+                        // is unambiguous; never merge two different combinations
+                        // just because they share the primary variant ID.
+                        if (count($selectedIds) === 1) {
+                            $query->orWhere(function ($legacy) use ($selectedIds) {
+                                $legacy
+                                    ->whereNull('variant_key')
+                                    ->whereNull('variant_options')
+                                    ->where('product_variant_id', $selectedIds[0]);
+                            });
+                        } elseif ($variantKey === 'base' || $selectedIds === []) {
+                            $query->orWhere(function ($legacy) {
+                                $legacy
+                                    ->whereNull('variant_key')
+                                    ->whereNull('variant_options')
+                                    ->whereNull('product_variant_id');
+                            });
+                        }
+                    });
+                } elseif ($guestItem->product_variant_id !== null) {
+                    $existingQuery
+                        ->whereNull('variant_key')
+                        ->where('product_variant_id', $guestItem->product_variant_id);
+                } else {
+                    $existingQuery
+                        ->whereNull('variant_key')
+                        ->whereNull('variant_options')
+                        ->whereNull('product_variant_id');
+                }
+
+                $existingItem = $existingQuery->lockForUpdate()->first();
+
+                $payload = [
+                    'product_variant_id' => $guestItem->product_variant_id,
+                    'variant_key' => $variantKey ?? 'base',
+                    'variant_options' => $guestItem->variant_options,
+                    'unit_price' => $guestItem->unit_price,
+                ];
+
+                if ($existingItem) {
+                    $existingItem->update(array_merge($payload, [
+                        'quantity' => (int) $existingItem->quantity + (int) $guestItem->quantity,
+                    ]));
+
+                    continue;
+                }
+
+                $userCart->items()->create(array_merge($payload, [
+                    'product_id' => $guestItem->product_id,
+                    'quantity' => $guestItem->quantity,
+                ]));
+            }
+
+            $guestCart->items()->delete();
+            $guestCart->update(['status' => 'converted']);
+        });
     }
 }
