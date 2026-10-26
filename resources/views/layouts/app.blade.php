@@ -69,7 +69,7 @@
                 if (target?.isConnected && target.offsetParent !== null) {
                     target.focus?.({ preventScroll: true });
                 } else {
-                    document.querySelector('.livora-mobile-nav button[aria-label="جستجو"]')?.focus({ preventScroll: true });
+                    document.querySelector('[data-livora-search-trigger]')?.focus({ preventScroll: true });
                 }
             });
         }
