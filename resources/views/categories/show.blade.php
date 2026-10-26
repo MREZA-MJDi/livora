@@ -170,7 +170,7 @@
                             </span>
 
                                 <a
-                                    href="{{ route('shop.index', ['category' => $category->id]) }}"
+                                    href="{{ route('shop.index', ['category' => $category->slug]) }}"
                                     class="rounded-full bg-[var(--livora-ink)] px-4 py-2 text-[11px] font-medium text-white transition hover:bg-[var(--livora-accent)]"
                                 >
                                     مشاهده همه محصولات
