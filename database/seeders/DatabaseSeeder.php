@@ -8,20 +8,19 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Core catalog data is safe to seed in every environment so a fresh
-        // installation has sample products, variants, categories, and images.
-        $this->call([
-            CategorySeeder::class,
-            ProductSeeder::class,
-            ProductImageSeeder::class,
-            ProductVariantSeeder::class,
-            UserSeeder::class,
-        ]);
-
-        // Demo customer/order data is intentionally limited to local/testing.
-        // Production must start without fake carts, wishlists, orders, or payments.
+        /*
+         * Demo catalogue images, prices, stock, customers, orders, and payments
+         * are fixtures, not customer-approved production data. They must never
+         * be inserted or overwrite live catalogue records during a production
+         * seed run.
+         */
         if (app()->environment(['local', 'testing'])) {
             $this->call([
+                CategorySeeder::class,
+                ProductSeeder::class,
+                ProductImageSeeder::class,
+                ProductVariantSeeder::class,
+                UserSeeder::class,
                 AddressSeeder::class,
                 CartSeeder::class,
                 WishlistSeeder::class,
@@ -29,6 +28,14 @@ class DatabaseSeeder extends Seeder
                 OrderItemSeeder::class,
                 PaymentSeeder::class,
             ]);
+
+            return;
         }
+
+        // Production seeding is limited to safe administrator bootstrap.
+        // UserSeeder preserves an existing admin and rejects unsafe defaults.
+        $this->call([
+            UserSeeder::class,
+        ]);
     }
 }
