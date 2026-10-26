@@ -351,6 +351,69 @@ class StorefrontReadinessTest extends TestCase
         ]);
     }
 
+    public function test_customer_login_normalizes_email_and_rejects_role_mismatched_intended_routes(): void
+    {
+        $customer = User::create([
+            'name' => 'Login Redirect Customer',
+            'email' => 'login-redirect@example.test',
+            'password' => Hash::make('LivoraTest123'),
+            'role' => 'customer',
+        ]);
+
+        $this->withSession([
+            'url.intended' => route('admin.dashboard'),
+        ])
+            ->post(route('login.store'), [
+                'email' => '  LOGIN-REDIRECT@EXAMPLE.TEST ',
+                'password' => 'LivoraTest123',
+            ])
+            ->assertRedirect(route('account.index'));
+
+        $this->assertAuthenticatedAs($customer);
+    }
+
+    public function test_admin_login_cannot_be_redirected_into_customer_pages(): void
+    {
+        $admin = User::create([
+            'name' => 'Login Redirect Admin',
+            'email' => 'login-redirect-admin@example.test',
+            'password' => Hash::make('LivoraTest123'),
+            'role' => 'admin',
+        ]);
+
+        $this->withSession([
+            'url.intended' => route('account.index'),
+        ])
+            ->post(route('login.store'), [
+                'email' => $admin->email,
+                'password' => 'LivoraTest123',
+            ])
+            ->assertRedirect(route('admin.dashboard'));
+
+        $this->assertAuthenticatedAs($admin);
+    }
+
+    public function test_login_rejects_external_intended_redirects(): void
+    {
+        $customer = User::create([
+            'name' => 'Open Redirect Customer',
+            'email' => 'open-redirect@example.test',
+            'password' => Hash::make('LivoraTest123'),
+            'role' => 'customer',
+        ]);
+
+        $this->withSession([
+            'url.intended' => 'https://attacker.example/phishing',
+        ])
+            ->post(route('login.store'), [
+                'email' => $customer->email,
+                'password' => 'LivoraTest123',
+            ])
+            ->assertRedirect(route('account.index'));
+
+        $this->assertAuthenticatedAs($customer);
+    }
+
     public function test_guests_cannot_reach_customer_or_admin_pages(): void
     {
         foreach ([
