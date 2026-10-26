@@ -11,6 +11,7 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
@@ -135,6 +136,26 @@ Route::middleware('guest')->group(function () {
         '/register',
         [AuthController::class, 'register']
     )->middleware('throttle:10,1')->name('register.store');
+
+    Route::get(
+        '/forgot-password',
+        [PasswordResetController::class, 'requestForm']
+    )->name('password.request');
+
+    Route::post(
+        '/forgot-password',
+        [PasswordResetController::class, 'sendLink']
+    )->middleware('throttle:5,1')->name('password.email');
+
+    Route::get(
+        '/reset-password/{token}',
+        [PasswordResetController::class, 'resetForm']
+    )->name('password.reset');
+
+    Route::post(
+        '/reset-password',
+        [PasswordResetController::class, 'reset']
+    )->middleware('throttle:5,1')->name('password.update');
 });
 
 
