@@ -10,6 +10,12 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
+        if (! app()->environment(['local', 'testing', 'production'])) {
+            throw new \\RuntimeException(
+                'User seeding is disabled outside local, testing, and production environments.'
+            );
+        }
+
         $adminName = trim((string) env('ADMIN_NAME', ''));
         $adminEmail = strtolower(trim((string) env('ADMIN_EMAIL', '')));
         $adminPassword = (string) env('ADMIN_PASSWORD', '');
