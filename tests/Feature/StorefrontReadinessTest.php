@@ -4,6 +4,10 @@ namespace Tests\Feature;
 
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\ProductVariant;
+use App\Services\Inventory\OrderInventoryService;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
@@ -81,6 +85,165 @@ class StorefrontReadinessTest extends TestCase
             ->assertJsonValidationErrors('product');
 
         $this->assertDatabaseCount('cart_items', 0);
+    }
+
+    public function test_cart_requires_an_active_selection_for_each_configured_variant_type(): void
+    {
+        $product = $this->product($this->category(), [
+            'name' => 'محصول با گزینه غیرفعال',
+            'slug' => 'product-with-disabled-option-type',
+            'stock' => 20,
+        ]);
+
+        $color = ProductVariant::create([
+            'product_id' => $product->id,
+            'type' => 'color',
+            'name' => 'رنگ',
+            'value' => 'cream',
+            'sku' => 'LIV-TEST-COLOR-1',
+            'price_adjustment' => 0,
+            'stock' => 5,
+            'is_active' => true,
+        ]);
+
+        ProductVariant::create([
+            'product_id' => $product->id,
+            'type' => 'size',
+            'name' => 'سایز',
+            'value' => 'large',
+            'sku' => 'LIV-TEST-SIZE-1',
+            'price_adjustment' => 0,
+            'stock' => 5,
+            'is_active' => false,
+        ]);
+
+        $this->postJson(route('cart.add', $product), [
+            'quantity' => 1,
+            'variants' => [
+                'color' => $color->id,
+            ],
+        ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('variants.size');
+
+        $this->assertDatabaseCount('cart_items', 0);
+    }
+
+    public function test_paid_order_inventory_deduction_is_idempotent_for_products_and_variants(): void
+    {
+        $product = $this->product($this->category(), [
+            'name' => 'محصول موجودی پایه',
+            'slug' => 'base-stock-inventory-product',
+            'stock' => 8,
+        ]);
+
+        $variantProduct = $this->product($this->category(), [
+            'name' => 'محصول موجودی تنوع',
+            'slug' => 'variant-stock-inventory-product',
+            'stock' => 30,
+        ]);
+
+        $variant = ProductVariant::create([
+            'product_id' => $variantProduct->id,
+            'type' => 'color',
+            'name' => 'رنگ',
+            'value' => 'cream',
+            'sku' => 'LIV-TEST-INVENTORY-VARIANT',
+            'price_adjustment' => 0,
+            'stock' => 6,
+            'is_active' => true,
+        ]);
+
+        $order = $this->inventoryOrder();
+        $order->items()->create([
+            'product_id' => $product->id,
+            'product_variant_id' => null,
+            'variant_options' => null,
+            'product_name' => $product->name,
+            'sku' => $product->sku,
+            'quantity' => 2,
+            'unit_price' => 100,
+            'total' => 200,
+        ]);
+        $order->items()->create([
+            'product_id' => $variantProduct->id,
+            'product_variant_id' => $variant->id,
+            'variant_options' => [[
+                'id' => $variant->id,
+                'type' => 'color',
+                'name' => 'رنگ',
+                'value' => 'cream',
+            ]],
+            'product_name' => $variantProduct->name,
+            'sku' => $variant->sku,
+            'quantity' => 3,
+            'unit_price' => 100,
+            'total' => 300,
+        ]);
+
+        $service = app(OrderInventoryService::class);
+        $service->deductForPaidOrder($order->fresh());
+        $service->deductForPaidOrder($order->fresh());
+
+        $this->assertDatabaseHas('products', [
+            'id' => $product->id,
+            'stock' => 6,
+        ]);
+        $this->assertDatabaseHas('products', [
+            'id' => $variantProduct->id,
+            'stock' => 30,
+        ]);
+        $this->assertDatabaseHas('product_variants', [
+            'id' => $variant->id,
+            'stock' => 3,
+        ]);
+        $this->assertDatabaseHas('orders', [
+            'id' => $order->id,
+            'inventory_status' => 'deducted',
+        ]);
+    }
+
+    public function test_inventory_conflict_does_not_partially_decrement_an_order(): void
+    {
+        $availableProduct = $this->product($this->category(), [
+            'name' => 'محصول دارای موجودی',
+            'slug' => 'inventory-conflict-available',
+            'stock' => 5,
+        ]);
+        $emptyProduct = $this->product($this->category(), [
+            'name' => 'محصول بدون موجودی',
+            'slug' => 'inventory-conflict-empty',
+            'stock' => 0,
+        ]);
+
+        $order = $this->inventoryOrder();
+        foreach ([$availableProduct, $emptyProduct] as $product) {
+            $order->items()->create([
+                'product_id' => $product->id,
+                'product_variant_id' => null,
+                'variant_options' => null,
+                'product_name' => $product->name,
+                'sku' => $product->sku,
+                'quantity' => 1,
+                'unit_price' => 100,
+                'total' => 100,
+            ]);
+        }
+
+        app(OrderInventoryService::class)->deductForPaidOrder($order->fresh());
+
+        $this->assertDatabaseHas('products', [
+            'id' => $availableProduct->id,
+            'stock' => 5,
+        ]);
+        $this->assertDatabaseHas('products', [
+            'id' => $emptyProduct->id,
+            'stock' => 0,
+        ]);
+        $this->assertDatabaseHas('orders', [
+            'id' => $order->id,
+            'inventory_status' => 'stock_conflict',
+        ]);
     }
 
     public function test_public_category_index_uses_bounded_pagination(): void
@@ -259,6 +422,37 @@ class StorefrontReadinessTest extends TestCase
             ->assertForbidden();
 
         $this->assertDatabaseHas('cart_items', ['id' => $item->id]);
+    }
+
+    private function inventoryOrder(): Order
+    {
+        static $sequence = 0;
+        $sequence++;
+
+        return Order::create([
+            'user_id' => null,
+            'order_number' => 'LV-INVENTORY-TEST-' . $sequence,
+            'status' => 'pending',
+            'payment_status' => 'paid',
+            'payment_method' => 'online',
+            'payment_provider' => 'test-gateway',
+            'subtotal' => 500,
+            'shipping_cost' => 0,
+            'discount' => 0,
+            'total' => 500,
+            'first_name' => 'آزمون',
+            'last_name' => 'موجودی',
+            'phone' => '09123456789',
+            'email' => 'inventory@example.test',
+            'province' => 'تهران',
+            'city' => 'تهران',
+            'address' => 'آدرس آزمایشی',
+            'postal_code' => '1234567890',
+            'unit' => null,
+            'notes' => null,
+            'installment_enabled' => false,
+            'inventory_status' => 'pending',
+        ]);
     }
 
     private function category(array $attributes = []): Category
