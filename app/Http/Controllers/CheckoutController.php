@@ -601,9 +601,10 @@ class CheckoutController extends Controller
         return $product->variants()
             ->select('type')
             ->distinct()
-            ->orderBy('type')
             ->pluck('type')
             ->map(fn ($type) => (string) $type)
+            ->unique()
+            ->sort(SORT_STRING)
             ->values()
             ->all();
     }
