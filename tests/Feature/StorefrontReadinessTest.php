@@ -292,6 +292,65 @@ class StorefrontReadinessTest extends TestCase
             });
     }
 
+    public function test_password_recovery_does_not_reveal_whether_an_email_exists(): void
+    {
+        Notification::fake();
+
+        $customer = User::create([
+            'name' => 'Recovery Test Customer',
+            'email' => 'recovery-user@example.test',
+            'password' => Hash::make('OldPass123A'),
+            'role' => 'customer',
+        ]);
+
+        $genericStatus = 'اگر حسابی با این ایمیل ثبت شده باشد، لینک بازنشانی برای آن ارسال می‌شود.';
+
+        $this->from(route('password.request'))
+            ->post(route('password.email'), [
+                'email' => $customer->email,
+            ])
+            ->assertRedirect(route('password.request'))
+            ->assertSessionHas('status', $genericStatus);
+
+        Notification::assertSentTo($customer, ResetPassword::class);
+
+        $this->from(route('password.request'))
+            ->post(route('password.email'), [
+                'email' => 'missing-account@example.test',
+            ])
+            ->assertRedirect(route('password.request'))
+            ->assertSessionHas('status', $genericStatus);
+    }
+
+    public function test_password_reset_consumes_its_token_and_updates_the_password(): void
+    {
+        $customer = User::create([
+            'name' => 'Reset Test Customer',
+            'email' => 'reset-user@example.test',
+            'password' => Hash::make('OldPass123A'),
+            'role' => 'customer',
+        ]);
+
+        $token = Password::createToken($customer);
+        $replacementPassword = 'NewPass456B';
+
+        $this->post(route('password.update'), [
+            'token' => $token,
+            'email' => $customer->email,
+            'password' => $replacementPassword,
+            'password_confirmation' => $replacementPassword,
+        ])
+            ->assertRedirect(route('login'))
+            ->assertSessionHas('status', 'رمز عبور تغییر کرد. حالا وارد حساب شوید.');
+
+        $customer->refresh();
+
+        $this->assertTrue(Hash::check($replacementPassword, $customer->password));
+        $this->assertDatabaseMissing('password_reset_tokens', [
+            'email' => $customer->email,
+        ]);
+    }
+
     public function test_guests_cannot_reach_customer_or_admin_pages(): void
     {
         foreach ([
