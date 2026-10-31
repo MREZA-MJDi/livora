@@ -184,7 +184,9 @@ class DashboardController extends Controller
     protected function getTopProducts(): Collection
     {
         return OrderItem::query()
-            ->with('product.images')
+            ->with([
+                'product.images' => fn ($imageQuery) => $imageQuery->limit(1),
+            ])
             ->whereHas(
                 'order',
                 fn ($query) => $query->where('payment_status', 'paid')
