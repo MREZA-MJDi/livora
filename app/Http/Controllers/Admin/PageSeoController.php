@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\SeoPageSetting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class PageSeoController extends Controller
@@ -43,6 +43,10 @@ class PageSeoController extends Controller
                 'seo_index' => (bool) ($data['seo_index'] ?? false),
                 'seo_follow' => (bool) ($data['seo_follow'] ?? false),
             ]);
+        }
+
+        foreach (['home', 'shop', 'categories', 'blog', 'contact'] as $routeKey) {
+            Cache::forget("seo_page_settings.{$routeKey}");
         }
 
         return redirect()->route('admin.seo.pages')->with('success', 'تنظیمات SEO صفحات ثابت ذخیره شد.');
