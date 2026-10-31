@@ -1,11 +1,11 @@
 @extends('errors.layout')
 
-@section('title', 'دسترسی غیرمجاز | SilaGallery')
+@section('title', 'دسترسی غیرمجاز | SillaGallery')
 
 @section('content')
 <div class="wrap">
     <main class="card">
-        <div class="brand">SilaGallery</div>
+        <div class="brand">SillaGallery</div>
         <div class="code ">403</div>
         <h1>اجازه ورود به این بخش را ندارید.</h1>
         <p>این درخواست نیاز به سطح دسترسی دیگری دارد یا برای حساب فعلی شما در دسترس نیست.</p>

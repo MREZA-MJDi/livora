@@ -14,23 +14,23 @@
         'w-full',
         'rounded-2xl',
         'border',
-        'bg-[var(--livora-white)]',
+        'bg-[var(--sg-white)]',
         'px-4',
         'py-3.5',
         'text-sm',
-        'text-[var(--livora-ink)]',
+        'text-[var(--sg-ink)]',
         'outline-none',
         'transition-all',
         'duration-300',
-        'placeholder:text-[var(--livora-stone)]',
-        'focus:border-[var(--livora-ink)]',
+        'placeholder:text-[var(--sg-stone)]',
+        'focus:border-[var(--sg-ink)]',
         'focus:ring-2',
-        'focus:ring-[var(--livora-ink)]/5',
+        'focus:ring-[var(--sg-ink)]/5',
         'disabled:cursor-not-allowed',
         'disabled:opacity-50',
          $resolvedError
             ? 'border-red-300 focus:border-red-500 focus:ring-red-500/5'
-            : 'border-[var(--livora-border)]',
+            : 'border-[var(--sg-border)]',
         $icon ? 'pr-11' : '',
     ]);
 @endphp
@@ -43,7 +43,7 @@
             @if($attributes->has('id'))
             for="{{ $attributes->get('id') }}"
             @endif
-            class="mb-2 block text-xs font-medium text-[var(--livora-ink)]"
+            class="mb-2 block text-xs font-medium text-[var(--sg-ink)]"
         >
             {{ $label }}
         </label>
@@ -56,7 +56,7 @@
 
             <span
                 aria-hidden="true"
-                class="pointer-events-none absolute right-4 top-1/2 flex -translate-y-1/2 items-center text-[var(--livora-stone)]"
+                class="pointer-events-none absolute right-4 top-1/2 flex -translate-y-1/2 items-center text-[var(--sg-stone)]"
             >
                 {{ $icon }}
             </span>
@@ -99,7 +99,7 @@
 
     @elseif($hint)
 
-        <p class="mt-2 text-[11px] leading-6 text-[var(--livora-stone)]">
+        <p class="mt-2 text-[11px] leading-6 text-[var(--sg-stone)]">
             {{ $hint }}
         </p>
 
