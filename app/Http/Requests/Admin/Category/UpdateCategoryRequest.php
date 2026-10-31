@@ -30,7 +30,8 @@ class UpdateCategoryRequest extends FormRequest
     {
         $category = $this->route('category');
 
-        return [            'seo_index' => ['sometimes', 'boolean'],
+        return [
+            'seo_index' => ['sometimes', 'boolean'],
             'seo_follow' => ['sometimes', 'boolean'],
 
             'name' => [
