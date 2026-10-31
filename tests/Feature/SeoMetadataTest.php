@@ -147,14 +147,15 @@ class SeoMetadataTest extends TestCase
 
     public function test_public_storefront_routes_use_sillagallery_brand_without_internal_livora_namespace(): void
     {
-        foreach (['/', '/shop', '/categories', '/about', '/terms', '/blog', '/contact', '/login', '/register', '/cart'] as $path) {
-            $response = $this->get($path)->assertOk();
-            $html = strtolower((string) $response->getContent());
+        $routes = ['/', '/shop', '/categories', '/about', '/terms', '/blog', '/contact', '/login', '/register', '/cart'];
 
-            $this->assertStringContainsString('sillagallery', $html, $path . ' must identify SillaGallery');
-            $this->assertStringNotContainsString('livora', $html, $path . ' must not expose Livora');
-            $this->assertStringNotContainsString('silagallery', $html, $path . ' must not expose the misspelled brand');
-            $this->assertStringNotContainsString('data-livora-', $html, $path . ' must not expose old frontend hooks');
+        foreach ($routes as $path) {
+            $response = $this->get($path)->assertOk();
+            $html = (string) $response->getContent();
+
+            $this->assertStringContainsString('SillaGallery', $html, $path . ' must identify SillaGallery');
+            $this->assertDoesNotMatchRegularExpression('/SilaGallery/i', $html, $path . ' exposes a misspelled public brand');
+            $this->assertDoesNotMatchRegularExpression('/Livora/i', $html, $path . ' exposes the internal project name');
         }
     }
 
