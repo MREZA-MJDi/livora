@@ -16,6 +16,8 @@ class StoreCategoryRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
+            'seo_index' => $this->boolean('seo_index'),
+            'seo_follow' => $this->boolean('seo_follow'),
             'slug' => $this->slug
                 ? Str::slug($this->slug)
                 : Str::slug($this->name),
@@ -26,7 +28,9 @@ class StoreCategoryRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
+        return [            'seo_index' => ['sometimes', 'boolean'],
+            'seo_follow' => ['sometimes', 'boolean'],
+
             'name' => [
                 'required',
                 'string',
