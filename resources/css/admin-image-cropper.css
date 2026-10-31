@@ -49,7 +49,7 @@
 .admin-cropper__viewport {
     position: relative;
     width: 100%;
-    max-height: 360px;
+    max-width: 540px;
     overflow: hidden;
     border: 1px solid rgba(239,232,218,.22);
     border-radius: .8rem;
@@ -126,7 +126,6 @@
 }
 @media (max-width: 640px) {
     .admin-cropper { padding: .65rem; }
-    .admin-cropper__viewport { max-height: 260px; }
     .admin-cropper__top { align-items: flex-start; }
     .admin-cropper__footer { font-size: .58rem; }
 }
