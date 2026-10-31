@@ -1,11 +1,11 @@
 @extends('errors.layout')
 
-@section('title', 'اطلاعات قابل پردازش نیست | SilaGallery')
+@section('title', 'اطلاعات قابل پردازش نیست | SillaGallery')
 
 @section('content')
 <div class="wrap">
     <main class="card">
-        <div class="brand">SilaGallery</div>
+        <div class="brand">SillaGallery</div>
         <div class="code">422</div>
         <h1>اطلاعات درخواست قابل پردازش نیست.</h1>
         <p>اطلاعات واردشده را بررسی کنید و دوباره تلاش کنید.</p>

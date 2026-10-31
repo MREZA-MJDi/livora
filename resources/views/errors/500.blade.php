@@ -1,11 +1,11 @@
 @extends('errors.layout')
 
-@section('title', 'خطای سرور | SilaGallery')
+@section('title', 'خطای سرور | SillaGallery')
 
 @section('content')
 <div class="wrap">
     <main class="card">
-        <div class="brand">SilaGallery</div>
+        <div class="brand">SillaGallery</div>
         <div class="code danger">500</div>
         <h1>یک خطای غیرمنتظره رخ داد.</h1>
         <p>مشکلی در پردازش درخواست پیش آمد. اطلاعات فنی برای بررسی ثبت شده است؛ لطفاً دوباره تلاش کنید.</p>
