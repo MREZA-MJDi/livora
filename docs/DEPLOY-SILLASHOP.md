@@ -25,7 +25,16 @@ Check that DNS has propagated before requesting the origin certificate. Do not a
     composer --version
     sudo nginx -T | grep -nE 'server_name|listen 443|root '
 
-Use the PHP-FPM socket that actually exists in /run/php/. The supplied Nginx file currently uses /run/php/php8.5-fpm.sock, matching the PHP 8.5 CLI version previously observed; change that one line if the installed FPM socket has a different version.
+Use the matching PHP-FPM version and give Livora its own pool/socket. The included pool config caps the Livora pool at four on-demand workers so it cannot consume unlimited PHP workers on a VPS shared with Farzin.
+
+For PHP 8.5, install and validate the pool after cloning the repository:
+
+    sudo install -m 644 deploy/php-fpm/livora.conf /etc/php/8.5/fpm/pool.d/livora.conf
+    sudo php-fpm8.5 -t
+    sudo systemctl reload php8.5-fpm
+    sudo test -S /run/php/php8.5-fpm-livora.sock
+
+If the installed FPM version is different, copy the pool file into that version's /etc/php/VERSION/fpm/pool.d/ directory and change its listen path and the Nginx fastcgi_pass socket to match. Do not alter the existing Farzin pool.
 
 ## 3. Create Livora's separate directory and database
 
@@ -46,12 +55,16 @@ Create a dedicated unprivileged deployment account. Do not clone Livora into /va
 Create a new MySQL/MariaDB database and least-privilege user for Livora only. Use a unique strong password and do not reuse Farzin's credentials:
 
     CREATE DATABASE livora_production CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-    CREATE USER 'livora_app'@'127.0.0.1' IDENTIFIED BY 'REPLACE_WITH_A_UNIQUE_LONG_PASSWORD';
-    GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, INDEX, DROP, REFERENCES
+    CREATE USER 'livora_app'@'127.0.0.1' IDENTIFIED BY 'REPLACE_WITH_APP_PASSWORD';
+    GRANT SELECT, INSERT, UPDATE, DELETE
     ON livora_production.* TO 'livora_app'@'127.0.0.1';
+
+    CREATE USER 'livora_migrator'@'127.0.0.1' IDENTIFIED BY 'REPLACE_WITH_MIGRATOR_PASSWORD';
+    GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, INDEX, DROP, REFERENCES
+    ON livora_production.* TO 'livora_migrator'@'127.0.0.1';
     FLUSH PRIVILEGES;
 
-If PHP connects through a Unix socket, create the database user for the matching host (commonly localhost) and set DB_HOST=127.0.0.1 or localhost to match the actual PDO connection mode. Do not grant global privileges.
+The normal APP .env uses livora_app (data access only). Use livora_migrator only for the deployment-time migration command below; never store its password in the shared .env. If PHP connects through a Unix socket, create both users for the matching host and set DB_HOST to match the actual PDO connection mode. Do not grant global privileges.
 
 ## 4. Clone the production branch into a release
 
@@ -116,7 +129,12 @@ Also configure real SMTP settings, sender identity, and the public business cont
     sudo -u livora bash -lc "cd '$RELEASE' && composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader"
     sudo -u livora bash -lc "cd '$RELEASE' && npm ci && npm run build"
     sudo -u livora bash -lc "cd '$RELEASE' && php artisan key:generate"
-    sudo -u livora bash -lc "cd '$RELEASE' && php artisan migrate --force"
+
+    read -rsp "Livora migration DB password: " LIVORA_MIGRATOR_PASSWORD; echo
+    sudo -u livora env DB_USERNAME=livora_migrator DB_PASSWORD="$LIVORA_MIGRATOR_PASSWORD" \
+      bash -lc "cd '$RELEASE' && php artisan config:clear && php artisan migrate --force"
+    unset LIVORA_MIGRATOR_PASSWORD
+
     sudo -u livora bash -lc "cd '$RELEASE' && php artisan optimize"
 
 Run php artisan key:generate only when creating the first shared .env. Never regenerate APP_KEY during a routine release because that invalidates encrypted sessions and data. Do not run migrate:fresh, demo seeders, or destructive seed commands against production.
@@ -129,7 +147,8 @@ Make sure Laravel's writable storage directories remain group-writable by www-da
     sudo find /var/www/livora/shared/storage -type d -exec chmod 2775 {} \;
     sudo find /var/www/livora/shared/storage -type f -exec chmod 0664 {} \;
     sudo chown -R livora:www-data "$RELEASE/bootstrap/cache"
-    sudo chmod -R 2775 "$RELEASE/bootstrap/cache"
+    sudo find "$RELEASE/bootstrap/cache" -type d -exec chmod 2775 {} \\
+    sudo find "$RELEASE/bootstrap/cache" -type f -exec chmod 0664 {} \\
 
 ## 6. Atomically activate the release
 
@@ -138,9 +157,22 @@ Make sure Laravel's writable storage directories remain group-writable by www-da
 
 The Nginx root must be /var/www/livora/current/public. Keep at least the previous release for rollback.
 
+Install and start the dedicated database queue worker after the current symlink is active:
+
+    sudo apt-get install -y supervisor
+    sudo cp deploy/supervisor/livora-worker.conf /etc/supervisor/conf.d/livora-worker.conf
+    sudo supervisorctl reread
+    sudo supervisorctl update
+    sudo supervisorctl status livora-worker:*
+
+Enable Laravel's scheduler (safe even when no scheduled task is registered yet):
+
+    echo '* * * * * cd /var/www/livora/current && /usr/bin/php artisan schedule:run >> /dev/null 2>&1' | sudo tee /etc/cron.d/livora-scheduler
+    sudo chmod 644 /etc/cron.d/livora-scheduler
+
 ## 7. Nginx and origin SSL
 
-Copy deploy/nginx/sillashop.com.conf to /etc/nginx/sites-available/sillashop.com, verify the FPM socket, then enable only this new server block:
+Copy deploy/nginx/sillashop.com.conf to /etc/nginx/sites-available/sillashop.com. It points to the dedicated /run/php/php8.5-fpm-livora.sock pool, not the shared default PHP-FPM pool. Verify that socket exists, then enable only this new server block:
 
     sudo ln -s /etc/nginx/sites-available/sillashop.com /etc/nginx/sites-enabled/sillashop.com
     sudo nginx -t
@@ -187,4 +219,9 @@ Do not enable online payment gateways until the actual provider sandbox flow is 
 
 For each release, clone a new main checkout into a new releases/<timestamp>, link the same shared .env and storage, install/build, run additive migrations, cache, and atomically switch current. Do not overwrite the active release in place.
 
-Rollback the code by switching current to the previous release and reloading PHP-FPM. Do not automatically roll back database migrations; use a tested forward fix when a schema migration has already been applied.
+After each release, restart the worker on the new code with:
+
+    sudo -u livora php /var/www/livora/current/artisan queue:restart
+    sudo systemctl reload php8.5-fpm
+
+Rollback the code by switching current to the previous release and reloading only the Livora PHP-FPM service where possible. Do not automatically roll back database migrations; use a tested forward fix when a schema migration has already been applied.
