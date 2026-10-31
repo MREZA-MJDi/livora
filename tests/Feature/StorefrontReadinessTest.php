@@ -397,6 +397,7 @@ class StorefrontReadinessTest extends TestCase
             'installment' => '1',
             'featured' => '1',
             'new' => '1',
+            'sort' => 'oldest',
             'page' => 2,
         ]))
             ->assertOk()
