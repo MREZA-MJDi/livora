@@ -7,60 +7,9 @@
     'برای مشاوره خرید، پیگیری سفارش و دریافت اطلاعات بیشتر درباره محصولات و خدمات SilaGallery با ما در ارتباط باشید.'
 )
 
-@section('canonical', route('contact'))
+@section('canonical', \App\Models\SeoPageSetting::forRoute('contact')?->canonical_url ?: route('contact'))
+@section('robots', \App\Models\SeoPageSetting::forRoute('contact')?->robots() ?? \App\Models\SeoSetting::current()->robots())
 
-@push('seo')
-
-    <meta
-        property="og:type"
-        content="website"
-    >
-
-    <meta
-        property="og:title"
-        content="تماس با SilaGallery | ارتباط با ما"
-    >
-
-    <meta
-        property="og:description"
-        content="برای مشاوره خرید، پیگیری سفارش و دریافت اطلاعات بیشتر با SilaGallery در ارتباط باشید."
-    >
-
-    <meta
-        property="og:url"
-        content="{{ route('contact') }}"
-    >
-
-    <meta
-        name="twitter:card"
-        content="summary"
-    >
-
-    <meta
-        name="twitter:title"
-        content="تماس با SilaGallery"
-    >
-
-    <meta
-        name="twitter:description"
-        content="راه‌های ارتباطی و پشتیبانی SilaGallery."
-    >
-
-    <script type="application/ld+json">
-    {
-        "@@context": "https://schema.org",
-        "@@type": "WebSite",
-        "name": "SilaGallery",
-        "url": @json(url('/')),
-        "potentialAction": {
-            "@@type": "SearchAction",
-            "target": @json(url('/shop') . '?search={search_term_string}'),
-            "query-input": "required name=search_term_string"
-        }
-    }
-    </script>
-
-@endpush
 
 
 @section('content')

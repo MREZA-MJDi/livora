@@ -5,6 +5,10 @@ use App\Http\Controllers\Admin\ContactMessageController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\SeoController as AdminSeoController;
 use App\Http\Controllers\Admin\BlogPostController as AdminBlogPostController;
+use App\Http\Controllers\Admin\EditorImageController;
+use App\Http\Controllers\Admin\PageController as AdminPageController;
+use App\Http\Controllers\Admin\PageSeoController;
+use App\Http\Controllers\PageController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\AuthController;
@@ -38,6 +42,7 @@ Route::get('/', [HomeController::class, 'index'])
     ->name('home');
 
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+Route::get('/blog/tag/{tag:slug}', [BlogController::class, 'tag'])->name('blog.tag');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 
@@ -55,11 +60,8 @@ Route::get(
     [CategoryController::class, 'show']
 )->name('categories.show');
 
-Route::view('/about', 'about.index')
-    ->name('about');
-
-Route::view('/terms', 'legal.terms')
-    ->name('terms');
+Route::get('/about', [PageController::class, 'show'])->defaults('slug', 'about')->name('about');
+Route::get('/terms', [PageController::class, 'show'])->defaults('slug', 'terms')->name('terms');
 
 
 /*
@@ -355,6 +357,8 @@ Route::middleware(['auth', 'customer'])->group(function () {
 });
 
 
+
+
 /*
 |--------------------------------------------------------------------------
 | Admin
@@ -482,6 +486,10 @@ Route::middleware(['auth', 'admin'])
         */
         Route::get('/seo', [AdminSeoController::class, 'edit'])->name('seo.edit');
         Route::put('/seo', [AdminSeoController::class, 'update'])->name('seo.update');
+        Route::get('/seo/pages', [PageSeoController::class, 'index'])->name('seo.pages');
+        Route::put('/seo/pages', [PageSeoController::class, 'update'])->name('seo.pages.update');
+        Route::resource('pages', AdminPageController::class)->except(['show']);
+        Route::post('/editor-images', [EditorImageController::class, 'store'])->middleware('throttle:30,1')->name('editor-images.store');
         Route::resource('blog', AdminBlogPostController::class)->except(['show']);
 
         /*
@@ -537,3 +545,8 @@ Route::middleware(['auth', 'admin'])
             [ContactMessageController::class, 'destroy']
         )->name('contact-messages.destroy');
     });
+
+// Public CMS slug route must remain after all explicit routes, especially /admin.
+Route::get('/{slug}', [PageController::class, 'show'])
+    ->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')
+    ->name('pages.show');

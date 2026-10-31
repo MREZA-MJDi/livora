@@ -4,66 +4,98 @@ namespace App\Http\Controllers;
 
 use App\Models\BlogPost;
 use App\Models\Category;
+use App\Models\ContentPage;
 use App\Models\Product;
+use App\Models\SeoPageSetting;
 use App\Models\SeoSetting;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SitemapController extends Controller
 {
-    public function __invoke(): Response
+    public function __invoke(): StreamedResponse
     {
         $settings = SeoSetting::current();
-        $urls = [];
 
-        if ($settings->indexing_enabled) {
+        return response()->stream(function () use ($settings): void {
+            echo '<?xml version="1.0" encoding="UTF-8"?>';
+            echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+
+            if (! $settings->indexing_enabled) {
+                echo '</urlset>';
+                return;
+            }
+
             $base = rtrim(config('app.url'), '/');
 
-            foreach (['/', '/shop', '/categories', '/blog', '/about', '/contact'] as $path) {
-                $urls[] = ['loc' => $base . $path, 'lastmod' => now()->toAtomString()];
-            }
+            SeoPageSetting::query()
+                ->where('seo_index', true)
+                ->orderBy('id')
+                ->cursor()
+                ->each(function (SeoPageSetting $page) use ($base): void {
+                    $loc = $page->canonical_url ?: $base . $page->path;
+                    $this->writeUrl($loc, $page->updated_at);
+                });
+
+            ContentPage::published()
+                ->where('seo_index', true)
+                ->select(['id', 'slug', 'updated_at', 'canonical_url'])
+                ->chunkById(300, function ($pages) use ($base): void {
+                    foreach ($pages as $page) {
+                        $this->writeUrl($page->canonical_url ?: $base . '/' . $page->slug, $page->updated_at);
+                    }
+                });
 
             Product::query()
                 ->where('status', 'active')
                 ->where('seo_index', true)
-                ->select(['id', 'slug', 'updated_at'])
-                ->chunkById(500, function ($products) use (&$urls, $base): void {
+                ->select(['id', 'slug', 'updated_at', 'canonical_url'])
+                ->chunkById(300, function ($products) use ($base): void {
                     foreach ($products as $product) {
-                        $urls[] = [
-                            'loc' => $base . '/product/' . $product->slug,
-                            'lastmod' => $product->updated_at?->toAtomString(),
-                        ];
+                        $this->writeUrl($product->canonical_url ?: $base . '/product/' . $product->slug, $product->updated_at);
                     }
                 });
 
             Category::query()
                 ->where('is_active', true)
                 ->where('seo_index', true)
-                ->select(['id', 'slug', 'updated_at'])
-                ->chunkById(500, function ($categories) use (&$urls, $base): void {
+                ->select(['id', 'slug', 'updated_at', 'canonical_url'])
+                ->chunkById(300, function ($categories) use ($base): void {
                     foreach ($categories as $category) {
-                        $urls[] = [
-                            'loc' => $base . '/categories/' . $category->slug,
-                            'lastmod' => $category->updated_at?->toAtomString(),
-                        ];
+                        $this->writeUrl($category->canonical_url ?: $base . '/categories/' . $category->slug, $category->updated_at);
                     }
                 });
 
             BlogPost::published()
                 ->where('seo_index', true)
-                ->select(['id', 'slug', 'updated_at'])
-                ->chunkById(500, function ($posts) use (&$urls, $base): void {
+                ->select(['id', 'slug', 'updated_at', 'canonical_url'])
+                ->chunkById(300, function ($posts) use ($base): void {
                     foreach ($posts as $post) {
-                        $urls[] = [
-                            'loc' => $base . '/blog/' . $post->slug,
-                            'lastmod' => $post->updated_at?->toAtomString(),
-                        ];
+                        $this->writeUrl($post->canonical_url ?: $base . '/blog/' . $post->slug, $post->updated_at);
                     }
                 });
+
+            echo '</urlset>';
+        }, 200, [
+            'Content-Type' => 'application/xml; charset=UTF-8',
+            'Cache-Control' => 'public, max-age=300, s-maxage=300',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
+    }
+
+    private function writeUrl(string $url, mixed $updatedAt): void
+    {
+        // Canonical URLs outside the configured SillaGallery origin are
+        // intentionally excluded from the SillaGallery sitemap.
+        $originHost = parse_url(config('app.url'), PHP_URL_HOST);
+        $urlHost = parse_url($url, PHP_URL_HOST);
+        if (! $originHost || ! $urlHost || strcasecmp($originHost, $urlHost) !== 0) {
+            return;
         }
 
-        return response()
-            ->view('seo.sitemap', compact('urls'))
-            ->header('Content-Type', 'application/xml; charset=UTF-8')
-            ->header('Cache-Control', 'public, max-age=300');
+        echo '<url><loc>' . htmlspecialchars($url, ENT_XML1 | ENT_QUOTES, 'UTF-8') . '</loc>';
+        if ($updatedAt) {
+            echo '<lastmod>' . e($updatedAt->toAtomString()) . '</lastmod>';
+        }
+        echo '</url>';
     }
 }

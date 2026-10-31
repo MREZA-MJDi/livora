@@ -22,11 +22,18 @@ class ApplyRobotsHeaders
         $settings = SeoSetting::current();
         $contentType = (string) $response->headers->get('Content-Type');
 
-        // Keep the emergency global noindex policy in an HTTP header so it
-        // still applies if a template is changed or serves a custom HTML page.
-        // Per-page directives are emitted in the HTML when indexing is enabled.
-        if (! $settings->indexing_enabled && str_contains($contentType, 'text/html')) {
-            $response->headers->set('X-Robots-Tag', $settings->robots());
+        if (str_contains($contentType, 'text/html')) {
+            $routeName = (string) $request->route()?->getName();
+            $privateRoute = preg_match('/^(account|cart|checkout|login|register|password|logout)(\\.|$)/', $routeName) === 1
+                || $request->is('account/*', 'cart/*', 'checkout/*', 'login', 'register', 'forgot-password', 'reset-password/*');
+
+            if ($privateRoute) {
+                $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
+            } elseif (! $settings->indexing_enabled || ! $settings->following_enabled) {
+                $response->headers->set('X-Robots-Tag', $settings->robots());
+            } else {
+                $response->headers->remove('X-Robots-Tag');
+            }
         }
 
         return $response;

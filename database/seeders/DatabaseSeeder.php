@@ -37,6 +37,7 @@ class DatabaseSeeder extends Seeder
             // UserSeeder preserves an existing admin and rejects unsafe defaults.
             $this->call([
                 UserSeeder::class,
+                SillaGalleryStarterCatalogSeeder::class,
             ]);
 
             return;

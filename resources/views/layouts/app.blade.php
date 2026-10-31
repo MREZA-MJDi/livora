@@ -1,106 +1,104 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
-
 <head>
-    @php($siteSeo = \App\Models\SeoSetting::current())
+    @php
+        $siteSeo = \App\Models\SeoSetting::current();
+        $pageSeo = \App\Models\SeoPageSetting::forRoute(\Illuminate\Support\Facades\Route::currentRouteName());
+        $seoTitle = trim($__env->yieldContent('title')) ?: ($pageSeo?->meta_title ?: ($siteSeo->default_title ?: 'SillaGallery'));
+        $seoDescription = trim($__env->yieldContent('description')) ?: ($pageSeo?->meta_description ?: ($siteSeo->default_description ?: 'فروشگاه SillaGallery'));
+        $routeName = (string) \Illuminate\Support\Facades\Route::currentRouteName();
+        $privateRoute = in_array($routeName, [
+            'login', 'register', 'password.request', 'password.reset',
+            'account.index', 'account.profile.edit', 'account.addresses.index',
+            'account.orders.index', 'account.wishlist.index',
+        ], true) || request()->is('account/*', 'cart/*', 'checkout/*', 'login', 'register', 'forgot-password', 'reset-password/*');
+        $seoRobots = $privateRoute
+            ? 'noindex, nofollow'
+            : (trim($__env->yieldContent('robots')) ?: ($pageSeo?->robots() ?: $siteSeo->robots()));
+        $seoCanonical = trim($__env->yieldContent('canonical')) ?: ($pageSeo?->canonical_url ?: url()->current());
+        $seoOgTitle = trim($__env->yieldContent('og_title')) ?: $seoTitle;
+        $seoOgDescription = trim($__env->yieldContent('og_description')) ?: $seoDescription;
+        $seoOgImage = trim($__env->yieldContent('og_image')) ?: $pageSeo?->og_image ?: $siteSeo->default_og_image_url;
+        $seoOgType = trim($__env->yieldContent('og_type')) ?: 'website';
+    @endphp
     <meta charset="UTF-8">
-    <meta name="robots" content="@yield('robots', $siteSeo->robots())">
-    <meta property="og:site_name" content="{{ $siteSeo->site_name }}">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>
-        @yield('title', $siteSeo->default_title ?: 'SilaGallery')
-    </title>
-
-    <meta
-        name="description"
-        content="@yield('description', $siteSeo->default_description ?: 'سیلاگالری — مبلمان و لوازم خانه')"
-    >
-
-    @hasSection('keywords')
-        <meta
-            name="keywords"
-            content="@yield('keywords')"
-        >
-    @endif
-
-    @hasSection('canonical')
-        <link
-            rel="canonical"
-            href="@yield('canonical')"
-        >
-    @else
-        <link rel="canonical" href="{{ rtrim(config('app.url'), '/') . request()->getPathInfo() }}">
-    @endif
-
-    @stack('seo')
-
-    @vite([
-    'resources/css/app.css',
-    'resources/js/app.js',
-    ])
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="{{ $seoRobots }}">
+    <meta name="description" content="{{ $seoDescription }}">
+    <meta name="theme-color" content="#f3f1ed">
+    <meta property="og:site_name" content="SillaGallery">
+    <meta property="og:type" content="{{ $seoOgType }}">
+    <meta property="og:title" content="{{ $seoOgTitle }}">
+    <meta property="og:description" content="{{ $seoOgDescription }}">
+    <meta property="og:url" content="{{ $seoCanonical }}">
+    @if($seoOgImage)<meta property="og:image" content="{{ $seoOgImage }}">@endif
+    <meta name="twitter:card" content="{{ $seoOgImage ? 'summary_large_image' : 'summary' }}">
+    <meta name="twitter:title" content="{{ $seoOgTitle }}">
+    <meta name="twitter:description" content="{{ $seoOgDescription }}">
+    @if($seoOgImage)<meta name="twitter:image" content="{{ $seoOgImage }}">@endif
+    @if($siteSeo->twitter_handle)<meta name="twitter:site" content="{{ str_starts_with($siteSeo->twitter_handle, '@') ? $siteSeo->twitter_handle : '@'.$siteSeo->twitter_handle }}">@endif
+    @if($siteSeo->google_site_verification)<meta name="google-site-verification" content="{{ $siteSeo->google_site_verification }}">@endif
+    @if($siteSeo->bing_site_verification)<meta name="msvalidate.01" content="{{ $siteSeo->bing_site_verification }}">@endif
+    <link rel="canonical" href="{{ $seoCanonical }}">
+    <title>{{ $seoTitle }}</title>
+    <script type="application/ld+json">{!! json_encode([
+        '@context' => 'https://schema.org',
+        '@type' => 'Organization',
+        'name' => $siteSeo->organization_name ?: 'SillaGallery',
+        'description' => $siteSeo->organization_description ?: $siteSeo->default_description,
+        'url' => url('/'),
+        'logo' => $siteSeo->organization_logo_url,
+        'email' => $siteSeo->contact_email,
+        'telephone' => $siteSeo->contact_phone,
+        'sameAs' => array_values($siteSeo->social_links ?: []),
+    ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) !!}</script>
+    <script type="application/ld+json">{!! json_encode([
+        '@context' => 'https://schema.org',
+        '@type' => 'WebSite',
+        'name' => 'SillaGallery',
+        'url' => url('/'),
+        'potentialAction' => [
+            '@type' => 'SearchAction',
+            'target' => url('/shop') . '?search={search_term_string}',
+            'query-input' => 'required name=search_term_string',
+        ],
+    ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) !!}</script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
+    @stack('seo')
 </head>
-
 <body class="min-h-screen antialiased">
-
-<div
-    id="app"
-    x-data="{
-        mobileOpen: false,
-        searchOpen: false,
-        filterOpen: false,
-        searchReturnFocus: null,
-        openSearch(trigger) {
-            const openedFromMenu = trigger?.closest?.('[data-livora-mobile-menu]');
-            this.searchReturnFocus = openedFromMenu
-                ? document.querySelector('[data-livora-search-trigger]')
-                : (trigger || document.activeElement);
-            this.mobileOpen = false;
-            this.searchOpen = true;
-            this.$nextTick(() => {
-                document.getElementById('global-search')?.focus({ preventScroll: true });
-            });
-        },
-        closeSearch() {
-            this.searchOpen = false;
-            this.$nextTick(() => {
-                const target = this.searchReturnFocus;
-                if (target?.isConnected && target.offsetParent !== null) {
-                    target.focus?.({ preventScroll: true });
-                } else {
-                    document.querySelector('[data-livora-search-trigger]')?.focus({ preventScroll: true });
-                }
-            });
-        }
-    }"
-    class="min-h-screen pb-24 lg:pb-0"
->
-
+<div id="app" x-data="{
+    mobileOpen: false,
+    searchOpen: false,
+    filterOpen: false,
+    searchReturnFocus: null,
+    openSearch(trigger) {
+        const openedFromMenu = trigger?.closest?.('[data-livora-mobile-menu]');
+        this.searchReturnFocus = openedFromMenu
+            ? document.querySelector('[data-livora-search-trigger]')
+            : (trigger || document.activeElement);
+        this.mobileOpen = false;
+        this.searchOpen = true;
+        this.$nextTick(() => document.getElementById('global-search')?.focus({ preventScroll: true }));
+    },
+    closeSearch() {
+        this.searchOpen = false;
+        this.$nextTick(() => {
+            const target = this.searchReturnFocus;
+            if (target?.isConnected && target.offsetParent !== null) target.focus?.({ preventScroll: true });
+            else document.querySelector('[data-livora-search-trigger]')?.focus({ preventScroll: true });
+        });
+    }
+}" class="min-h-screen pb-24 lg:pb-0">
     <x-layout.navbar />
-
     <x-layout.mobile-menu />
-
     <x-layout.search-overlay />
-
     <x-shop.filter-drawer />
-
-    <main class="storefront-content">
-        @yield('content')
-    </main>
-
+    <main class="storefront-content">@yield('content')</main>
     <x-layout.footer />
-
     <x-layout.mobile-bottom-bar />
-
 </div>
-
 @stack('scripts')
-
 </body>
 </html>

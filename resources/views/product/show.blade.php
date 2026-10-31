@@ -155,89 +155,26 @@
 
 @section('description', $pageDescription)
 @section('robots', \App\Models\SeoSetting::current()->robotsFor($product->seo_index, $product->seo_follow))
+@section('og_title', $pageTitle)
+@section('og_description', $pageDescription)
+@section('og_image', $product->og_image ?: $mainImage)
 
 @section(
     'canonical',
-    route('product.show', $product->slug)
+    ($product->canonical_url ?: route('product.show', $product->slug))
 )
 
 @push('seo')
-
-    <meta
-        property="og:type"
-        content="product"
-    >
-
-    <meta
-        property="og:title"
-        content="{{ $pageTitle }}"
-    >
-
-    <meta
-        property="og:description"
-        content="{{ $pageDescription }}"
-    >
-
-    <meta
-        property="og:url"
-        content="{{ route('product.show', $product->slug) }}"
-    >
-
-    @if($mainImage)
-        <meta
-            property="og:image"
-            content="{{ $mainImage }}"
-        >
-    @endif
-
-    <meta
-        name="twitter:card"
-        content="summary_large_image"
-    >
-
-    <meta
-        name="twitter:title"
-        content="{{ $pageTitle }}"
-    >
-
-    <meta
-        name="twitter:description"
-        content="{{ $pageDescription }}"
-    >
-
-    @if($mainImage)
-        <meta
-            name="twitter:image"
-            content="{{ $mainImage }}"
-        >
-    @endif
-
-    {{-- Product Schema --}}
-    <script type="application/ld+json">
-{
-    "@@context": "https://schema.org",
-    "@@type": "WebSite",
-    "name": "سیلاگالری",
-    "url": @json(url('/')),
-    "potentialAction": {
-        "@@type": "SearchAction",
-        "target": @json(url('/shop') . '?search={search_term_string}'),
-        "query-input": "required name=search_term_string"
-    }
-}
-</script>
-
-    <script type="application/ld+json">
-{
-    "@@context": "https://schema.org",
-    "@@type": "Organization",
-    "name": "سیلاگالری",
-    "url": @json(url('/'))
-        }
-</script>
-
+<script type="application/ld+json">{!! json_encode([
+    '@context' => 'https://schema.org',
+    '@type' => 'Product',
+    'name' => $product->name,
+    'description' => $pageDescription,
+    'sku' => $product->sku,
+    'image' => $product->images->pluck('url')->filter()->values()->all(),
+    'brand' => ['@type' => 'Brand', 'name' => 'SillaGallery'],
+], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) !!}</script>
 @endpush
-
 @section('content')
 
     <div
