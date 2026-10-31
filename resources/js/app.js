@@ -1,4 +1,5 @@
 import './bootstrap';
+import './shop-grid-loading';
 import Alpine from 'alpinejs';
 
 window.Alpine = Alpine;

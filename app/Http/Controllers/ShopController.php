@@ -89,6 +89,9 @@ class ShopController extends Controller
 
         $categories = Category::query()
             ->active()
+            ->with([
+                'latestActiveProduct.images' => fn ($imageQuery) => $imageQuery->limit(1),
+            ])
             ->withCount([
                 'products' => fn ($productQuery) => $productQuery->active(),
             ])

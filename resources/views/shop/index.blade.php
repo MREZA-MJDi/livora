@@ -243,6 +243,76 @@
 
 
                         {{-- =================================================
+                             CATEGORY IMAGE TABS
+                        ================================================== --}}
+                        @php
+                            $shopBaseQuery = request()->except(['category', 'page']);
+                            $selectedCategorySlug = request('category');
+                        @endphp
+
+                        @if($categories->isNotEmpty())
+                            <nav class="shop-category-tabs mt-7" aria-label="دسته‌بندی‌های فروشگاه">
+                                <div class="mb-3 flex items-center justify-between gap-3">
+                                    <p class="text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--sg-accent)]">
+                                        SHOP BY CATEGORY
+                                    </p>
+                                    <span class="text-[10px] text-[var(--sg-stone)]">
+                                        انتخاب دسته‌بندی
+                                    </span>
+                                </div>
+
+                                <div class="shop-category-tabs__track">
+                                    <a
+                                        href="{{ route('shop.index', $shopBaseQuery) }}"
+                                        class="shop-category-tab {{ blank($selectedCategorySlug) ? 'is-active' : '' }}"
+                                        aria-current="{{ blank($selectedCategorySlug) ? 'page' : 'false' }}"
+                                    >
+                                        <span class="shop-category-tab__image shop-category-tab__image--all" aria-hidden="true">
+                                            SG
+                                        </span>
+                                        <span class="shop-category-tab__meta">
+                                            <span class="shop-category-tab__name">همه محصولات</span>
+                                            <span class="shop-category-tab__count">{{ number_format($products->total()) }} محصول</span>
+                                        </span>
+                                    </a>
+
+                                    @foreach($categories as $category)
+                                        @php
+                                            $categoryImage = $category->homepage_image_url;
+                                            $categoryIsActive = $selectedCategorySlug === $category->slug;
+                                            $categoryQuery = array_merge($shopBaseQuery, ['category' => $category->slug]);
+                                        @endphp
+
+                                        <a
+                                            href="{{ route('shop.index', $categoryQuery) }}"
+                                            class="shop-category-tab {{ $categoryIsActive ? 'is-active' : '' }}"
+                                            aria-current="{{ $categoryIsActive ? 'page' : 'false' }}"
+                                        >
+                                            <span class="shop-category-tab__image">
+                                                @if($categoryImage)
+                                                    <img
+                                                        src="{{ $categoryImage }}"
+                                                        alt=""
+                                                        loading="lazy"
+                                                        decoding="async"
+                                                    >
+                                                @else
+                                                    <span class="shop-category-tab__placeholder">SG</span>
+                                                @endif
+                                            </span>
+
+                                            <span class="shop-category-tab__meta">
+                                                <span class="shop-category-tab__name">{{ $category->name }}</span>
+                                                <span class="shop-category-tab__count">{{ number_format($category->products_count) }} محصول</span>
+                                            </span>
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </nav>
+                        @endif
+
+
+                        {{-- =================================================
                              SORTING TOOLBAR
                         ================================================== --}}
 
@@ -353,13 +423,18 @@
 
                         @if($products->isNotEmpty())
 
-                            <div class="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-5 lg:grid-cols-2 xl:grid-cols-3">
+                            <div
+                                class="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-5 lg:grid-cols-2 xl:grid-cols-3 sg-shop-grid"
+                                data-shop-grid="amun"
+                            >
 
                                 @foreach($products as $product)
 
-                                    <x-product.card
-                                        :product="$product"
-                                    />
+                                    <div class="sg-shop-grid__item" data-shop-grid-item>
+                                        <x-product.card
+                                            :product="$product"
+                                        />
+                                    </div>
 
                                 @endforeach
 
