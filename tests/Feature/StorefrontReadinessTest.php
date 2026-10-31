@@ -17,6 +17,7 @@ use App\Models\SeoSetting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
@@ -1006,7 +1007,6 @@ class StorefrontReadinessTest extends TestCase
             'installment_enabled' => false,
         ], $attributes));
     }
-}
 
     public function test_shop_eager_loads_media_for_product_images_and_category_fallbacks(): void
     {
@@ -1064,7 +1064,7 @@ class StorefrontReadinessTest extends TestCase
             'indexing_enabled' => true,
             'following_enabled' => true,
         ])->save();
-        \\Illuminate\\Support\\Facades\\Cache::forget('seo_settings.current');
+        Cache::forget('seo_settings.current');
 
         $category = $this->category([
             'name' => 'دسته فیلتر SEO',
@@ -1080,4 +1080,4 @@ class StorefrontReadinessTest extends TestCase
             ->assertSee('<link rel="canonical" href="https://sillashop.com/shop">', false)
             ->assertHeader('X-Robots-Tag', 'noindex, follow');
     }
-
+}
