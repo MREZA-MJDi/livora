@@ -12,7 +12,7 @@
 
             <a
                 href="{{ route('admin.contact-messages.index') }}"
-                class="text-xs text-[var(--livora-stone)] transition hover:text-[var(--livora-ink)]"
+                class="text-xs text-[var(--sg-stone)] transition hover:text-[var(--sg-ink)]"
             >
                 ← بازگشت به پیام‌ها
             </a>
@@ -26,13 +26,13 @@
 
         {{-- Contact Info --}}
 
-        <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-6">
+        <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-6">
 
             <div class="grid gap-5 sm:grid-cols-2">
 
                 <div>
 
-                    <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                    <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
                         NAME
                     </p>
 
@@ -45,7 +45,7 @@
 
                 <div>
 
-                    <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                    <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
                         PHONE
                     </p>
 
@@ -63,7 +63,7 @@
 
                     <div>
 
-                        <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                        <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
                             EMAIL
                         </p>
 
@@ -81,7 +81,7 @@
 
                 <div>
 
-                    <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                    <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
                         SUBJECT
                     </p>
 
@@ -105,13 +105,13 @@
 
         {{-- Message --}}
 
-        <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-6">
+        <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-6">
 
-            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
                 MESSAGE
             </p>
 
-            <p class="mt-5 whitespace-pre-line text-sm leading-8 text-[var(--livora-stone)]">
+            <p class="mt-5 whitespace-pre-line text-sm leading-8 text-[var(--sg-stone)]">
                 {{ $contactMessage->message }}
             </p>
 
@@ -134,7 +134,7 @@
 
                     <button
                         type="submit"
-                        class="rounded-2xl bg-[var(--livora-ink)] px-5 py-3 text-xs font-medium text-white"
+                        class="rounded-2xl bg-[var(--sg-ink)] px-5 py-3 text-xs font-medium text-white"
                     >
                         علامت‌گذاری به عنوان خوانده‌شده
                     </button>
