@@ -1,11 +1,11 @@
 <?php
 
-namespace App\\Http\\Controllers;
+namespace App\Http\Controllers;
 
-use App\\Http\\Requests\\Shop\\ShopFilterRequest;
-use App\\Models\\Category;
-use App\\Models\\Product;
-use Illuminate\\Contracts\\View\\View;
+use App\Http\Requests\Shop\ShopFilterRequest;
+use App\Models\Category;
+use App\Models\Product;
+use Illuminate\Contracts\View\View;
 
 class ShopController extends Controller
 {
