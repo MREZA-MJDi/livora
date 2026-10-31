@@ -3,6 +3,10 @@
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Admin\ContactMessageController;
 use App\Http\Controllers\Admin\MediaController;
+use App\Http\Controllers\Admin\SeoController as AdminSeoController;
+use App\Http\Controllers\Admin\BlogPostController as AdminBlogPostController;
+use App\Http\Controllers\BlogController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
@@ -32,6 +36,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])
     ->name('home');
+
+Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 
 Route::get('/shop', [ShopController::class, 'index'])
     ->name('shop.index');
@@ -466,6 +474,15 @@ Route::middleware(['auth', 'admin'])
             [AdminCustomerController::class, 'update']
         )->name('customers.update');
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | SEO Settings and Blog
+        |--------------------------------------------------------------------------
+        */
+        Route::get('/seo', [AdminSeoController::class, 'edit'])->name('seo.edit');
+        Route::put('/seo', [AdminSeoController::class, 'update'])->name('seo.update');
+        Route::resource('blog', AdminBlogPostController::class)->except(['show']);
 
         /*
         |--------------------------------------------------------------------------
