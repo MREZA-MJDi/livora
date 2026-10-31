@@ -13,27 +13,15 @@ class ShopController extends Controller
     {
         $filters = $request->validated();
 
-        /*
-        |--------------------------------------------------------------------------
-        | Product Query
-        |--------------------------------------------------------------------------
-        */
-
         $query = Product::query()
             ->with([
                 'category',
-                'images',
+                'images' => fn ($imageQuery) => $imageQuery->limit(1),
             ])
             ->active()
             ->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('is_active', true));
 
-        /*
-        |--------------------------------------------------------------------------
-        | Category Filter - SLUG BASED
-        |--------------------------------------------------------------------------
-        */
-
-        if (!empty($filters['category'])) {
+        if (! empty($filters['category'])) {
             $query->whereHas('category', function ($categoryQuery) use ($filters) {
                 $categoryQuery
                     ->where('slug', $filters['category'])
@@ -41,13 +29,7 @@ class ShopController extends Controller
             });
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Search
-        |--------------------------------------------------------------------------
-        */
-
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $search = trim($filters['search']);
 
             $query->where(function ($productQuery) use ($search) {
@@ -59,47 +41,27 @@ class ShopController extends Controller
             });
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Minimum Price
-        |--------------------------------------------------------------------------
-        */
-
-        if (
-            isset($filters['min_price']) &&
-            $filters['min_price'] !== null
-        ) {
-            $query->where(
-                'price',
-                '>=',
-                $filters['min_price']
-            );
+        if (($filters['min_price'] ?? null) !== null) {
+            $query->where('price', '>=', $filters['min_price']);
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Maximum Price
-        |--------------------------------------------------------------------------
-        */
-
-        if (
-            isset($filters['max_price']) &&
-            $filters['max_price'] !== null
-        ) {
-            $query->where(
-                'price',
-                '<=',
-                $filters['max_price']
-            );
+        if (($filters['max_price'] ?? null) !== null) {
+            $query->where('price', '<=', $filters['max_price']);
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Stock Filter
-        |--------------------------------------------------------------------------
-        */
+        if ($filters['installment'] ?? false) {
+            $query->where('installment_enabled', true);
+        }
 
-        if (!empty($filters['in_stock'])) {
+        if ($filters['featured'] ?? false) {
+            $query->where('is_featured', true);
+        }
+
+        if ($filters['new'] ?? false) {
+            $query->where('is_new', true);
+        }
+
+        if ($filters['in_stock'] ?? false) {
             // Variant-enabled products are available when at least one active
             // option has stock; base-product stock must not override option stock.
             $query->where(function ($stockQuery) {
@@ -113,56 +75,25 @@ class ShopController extends Controller
             });
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Sorting
-        |--------------------------------------------------------------------------
-        */
-
-        match ($filters['sort'] ?? 'newest') {
-
-            'price_asc' => $query->orderBy('price'),
-
-            'price_desc' => $query->orderByDesc('price'),
-
-            'name_asc' => $query->orderBy('name'),
-
-            'popular' => $query
-                ->orderByDesc('is_featured')
-                ->latest(),
-
-            default => $query->latest(),
+        match ($filters['sort'] ?? 'latest') {
+            'oldest' => $query->orderBy('created_at')->orderBy('id'),
+            'price_asc' => $query->orderBy('price')->orderBy('id'),
+            'price_desc' => $query->orderByDesc('price')->orderByDesc('id'),
+            'name_asc' => $query->orderBy('name')->orderBy('id'),
+            default => $query->orderByDesc('created_at')->orderByDesc('id'),
         };
-
-        /*
-        |--------------------------------------------------------------------------
-        | Pagination
-        |--------------------------------------------------------------------------
-        */
 
         $products = $query
             ->paginate(12)
             ->withQueryString();
 
-        /*
-        |--------------------------------------------------------------------------
-        | Categories
-        |--------------------------------------------------------------------------
-        */
-
         $categories = Category::query()
             ->active()
             ->withCount([
-                'products' => fn ($query) => $query->active(),
+                'products' => fn ($productQuery) => $productQuery->active(),
             ])
             ->orderBy('sort_order')
             ->get();
-
-        /*
-        |--------------------------------------------------------------------------
-        | View
-        |--------------------------------------------------------------------------
-        */
 
         return view('shop.index', [
             'products' => $products,

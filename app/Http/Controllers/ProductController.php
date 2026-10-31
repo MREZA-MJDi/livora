@@ -25,7 +25,7 @@ class ProductController extends Controller
             ->whereHas('category', fn ($query) => $query->where('is_active', true))
             ->with([
                 'category',
-                'images',
+                'images' => fn ($imageQuery) => $imageQuery->limit(1),
             ])
             ->where('id', '!=', $product->id)
             ->where('category_id', $product->category_id)

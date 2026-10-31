@@ -32,7 +32,7 @@ class CategoryController extends Controller
             ->active()
             ->with([
                 'category',
-                'images',
+                'images' => fn ($imageQuery) => $imageQuery->limit(1),
             ])
             ->latest()
             ->paginate(12)

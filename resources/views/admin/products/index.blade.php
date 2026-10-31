@@ -65,7 +65,9 @@
                 @forelse($products as $product)
 
                     @php
-                        $primaryImage = $product->primaryImage();
+                        // The images relation is eager-loaded by the controller;
+                        // using it here avoids one or two extra queries per product.
+                        $primaryImage = $product->images->first();
                     @endphp
 
                     <tr>

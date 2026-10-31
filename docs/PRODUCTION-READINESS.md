@@ -42,6 +42,14 @@ After deployment, verify `/up`, login/logout, category/product listing, image UR
 - Existing paid orders are marked `needs_reconciliation` because their past stock deduction history cannot be inferred safely. Review them explicitly.
 - The payment adapters' generic field names are not proof of compatibility with DigiPay, SnapPay, or TorobPay. Keep `PAYMENT_GATEWAYS_PRODUCTION_READY=false` until each provider passes a documented sandbox checklist.
 
+## CDN and public media
+
+- Keep uploaded product/category/media files on the persistent public disk or an explicitly configured object-storage disk; do not place uploads inside a release directory.
+- For a CDN serving the Vite build and fonts, set `ASSET_URL` to the CDN origin (for example, `https://cdn.example.com`).
+- For uploaded files, set `PUBLIC_STORAGE_URL` to the exact public storage base URL (for example, `https://cdn.example.com/storage`). Leave it empty to derive the storage URL from `ASSET_URL` or `APP_URL`.
+- Configure the CDN origin to serve only public `/build` and `/storage` paths. Add the correct CORS response headers for web fonts, and do not cache dynamic HTML, account, admin, cart, checkout, or payment callback responses.
+- Use versioned/unique upload paths and invalidate the CDN when an existing object is replaced. Verify a newly uploaded image from a separate browser/network after enabling the CDN.
+
 ## Rollback and observability
 
 Take a database backup before migrations; record the release SHA and keep the previous release available. Watch application logs, failed jobs, payment exceptions, duplicate-payment alerts, and inventory conflicts during the first orders. Do not roll back by dropping the new inventory columns after they have been used: reconcile order state first and prepare a tested forward migration if schema changes need to be reversed.
