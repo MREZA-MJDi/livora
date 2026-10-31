@@ -91,7 +91,6 @@
 <div id="app" x-data="{
     mobileOpen: false,
     searchOpen: false,
-    filterOpen: false,
     searchReturnFocus: null,
     openSearch(trigger) {
         const openedFromMenu = trigger?.closest?.('[data-sg-mobile-menu]');
@@ -114,7 +113,6 @@
     <x-layout.navbar />
     <x-layout.mobile-menu />
     <x-layout.search-overlay />
-    <x-shop.filter-drawer />
     <main class="storefront-content">@yield('content')</main>
     <x-layout.footer />
     <x-layout.mobile-bottom-bar />

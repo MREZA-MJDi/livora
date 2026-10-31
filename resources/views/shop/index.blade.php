@@ -5,6 +5,10 @@
 @section('canonical', \App\Models\SeoPageSetting::forRoute('shop')?->canonical_url ?: route('shop.index'))
 @section('robots', \App\Models\SeoPageSetting::forRoute('shop')?->robots() ?? \App\Models\SeoSetting::current()->robots())
 
+@push('styles')
+    @vite('resources/css/shop.css')
+@endpush
+
 @section('content')
     <div class="sg-shop-page" x-data="{ filterOpen: false }">
         <header class="sg-shop-header">
