@@ -12,7 +12,7 @@ class ProductController extends Controller
         $product = Product::query()
             ->with([
                 'category',
-                'images',
+                'images' => fn ($imageQuery) => $imageQuery->limit(1),
                 'variants.images',
             ])
             ->active()
