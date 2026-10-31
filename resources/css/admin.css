@@ -1462,7 +1462,7 @@ p {
 }
 
 
-/* SilaGallery admin responsive safeguards */
+/* SillaGallery admin responsive safeguards */
 .admin-btn { white-space: nowrap; flex: 0 0 auto; min-width: max-content; }
 .admin-btn svg { flex: 0 0 auto; }
 .admin-page-header { min-width: 0; }
