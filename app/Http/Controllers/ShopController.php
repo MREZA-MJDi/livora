@@ -17,6 +17,7 @@ class ShopController extends Controller
             ->with([
                 'category',
                 'images' => fn ($imageQuery) => $imageQuery->limit(1),
+                'images.media',
             ])
             ->active()
             ->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('is_active', true));
@@ -91,6 +92,7 @@ class ShopController extends Controller
             ->active()
             ->with([
                 'latestActiveProduct.images' => fn ($imageQuery) => $imageQuery->limit(1),
+                'latestActiveProduct.images.media',
             ])
             ->withCount([
                 'products' => fn ($productQuery) => $productQuery->active(),

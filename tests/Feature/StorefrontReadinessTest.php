@@ -12,6 +12,8 @@ use App\Services\Inventory\OrderInventoryService;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Models\Media;
+use App\Models\SeoSetting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -1005,3 +1007,77 @@ class StorefrontReadinessTest extends TestCase
         ], $attributes));
     }
 }
+
+    public function test_shop_eager_loads_media_for_product_images_and_category_fallbacks(): void
+    {
+        $category = $this->category([
+            'name' => 'دسته تصویر مدیا',
+            'slug' => 'media-backed-category',
+            'image' => null,
+        ]);
+        $product = $this->product($category, [
+            'name' => 'محصول تصویر مدیا',
+            'slug' => 'media-backed-product',
+        ]);
+
+        $media = Media::query()->create([
+            'disk' => 'public',
+            'path' => 'products/media-backed-product.webp',
+            'filename' => 'media-backed-product.webp',
+            'original_name' => 'media-backed-product.webp',
+            'mime_type' => 'image/webp',
+            'extension' => 'webp',
+            'size' => 1024,
+            'alt' => 'تصویر محصول مدیا',
+        ]);
+
+        ProductImage::query()->create([
+            'product_id' => $product->id,
+            'media_id' => $media->id,
+            'path' => 'missing/product-image.webp',
+            'alt' => $product->name,
+            'sort_order' => 0,
+            'is_primary' => true,
+        ]);
+
+        $this->get('/shop')
+            ->assertOk()
+            ->assertViewHas('products', function ($products): bool {
+                $image = $products->first()?->images->first();
+
+                return $image !== null
+                    && $image->relationLoaded('media')
+                    && $image->media !== null;
+            })
+            ->assertViewHas('categories', function ($categories): bool {
+                $image = $categories->first()?->latestActiveProduct?->images->first();
+
+                return $image !== null && $image->relationLoaded('media');
+            });
+    }
+
+    public function test_shop_filtered_urls_are_noindex_follow_and_canonicalize_to_the_clean_shop_url(): void
+    {
+        config(['app.url' => 'https://sillashop.com']);
+
+        SeoSetting::current()->forceFill([
+            'indexing_enabled' => true,
+            'following_enabled' => true,
+        ])->save();
+        \\Illuminate\\Support\\Facades\\Cache::forget('seo_settings.current');
+
+        $category = $this->category([
+            'name' => 'دسته فیلتر SEO',
+            'slug' => 'seo-filter-category',
+        ]);
+
+        $this->get(route('shop.index', [
+            'category' => $category->slug,
+            'sort' => 'latest',
+        ]))
+            ->assertOk()
+            ->assertSee('<meta name="robots" content="noindex, follow">', false)
+            ->assertSee('<link rel="canonical" href="https://sillashop.com/shop">', false)
+            ->assertHeader('X-Robots-Tag', 'noindex, follow');
+    }
+

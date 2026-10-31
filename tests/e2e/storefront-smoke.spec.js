@@ -114,3 +114,53 @@ test('mobile menu is reachable from the visible header and can be closed', async
     await menu.locator('button[aria-label="بستن منو"]').last().click();
     await expect(menu).toBeHidden();
 });
+
+test('shop loads its local Codrops runtime and all three grid layouts', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 960 });
+    await page.goto('/shop', { waitUntil: 'load' });
+
+    await expect(page.locator('[data-shop-grid]')).toBeVisible();
+    await page.waitForFunction(() => (
+        typeof window.GridLoaderFx === 'function'
+        && typeof window.Masonry === 'function'
+        && typeof window.imagesLoaded === 'function'
+        && typeof window.anime === 'function'
+    ));
+
+    const runtime = await page.evaluate(() => {
+        const vendorScripts = Array.from(document.scripts)
+            .map(script => script.src)
+            .filter(src => src.includes('/vendor/codrops/'));
+
+        return {
+            vendorScripts,
+            allSameOrigin: vendorScripts.every(src => new URL(src).origin === window.location.origin),
+            productLinks: Array.from(document.querySelectorAll('[data-shop-grid] a[href*="/product/"]'))
+                .map(anchor => anchor.href),
+            imageCount: document.querySelectorAll('[data-grid-animation-target]').length,
+        };
+    });
+
+    expect(runtime.vendorScripts).toHaveLength(3);
+    expect(runtime.allSameOrigin).toBe(true);
+    expect(runtime.imageCount).toBeGreaterThan(0);
+    expect(runtime.productLinks.length).toBeGreaterThan(0);
+
+    for (const layout of ['b', 'c', 'a']) {
+        await page.locator('[data-shop-grid-layout="' + layout + '"]').click();
+        await expect(page.locator('[data-shop-grid]')).toHaveClass(new RegExp('grid--type-' + layout));
+        await expect(page.locator('[data-shop-grid-layout="' + layout + '"]')).toHaveAttribute('aria-pressed', 'true');
+    }
+});
+
+test('shop mobile filters open and close without losing the selected category', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/shop?category=furniture&sort=latest', { waitUntil: 'load' });
+
+    await page.locator('.sg-shop-mobile-filter').click();
+    await expect(page.getByRole('button', { name: 'بستن فیلترها' })).toBeVisible();
+
+    await page.getByRole('button', { name: 'بستن فیلترها' }).click();
+    await expect(page.getByRole('button', { name: 'بستن فیلترها' })).toBeHidden();
+});
+

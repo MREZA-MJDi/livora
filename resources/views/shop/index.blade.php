@@ -1,18 +1,87 @@
 @extends('layouts.app')
 
-@section('title', \App\Models\SeoPageSetting::forRoute('shop')?->meta_title ?: 'فروشگاه مبلمان | SillaGallery')
-@section('description', \App\Models\SeoPageSetting::forRoute('shop')?->meta_description ?: 'خرید مبلمان و لوازم خانه از SillaGallery؛ مجموعه محصولات، قیمت‌ها و شرایط خرید اقساطی.')
-@section('canonical', \App\Models\SeoPageSetting::forRoute('shop')?->canonical_url ?: route('shop.index'))
-@section('robots', \App\Models\SeoPageSetting::forRoute('shop')?->robots() ?? \App\Models\SeoSetting::current()->robots())
+@php
+    $shopSeo = \App\Models\SeoPageSetting::forRoute('shop');
+    $shopSiteSeo = \App\Models\SeoSetting::current();
+    $shopHasIndexFilters = request()->hasAny([
+        'category',
+        'search',
+        'min_price',
+        'max_price',
+        'installment',
+        'featured',
+        'new',
+        'in_stock',
+        'sort',
+    ]);
+    $shopTitle = $shopSeo?->meta_title ?: 'فروشگاه مبلمان | SillaGallery';
+    $shopDescription = $shopSeo?->meta_description ?: 'خرید مبلمان و لوازم خانه از SillaGallery؛ مجموعه محصولات، قیمت‌ها و شرایط خرید اقساطی.';
+    $shopCanonical = $shopSeo?->canonical_url ?: (
+        $shopHasIndexFilters
+            ? route('shop.index')
+            : ($products->currentPage() > 1
+                ? route('shop.index', ['page' => $products->currentPage()])
+                : route('shop.index'))
+    );
+    $shopRobots = $shopHasIndexFilters
+        ? $shopSiteSeo->robotsFor(false, $shopSeo?->seo_follow ?? true)
+        : ($shopSeo?->robots() ?? $shopSiteSeo->robots());
+    $shopVendorBaseUrl = rtrim((string) config('app.url'), '/') . '/vendor/codrops';
+@endphp
+
+@section('title', $shopTitle)
+@section('description', $shopDescription)
+@section('canonical', $shopCanonical)
+@section('robots', $shopRobots)
+@section('og_title', $shopTitle)
+@section('og_description', $shopDescription)
+@section('og_image', $shopSeo?->og_image)
+@section('og_type', 'website')
+
+@push('seo')
+    @php
+        $shopItemList = $products->getCollection()->values()->map(
+            function ($product, $index) use ($products) {
+                $item = [
+                    '@type' => 'ListItem',
+                    'position' => (int) ($products->firstItem() ?: 1) + $index,
+                    'url' => route('product.show', $product->slug),
+                    'name' => $product->name,
+                ];
+
+                $imageUrl = $product->images->first()?->url;
+
+                if ($imageUrl) {
+                    $item['image'] = $imageUrl;
+                }
+
+                return $item;
+            }
+        );
+    @endphp
+    <script type="application/ld+json">{!! json_encode([
+        '@context' => 'https://schema.org',
+        '@type' => 'CollectionPage',
+        'name' => $shopTitle,
+        'description' => $shopDescription,
+        'url' => route('shop.index'),
+        'mainEntity' => [
+            '@type' => 'ItemList',
+            'numberOfItems' => $products->count(),
+            'itemListElement' => $shopItemList,
+        ],
+    ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) !!}</script>
+@endpush
 
 @push('styles')
     @vite('resources/css/shop.css')
 @endpush
 
 @push('scripts')
-    <script src="{{ asset('vendor/codrops/anime.min.js') }}"></script>
-    <script src="{{ asset('vendor/codrops/imagesloaded.pkgd.min.js') }}"></script>
-    <script src="{{ asset('vendor/codrops/masonry.pkgd.min.js') }}"></script>
+    {{-- Locally hosted Codrops runtime: deliberately pinned to the application origin, not ASSET_URL. --}}
+    <script src="{{ $shopVendorBaseUrl }}/anime.min.js"></script>
+    <script src="{{ $shopVendorBaseUrl }}/imagesloaded.pkgd.min.js"></script>
+    <script src="{{ $shopVendorBaseUrl }}/masonry.pkgd.min.js"></script>
     @vite('resources/js/shop-grid-loading.js')
 @endpush
 
@@ -182,7 +251,7 @@
                                 :product="$product"
                                 shop-grid-item
                                 :image-loading="$loop->index < 4 ? 'eager' : 'lazy'"
-                                :image-priority="$loop->index < 2 ? 'high' : 'auto'"
+                                :image-priority="$loop->first ? 'high' : 'auto'"
                             />
                         @endforeach
                     </div>

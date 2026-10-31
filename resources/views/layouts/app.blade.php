@@ -16,15 +16,30 @@
         ], true)
             || preg_match('/^(account|cart|checkout|login|register|password|logout)(\\.|$)/', $routeName) === 1
             || request()->is('account/*', 'cart/*', 'checkout/*', 'cart', 'login', 'register', 'forgot-password', 'reset-password/*');
+        $shopHasIndexFilters = $routeName === 'shop.index' && request()->hasAny([
+            'category',
+            'search',
+            'min_price',
+            'max_price',
+            'installment',
+            'featured',
+            'new',
+            'in_stock',
+            'sort',
+        ]);
         $seoRobots = $privateRoute
             ? 'noindex, nofollow'
-            : ($pageSeo !== null
-                ? $pageSeo->robots()
-                : (trim($__env->yieldContent('robots')) ?: $siteSeo->robots()));
+            : ($shopHasIndexFilters
+                ? $siteSeo->robotsFor(false, $pageSeo?->seo_follow ?? true)
+                : ($pageSeo !== null
+                    ? $pageSeo->robots()
+                    : (trim($__env->yieldContent('robots')) ?: $siteSeo->robots())));
         // Canonical and social URLs must be bound to this application's configured origin.
         // Never let an inbound Host header from another virtual host poison SillaGallery metadata.
         $seoOrigin = rtrim((string) config('app.url', 'https://sillashop.com'), '/');
-        $seoCanonicalSource = $pageSeo?->canonical_url ?: trim($__env->yieldContent('canonical'));
+        $seoCanonicalSource = $routeName === 'shop.index'
+            ? trim($__env->yieldContent('canonical'))
+            : ($pageSeo?->canonical_url ?: trim($__env->yieldContent('canonical')));
         $seoCanonicalPath = parse_url($seoCanonicalSource, PHP_URL_PATH);
         $seoCanonicalPath = is_string($seoCanonicalPath) && $seoCanonicalPath !== ''
             ? $seoCanonicalPath
