@@ -1,5 +1,6 @@
 @props([
 'product',
+'shopGridItem' => false,
 ])
 
 @php
@@ -49,6 +50,7 @@
         <a
             href="{{ route('product.show', $product->slug) }}"
             class="product-card-media block aspect-[4/5] overflow-hidden"
+            @if($shopGridItem) data-shop-grid-item @endif
         >
 
             @if($image)

@@ -431,11 +431,10 @@
 
                                 @foreach($products as $product)
 
-                                    <div class="sg-shop-grid__item" data-shop-grid-item>
-                                        <x-product.card
-                                            :product="$product"
-                                        />
-                                    </div>
+                                    <x-product.card
+                                        :product="$product"
+                                        shop-grid-item
+                                    />
 
                                 @endforeach
 

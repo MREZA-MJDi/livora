@@ -1384,11 +1384,6 @@ body {
     min-width: 0;
 }
 
-.sg-shop-grid__item {
-    min-width: 0;
-    height: 100%;
-}
-
 @media (max-width: 639px) {
     .shop-category-tab {
         min-width: 9.5rem;
