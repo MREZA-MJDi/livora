@@ -78,7 +78,7 @@
 ========================================================= --}}
 
 <script>
-    window.LivoraAdmin = {
+    window.SillaGalleryAdmin = {
 
         formatNumber(value) {
 
