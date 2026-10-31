@@ -79,9 +79,3 @@ window.richTextEditor = (uploadUrl) => ({
 
 Alpine.start();
 
-// Keep Masonry and the complete grid animation engine off non-shop pages.
-if (document.querySelector('[data-shop-grid]')) {
-    import('./shop-grid-loading').catch((error) => {
-        console.error('SillaGallery shop grid could not initialize.', error);
-    });
-}

@@ -9,6 +9,13 @@
     @vite('resources/css/shop.css')
 @endpush
 
+@push('scripts')
+    <script src="{{ asset('vendor/codrops/anime.min.js') }}"></script>
+    <script src="{{ asset('vendor/codrops/imagesloaded.pkgd.min.js') }}"></script>
+    <script src="{{ asset('vendor/codrops/masonry.pkgd.min.js') }}"></script>
+    @vite('resources/js/shop-grid-loading.js')
+@endpush
+
 @section('content')
     <div class="sg-shop-page" x-data="{ filterOpen: false }">
         <header class="sg-shop-header">
