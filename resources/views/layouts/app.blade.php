@@ -13,7 +13,9 @@
             'login', 'register', 'password.request', 'password.reset',
             'account.index', 'account.profile.edit', 'account.addresses.index',
             'account.orders.index', 'account.wishlist.index',
-        ], true) || request()->is('account/*', 'cart/*', 'checkout/*', 'login', 'register', 'forgot-password', 'reset-password/*');
+        ], true)
+            || preg_match('/^(account|cart|checkout|login|register|password|logout)(\\.|$)/', $routeName) === 1
+            || request()->is('account/*', 'cart/*', 'checkout/*', 'cart', 'login', 'register', 'forgot-password', 'reset-password/*');
         $seoRobots = $privateRoute
             ? 'noindex, nofollow'
             : ($pageSeo !== null
