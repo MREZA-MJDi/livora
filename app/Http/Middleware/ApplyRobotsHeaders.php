@@ -1,11 +1,11 @@
 <?php
 
-namespace App\\Http\\Middleware;
+namespace App\Http\Middleware;
 
-use App\\Models\\SeoSetting;
+use App\Models\SeoSetting;
 use Closure;
-use Illuminate\\Http\\Request;
-use Symfony\\Component\\HttpFoundation\\Response;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class ApplyRobotsHeaders
 {
@@ -14,15 +14,13 @@ class ApplyRobotsHeaders
         $response = $next($request);
         $settings = SeoSetting::current();
 
-        $routeName = (string) $request->route()?->getName();
-        $privateRoute = $request->is('admin', 'admin/*')
-            || preg_match('/^(account|cart|checkout|login|register|password|logout)(\\\\.|$)/', $routeName) === 1
-            || $request->is(
-                'account', 'account/*',
-                'cart', 'cart/*',
-                'checkout', 'checkout/*',
-                'login', 'register', 'forgot-password', 'reset-password/*'
-            );
+        $privateRoute = $request->is(
+            'admin', 'admin/*',
+            'account', 'account/*',
+            'cart', 'cart/*',
+            'checkout', 'checkout/*',
+            'login', 'register', 'forgot-password', 'reset-password/*', 'logout'
+        );
 
         // Admin, authentication and customer-specific responses must never be
         // indexed, even after the public SEO release switch is enabled.
