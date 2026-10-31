@@ -73,7 +73,7 @@ final class JalaliHelper
     public static function toGregorian(int $jy, int $jm, int $jd): array
     {
         if ($jm < 1 || $jm > 12 || $jd < 1 || $jd > ($jm <= 6 ? 31 : ($jm <= 11 ? 30 : 30))) {
-            throw new \\InvalidArgumentException('Invalid Jalali date.');
+            throw new \InvalidArgumentException('Invalid Jalali date.');
         }
 
         $jy += 1595;
@@ -136,7 +136,7 @@ final class JalaliHelper
 
     public static function monthName(int $month): string
     {
-        return self::MONTHS[$month] ?? throw new \\InvalidArgumentException('Invalid Jalali month.');
+        return self::MONTHS[$month] ?? throw new \InvalidArgumentException('Invalid Jalali month.');
     }
 
     public static function formatMonthYear(int $year, int $month): string
