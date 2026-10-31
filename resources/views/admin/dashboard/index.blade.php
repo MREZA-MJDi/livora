@@ -212,7 +212,8 @@
                                 @if($slotPreviewUrl)
                                     <img id="hero-product-preview-{{ $slot }}" src="{{ $slotPreviewUrl }}" alt="پیش‌نمایش کارت {{ $slot }}" class="aspect-[4/3] w-full object-cover">
                                 @else
-                                    <div id="hero-product-preview-{{ $slot }}" class="flex aspect-[4/3] items-center justify-center text-[10px] text-[var(--admin-muted)]">پیش‌نمایش تصویر محصول</div>
+                                    <div data-hero-empty class="flex aspect-[4/3] items-center justify-center text-[10px] text-[var(--admin-muted)]">پیش‌نمایش تصویر محصول</div>
+                                    <img id="hero-product-preview-{{ $slot }}" src="" alt="پیش‌نمایش کارت {{ $slot }}" class="hidden aspect-[4/3] w-full object-cover">
                                 @endif
                             </div>
 
@@ -256,6 +257,7 @@
                     target.src = previewUrl;
                     target.classList.remove('hidden');
                     target.classList.add('block');
+                    target.parentElement?.querySelector('[data-hero-empty]')?.classList.add('hidden');
                 });
             });
         });

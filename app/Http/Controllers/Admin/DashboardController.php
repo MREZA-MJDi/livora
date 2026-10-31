@@ -292,7 +292,7 @@ class DashboardController extends Controller
             }
         }
 
-        $heroSetting = HomepageHeroSetting::query()->firstOrCreate([]);
+        $heroSetting = HomepageHeroSetting::query()->firstOrCreate(['id' => 1]);
         $uploadedPaths = [];
         $pathsToDelete = [];
 
