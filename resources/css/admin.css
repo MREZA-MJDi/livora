@@ -1469,3 +1469,25 @@ p {
 .admin-page-header > * { min-width: 0; }
 .admin-table-wrapper { -webkit-overflow-scrolling: touch; }
 @media (max-width: 767px) { .admin-btn { min-height: 2.875rem; padding-inline: .875rem; font-size: .8125rem; } .admin-table { min-width: 680px; } .admin-page-title, .admin-title { font-size: clamp(1.4rem, 5vw, 1.7rem); } }
+
+
+/* SillaGallery CMS rich-text editor */
+.cms-editor {
+    min-height: 22rem; max-height: 70vh; overflow-y: auto;
+    color: var(--admin-text); line-height: 1.9; text-align: start; overflow-wrap: anywhere;
+}
+.cms-editor:focus { outline: none; }
+.cms-editor h1, .cms-editor h2, .cms-editor h3 { margin: 1.25rem 0 .65rem; font-weight: 800; line-height: 1.5; }
+.cms-editor h1 { font-size: 1.6rem; }
+.cms-editor h2 { font-size: 1.3rem; }
+.cms-editor h3 { font-size: 1.1rem; }
+.cms-editor p { margin: .75rem 0; }
+.cms-editor ul, .cms-editor ol { margin: .75rem 1.25rem; padding-inline-start: 1rem; }
+.cms-editor ul { list-style: disc; }
+.cms-editor ol { list-style: decimal; }
+.cms-editor blockquote { margin: 1rem 0; border-inline-start: 3px solid var(--admin-accent); padding: .75rem 1rem; background: var(--admin-surface); border-radius: .75rem; }
+.cms-editor figure { margin: 1rem 0; }
+.cms-editor img { max-width: 100%; height: auto; border-radius: .9rem; }
+.cms-editor figcaption { color: var(--admin-muted); font-size: .75rem; }
+.cms-editor a { color: var(--admin-accent-dark); text-decoration: underline; }
+@media (max-width: 640px) { .cms-editor { min-height: 18rem; padding: 1rem; } }

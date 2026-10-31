@@ -1228,3 +1228,23 @@ body {
         object-position: center 45%;
     }
 }
+
+
+/* Public rich-content renderer used by CMS pages and articles */
+.cms-content { overflow-wrap: anywhere; }
+.cms-content h1, .cms-content h2, .cms-content h3, .cms-content h4 { margin: 1.6em 0 .65em; color: var(--livora-ink); font-weight: 700; line-height: 1.6; }
+.cms-content h1 { font-size: clamp(1.6rem, 3vw, 2.1rem); }
+.cms-content h2 { font-size: clamp(1.25rem, 2.4vw, 1.65rem); }
+.cms-content h3 { font-size: 1.15rem; }
+.cms-content p { margin: .9em 0; }
+.cms-content ul, .cms-content ol { margin: 1rem 1.4rem; padding-inline-start: 1rem; }
+.cms-content ul { list-style: disc; }
+.cms-content ol { list-style: decimal; }
+.cms-content blockquote { margin: 1.25rem 0; padding: .9rem 1rem; border-inline-start: 3px solid var(--livora-accent); background: var(--livora-surface); border-radius: 1rem; }
+.cms-content a { color: var(--livora-accent); text-decoration: underline; text-underline-offset: .2em; }
+.cms-content img { max-width: 100%; height: auto; border-radius: 1rem; margin: 1.25rem auto; }
+.cms-content figure { margin: 1.5rem 0; }
+.cms-content figcaption { color: var(--livora-stone); text-align: center; font-size: .8rem; }
+.cms-content table { width: 100%; display: block; overflow-x: auto; border-collapse: collapse; }
+.cms-content th, .cms-content td { border: 1px solid var(--livora-border); padding: .65rem; }
+.cms-content pre { overflow-x: auto; padding: 1rem; border-radius: 1rem; background: var(--livora-ink); color: #fff; direction: ltr; text-align: left; }

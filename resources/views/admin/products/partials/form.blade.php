@@ -1152,6 +1152,12 @@
     </div>
 
 
+    <div class="admin-card space-y-4 p-6">
+        <h3 class="text-base font-bold text-[var(--admin-text)]">تنظیمات تکمیلی SEO</h3>
+        <div><label class="admin-label" for="canonical_url">Canonical URL</label><input id="canonical_url" name="canonical_url" type="url" dir="ltr" class="admin-input" value="{{ old('canonical_url', $product->canonical_url ?? '') }}"></div>
+        <div><label class="admin-label" for="og_image">Open Graph Image URL</label><input id="og_image" name="og_image" type="url" dir="ltr" class="admin-input" value="{{ old('og_image', $product->og_image ?? '') }}"></div>
+    </div>
+
     <div class="admin-card p-6">
         <h3 class="text-base font-bold text-[var(--admin-text)]">وضعیت موقت SEO</h3>
         <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">تا زمان بررسی کارشناس SEO، این محصول Noindex/Nofollow می‌ماند. تنظیم سراسری SEO نیز فعلاً غیرفعال است.</p>
