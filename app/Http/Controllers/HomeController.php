@@ -15,7 +15,7 @@ class HomeController extends Controller
             ->withCount([
                 'products' => fn ($query) => $query->active(),
             ])
-            ->with('latestActiveProduct.images')
+            ->with(['latestActiveProduct.images' => fn ($imageQuery) => $imageQuery->limit(1)])
             ->orderBy('sort_order')
             ->limit(8)
             ->get();
@@ -28,7 +28,10 @@ class HomeController extends Controller
         $featuredProducts = Product::query()
             ->active()
             ->whereHas('category', fn ($query) => $query->where('is_active', true))
-            ->with(['category', 'images'])
+            ->with([
+                'category',
+                'images' => fn ($imageQuery) => $imageQuery->limit(1),
+            ])
             ->orderByDesc('updated_at')
             ->limit(8)
             ->get();
@@ -37,7 +40,10 @@ class HomeController extends Controller
             ->active()
             ->new()
             ->whereHas('category', fn ($query) => $query->where('is_active', true))
-            ->with(['category', 'images'])
+            ->with([
+                'category',
+                'images' => fn ($imageQuery) => $imageQuery->limit(1),
+            ])
             ->latest()
             ->limit(8)
             ->get();
