@@ -17,8 +17,8 @@
                     class="group inline-flex items-center"
                     aria-label="SillaGallery"
                 >
-                    <span class="silagallery-wordmark" aria-hidden="true">
-                        <span class="silagallery-wordmark__main">Sila</span><span class="silagallery-wordmark__sub">Gallery</span>
+                    <span class="sillagallery-wordmark" aria-hidden="true">
+                        <span class="silagallery-wordmark__main">Silla</span><span class="silagallery-wordmark__sub">Gallery</span>
                     </span>
                 </a>
 

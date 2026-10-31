@@ -145,4 +145,15 @@ class SeoMetadataTest extends TestCase
         $this->get('/about')->assertOk()->assertSee('درباره SillaGallery - ویرایش');
     }
 
+    public function test_public_homepage_uses_sillagallery_brand_without_internal_livora_namespace(): void
+    {
+        $response = $this->get('/')->assertOk();
+        $html = strtolower((string) $response->getContent());
+
+        $this->assertStringContainsString('sillagallery', $html);
+        $this->assertStringNotContainsString('livora', $html);
+        $this->assertStringNotContainsString('silagallery', $html);
+        $this->assertStringNotContainsString('data-livora-', $html);
+    }
+
 }

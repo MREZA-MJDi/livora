@@ -821,7 +821,7 @@ h6 {
 
 
 /* SilaGallery wordmark */
-.silagallery-wordmark {
+.sillagallery-wordmark {
     display: inline-flex;
     align-items: baseline;
     gap: 0.04em;
@@ -831,18 +831,18 @@ h6 {
     letter-spacing: -0.035em;
     transition: opacity 180ms ease, transform 180ms ease;
 }
-.silagallery-wordmark__main {
+.sillagallery-wordmark__main {
     font-size: 1.48rem;
     font-weight: 700;
     letter-spacing: -0.045em;
 }
-.silagallery-wordmark__sub {
+.sillagallery-wordmark__sub {
     font-size: 0.92rem;
     font-weight: 400;
     letter-spacing: 0.02em;
     opacity: 0.82;
 }
-a:hover .silagallery-wordmark {
+a:hover .sillagallery-wordmark {
     opacity: 0.72;
     transform: translateY(-1px);
 }
