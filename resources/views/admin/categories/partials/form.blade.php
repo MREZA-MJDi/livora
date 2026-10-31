@@ -296,6 +296,16 @@
 
     </div>
 
+
+    <div class="admin-card p-6">
+        <h3 class="text-base font-bold text-[var(--admin-text)]">وضعیت موقت SEO</h3>
+        <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">تا بررسی کارشناس SEO، این دسته‌بندی Noindex/Nofollow می‌ماند.</p>
+        <div class="mt-4 grid gap-3 sm:grid-cols-2">
+            <label class="flex items-center gap-3 rounded-xl border border-[var(--admin-border)] p-4"><input type="checkbox" name="seo_index" value="1" class="admin-checkbox" @checked(old('seo_index', $category->seo_index ?? false))><span class="text-sm">اجازه ایندکس این دسته‌بندی</span></label>
+            <label class="flex items-center gap-3 rounded-xl border border-[var(--admin-border)] p-4"><input type="checkbox" name="seo_follow" value="1" class="admin-checkbox" @checked(old('seo_follow', $category->seo_follow ?? false))><span class="text-sm">اجازه دنبال‌کردن لینک‌ها</span></label>
+        </div>
+    </div>
+
 </div>
 
 
