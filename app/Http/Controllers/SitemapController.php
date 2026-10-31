@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BlogPost;
 use App\Models\Category;
+use App\Models\ContentPage;
 use App\Models\Product;
 use App\Models\SeoSetting;
 use Illuminate\Http\Response;
@@ -17,19 +18,32 @@ class SitemapController extends Controller
 
         if ($settings->indexing_enabled) {
             $base = rtrim(config('app.url'), '/');
+            $now = now()->toAtomString();
 
-            foreach (['/', '/shop', '/categories', '/blog', '/about', '/contact'] as $path) {
-                $urls[] = ['loc' => $base . $path, 'lastmod' => now()->toAtomString()];
+            foreach (['/', '/shop', '/categories', '/blog', '/contact'] as $path) {
+                $urls[] = ['loc' => $base . $path, 'lastmod' => $now];
             }
+
+            ContentPage::published()
+                ->where('seo_index', true)
+                ->select(['id', 'slug', 'updated_at', 'canonical_url'])
+                ->chunkById(500, function ($pages) use (&$urls, $base): void {
+                    foreach ($pages as $page) {
+                        $urls[] = [
+                            'loc' => $page->canonical_url ?: $base . '/' . $page->slug,
+                            'lastmod' => $page->updated_at?->toAtomString(),
+                        ];
+                    }
+                });
 
             Product::query()
                 ->where('status', 'active')
                 ->where('seo_index', true)
-                ->select(['id', 'slug', 'updated_at'])
+                ->select(['id', 'slug', 'updated_at', 'canonical_url'])
                 ->chunkById(500, function ($products) use (&$urls, $base): void {
                     foreach ($products as $product) {
                         $urls[] = [
-                            'loc' => $base . '/product/' . $product->slug,
+                            'loc' => $product->canonical_url ?: $base . '/product/' . $product->slug,
                             'lastmod' => $product->updated_at?->toAtomString(),
                         ];
                     }
@@ -38,11 +52,11 @@ class SitemapController extends Controller
             Category::query()
                 ->where('is_active', true)
                 ->where('seo_index', true)
-                ->select(['id', 'slug', 'updated_at'])
+                ->select(['id', 'slug', 'updated_at', 'canonical_url'])
                 ->chunkById(500, function ($categories) use (&$urls, $base): void {
                     foreach ($categories as $category) {
                         $urls[] = [
-                            'loc' => $base . '/categories/' . $category->slug,
+                            'loc' => $category->canonical_url ?: $base . '/categories/' . $category->slug,
                             'lastmod' => $category->updated_at?->toAtomString(),
                         ];
                     }
@@ -50,11 +64,11 @@ class SitemapController extends Controller
 
             BlogPost::published()
                 ->where('seo_index', true)
-                ->select(['id', 'slug', 'updated_at'])
+                ->select(['id', 'slug', 'updated_at', 'canonical_url'])
                 ->chunkById(500, function ($posts) use (&$urls, $base): void {
                     foreach ($posts as $post) {
                         $urls[] = [
-                            'loc' => $base . '/blog/' . $post->slug,
+                            'loc' => $post->canonical_url ?: $base . '/blog/' . $post->slug,
                             'lastmod' => $post->updated_at?->toAtomString(),
                         ];
                     }
@@ -64,6 +78,6 @@ class SitemapController extends Controller
         return response()
             ->view('seo.sitemap', compact('urls'))
             ->header('Content-Type', 'application/xml; charset=UTF-8')
-            ->header('Cache-Control', 'public, max-age=300');
+            ->header('Cache-Control', 'public, max-age=300, s-maxage=300');
     }
 }
