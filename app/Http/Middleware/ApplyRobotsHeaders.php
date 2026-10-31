@@ -30,6 +30,24 @@ class ApplyRobotsHeaders
             return $response;
         }
 
+        // Faceted/search/sort catalogue URLs are crawlable links, not indexable
+        // landing pages. Their clean /shop canonical is emitted by the view.
+        if ($request->routeIs('shop.index') && $request->hasAny([
+            'category',
+            'search',
+            'min_price',
+            'max_price',
+            'installment',
+            'featured',
+            'new',
+            'in_stock',
+            'sort',
+        ])) {
+            $response->headers->set('X-Robots-Tag', $settings->robotsFor(false, true));
+
+            return $response;
+        }
+
         // Apply the site-wide SEO gate to every Laravel response, not only HTML.
         // This also covers XML sitemaps, JSON responses and controller-served files.
         if (! $settings->indexing_enabled || ! $settings->following_enabled) {
