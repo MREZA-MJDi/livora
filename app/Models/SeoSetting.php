@@ -3,15 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class SeoSetting extends Model
 {
     protected $fillable = [
-        'indexing_enabled',
-        'following_enabled',
-        'site_name',
-        'default_title',
-        'default_description',
+        'indexing_enabled', 'following_enabled', 'site_name', 'default_title',
+        'default_description', 'default_og_image', 'twitter_handle',
+        'google_site_verification', 'bing_site_verification', 'organization_name',
+        'organization_description', 'organization_logo', 'contact_email',
+        'contact_phone', 'social_links',
     ];
 
     protected function casts(): array
@@ -19,6 +20,7 @@ class SeoSetting extends Model
         return [
             'indexing_enabled' => 'boolean',
             'following_enabled' => 'boolean',
+            'social_links' => 'array',
         ];
     }
 
@@ -32,6 +34,7 @@ class SeoSetting extends Model
                 'site_name' => 'SillaGallery',
                 'default_title' => 'SillaGallery | مبلمان و لوازم خانه',
                 'default_description' => 'فروشگاه SillaGallery؛ انتخاب مبلمان و لوازم خانه با طراحی و کیفیت ماندگار.',
+                'organization_name' => 'SillaGallery',
             ]
         );
     }
@@ -45,7 +48,27 @@ class SeoSetting extends Model
     {
         $index = $this->indexing_enabled && $pageIndex;
         $follow = $this->following_enabled && $pageFollow;
-
         return ($index ? 'index' : 'noindex') . ', ' . ($follow ? 'follow' : 'nofollow');
+    }
+
+    public function getDefaultOgImageUrlAttribute(): ?string
+    {
+        return $this->imageUrl($this->default_og_image);
+    }
+
+    public function getOrganizationLogoUrlAttribute(): ?string
+    {
+        return $this->imageUrl($this->organization_logo);
+    }
+
+    private function imageUrl(?string $path): ?string
+    {
+        if (! $path) {
+            return null;
+        }
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            return $path;
+        }
+        return Storage::disk('public')->url($path);
     }
 }
