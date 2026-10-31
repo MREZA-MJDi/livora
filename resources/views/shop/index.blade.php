@@ -4,7 +4,7 @@
 
 @section(
     'description',
-    (\App\Models\SeoPageSetting::forRoute('shop')?->meta_description ?: 'خرید مبلمان و لوازم خانه از SilaGallery؛ مشاهده محصولات جدید، ویژه، تخفیف‌دار و دارای شرایط خرید اقساطی.')
+    (\App\Models\SeoPageSetting::forRoute('shop')?->meta_description ?: 'خرید مبلمان و لوازم خانه از SillaGallery؛ مشاهده محصولات جدید، ویژه، تخفیف‌دار و دارای شرایط خرید اقساطی.')
 )
 
 @section('canonical', \App\Models\SeoPageSetting::forRoute('shop')?->canonical_url ?: route('shop.index'))

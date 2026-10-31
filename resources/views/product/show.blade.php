@@ -8,14 +8,14 @@
     */
 
     $pageTitle = str_ireplace(
-        'SilaGallery',
+        'SillaGallery',
         'سیلاگالری',
         $product->meta_title
             ?: ($product->name . ' | سیلاگالری')
     );
 
     $pageDescription = str_ireplace(
-        'SilaGallery',
+        'SillaGallery',
         'سیلاگالری',
         $product->meta_description
             ?: ($product->short_description

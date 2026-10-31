@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\SeoPageSetting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class PageSeoController extends Controller
@@ -25,6 +25,7 @@ class PageSeoController extends Controller
             'pages.*.meta_title' => ['nullable', 'string', 'max:255'],
             'pages.*.meta_description' => ['nullable', 'string', 'max:1000'],
             'pages.*.canonical_url' => ['nullable', 'url', 'max:2048'],
+            'pages.*.og_image' => ['nullable', 'url', 'max:2048'],
             'pages.*.seo_index' => ['nullable', 'boolean'],
             'pages.*.seo_follow' => ['nullable', 'boolean'],
         ]);
@@ -40,9 +41,14 @@ class PageSeoController extends Controller
                 'meta_title' => $data['meta_title'] ?? null,
                 'meta_description' => $data['meta_description'] ?? null,
                 'canonical_url' => $data['canonical_url'] ?? null,
+                'og_image' => $data['og_image'] ?? null,
                 'seo_index' => (bool) ($data['seo_index'] ?? false),
                 'seo_follow' => (bool) ($data['seo_follow'] ?? false),
             ]);
+        }
+
+        foreach (['home', 'shop', 'categories', 'blog', 'contact'] as $routeKey) {
+            Cache::forget("seo_page_settings.{$routeKey}");
         }
 
         return redirect()->route('admin.seo.pages')->with('success', 'تنظیمات SEO صفحات ثابت ذخیره شد.');

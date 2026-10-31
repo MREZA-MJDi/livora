@@ -29,6 +29,7 @@
                 <div class="grid gap-4 lg:grid-cols-2">
                     <div><label class="admin-label">Meta Title</label><input class="admin-input" name="pages[{{ $page->id }}][meta_title]" maxlength="255" value="{{ old("pages.{$page->id}.meta_title", $page->meta_title) }}"></div>
                     <div><label class="admin-label">Canonical URL</label><input class="admin-input" dir="ltr" type="url" name="pages[{{ $page->id }}][canonical_url]" value="{{ old("pages.{$page->id}.canonical_url", $page->canonical_url) }}"></div>
+                    <div><label class="admin-label">Open Graph Image URL</label><input class="admin-input" dir="ltr" type="url" name="pages[{{ $page->id }}][og_image]" value="{{ old("pages.{$page->id}.og_image", $page->og_image) }}"></div>
                     <div class="lg:col-span-2"><label class="admin-label">Meta Description</label><textarea class="admin-textarea" rows="2" maxlength="1000" name="pages[{{ $page->id }}][meta_description]">{{ old("pages.{$page->id}.meta_description", $page->meta_description) }}</textarea></div>
                 </div>
                 <div class="flex flex-wrap gap-3">

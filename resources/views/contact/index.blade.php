@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'تماس با SilaGallery | ارتباط با ما')
+@section('title', 'تماس با SillaGallery | ارتباط با ما')
 
 @section(
     'description',
-    'برای مشاوره خرید، پیگیری سفارش و دریافت اطلاعات بیشتر درباره محصولات و خدمات SilaGallery با ما در ارتباط باشید.'
+    'برای مشاوره خرید، پیگیری سفارش و دریافت اطلاعات بیشتر درباره محصولات و خدمات SillaGallery با ما در ارتباط باشید.'
 )
 
 @section('canonical', \App\Models\SeoPageSetting::forRoute('contact')?->canonical_url ?: route('contact'))
@@ -69,7 +69,7 @@
 
                             <p class="text-sm leading-8 text-[var(--livora-stone)] sm:text-base">
                                 برای مشاوره خرید، پیگیری سفارش، پرسش درباره شرایط اقساط
-                                یا هر موضوع دیگری می‌توانید با SilaGallery در ارتباط باشید.
+                                یا هر موضوع دیگری می‌توانید با SillaGallery در ارتباط باشید.
                             </p>
 
                             <a
@@ -650,7 +650,7 @@
                     </h2>
 
                     <p class="mt-4 text-sm leading-8 text-[var(--livora-stone)]">
-                        پاسخ چند سؤال رایج درباره ارتباط با SilaGallery و خرید از فروشگاه.
+                        پاسخ چند سؤال رایج درباره ارتباط با SillaGallery و خرید از فروشگاه.
                     </p>
 
                 </div>
@@ -740,7 +740,7 @@
                 <div>
 
                     <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--livora-accent)]">
-                        SilaGallery
+                        SillaGallery
                     </p>
 
                     <h2 class="mt-2 text-2xl font-semibold">

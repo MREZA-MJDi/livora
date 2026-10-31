@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\Category\StoreCategoryRequest;
 use App\Http\Requests\Admin\Category\UpdateCategoryRequest;
 use App\Models\Category;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -47,6 +48,7 @@ class CategoryController extends Controller
         }
 
         Category::create($data);
+        Cache::forget('layout.search_categories');
 
         return redirect()
             ->route('admin.categories.index')
@@ -90,6 +92,7 @@ class CategoryController extends Controller
         }
 
         $category->update($data);
+        Cache::forget('layout.search_categories');
 
         if (
             $newImage
@@ -123,6 +126,7 @@ class CategoryController extends Controller
         $image = $category->image;
 
         $category->delete();
+        Cache::forget('layout.search_categories');
 
         if (
             $image

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
 class SeoSetting extends Model
@@ -26,7 +27,7 @@ class SeoSetting extends Model
 
     public static function current(): self
     {
-        return static::query()->firstOrCreate(
+        return Cache::rememberForever('seo_settings.current', static fn (): self => static::query()->firstOrCreate(
             ['id' => 1],
             [
                 'indexing_enabled' => false,
@@ -36,7 +37,7 @@ class SeoSetting extends Model
                 'default_description' => 'فروشگاه SillaGallery؛ انتخاب مبلمان و لوازم خانه با طراحی و کیفیت ماندگار.',
                 'organization_name' => 'SillaGallery',
             ]
-        );
+        ));
     }
 
     public function robots(): string

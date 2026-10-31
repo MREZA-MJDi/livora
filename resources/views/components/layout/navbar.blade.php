@@ -15,7 +15,7 @@
                 <a
                     href="{{ route('home') }}"
                     class="group inline-flex items-center"
-                    aria-label="SilaGallery"
+                    aria-label="SillaGallery"
                 >
                     <span class="silagallery-wordmark" aria-hidden="true">
                         <span class="silagallery-wordmark__main">Sila</span><span class="silagallery-wordmark__sub">Gallery</span>

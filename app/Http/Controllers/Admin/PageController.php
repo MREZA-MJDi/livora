@@ -16,7 +16,7 @@ use Illuminate\View\View;
 class PageController extends Controller
 {
     private const RESERVED = [
-        'admin', 'api', 'shop', 'product', 'categories', 'blog', 'contact',
+        'admin', 'api', 'shop', 'product', 'categories', 'blog', 'contact', 'about', 'terms',
         'cart', 'checkout', 'account', 'login', 'register', 'logout',
         'sitemap.xml', 'storage', 'up', 'password', 'reset-password',
     ];
@@ -39,7 +39,9 @@ class PageController extends Controller
 
     public function create(): View
     {
-        return view('admin.pages.create');
+        return view('admin.pages.create', [
+            'bodyHtml' => HtmlSanitizer::sanitize((string) old('body', '')),
+        ]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -72,7 +74,10 @@ class PageController extends Controller
 
     public function edit(ContentPage $page): View
     {
-        return view('admin.pages.edit', compact('page'));
+        return view('admin.pages.edit', [
+            'page' => $page,
+            'bodyHtml' => HtmlSanitizer::sanitize((string) old('body', $page->body)),
+        ]);
     }
 
     public function update(Request $request, ContentPage $page): RedirectResponse
@@ -103,7 +108,7 @@ class PageController extends Controller
             throw $exception;
         }
 
-        if ($newImage && $oldImage && $oldImage !== $newImage && ! str_starts_with($oldImage, 'http')) {
+        if ($newImage && $oldImage && $oldImage !== $newImage && ! str_starts_with($oldImage, 'http') && ! str_starts_with($oldImage, '//')) {
             Storage::disk('public')->delete($oldImage);
         }
 
@@ -118,7 +123,7 @@ class PageController extends Controller
 
         $image = $page->featured_image;
         $page->delete();
-        if ($image && ! str_starts_with($image, 'http')) {
+        if ($image && ! str_starts_with($image, 'http') && ! str_starts_with($image, '//')) {
             Storage::disk('public')->delete($image);
         }
 
@@ -127,9 +132,15 @@ class PageController extends Controller
 
     private function validated(Request $request, ?ContentPage $page = null): array
     {
-        $slug = trim((string) $request->input('slug'));
-        if ($slug === '') {
-            $slug = UniqueSlug::make((string) $request->input('title'), 'content_pages', $page?->id);
+        // Built-in pages are bound to explicit /about and /terms routes.
+        // Their slugs are immutable so editing their content cannot break navigation.
+        if ($page && in_array($page->slug, ['about', 'terms'], true)) {
+            $slug = $page->slug;
+        } else {
+            $slug = trim((string) $request->input('slug'));
+            if ($slug === '') {
+                $slug = UniqueSlug::make((string) $request->input('title'), 'content_pages', $page?->id);
+            }
         }
         $request->merge([
             'slug' => $slug,
@@ -141,7 +152,7 @@ class PageController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'slug' => [
                 'required', 'string', 'max:190', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/',
-                Rule::notIn(self::RESERVED),
+                Rule::notIn(array_values(array_diff(self::RESERVED, [$page?->slug]))),
                 Rule::unique('content_pages', 'slug')->ignore($page),
             ],
             'excerpt' => ['nullable', 'string', 'max:500'],
