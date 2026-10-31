@@ -112,7 +112,8 @@ class UpdateProductRequest extends FormRequest
     {
         $product = $this->route('product');
 
-        return [            'seo_index' => ['sometimes', 'boolean'],
+        return [
+            'seo_index' => ['sometimes', 'boolean'],
             'seo_follow' => ['sometimes', 'boolean'],
 
             'category_id' => [
