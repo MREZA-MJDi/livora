@@ -7,7 +7,8 @@
     'برای مشاوره خرید، پیگیری سفارش و دریافت اطلاعات بیشتر درباره محصولات و خدمات SilaGallery با ما در ارتباط باشید.'
 )
 
-@section('canonical', route('contact'))
+@section('canonical', \\App\\Models\\SeoPageSetting::forRoute('contact')?->canonical_url ?: route('contact'))
+@section('robots', \\App\\Models\\SeoPageSetting::forRoute('contact')?->robots() ?? \\App\\Models\\SeoSetting::current()->robots())
 
 @push('seo')
 

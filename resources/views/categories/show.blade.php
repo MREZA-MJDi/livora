@@ -12,87 +12,15 @@
 )
 
 @section('robots', \App\Models\SeoSetting::current()->robotsFor($category->seo_index, $category->seo_follow))
+@section('og_title', $category->meta_title ?: ($category->name . ' | SillaGallery'))
+@section('og_description', $category->meta_description ?: ('محصولات ' . $category->name . ' در SillaGallery'))
+@section('og_image', $category->og_image ?: $category->image_url)
 
 @section(
     'canonical',
-    route('categories.show', $category->slug)
+    ($category->canonical_url ?: route('categories.show', $category->slug))
 )
 
-@push('seo')
-
-    <meta
-        property="og:type"
-        content="website"
-    >
-
-    <meta
-        property="og:title"
-        content="{{ $category->name }} | SilaGallery"
-    >
-
-    <meta
-        property="og:description"
-        content="{{ $category->meta_description ?? ('محصولات ' . $category->name . ' در SilaGallery') }}"
-    >
-
-    <meta
-        property="og:url"
-        content="{{ route('categories.show', $category->slug) }}"
-    >
-
-    @if($category->image)
-        <meta
-            property="og:image"
-            content="{{ $category->image_url }}"
-        >
-    @endif
-
-    <meta
-        name="twitter:card"
-        content="summary_large_image"
-    >
-
-    <meta
-        name="twitter:title"
-        content="{{ $category->name }} | SilaGallery"
-    >
-
-    <meta
-        name="twitter:description"
-        content="{{ $category->meta_description ?? ('محصولات ' . $category->name . ' در SilaGallery') }}"
-    >
-
-    @if($category->image)
-        <meta
-            name="twitter:image"
-            content="{{ $category->image_url }}"
-        >
-    @endif
-
-    <script type="application/ld+json">
-{
-    "@@context": "https://schema.org",
-    "@@type": "WebSite",
-    "name": "SilaGallery",
-    "url": @json(url('/')),
-    "potentialAction": {
-        "@@type": "SearchAction",
-        "target": @json(url('/shop') . '?search={search_term_string}'),
-        "query-input": "required name=search_term_string"
-    }
-}
-</script>
-
-    <script type="application/ld+json">
-{
-    "@@context": "https://schema.org",
-    "@@type": "Organization",
-    "name": "SilaGallery",
-    "url": @json(url('/'))
-        }
-</script>
-
-@endpush
 
 @section('content')
 

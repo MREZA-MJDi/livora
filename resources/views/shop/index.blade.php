@@ -1,13 +1,14 @@
 @extends('layouts.app')
 
-@section('title', 'فروشگاه مبلمان | SilaGallery')
+@section('title', \\App\\Models\\SeoPageSetting::forRoute('shop')?->meta_title ?: 'فروشگاه مبلمان | SillaGallery')
 
 @section(
     'description',
-    'خرید مبلمان و لوازم خانه از SilaGallery؛ مشاهده محصولات جدید، ویژه، تخفیف‌دار و دارای شرایط خرید اقساطی.'
+    (\\App\\Models\\SeoPageSetting::forRoute('shop')?->meta_description ?: 'خرید مبلمان و لوازم خانه از SilaGallery؛ مشاهده محصولات جدید، ویژه، تخفیف‌دار و دارای شرایط خرید اقساطی.')
 )
 
-@section('canonical', route('shop.index'))
+@section('canonical', \\App\\Models\\SeoPageSetting::forRoute('shop')?->canonical_url ?: route('shop.index'))
+@section('robots', \\App\\Models\\SeoPageSetting::forRoute('shop')?->robots() ?? \\App\\Models\\SeoSetting::current()->robots())
 
 @push('seo')
 
