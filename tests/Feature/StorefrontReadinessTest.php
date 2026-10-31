@@ -292,6 +292,127 @@ class StorefrontReadinessTest extends TestCase
             });
     }
 
+    public function test_shop_applies_each_visible_catalogue_filter(): void
+    {
+        $category = $this->category();
+
+        $installmentProduct = $this->product($category, [
+            'name' => 'محصول اقساطی آزمون',
+            'slug' => 'filter-installment-product',
+            'installment_enabled' => true,
+            'stock' => 0,
+        ]);
+        $featuredProduct = $this->product($category, [
+            'name' => 'محصول ویژه آزمون',
+            'slug' => 'filter-featured-product',
+            'is_featured' => true,
+            'stock' => 0,
+        ]);
+        $newProduct = $this->product($category, [
+            'name' => 'محصول جدید آزمون',
+            'slug' => 'filter-new-product',
+            'is_new' => true,
+            'stock' => 0,
+        ]);
+        $inStockProduct = $this->product($category, [
+            'name' => 'محصول موجود آزمون',
+            'slug' => 'filter-in-stock-product',
+            'stock' => 4,
+        ]);
+        $unmatchedProduct = $this->product($category, [
+            'name' => 'محصول بدون ویژگی آزمون',
+            'slug' => 'filter-unmatched-product',
+            'stock' => 0,
+        ]);
+
+        foreach ([
+            ['installment', $installmentProduct],
+            ['featured', $featuredProduct],
+            ['new', $newProduct],
+            ['in_stock', $inStockProduct],
+        ] as [$filter, $expectedProduct]) {
+            $this->get(route('shop.index', [$filter => '1']))
+                ->assertOk()
+                ->assertSee($expectedProduct->name)
+                ->assertDontSee($unmatchedProduct->name);
+        }
+    }
+
+    public function test_shop_sort_options_match_the_visible_sorting_menu(): void
+    {
+        $category = $this->category();
+
+        $oldest = $this->product($category, [
+            'name' => 'محصول قدیمی‌تر آزمون',
+            'slug' => 'sorting-oldest-product',
+        ]);
+        $newest = $this->product($category, [
+            'name' => 'محصول جدیدتر آزمون',
+            'slug' => 'sorting-newest-product',
+        ]);
+
+        $oldest->forceFill([
+            'created_at' => now()->subDays(2),
+            'updated_at' => now()->subDays(2),
+        ])->save();
+
+        $newest->forceFill([
+            'created_at' => now()->subDay(),
+            'updated_at' => now()->subDay(),
+        ])->save();
+
+        foreach (['latest', 'oldest', 'price_asc', 'price_desc', 'name_asc'] as $sort) {
+            $this->get(route('shop.index', ['sort' => $sort]))
+                ->assertOk();
+        }
+
+        $this->get(route('shop.index', ['sort' => 'oldest']))
+            ->assertViewHas('products', fn ($products) => $products->first()?->is($oldest));
+
+        $this->get(route('shop.index', ['sort' => 'latest']))
+            ->assertViewHas('products', fn ($products) => $products->first()?->is($newest));
+    }
+
+    public function test_shop_pagination_keeps_active_filters_and_has_a_fixed_page_size(): void
+    {
+        $category = $this->category();
+        $products = [];
+
+        for ($i = 1; $i <= 13; $i++) {
+            $products[] = $this->product($category, [
+                'name' => 'محصول صفحه‌بندی ' . $i,
+                'slug' => 'pagination-product-' . $i,
+                'installment_enabled' => true,
+                'is_featured' => true,
+                'is_new' => true,
+            ]);
+        }
+
+        $this->product($category, [
+            'name' => 'محصول خارج از فیلتر صفحه‌بندی',
+            'slug' => 'pagination-excluded-product',
+        ]);
+
+        $this->get(route('shop.index', [
+            'installment' => '1',
+            'featured' => '1',
+            'new' => '1',
+            'page' => 2,
+        ]))
+            ->assertOk()
+            ->assertViewHas('products', function ($paginator) {
+                return $paginator instanceof LengthAwarePaginator
+                    && $paginator->perPage() === 12
+                    && $paginator->total() === 13
+                    && $paginator->currentPage() === 2;
+            })
+            ->assertSee($products[12]->name)
+            ->assertDontSee($products[0]->name)
+            ->assertSee('installment=1', false)
+            ->assertSee('featured=1', false)
+            ->assertSee('new=1', false);
+    }
+
     public function test_password_recovery_does_not_reveal_whether_an_email_exists(): void
     {
         Notification::fake();
