@@ -1,6 +1,8 @@
 @props([
 'product',
 'shopGridItem' => false,
+'imageLoading' => 'lazy',
+'imagePriority' => 'auto',
 ])
 
 @php
@@ -42,15 +44,15 @@
             : 0;
 @endphp
 
-<article class="group relative flex h-full min-w-0 flex-col">
+<article class="group relative flex h-full min-w-0 flex-col {{ $shopGridItem ? 'sg-shop-card grid__item' : '' }}">
 
     {{-- Image --}}
-    <div class="relative overflow-hidden rounded-[1.5rem] bg-[var(--sg-surface)]">
+    <div class="relative overflow-hidden {{ $shopGridItem ? 'sg-shop-card__media-shell' : 'rounded-[1.5rem]' }} bg-[var(--sg-surface)]">
 
         <a
             href="{{ route('product.show', $product->slug) }}"
-            class="product-card-media block aspect-[4/5] overflow-hidden"
-            @if($shopGridItem) data-shop-grid-item @endif
+            class="product-card-media grid__link block overflow-hidden {{ $shopGridItem ? 'sg-shop-card__link' : 'aspect-[4/5]' }}"
+            @if($shopGridItem) data-grid-animation-target @endif
         >
 
             @if($image)
@@ -58,13 +60,15 @@
                 <img
                     src="{{ $image }}"
                     alt="{{ $product->name }}"
-                    loading="lazy"
-                    class="product-card-image h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.045]"
+                    loading="{{ $shopGridItem ? $imageLoading : 'lazy' }}"
+                    fetchpriority="{{ $shopGridItem ? $imagePriority : 'auto' }}"
+                    decoding="async"
+                    class="product-card-image {{ $shopGridItem ? 'sg-shop-card__image' : 'h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.045]' }}"
                 >
 
             @else
 
-                <div class="flex h-full w-full items-center justify-center">
+                <div class="flex h-full w-full items-center justify-center {{ $shopGridItem ? 'sg-shop-card__placeholder' : '' }}">
                     <span class="text-xs tracking-[0.2em] text-[var(--sg-stone)]">
                         SillaGallery
                     </span>

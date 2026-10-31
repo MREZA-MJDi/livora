@@ -1,517 +1,226 @@
 @extends('layouts.app')
 
 @section('title', \App\Models\SeoPageSetting::forRoute('shop')?->meta_title ?: 'فروشگاه مبلمان | SillaGallery')
-
-@section(
-    'description',
-    (\App\Models\SeoPageSetting::forRoute('shop')?->meta_description ?: 'خرید مبلمان و لوازم خانه از SillaGallery؛ مشاهده محصولات جدید، ویژه، تخفیف‌دار و دارای شرایط خرید اقساطی.')
-)
-
+@section('description', \App\Models\SeoPageSetting::forRoute('shop')?->meta_description ?: 'خرید مبلمان و لوازم خانه از SillaGallery؛ مجموعه محصولات، قیمت‌ها و شرایط خرید اقساطی.')
 @section('canonical', \App\Models\SeoPageSetting::forRoute('shop')?->canonical_url ?: route('shop.index'))
 @section('robots', \App\Models\SeoPageSetting::forRoute('shop')?->robots() ?? \App\Models\SeoSetting::current()->robots())
 
-
-
 @section('content')
+    <div class="sg-shop-page" x-data="{ filterOpen: false }">
+        <header class="sg-shop-header">
+            <div class="sg-shop-shell">
+                <nav class="sg-shop-breadcrumb" aria-label="مسیر صفحه">
+                    <a href="{{ route('home') }}">خانه</a>
+                    <span aria-hidden="true">/</span>
+                    <span aria-current="page">فروشگاه</span>
+                </nav>
 
-    <div
-        class="overflow-hidden bg-[var(--sg-cream)]"
-        x-data="{
-            filterOpen: false
-        }"
-    >
+                <div class="sg-shop-header__content">
+                    <div>
+                        <p class="sg-shop-eyebrow">SILLAGALLERY / COLLECTION</p>
+                        <h1 class="sg-shop-title">فروشگاه</h1>
+                        <p class="sg-shop-description">
+                            مجموعه مبلمان و عناصر خانه؛ محصولات را بر اساس دسته‌بندی، قیمت و شرایط خرید بررسی کنید.
+                        </p>
+                    </div>
+                    <p class="sg-shop-total">
+                        <strong>{{ number_format($products->total()) }}</strong>
+                        <span>محصول</span>
+                    </p>
+                </div>
+            </div>
+        </header>
 
-        {{-- =========================================================
-             SHOP HEADER
-        ========================================================== --}}
+        <div class="sg-shop-shell sg-shop-workspace">
+            {{-- LEFT CONTROL RAIL: live categories and actual GET filters --}}
+            <aside class="sg-shop-sidebar" aria-label="دسته‌بندی و فیلتر محصولات">
+                <section class="sg-shop-control-group">
+                    <div class="sg-shop-control-heading">
+                        <span class="sg-shop-eyebrow">COLLECTIONS</span>
+                        <h2>دسته‌بندی‌ها</h2>
+                    </div>
 
-        <section class="border-b border-[var(--sg-border)] bg-[var(--sg-white)]">
+                    @php
+                        $shopBaseQuery = request()->except(['category', 'page']);
+                        $selectedCategorySlug = request('category');
+                    @endphp
 
-            <x-layout.container>
-
-                <div class="py-10 sm:py-14 lg:py-16">
-
-                    {{-- Breadcrumb --}}
-
-                    <nav
-                        aria-label="breadcrumb"
-                        class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--sg-stone)]"
-                    >
-
+                    <nav class="sg-shop-category-list" aria-label="دسته‌بندی محصولات">
                         <a
-                            href="{{ route('home') }}"
-                            class="transition hover:text-[var(--sg-ink)]"
+                            href="{{ route('shop.index', $shopBaseQuery) }}"
+                            class="sg-shop-category-link {{ blank($selectedCategorySlug) ? 'is-active' : '' }}"
+                            @if(blank($selectedCategorySlug)) aria-current="page" @endif
                         >
-                            خانه
+                            <span class="sg-shop-category-image sg-shop-category-image--all" aria-hidden="true">SG</span>
+                            <span class="sg-shop-category-copy">
+                                <span class="sg-shop-category-name">همه محصولات</span>
+                                <span class="sg-shop-category-count">مشاهده مجموعه کامل</span>
+                            </span>
                         </a>
 
-                        <span>/</span>
-
-                        <span class="text-[var(--sg-ink)]">
-                            فروشگاه
-                        </span>
-
-                    </nav>
-
-
-                    {{-- Header Content --}}
-
-                    <div class="mt-7 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-
-                        <div class="max-w-3xl">
-
-                            <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
-                                SillaGallery COLLECTION
-                            </p>
-
-                            <h1 class="mt-3 text-4xl font-semibold tracking-tight text-[var(--sg-ink)] sm:text-5xl">
-                                فروشگاه
-                            </h1>
-
-                            <p class="mt-4 max-w-2xl text-sm leading-8 text-[var(--sg-stone)]">
-                                مجموعه‌ای منتخب از مبلمان و عناصر خانه برای فضاهایی که قرار است
-                                شخصیت و ماندگاری داشته باشند.
-                            </p>
-
-                        </div>
-
-
-                        <div class="text-sm text-[var(--sg-stone)]">
-
-                            <span class="font-semibold text-[var(--sg-ink)]">
-                                {{ number_format($products->total()) }}
-                            </span>
-
-                            محصول
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </x-layout.container>
-
-        </section>
-
-
-        {{-- =========================================================
-             SHOP CONTENT
-        ========================================================== --}}
-
-        <section>
-
-            <x-layout.container>
-
-                <div class="grid gap-8 py-8 lg:grid-cols-[250px_minmax(0,1fr)] lg:py-12">
-
-
-                    {{-- =================================================
-                         DESKTOP SIDEBAR
-                    ================================================== --}}
-
-                    <aside class="hidden min-w-0 lg:block">
-
-                        <div class="sticky top-28 space-y-5">
-
-
-                            {{-- =================================================
-                                 FILTER CARD
-                            ================================================== --}}
-
-                            <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
-
-                                <div class="flex items-center justify-between gap-3">
-
-                                    <div>
-
-                                        <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
-                                            DISCOVER
-                                        </p>
-
-                                        <h2 class="mt-2 text-sm font-semibold">
-                                            فیلترها
-                                        </h2>
-
-                                    </div>
-
-
-                                    <a
-                                        href="{{ route('shop.index') }}"
-                                        class="shrink-0 text-[11px] text-[var(--sg-stone)] transition hover:text-[var(--sg-accent)]"
-                                    >
-                                        پاک کردن
-                                    </a>
-
-                                </div>
-
-
-                                {{-- Desktop Filter has its own GET form --}}
-
-                                <form
-                                    method="GET"
-                                    action="{{ route('shop.index') }}"
-                                    class="mt-6"
-                                >
-
-                                    <x-shop.filters
-                                        :categories="$categories"
-                                        :selected-category="request('category')"
-                                        :show-categories="false"
-                                    />
-
-                                </form>
-
-                            </div>
-
-
-                            {{-- =================================================
-                                 DISCOVERY BOX
-                            ================================================== --}}
-
-                            <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-surface)] p-5">
-
-                                <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
-                                    SillaGallery
-                                </p>
-
-                                <h3 class="mt-3 text-sm font-semibold">
-                                    انتخاب آگاهانه
-                                </h3>
-
-                                <p class="mt-2 text-xs leading-7 text-[var(--sg-stone)]">
-                                    قیمت، طراحی، موجودی و شرایط خرید اقساطی را
-                                    قبل از انتخاب محصول بررسی کنید.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                    </aside>
-
-
-                    {{-- =================================================
-                         PRODUCTS AREA
-                    ================================================== --}}
-
-                    <div class="min-w-0">
-
-
-                        {{-- =================================================
-                             MOBILE TOOLBAR
-                        ================================================== --}}
-
-                        <div class="mb-5 flex items-center justify-between gap-3 lg:hidden">
-
-                            <button
-                                type="button"
-                                @click="filterOpen = true"
-                                class="inline-flex items-center gap-2 rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] px-4 py-3 text-sm font-medium text-[var(--sg-ink)] transition hover:border-[var(--sg-ink)]"
-                            >
-
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke-width="1.5"
-                                    stroke="currentColor"
-                                    class="h-4 w-4"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="M3.75 6.75h16.5M6.75 12h10.5m-7.5 5.25h5.25"
-                                    />
-                                </svg>
-
-                                فیلترها
-
-                            </button>
-
-
-                            <span class="text-xs text-[var(--sg-stone)]">
-
-                                <span class="font-medium text-[var(--sg-ink)]">
-                                    {{ number_format($products->total()) }}
-                                </span>
-
-                                محصول
-
-                            </span>
-
-                        </div>
-
-
-                        {{-- =================================================
-                             CATEGORY IMAGE TABS
-                        ================================================== --}}
-                        @php
-                            $shopBaseQuery = request()->except(['category', 'page']);
-                            $selectedCategorySlug = request('category');
-                        @endphp
-
-                        @if($categories->isNotEmpty())
-                            <nav class="shop-category-tabs mt-7" aria-label="دسته‌بندی‌های فروشگاه">
-                                <div class="mb-3 flex items-center justify-between gap-3">
-                                    <p class="text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--sg-accent)]">
-                                        SHOP BY CATEGORY
-                                    </p>
-                                    <span class="text-[10px] text-[var(--sg-stone)]">
-                                        انتخاب دسته‌بندی
-                                    </span>
-                                </div>
-
-                                <div class="shop-category-tabs__track">
-                                    <a
-                                        href="{{ route('shop.index', $shopBaseQuery) }}"
-                                        class="shop-category-tab {{ blank($selectedCategorySlug) ? 'is-active' : '' }}"
-                                        aria-current="{{ blank($selectedCategorySlug) ? 'page' : 'false' }}"
-                                    >
-                                        <span class="shop-category-tab__image shop-category-tab__image--all" aria-hidden="true">
-                                            SG
-                                        </span>
-                                        <span class="shop-category-tab__meta">
-                                            <span class="shop-category-tab__name">همه محصولات</span>
-                                            <span class="shop-category-tab__count">همه دسته‌بندی‌ها</span>
-                                        </span>
-                                    </a>
-
-                                    @foreach($categories as $category)
-                                        @php
-                                            $categoryImage = $category->homepage_image_url;
-                                            $categoryIsActive = $selectedCategorySlug === $category->slug;
-                                            $categoryQuery = array_merge($shopBaseQuery, ['category' => $category->slug]);
-                                        @endphp
-
-                                        <a
-                                            href="{{ route('shop.index', $categoryQuery) }}"
-                                            class="shop-category-tab {{ $categoryIsActive ? 'is-active' : '' }}"
-                                            aria-current="{{ $categoryIsActive ? 'page' : 'false' }}"
-                                        >
-                                            <span class="shop-category-tab__image">
-                                                @if($categoryImage)
-                                                    <img
-                                                        src="{{ $categoryImage }}"
-                                                        alt=""
-                                                        loading="lazy"
-                                                        decoding="async"
-                                                    >
-                                                @else
-                                                    <span class="shop-category-tab__placeholder">SG</span>
-                                                @endif
-                                            </span>
-
-                                            <span class="shop-category-tab__meta">
-                                                <span class="shop-category-tab__name">{{ $category->name }}</span>
-                                                <span class="shop-category-tab__count">{{ number_format($category->products_count) }} محصول</span>
-                                            </span>
-                                        </a>
-                                    @endforeach
-                                </div>
-                            </nav>
-                        @endif
-
-
-                        {{-- =================================================
-                             SORTING TOOLBAR
-                        ================================================== --}}
-
-                        <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-4 sm:p-5">
-
-                            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-
-                                <div class="min-w-0">
-
-                                    <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
-                                        CURATED PRODUCTS
-                                    </p>
-
-                                    <p class="mt-2 text-sm font-medium text-[var(--sg-ink)]">
-                                        مجموعه SillaGallery
-                                    </p>
-
-                                </div>
-
-
-                                <div class="w-full sm:min-w-[220px] sm:w-auto">
-
-                                    <x-shop.sorting
-                                        :products="$products"
-                                    />
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-                        {{-- =================================================
-                             ACTIVE FILTER
-                        ================================================== --}}
-
-                        @if(request()->filled('category'))
-
+                        @foreach($categories as $category)
                             @php
-                                $activeCategory = $categories->firstWhere(
-                                    'slug',
-                                    request('category')
-                                );
+                                $categoryImage = $category->homepage_image_url;
+                                $categoryIsActive = $selectedCategorySlug === $category->slug;
+                                $categoryQuery = array_merge($shopBaseQuery, ['category' => $category->slug]);
                             @endphp
 
-
-                            <div class="mt-5 flex flex-wrap items-center gap-2">
-
-                                <span class="text-xs text-[var(--sg-stone)]">
-                                    فیلتر فعال:
-                                </span>
-
-                                <span class="inline-flex items-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)] px-3 py-1.5 text-[11px] text-[var(--sg-ink)]">
-                                    {{ $activeCategory?->name ?? request('category') }}
-                                </span>
-
-                                <a
-                                    href="{{ route('shop.index') }}"
-                                    class="inline-flex items-center rounded-full border border-[var(--sg-border)] px-3 py-1.5 text-[11px] text-[var(--sg-stone)] transition hover:border-[var(--sg-ink)] hover:text-[var(--sg-ink)]"
-                                >
-                                    حذف
-                                </a>
-
-                            </div>
-
-                        @endif
-
-
-                        {{-- =================================================
-                             RESULT META
-                        ================================================== --}}
-
-                        @if($products->total() > 0)
-
-                            <div class="mt-6">
-
-                                <p class="text-xs text-[var(--sg-stone)]">
-
-                                    نمایش
-
-                                    <span class="font-medium text-[var(--sg-ink)]">
-                                        {{ number_format($products->firstItem()) }}
-                                    </span>
-
-                                    تا
-
-                                    <span class="font-medium text-[var(--sg-ink)]">
-                                        {{ number_format($products->lastItem()) }}
-                                    </span>
-
-                                    از
-
-                                    <span class="font-medium text-[var(--sg-ink)]">
-                                        {{ number_format($products->total()) }}
-                                    </span>
-
-                                </p>
-
-                            </div>
-
-                        @endif
-
-
-                        {{-- =================================================
-                             PRODUCT GRID
-                        ================================================== --}}
-
-                        @if($products->isNotEmpty())
-
-                            <div
-                                class="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-5 lg:grid-cols-2 xl:grid-cols-3 sg-shop-grid"
-                                data-shop-grid="amun"
+                            <a
+                                href="{{ route('shop.index', $categoryQuery) }}"
+                                class="sg-shop-category-link {{ $categoryIsActive ? 'is-active' : '' }}"
+                                @if($categoryIsActive) aria-current="page" @endif
                             >
-
-                                @foreach($products as $product)
-
-                                    <x-product.card
-                                        :product="$product"
-                                        shop-grid-item
-                                    />
-
-                                @endforeach
-
-                            </div>
-
-
-                            {{-- =================================================
-                                 PAGINATION
-                            ================================================== --}}
-
-                            @if($products->hasPages())
-
-                                <nav
-                                    class="mt-14"
-                                    aria-label="صفحه‌بندی محصولات"
-                                >
-
-                                    {{ $products->withQueryString()->links() }}
-
-                                </nav>
-
-                            @endif
-
-
-                        @else
-
-                            {{-- =================================================
-                                 EMPTY STATE
-                            ================================================== --}}
-
-                            <div class="mt-8 rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] px-6 py-24 text-center">
-
-                                <span class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--sg-surface)] text-sm text-[var(--sg-stone)]">
-                                    —
+                                <span class="sg-shop-category-image">
+                                    @if($categoryImage)
+                                        <img src="{{ $categoryImage }}" alt="" loading="lazy" decoding="async">
+                                    @else
+                                        <span class="sg-shop-category-placeholder">SG</span>
+                                    @endif
                                 </span>
+                                <span class="sg-shop-category-copy">
+                                    <span class="sg-shop-category-name">{{ $category->name }}</span>
+                                    <span class="sg-shop-category-count">{{ number_format($category->products_count) }} محصول</span>
+                                </span>
+                            </a>
+                        @endforeach
+                    </nav>
+                </section>
 
-
-                                <h2 class="mt-6 text-2xl font-semibold text-[var(--sg-ink)]">
-                                    محصولی پیدا نشد
-                                </h2>
-
-
-                                <p class="mx-auto mt-3 max-w-md text-sm leading-7 text-[var(--sg-stone)]">
-                                    فیلترها یا عبارت جستجو را تغییر دهید و دوباره مجموعه محصولات را بررسی کنید.
-                                </p>
-
-
-                                <a
-                                    href="{{ route('shop.index') }}"
-                                    class="mt-7 inline-flex rounded-2xl bg-[var(--sg-ink)] px-6 py-3.5 text-sm font-medium text-white transition hover:bg-[var(--sg-accent)]"
-                                >
-                                    مشاهده همه محصولات
-                                </a>
-
-                            </div>
-
-                        @endif
-
+                <section class="sg-shop-filter-panel">
+                    <div class="sg-shop-control-heading">
+                        <span class="sg-shop-eyebrow">REFINE</span>
+                        <div class="sg-shop-filter-heading-row">
+                            <h2>فیلترها</h2>
+                            <a href="{{ route('shop.index') }}">پاک کردن</a>
+                        </div>
                     </div>
 
+                    <form method="GET" action="{{ route('shop.index') }}" class="sg-shop-filter-form">
+                        @if(request()->filled('sort'))
+                            <input type="hidden" name="sort" value="{{ request('sort') }}">
+                        @endif
+                        <x-shop.filters
+                            :categories="$categories"
+                            :selected-category="request('category')"
+                            :show-categories="false"
+                        />
+                    </form>
+                </section>
+            </aside>
+
+            {{-- CENTRAL CATALOG --}}
+            <section class="sg-shop-main" aria-label="محصولات فروشگاه">
+                <div class="sg-shop-toolbar">
+                    <div class="sg-shop-toolbar__meta">
+                        <p class="sg-shop-eyebrow">CURATED OBJECTS</p>
+                        <p class="sg-shop-result-count">
+                            @if($products->total() > 0)
+                                نمایش {{ number_format($products->firstItem()) }} تا {{ number_format($products->lastItem()) }}
+                                از {{ number_format($products->total()) }} محصول
+                            @else
+                                نتیجه‌ای برای نمایش وجود ندارد
+                            @endif
+                        </p>
+                    </div>
+
+                    <div class="sg-shop-toolbar__actions">
+                        <button
+                            type="button"
+                            class="sg-shop-mobile-filter"
+                            @click="filterOpen = true"
+                            aria-haspopup="dialog"
+                        >
+                            <span aria-hidden="true">☷</span>
+                            فیلترها
+                        </button>
+                        <div class="sg-shop-sort">
+                            <x-shop.sorting :products="$products" />
+                        </div>
+                    </div>
                 </div>
 
-            </x-layout.container>
+                @if(request()->filled('category') || request()->filled('search') || request()->filled('min_price') || request()->filled('max_price') || request()->boolean('in_stock') || request()->boolean('installment') || request()->boolean('featured') || request()->boolean('new'))
+                    <div class="sg-shop-active-filters" aria-label="فیلترهای فعال">
+                        @if(request()->filled('category'))
+                            @php $activeCategory = $categories->firstWhere('slug', request('category')); @endphp
+                            <span>{{ $activeCategory?->name ?? request('category') }}</span>
+                        @endif
+                        @if(request()->filled('search')) <span>جستجو: {{ request('search') }}</span> @endif
+                        @if(request()->boolean('in_stock')) <span>موجود</span> @endif
+                        @if(request()->boolean('installment')) <span>خرید اقساطی</span> @endif
+                        @if(request()->boolean('featured')) <span>ویژه</span> @endif
+                        @if(request()->boolean('new')) <span>جدید</span> @endif
+                        <a href="{{ route('shop.index') }}">حذف همه</a>
+                    </div>
+                @endif
 
-        </section>
+                @if($products->isNotEmpty())
+                    <div
+                        class="sg-shop-grid grid--type-a"
+                        data-shop-grid
+                        data-shop-grid-effect="Amun"
+                        aria-label="فهرست محصولات"
+                    >
+                        <div class="grid__sizer" aria-hidden="true"></div>
 
+                        @foreach($products as $product)
+                            <x-product.card
+                                :product="$product"
+                                shop-grid-item
+                                :image-loading="$loop->index < 4 ? 'eager' : 'lazy'"
+                                :image-priority="$loop->index < 2 ? 'high' : 'auto'"
+                            />
+                        @endforeach
+                    </div>
 
-        {{-- =========================================================
-             MOBILE FILTER DRAWER
-        ========================================================== --}}
+                    @if($products->hasPages())
+                        <nav class="sg-shop-pagination" aria-label="صفحه‌بندی محصولات">
+                            {{ $products->withQueryString()->links() }}
+                        </nav>
+                    @endif
+                @else
+                    <section class="sg-shop-empty-state">
+                        <span class="sg-shop-empty-mark" aria-hidden="true">SG</span>
+                        <p class="sg-shop-eyebrow">NO MATCHING PRODUCTS</p>
+                        <h2>محصولی با این مشخصات پیدا نشد.</h2>
+                        <p>فیلترها را تغییر دهید یا همه محصولات فروشگاه را مشاهده کنید.</p>
+                        <a href="{{ route('shop.index') }}">مشاهده همه محصولات</a>
+                    </section>
+                @endif
+            </section>
+
+            {{-- RIGHT CONTROL RAIL: the three original grid geometries --}}
+            <aside class="sg-shop-layout-panel" aria-label="انتخاب چیدمان محصولات">
+                <div class="sg-shop-control-heading">
+                    <span class="sg-shop-eyebrow">VIEW</span>
+                    <h2>چیدمان</h2>
+                </div>
+
+                <div class="sg-shop-layout-options" role="group" aria-label="نوع چیدمان شبکه">
+                    <button type="button" class="sg-shop-layout-option" data-shop-grid-layout="a" aria-pressed="true">
+                        <span class="sg-shop-layout-icon sg-shop-layout-icon--a" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+                        <span>Grid A</span>
+                    </button>
+                    <button type="button" class="sg-shop-layout-option" data-shop-grid-layout="b" aria-pressed="false">
+                        <span class="sg-shop-layout-icon sg-shop-layout-icon--b" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+                        <span>Grid B</span>
+                    </button>
+                    <button type="button" class="sg-shop-layout-option" data-shop-grid-layout="c" aria-pressed="false">
+                        <span class="sg-shop-layout-icon sg-shop-layout-icon--c" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+                        <span>Grid C</span>
+                    </button>
+                </div>
+
+                <p class="sg-shop-layout-hint">
+                    تراکم و فاصله تصاویر را متناسب با سلیقه خود تغییر دهید.
+                </p>
+            </aside>
+        </div>
 
         <x-shop.filter-drawer
             :categories="$categories"
             :selected-category="request('category')"
             :show-categories="false"
         />
-
     </div>
-
 @endsection
