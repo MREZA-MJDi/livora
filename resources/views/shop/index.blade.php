@@ -1,67 +1,15 @@
 @extends('layouts.app')
 
-@section('title', \\App\\Models\\SeoPageSetting::forRoute('shop')?->meta_title ?: 'فروشگاه مبلمان | SillaGallery')
+@section('title', \App\Models\SeoPageSetting::forRoute('shop')?->meta_title ?: 'فروشگاه مبلمان | SillaGallery')
 
 @section(
     'description',
-    (\\App\\Models\\SeoPageSetting::forRoute('shop')?->meta_description ?: 'خرید مبلمان و لوازم خانه از SilaGallery؛ مشاهده محصولات جدید، ویژه، تخفیف‌دار و دارای شرایط خرید اقساطی.')
+    (\App\Models\SeoPageSetting::forRoute('shop')?->meta_description ?: 'خرید مبلمان و لوازم خانه از SilaGallery؛ مشاهده محصولات جدید، ویژه، تخفیف‌دار و دارای شرایط خرید اقساطی.')
 )
 
-@section('canonical', \\App\\Models\\SeoPageSetting::forRoute('shop')?->canonical_url ?: route('shop.index'))
-@section('robots', \\App\\Models\\SeoPageSetting::forRoute('shop')?->robots() ?? \\App\\Models\\SeoSetting::current()->robots())
+@section('canonical', \App\Models\SeoPageSetting::forRoute('shop')?->canonical_url ?: route('shop.index'))
+@section('robots', \App\Models\SeoPageSetting::forRoute('shop')?->robots() ?? \App\Models\SeoSetting::current()->robots())
 
-@push('seo')
-
-    <meta
-        property="og:type"
-        content="website"
-    >
-
-    <meta
-        property="og:title"
-        content="فروشگاه مبلمان | SilaGallery"
-    >
-
-    <meta
-        property="og:description"
-        content="مجموعه مبلمان و لوازم خانه SilaGallery را ببینید و محصول مناسب فضای خود را پیدا کنید."
-    >
-
-    <meta
-        property="og:url"
-        content="{{ route('shop.index') }}"
-    >
-
-    <meta
-        name="twitter:card"
-        content="summary_large_image"
-    >
-
-    <meta
-        name="twitter:title"
-        content="فروشگاه مبلمان | SilaGallery"
-    >
-
-    <meta
-        name="twitter:description"
-        content="مجموعه منتخب SilaGallery برای خانه‌ای زیباتر و ماندگارتر."
-    >
-
-    <script type="application/ld+json">
-    {
-        "@@context": "https://schema.org",
-        "@@type": "WebSite",
-        "name": "SilaGallery",
-        "url": @json(url('/')),
-        "potentialAction": {
-            "@@type": "SearchAction",
-            "target": @json(url('/shop') . '?search={search_term_string}'),
-            "query-input": "required name=search_term_string"
-        }
-    }
-    </script>
-
-@endpush
 
 
 @section('content')

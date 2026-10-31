@@ -2,11 +2,19 @@
 <html lang="fa" dir="rtl">
 <head>
     @php
-        $siteSeo = \\App\\Models\\SeoSetting::current();
-        $pageSeo = \\App\\Models\\SeoPageSetting::forRoute(\\Illuminate\\Support\\Facades\\Route::currentRouteName());
+        $siteSeo = \App\Models\SeoSetting::current();
+        $pageSeo = \App\Models\SeoPageSetting::forRoute(\Illuminate\Support\Facades\Route::currentRouteName());
         $seoTitle = trim($__env->yieldContent('title')) ?: ($pageSeo?->meta_title ?: ($siteSeo->default_title ?: 'SillaGallery'));
         $seoDescription = trim($__env->yieldContent('description')) ?: ($pageSeo?->meta_description ?: ($siteSeo->default_description ?: 'فروشگاه SillaGallery'));
-        $seoRobots = trim($__env->yieldContent('robots')) ?: ($pageSeo?->robots() ?: $siteSeo->robots());
+        $routeName = (string) \Illuminate\Support\Facades\Route::currentRouteName();
+        $privateRoute = in_array($routeName, [
+            'login', 'register', 'password.request', 'password.reset',
+            'account.index', 'account.profile.edit', 'account.addresses.index',
+            'account.orders.index', 'account.wishlist.index',
+        ], true) || request()->is('account/*', 'cart/*', 'checkout/*', 'login', 'register', 'forgot-password', 'reset-password/*');
+        $seoRobots = $privateRoute
+            ? 'noindex, nofollow'
+            : (trim($__env->yieldContent('robots')) ?: ($pageSeo?->robots() ?: $siteSeo->robots()));
         $seoCanonical = trim($__env->yieldContent('canonical')) ?: ($pageSeo?->canonical_url ?: url()->current());
         $seoOgTitle = trim($__env->yieldContent('og_title')) ?: $seoTitle;
         $seoOgDescription = trim($__env->yieldContent('og_description')) ?: $seoDescription;
