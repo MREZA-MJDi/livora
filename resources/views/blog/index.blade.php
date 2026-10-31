@@ -8,7 +8,7 @@
 @section('content')
 <section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
     <header class="mb-10 max-w-2xl">
-        <p class="text-xs uppercase tracking-[0.2em] text-[var(--sg-accent)]">SILAGALLERY JOURNAL</p>
+        <p class="text-xs uppercase tracking-[0.2em] text-[var(--sg-accent)]">SILLAGALLERY JOURNAL</p>
         <h1 class="mt-3 text-3xl font-semibold text-[var(--sg-ink)]">{{ isset($activeTag) ? 'مطالب: '.$activeTag->name : 'مجله SillaGallery' }}</h1>
         <p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">راهنماها، ایده‌ها و مطالب مرتبط با انتخاب و نگهداری مبلمان و فضای زندگی.</p>
     </header>
