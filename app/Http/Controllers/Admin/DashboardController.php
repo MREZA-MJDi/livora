@@ -3,17 +3,17 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\HomepageHeroItem;
+use App\Models\HomepageHeroSetting;
 use App\Models\Order;
-use AppModelsHomepageHeroItem;
-use AppModelsHomepageHeroSetting;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use IlluminateHttpRequest;
-use IlluminateSupportFacadesDB;
-use IlluminateSupportFacadesStorage;
-use IlluminateValidationValidationException;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 class DashboardController extends Controller
 {

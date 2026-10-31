@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\HomepageHeroItem;
+use App\Models\HomepageHeroSetting;
 use App\Models\Product;
-use AppModelsHomepageHeroItem;
-use AppModelsHomepageHeroSetting;
 use Illuminate\Contracts\View\View;
 
 class HomeController extends Controller
