@@ -173,7 +173,7 @@ class BlogPostController extends Controller
 
     private function syncTags(string $input): array
     {
-        $names = collect(explode(',', $input))
+        $names = collect(preg_split('/[,،]/u', $input) ?: [])
             ->map(fn ($name) => trim(preg_replace('/\s+/u', ' ', $name) ?? ''))
             ->filter()
             ->unique(fn ($name) => mb_strtolower($name))
