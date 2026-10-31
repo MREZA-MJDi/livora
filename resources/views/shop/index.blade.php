@@ -157,6 +157,7 @@
                                     <x-shop.filters
                                         :categories="$categories"
                                         :selected-category="request('category')"
+                                        :show-categories="false"
                                     />
 
                                 </form>
@@ -272,7 +273,7 @@
                                         </span>
                                         <span class="shop-category-tab__meta">
                                             <span class="shop-category-tab__name">همه محصولات</span>
-                                            <span class="shop-category-tab__count">{{ number_format($products->total()) }} محصول</span>
+                                            <span class="shop-category-tab__count">همه دسته‌بندی‌ها</span>
                                         </span>
                                     </a>
 
@@ -509,6 +510,7 @@
         <x-shop.filter-drawer
             :categories="$categories"
             :selected-category="request('category')"
+            :show-categories="false"
         />
 
     </div>

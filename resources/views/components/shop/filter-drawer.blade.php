@@ -1,6 +1,7 @@
 @props([
 'categories' => collect(),
 'selectedCategory' => null,
+'showCategories' => true,
 ])
 
 <div
@@ -110,6 +111,7 @@
                     mobile
                     :categories="$categories"
                     :selected-category="$selectedCategory"
+                    :show-categories="$showCategories"
                 />
 
             </div>

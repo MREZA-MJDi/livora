@@ -2,9 +2,12 @@
 'categories' => collect(),
 'selectedCategory' => null,
 'mobile' => false,
+'showCategories' => true,
 ])
 
 <div class="space-y-5">
+
+    @if($showCategories)
 
     {{-- =========================================================
          CATEGORY
@@ -80,6 +83,9 @@
         </div>
 
     </section>
+
+
+    @endif
 
 
     {{-- =========================================================
