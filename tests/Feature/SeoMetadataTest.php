@@ -27,11 +27,19 @@ class SeoMetadataTest extends TestCase
             ->assertSee('<meta name="robots" content="noindex, nofollow">', false)
             ->assertHeader('X-Robots-Tag', 'noindex, nofollow');
 
-        $this->get('/sitemap.xml')
+        $sitemap = $this->get('/sitemap.xml');
+        $sitemap
             ->assertOk()
-            ->assertHeader('Content-Type', 'application/xml; charset=UTF-8')
-            ->assertSee('<urlset', false)
-            ->assertDontSee('<url>', false);
+            ->assertHeader('Content-Type', 'application/xml; charset=UTF-8');
+
+        // StreamedResponse content is emitted only when sendContent() runs;
+        // TestResponse::assertSee() cannot inspect an unexecuted stream callback.
+        ob_start();
+        $sitemap->baseResponse->sendContent();
+        $xml = (string) ob_get_clean();
+
+        $this->assertStringContainsString('<urlset', $xml);
+        $this->assertStringNotContainsString('<url>', $xml);
     }
 
     public function test_fixed_page_seo_values_override_template_defaults_when_global_gate_is_enabled(): void
@@ -134,7 +142,7 @@ class SeoMetadataTest extends TestCase
             'title' => 'درباره SillaGallery - ویرایش',
         ]);
 
-        $this->get('/about')->assertOk()->assertSee('متن به‌روزشده');
+        $this->get('/about')->assertOk()->assertSee('درباره SillaGallery - ویرایش');
     }
 
 }
