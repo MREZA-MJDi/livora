@@ -80,9 +80,9 @@
     filterOpen: false,
     searchReturnFocus: null,
     openSearch(trigger) {
-        const openedFromMenu = trigger?.closest?.('[data-livora-mobile-menu]');
+        const openedFromMenu = trigger?.closest?.('[data-sg-mobile-menu]');
         this.searchReturnFocus = openedFromMenu
-            ? document.querySelector('[data-livora-search-trigger]')
+            ? document.querySelector('[data-sg-search-trigger]')
             : (trigger || document.activeElement);
         this.mobileOpen = false;
         this.searchOpen = true;
@@ -93,7 +93,7 @@
         this.$nextTick(() => {
             const target = this.searchReturnFocus;
             if (target?.isConnected && target.offsetParent !== null) target.focus?.({ preventScroll: true });
-            else document.querySelector('[data-livora-search-trigger]')?.focus({ preventScroll: true });
+            else document.querySelector('[data-sg-search-trigger]')?.focus({ preventScroll: true });
         });
     }
 }" class="min-h-screen pb-24 lg:pb-0">

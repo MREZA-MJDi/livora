@@ -1,11 +1,11 @@
 @extends('errors.layout')
 
-@section('title', 'درخواست منقضی شد | SilaGallery')
+@section('title', 'درخواست منقضی شد | SillaGallery')
 
 @section('content')
 <div class="wrap">
     <main class="card">
-        <div class="brand">SilaGallery</div>
+        <div class="brand">SillaGallery</div>
         <div class="code">419</div>
         <h1>درخواست شما منقضی شده است.</h1>
         <p>احتمالاً صفحه برای مدتی باز مانده بود. صفحه را تازه کنید و دوباره تلاش کنید.</p>

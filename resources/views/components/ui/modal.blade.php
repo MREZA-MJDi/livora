@@ -91,13 +91,13 @@
                     x-transition:leave-start="translate-y-0 scale-100 opacity-100"
                     x-transition:leave-end="translate-y-4 scale-[0.98] opacity-0"
                     @click.stop
-                    class="relative flex max-h-[90vh] w-full {{ $panelSize }} flex-col overflow-hidden rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] shadow-2xl"
+                    class="relative flex max-h-[90vh] w-full {{ $panelSize }} flex-col overflow-hidden rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] shadow-2xl"
                 >
 
                     {{-- Header --}}
                     @if($title || $description || $closeButton)
 
-                        <div class="flex items-start justify-between gap-5 border-b border-[var(--livora-border)] px-5 py-5 sm:px-7 sm:py-6">
+                        <div class="flex items-start justify-between gap-5 border-b border-[var(--sg-border)] px-5 py-5 sm:px-7 sm:py-6">
 
                             <div class="min-w-0">
 
@@ -105,7 +105,7 @@
 
                                     <h2
                                         id="{{ $name }}-title"
-                                        class="text-lg font-semibold tracking-tight text-[var(--livora-ink)]"
+                                        class="text-lg font-semibold tracking-tight text-[var(--sg-ink)]"
                                     >
                                         {{ $title }}
                                     </h2>
@@ -114,7 +114,7 @@
 
                                 @if($description)
 
-                                    <p class="mt-2 text-xs leading-7 text-[var(--livora-stone)]">
+                                    <p class="mt-2 text-xs leading-7 text-[var(--sg-stone)]">
                                         {{ $description }}
                                     </p>
 
@@ -129,7 +129,7 @@
                                     type="button"
                                     aria-label="بستن"
                                     @click="closeModal()"
-                                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[var(--livora-stone)] transition hover:bg-[var(--livora-surface)] hover:text-[var(--livora-ink)]"
+                                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[var(--sg-stone)] transition hover:bg-[var(--sg-surface)] hover:text-[var(--sg-ink)]"
                                 >
 
                                     <svg
@@ -167,7 +167,7 @@
                     {{-- Optional Footer --}}
                     @isset($footer)
 
-                        <div class="border-t border-[var(--livora-border)] bg-[var(--livora-surface)] px-5 py-4 sm:px-7 sm:py-5">
+                        <div class="border-t border-[var(--sg-border)] bg-[var(--sg-surface)] px-5 py-4 sm:px-7 sm:py-5">
 
                             {{ $footer }}
 

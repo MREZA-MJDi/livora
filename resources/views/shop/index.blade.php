@@ -15,7 +15,7 @@
 @section('content')
 
     <div
-        class="overflow-hidden bg-[var(--livora-cream)]"
+        class="overflow-hidden bg-[var(--sg-cream)]"
         x-data="{
             filterOpen: false
         }"
@@ -25,7 +25,7 @@
              SHOP HEADER
         ========================================================== --}}
 
-        <section class="border-b border-[var(--livora-border)] bg-[var(--livora-white)]">
+        <section class="border-b border-[var(--sg-border)] bg-[var(--sg-white)]">
 
             <x-layout.container>
 
@@ -35,19 +35,19 @@
 
                     <nav
                         aria-label="breadcrumb"
-                        class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--livora-stone)]"
+                        class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--sg-stone)]"
                     >
 
                         <a
                             href="{{ route('home') }}"
-                            class="transition hover:text-[var(--livora-ink)]"
+                            class="transition hover:text-[var(--sg-ink)]"
                         >
                             خانه
                         </a>
 
                         <span>/</span>
 
-                        <span class="text-[var(--livora-ink)]">
+                        <span class="text-[var(--sg-ink)]">
                             فروشگاه
                         </span>
 
@@ -60,15 +60,15 @@
 
                         <div class="max-w-3xl">
 
-                            <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--livora-accent)]">
-                                SilaGallery COLLECTION
+                            <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
+                                SillaGallery COLLECTION
                             </p>
 
-                            <h1 class="mt-3 text-4xl font-semibold tracking-tight text-[var(--livora-ink)] sm:text-5xl">
+                            <h1 class="mt-3 text-4xl font-semibold tracking-tight text-[var(--sg-ink)] sm:text-5xl">
                                 فروشگاه
                             </h1>
 
-                            <p class="mt-4 max-w-2xl text-sm leading-8 text-[var(--livora-stone)]">
+                            <p class="mt-4 max-w-2xl text-sm leading-8 text-[var(--sg-stone)]">
                                 مجموعه‌ای منتخب از مبلمان و عناصر خانه برای فضاهایی که قرار است
                                 شخصیت و ماندگاری داشته باشند.
                             </p>
@@ -76,9 +76,9 @@
                         </div>
 
 
-                        <div class="text-sm text-[var(--livora-stone)]">
+                        <div class="text-sm text-[var(--sg-stone)]">
 
-                            <span class="font-semibold text-[var(--livora-ink)]">
+                            <span class="font-semibold text-[var(--sg-ink)]">
                                 {{ number_format($products->total()) }}
                             </span>
 
@@ -119,13 +119,13 @@
                                  FILTER CARD
                             ================================================== --}}
 
-                            <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-5">
+                            <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
 
                                 <div class="flex items-center justify-between gap-3">
 
                                     <div>
 
-                                        <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                                        <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
                                             DISCOVER
                                         </p>
 
@@ -138,7 +138,7 @@
 
                                     <a
                                         href="{{ route('shop.index') }}"
-                                        class="shrink-0 text-[11px] text-[var(--livora-stone)] transition hover:text-[var(--livora-accent)]"
+                                        class="shrink-0 text-[11px] text-[var(--sg-stone)] transition hover:text-[var(--sg-accent)]"
                                     >
                                         پاک کردن
                                     </a>
@@ -168,17 +168,17 @@
                                  DISCOVERY BOX
                             ================================================== --}}
 
-                            <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-surface)] p-5">
+                            <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-surface)] p-5">
 
-                                <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
-                                    SilaGallery
+                                <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
+                                    SillaGallery
                                 </p>
 
                                 <h3 class="mt-3 text-sm font-semibold">
                                     انتخاب آگاهانه
                                 </h3>
 
-                                <p class="mt-2 text-xs leading-7 text-[var(--livora-stone)]">
+                                <p class="mt-2 text-xs leading-7 text-[var(--sg-stone)]">
                                     قیمت، طراحی، موجودی و شرایط خرید اقساطی را
                                     قبل از انتخاب محصول بررسی کنید.
                                 </p>
@@ -206,7 +206,7 @@
                             <button
                                 type="button"
                                 @click="filterOpen = true"
-                                class="inline-flex items-center gap-2 rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] px-4 py-3 text-sm font-medium text-[var(--livora-ink)] transition hover:border-[var(--livora-ink)]"
+                                class="inline-flex items-center gap-2 rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] px-4 py-3 text-sm font-medium text-[var(--sg-ink)] transition hover:border-[var(--sg-ink)]"
                             >
 
                                 <svg
@@ -229,9 +229,9 @@
                             </button>
 
 
-                            <span class="text-xs text-[var(--livora-stone)]">
+                            <span class="text-xs text-[var(--sg-stone)]">
 
-                                <span class="font-medium text-[var(--livora-ink)]">
+                                <span class="font-medium text-[var(--sg-ink)]">
                                     {{ number_format($products->total()) }}
                                 </span>
 
@@ -246,18 +246,18 @@
                              SORTING TOOLBAR
                         ================================================== --}}
 
-                        <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-4 sm:p-5">
+                        <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-4 sm:p-5">
 
                             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
                                 <div class="min-w-0">
 
-                                    <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                                    <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
                                         CURATED PRODUCTS
                                     </p>
 
-                                    <p class="mt-2 text-sm font-medium text-[var(--livora-ink)]">
-                                        مجموعه SilaGallery
+                                    <p class="mt-2 text-sm font-medium text-[var(--sg-ink)]">
+                                        مجموعه SillaGallery
                                     </p>
 
                                 </div>
@@ -292,17 +292,17 @@
 
                             <div class="mt-5 flex flex-wrap items-center gap-2">
 
-                                <span class="text-xs text-[var(--livora-stone)]">
+                                <span class="text-xs text-[var(--sg-stone)]">
                                     فیلتر فعال:
                                 </span>
 
-                                <span class="inline-flex items-center rounded-full border border-[var(--livora-border)] bg-[var(--livora-white)] px-3 py-1.5 text-[11px] text-[var(--livora-ink)]">
+                                <span class="inline-flex items-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)] px-3 py-1.5 text-[11px] text-[var(--sg-ink)]">
                                     {{ $activeCategory?->name ?? request('category') }}
                                 </span>
 
                                 <a
                                     href="{{ route('shop.index') }}"
-                                    class="inline-flex items-center rounded-full border border-[var(--livora-border)] px-3 py-1.5 text-[11px] text-[var(--livora-stone)] transition hover:border-[var(--livora-ink)] hover:text-[var(--livora-ink)]"
+                                    class="inline-flex items-center rounded-full border border-[var(--sg-border)] px-3 py-1.5 text-[11px] text-[var(--sg-stone)] transition hover:border-[var(--sg-ink)] hover:text-[var(--sg-ink)]"
                                 >
                                     حذف
                                 </a>
@@ -320,23 +320,23 @@
 
                             <div class="mt-6">
 
-                                <p class="text-xs text-[var(--livora-stone)]">
+                                <p class="text-xs text-[var(--sg-stone)]">
 
                                     نمایش
 
-                                    <span class="font-medium text-[var(--livora-ink)]">
+                                    <span class="font-medium text-[var(--sg-ink)]">
                                         {{ number_format($products->firstItem()) }}
                                     </span>
 
                                     تا
 
-                                    <span class="font-medium text-[var(--livora-ink)]">
+                                    <span class="font-medium text-[var(--sg-ink)]">
                                         {{ number_format($products->lastItem()) }}
                                     </span>
 
                                     از
 
-                                    <span class="font-medium text-[var(--livora-ink)]">
+                                    <span class="font-medium text-[var(--sg-ink)]">
                                         {{ number_format($products->total()) }}
                                     </span>
 
@@ -390,26 +390,26 @@
                                  EMPTY STATE
                             ================================================== --}}
 
-                            <div class="mt-8 rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] px-6 py-24 text-center">
+                            <div class="mt-8 rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] px-6 py-24 text-center">
 
-                                <span class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--livora-surface)] text-sm text-[var(--livora-stone)]">
+                                <span class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--sg-surface)] text-sm text-[var(--sg-stone)]">
                                     —
                                 </span>
 
 
-                                <h2 class="mt-6 text-2xl font-semibold text-[var(--livora-ink)]">
+                                <h2 class="mt-6 text-2xl font-semibold text-[var(--sg-ink)]">
                                     محصولی پیدا نشد
                                 </h2>
 
 
-                                <p class="mx-auto mt-3 max-w-md text-sm leading-7 text-[var(--livora-stone)]">
+                                <p class="mx-auto mt-3 max-w-md text-sm leading-7 text-[var(--sg-stone)]">
                                     فیلترها یا عبارت جستجو را تغییر دهید و دوباره مجموعه محصولات را بررسی کنید.
                                 </p>
 
 
                                 <a
                                     href="{{ route('shop.index') }}"
-                                    class="mt-7 inline-flex rounded-2xl bg-[var(--livora-ink)] px-6 py-3.5 text-sm font-medium text-white transition hover:bg-[var(--livora-accent)]"
+                                    class="mt-7 inline-flex rounded-2xl bg-[var(--sg-ink)] px-6 py-3.5 text-sm font-medium text-white transition hover:bg-[var(--sg-accent)]"
                                 >
                                     مشاهده همه محصولات
                                 </a>

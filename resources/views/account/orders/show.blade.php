@@ -2,12 +2,12 @@
 
 @section(
     'title',
-    'سفارش ' . $order->order_number . ' | SilaGallery'
+    'سفارش ' . $order->order_number . ' | SillaGallery'
 )
 
 @section(
     'description',
-    'جزئیات سفارش ' . $order->order_number . ' در SilaGallery.'
+    'جزئیات سفارش ' . $order->order_number . ' در SillaGallery.'
 )
 
 @push('seo')
@@ -78,22 +78,22 @@
 
     @endphp
 
-    <div class="bg-[var(--livora-cream)]">
+    <div class="bg-[var(--sg-cream)]">
 
         {{-- =========================================================
              HEADER
         ========================================================== --}}
-        <section class="border-b border-[var(--livora-border)] bg-[var(--livora-white)]">
+        <section class="border-b border-[var(--sg-border)] bg-[var(--sg-white)]">
 
             <x-layout.container>
 
                 <div class="py-8 sm:py-10">
 
-                    <div class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--livora-stone)]">
+                    <div class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--sg-stone)]">
 
                         <a
                             href="{{ route('home') }}"
-                            class="transition hover:text-[var(--livora-ink)]"
+                            class="transition hover:text-[var(--sg-ink)]"
                         >
                             خانه
                         </a>
@@ -102,7 +102,7 @@
 
                         <a
                             href="{{ route('account.index') }}"
-                            class="transition hover:text-[var(--livora-ink)]"
+                            class="transition hover:text-[var(--sg-ink)]"
                         >
                             حساب کاربری
                         </a>
@@ -111,14 +111,14 @@
 
                         <a
                             href="{{ route('account.orders.index') }}"
-                            class="transition hover:text-[var(--livora-ink)]"
+                            class="transition hover:text-[var(--sg-ink)]"
                         >
                             سفارش‌ها
                         </a>
 
                         <span>/</span>
 
-                        <span class="text-[var(--livora-ink)]">
+                        <span class="text-[var(--sg-ink)]">
                         {{ $order->order_number }}
                     </span>
 
@@ -128,7 +128,7 @@
 
                         <div>
 
-                            <p class="text-[10px] uppercase tracking-[0.22em] text-[var(--livora-accent)]">
+                            <p class="text-[10px] uppercase tracking-[0.22em] text-[var(--sg-accent)]">
                                 ORDER DETAILS
                             </p>
 
@@ -136,7 +136,7 @@
                                 سفارش {{ $order->order_number }}
                             </h1>
 
-                            <p class="mt-2 text-sm text-[var(--livora-stone)]">
+                            <p class="mt-2 text-sm text-[var(--sg-stone)]">
                                 {{ optional($order->created_at)->format('Y/m/d - H:i') }}
                             </p>
 
@@ -179,11 +179,11 @@
                     <div class="space-y-6">
 
                         {{-- Progress --}}
-                        <div class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-6 sm:p-7">
+                        <div class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-6 sm:p-7">
 
                             <div class="mb-7">
 
-                                <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--livora-accent)]">
+                                <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--sg-accent)]">
                                     ORDER STATUS
                                 </p>
 
@@ -226,11 +226,11 @@
 
                                     <div class="text-center">
 
-                                        <div class="mx-auto flex h-9 w-9 items-center justify-center rounded-full {{ $done ? 'bg-[var(--livora-ink)] text-white' : 'bg-[var(--livora-surface)] text-[var(--livora-stone)]' }} text-[10px] font-semibold">
+                                        <div class="mx-auto flex h-9 w-9 items-center justify-center rounded-full {{ $done ? 'bg-[var(--sg-ink)] text-white' : 'bg-[var(--sg-surface)] text-[var(--sg-stone)]' }} text-[10px] font-semibold">
                                             {{ $stepNumber }}
                                         </div>
 
-                                        <p class="mt-2 text-[10px] leading-5 {{ $done ? 'font-medium text-[var(--livora-ink)]' : 'text-[var(--livora-stone)]' }}">
+                                        <p class="mt-2 text-[10px] leading-5 {{ $done ? 'font-medium text-[var(--sg-ink)]' : 'text-[var(--sg-stone)]' }}">
                                             {{ $label }}
                                         </p>
 
@@ -252,11 +252,11 @@
 
 
                         {{-- Items --}}
-                        <div class="overflow-hidden rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)]">
+                        <div class="overflow-hidden rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)]">
 
-                            <div class="border-b border-[var(--livora-border)] p-6 sm:p-7">
+                            <div class="border-b border-[var(--sg-border)] p-6 sm:p-7">
 
-                                <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--livora-accent)]">
+                                <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--sg-accent)]">
                                     PRODUCTS
                                 </p>
 
@@ -266,13 +266,13 @@
 
                             </div>
 
-                            <div class="divide-y divide-[var(--livora-border)]">
+                            <div class="divide-y divide-[var(--sg-border)]">
 
                                 @foreach($order->items as $item)
 
                                     <div class="flex gap-4 p-5 sm:p-7">
 
-                                        <div class="h-20 w-20 shrink-0 overflow-hidden rounded-2xl bg-[var(--livora-surface)]">
+                                        <div class="h-20 w-20 shrink-0 overflow-hidden rounded-2xl bg-[var(--sg-surface)]">
 
                                             @if($item->product?->images?->first()?->url)
 
@@ -285,8 +285,8 @@
 
                                             @else
 
-                                                <div class="flex h-full w-full items-center justify-center text-[10px] tracking-wider text-[var(--livora-stone)]">
-                                                    SilaGallery
+                                                <div class="flex h-full w-full items-center justify-center text-[10px] tracking-wider text-[var(--sg-stone)]">
+                                                    SillaGallery
                                                 </div>
 
                                             @endif
@@ -314,10 +314,10 @@
 
                                                             @foreach($variantOptions as $option)
 
-                                                                <span class="rounded-full border border-[var(--livora-border)] bg-[var(--livora-surface)] px-2.5 py-1 text-[9px] text-[var(--livora-stone)]">
+                                                                <span class="rounded-full border border-[var(--sg-border)] bg-[var(--sg-surface)] px-2.5 py-1 text-[9px] text-[var(--sg-stone)]">
 
                                                                     {{ $option['name'] ?? $option['type'] ?? 'ویژگی' }}:
-                                                                    <span class="font-medium text-[var(--livora-ink)]">
+                                                                    <span class="font-medium text-[var(--sg-ink)]">
                                                                         {{ $option['value'] ?? '—' }}
                                                                     </span>
 
@@ -329,14 +329,14 @@
 
                                                     @endif
 
-                                                    <p class="mt-2 text-xs text-[var(--livora-stone)]">
+                                                    <p class="mt-2 text-xs text-[var(--sg-stone)]">
                                                         تعداد:
                                                         {{ number_format($item->quantity) }}
                                                     </p>
 
                                                     @if($item->sku)
 
-                                                        <p class="mt-1 text-[10px] text-[var(--livora-stone)]">
+                                                        <p class="mt-1 text-[10px] text-[var(--sg-stone)]">
                                                             SKU:
                                                             {{ $item->sku }}
                                                         </p>
@@ -366,7 +366,7 @@
                         {{-- Installments --}}
                         @if($isInstallment && $order->installments->isNotEmpty())
 
-                            <div class="overflow-hidden rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-ink)] text-white">
+                            <div class="overflow-hidden rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-ink)] text-white">
 
                                 <div class="p-6 sm:p-7">
 
@@ -386,7 +386,7 @@
 
                                 <div class="grid grid-cols-1 gap-px bg-white/10 sm:grid-cols-3">
 
-                                    <div class="bg-[var(--livora-ink)] p-5 sm:p-6">
+                                    <div class="bg-[var(--sg-ink)] p-5 sm:p-6">
 
                                         <p class="text-[10px] text-white/45">
                                             کل برنامه
@@ -402,7 +402,7 @@
 
                                     </div>
 
-                                    <div class="bg-[var(--livora-ink)] p-5 sm:p-6">
+                                    <div class="bg-[var(--sg-ink)] p-5 sm:p-6">
 
                                         <p class="text-[10px] text-white/45">
                                             پرداخت‌شده
@@ -418,7 +418,7 @@
 
                                     </div>
 
-                                    <div class="bg-[var(--livora-ink)] p-5 sm:p-6">
+                                    <div class="bg-[var(--sg-ink)] p-5 sm:p-6">
 
                                         <p class="text-[10px] text-white/45">
                                             باقی‌مانده
@@ -527,9 +527,9 @@
 
 
                         {{-- Address --}}
-                        <div class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-6 sm:p-7">
+                        <div class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-6 sm:p-7">
 
-                            <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--livora-accent)]">
+                            <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--sg-accent)]">
                                 DELIVERY
                             </p>
 
@@ -540,7 +540,7 @@
                             <div class="mt-6 grid gap-5 sm:grid-cols-2">
 
                                 <div>
-                                    <p class="text-[10px] text-[var(--livora-stone)]">
+                                    <p class="text-[10px] text-[var(--sg-stone)]">
                                         گیرنده
                                     </p>
 
@@ -551,7 +551,7 @@
                                 </div>
 
                                 <div>
-                                    <p class="text-[10px] text-[var(--livora-stone)]">
+                                    <p class="text-[10px] text-[var(--sg-stone)]">
                                         تلفن
                                     </p>
 
@@ -561,7 +561,7 @@
                                 </div>
 
                                 <div>
-                                    <p class="text-[10px] text-[var(--livora-stone)]">
+                                    <p class="text-[10px] text-[var(--sg-stone)]">
                                         استان / شهر
                                     </p>
 
@@ -573,7 +573,7 @@
                                 </div>
 
                                 <div>
-                                    <p class="text-[10px] text-[var(--livora-stone)]">
+                                    <p class="text-[10px] text-[var(--sg-stone)]">
                                         کد پستی
                                     </p>
 
@@ -584,7 +584,7 @@
 
                                 <div class="sm:col-span-2">
 
-                                    <p class="text-[10px] text-[var(--livora-stone)]">
+                                    <p class="text-[10px] text-[var(--sg-stone)]">
                                         آدرس
                                     </p>
 
@@ -610,9 +610,9 @@
                     ================================================== --}}
                     <aside class="space-y-5 lg:sticky lg:top-28 lg:self-start">
 
-                        <div class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-6 sm:p-7">
+                        <div class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-6 sm:p-7">
 
-                            <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--livora-accent)]">
+                            <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--sg-accent)]">
                                 SUMMARY
                             </p>
 
@@ -623,7 +623,7 @@
                             <div class="mt-6 space-y-4">
 
                                 <div class="flex items-center justify-between gap-4">
-                                <span class="text-sm text-[var(--livora-stone)]">
+                                <span class="text-sm text-[var(--sg-stone)]">
                                     مبلغ محصولات
                                 </span>
 
@@ -633,7 +633,7 @@
                                 </div>
 
                                 <div class="flex items-center justify-between gap-4">
-                                <span class="text-sm text-[var(--livora-stone)]">
+                                <span class="text-sm text-[var(--sg-stone)]">
                                     ارسال
                                 </span>
 
@@ -643,7 +643,7 @@
                                 </div>
 
                                 <div class="flex items-center justify-between gap-4">
-                                <span class="text-sm text-[var(--livora-stone)]">
+                                <span class="text-sm text-[var(--sg-stone)]">
                                     تخفیف
                                 </span>
 
@@ -654,11 +654,11 @@
 
                             </div>
 
-                            <div class="my-6 h-px bg-[var(--livora-border)]"></div>
+                            <div class="my-6 h-px bg-[var(--sg-border)]"></div>
 
                             <div class="flex items-end justify-between">
 
-                            <span class="text-sm text-[var(--livora-stone)]">
+                            <span class="text-sm text-[var(--sg-stone)]">
                                 مبلغ نهایی
                             </span>
 
@@ -668,7 +668,7 @@
                                         {{ number_format((float) $order->total) }}
                                     </p>
 
-                                    <p class="mt-1 text-[10px] text-[var(--livora-stone)]">
+                                    <p class="mt-1 text-[10px] text-[var(--sg-stone)]">
                                         تومان
                                     </p>
 
@@ -681,9 +681,9 @@
 
                         @if($order->payment_provider || $order->payment_method)
 
-                            <div class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-surface)] p-5 sm:p-6">
+                            <div class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-surface)] p-5 sm:p-6">
 
-                                <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                                <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
                                     PAYMENT
                                 </p>
 
@@ -694,7 +694,7 @@
                                 <div class="mt-4 space-y-3 text-xs">
 
                                     <div class="flex justify-between gap-4">
-                                    <span class="text-[var(--livora-stone)]">
+                                    <span class="text-[var(--sg-stone)]">
                                         روش
                                     </span>
 
@@ -706,7 +706,7 @@
                                     @if($order->payment_provider)
 
                                         <div class="flex justify-between gap-4">
-                                        <span class="text-[var(--livora-stone)]">
+                                        <span class="text-[var(--sg-stone)]">
                                             سرویس
                                         </span>
 
@@ -718,7 +718,7 @@
                                     @endif
 
                                     <div class="flex justify-between gap-4">
-                                    <span class="text-[var(--livora-stone)]">
+                                    <span class="text-[var(--sg-stone)]">
                                         وضعیت
                                     </span>
 
@@ -734,18 +734,18 @@
                         @endif
 
 
-                        <div class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-5 sm:p-6">
+                        <div class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-5 sm:p-6">
 
                             <a
                                 href="{{ route('account.orders.index') }}"
-                                class="flex w-full items-center justify-center rounded-2xl border border-[var(--livora-border)] px-5 py-3.5 text-sm font-medium transition hover:border-[var(--livora-ink)]"
+                                class="flex w-full items-center justify-center rounded-2xl border border-[var(--sg-border)] px-5 py-3.5 text-sm font-medium transition hover:border-[var(--sg-ink)]"
                             >
                                 بازگشت به سفارش‌ها
                             </a>
 
                             <a
                                 href="{{ route('shop.index') }}"
-                                class="mt-3 flex w-full items-center justify-center rounded-2xl bg-[var(--livora-ink)] px-5 py-3.5 text-sm font-medium text-white transition hover:bg-[var(--livora-accent)]"
+                                class="mt-3 flex w-full items-center justify-center rounded-2xl bg-[var(--sg-ink)] px-5 py-3.5 text-sm font-medium text-white transition hover:bg-[var(--sg-accent)]"
                             >
                                 ادامه خرید
                             </a>

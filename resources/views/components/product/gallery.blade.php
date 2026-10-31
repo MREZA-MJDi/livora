@@ -35,7 +35,7 @@
 
     $productName =
         $resolvedProduct?->name
-        ?? 'محصول SilaGallery';
+        ?? 'محصول SillaGallery';
 
     /*
     |--------------------------------------------------------------------------
@@ -137,7 +137,7 @@
          MAIN IMAGE
     ========================================================== --}}
 
-    <div class="product-gallery-shell group relative overflow-hidden rounded-[2rem] bg-[var(--livora-surface)]">
+    <div class="product-gallery-shell group relative overflow-hidden rounded-[2rem] bg-[var(--sg-surface)]">
 
         @if($imageCount > 0)
 
@@ -192,7 +192,7 @@
                         type="button"
                         aria-label="تصویر قبلی"
                         @click.stop="previous()"
-                        class="absolute right-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/30 text-white shadow-sm backdrop-blur-xl transition hover:bg-white hover:text-[var(--livora-ink)] focus-visible:bg-white focus-visible:text-[var(--livora-ink)] sm:opacity-85"
+                        class="absolute right-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/30 text-white shadow-sm backdrop-blur-xl transition hover:bg-white hover:text-[var(--sg-ink)] focus-visible:bg-white focus-visible:text-[var(--sg-ink)] sm:opacity-85"
                     >
 
                         <svg
@@ -220,7 +220,7 @@
                         type="button"
                         aria-label="تصویر بعدی"
                         @click.stop="next()"
-                        class="absolute left-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/30 text-white shadow-sm backdrop-blur-xl transition hover:bg-white hover:text-[var(--livora-ink)] focus-visible:bg-white focus-visible:text-[var(--livora-ink)] sm:opacity-85"
+                        class="absolute left-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/30 text-white shadow-sm backdrop-blur-xl transition hover:bg-white hover:text-[var(--sg-ink)] focus-visible:bg-white focus-visible:text-[var(--sg-ink)] sm:opacity-85"
                     >
 
                         <svg
@@ -282,15 +282,15 @@
 
                 <div class="text-center">
 
-                    <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)]">
+                    <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)]">
 
-                        <span class="text-xs tracking-[0.2em] text-[var(--livora-stone)]">
+                        <span class="text-xs tracking-[0.2em] text-[var(--sg-stone)]">
                             LV
                         </span>
 
                     </div>
 
-                    <p class="mt-4 text-xs text-[var(--livora-stone)]">
+                    <p class="mt-4 text-xs text-[var(--sg-stone)]">
                         تصویر محصول موجود نیست
                     </p>
 
@@ -318,10 +318,10 @@
                     @click="active = {{ $index }}"
                     :aria-current="active === {{ $index }} ? 'true' : 'false'"
                     aria-label="نمایش تصویر {{ $index + 1 }}"
-                    class="group relative h-20 w-16 shrink-0 overflow-hidden rounded-2xl bg-[var(--livora-surface)] transition sm:h-24 sm:w-20"
+                    class="group relative h-20 w-16 shrink-0 overflow-hidden rounded-2xl bg-[var(--sg-surface)] transition sm:h-24 sm:w-20"
                     :class="
                         active === {{ $index }}
-                        ? 'ring-2 ring-[var(--livora-ink)] ring-offset-2 ring-offset-[var(--livora-cream)]'
+                        ? 'ring-2 ring-[var(--sg-ink)] ring-offset-2 ring-offset-[var(--sg-cream)]'
                         : 'opacity-60 hover:opacity-100'
 "
                 >
@@ -348,16 +348,16 @@
 
     <template x-if="variantImageIndexes().length">
 
-        <div class="mt-5 rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-surface)] p-4">
+        <div class="mt-5 rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-surface)] p-4">
 
             <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
 
                 <div>
-                    <p class="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                    <p class="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--sg-accent)]">
                         VARIANT GALLERY
                     </p>
 
-                    <p class="mt-1 text-xs text-[var(--livora-stone)]">
+                    <p class="mt-1 text-xs text-[var(--sg-stone)]">
                         تصاویر مرتبط با گزینه انتخاب‌شده
                     </p>
                 </div>
@@ -374,10 +374,10 @@
                     <button
                         type="button"
                         @click="active = imageIndex"
-                        class="group h-16 w-14 shrink-0 overflow-hidden rounded-xl bg-[var(--livora-white)]"
+                        class="group h-16 w-14 shrink-0 overflow-hidden rounded-xl bg-[var(--sg-white)]"
                         :class="
                             active === imageIndex
-                            ? 'ring-2 ring-[var(--livora-ink)] ring-offset-1'
+                            ? 'ring-2 ring-[var(--sg-ink)] ring-offset-1'
                             : 'opacity-70 hover:opacity-100'
                         "
                         :aria-label="'نمایش تصویر ' + (index + 1) + ' از گزینه انتخاب‌شده'"
@@ -409,11 +409,11 @@
 
         <div>
 
-            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-stone)]">
+            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-stone)]">
                 PRODUCT GALLERY
             </p>
 
-            <p class="mt-1 text-xs text-[var(--livora-stone)]">
+            <p class="mt-1 text-xs text-[var(--sg-stone)]">
 
                 @if($imageCount > 0)
 
@@ -433,7 +433,7 @@
 
         @if($productSku)
 
-            <span class="text-[10px] text-[var(--livora-stone)]">
+            <span class="text-[10px] text-[var(--sg-stone)]">
                 SKU: {{ $productSku }}
             </span>
 
@@ -461,7 +461,7 @@
                 type="button"
                 aria-label="بستن تصویر"
                 @click="zoom = false"
-                class="absolute right-4 top-4 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-xl transition hover:bg-white hover:text-[var(--livora-ink)] sm:right-7 sm:top-7"
+                class="absolute right-4 top-4 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-xl transition hover:bg-white hover:text-[var(--sg-ink)] sm:right-7 sm:top-7"
             >
 
                 <svg
@@ -511,7 +511,7 @@
                             type="button"
                             aria-label="تصویر قبلی"
                             @click="previous()"
-                            class="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/30 text-white backdrop-blur-xl transition hover:bg-white hover:text-[var(--livora-ink)] sm:right-5"
+                            class="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/30 text-white backdrop-blur-xl transition hover:bg-white hover:text-[var(--sg-ink)] sm:right-5"
                         >
 
                             <svg
@@ -538,7 +538,7 @@
                             type="button"
                             aria-label="تصویر بعدی"
                             @click="next()"
-                            class="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/30 text-white backdrop-blur-xl transition hover:bg-white hover:text-[var(--livora-ink)] sm:left-5"
+                            class="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/30 text-white backdrop-blur-xl transition hover:bg-white hover:text-[var(--sg-ink)] sm:left-5"
                         >
 
                             <svg

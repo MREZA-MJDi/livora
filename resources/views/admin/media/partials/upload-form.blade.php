@@ -105,7 +105,7 @@
             name="alt"
             type="text"
             value="{{ old('alt') }}"
-            placeholder="مثلاً تصویر مبل راحتی SilaGallery"
+            placeholder="مثلاً تصویر مبل راحتی SillaGallery"
             class="w-full rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-bg)] px-4 py-3 text-sm text-[var(--admin-text)] outline-none transition placeholder:text-[var(--admin-muted)] focus:border-[var(--admin-accent)]"
         >
 

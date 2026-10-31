@@ -4,69 +4,69 @@
 
 
 /* =========================================================
-   LIVORA DESIGN TOKENS
+   SILLAGALLERY DESIGN TOKENS
    ========================================================= */
 
 /*:root {*/
 
 /*    !* Brand *!*/
-/*    --livora-ink: #181715;*/
-/*    --livora-charcoal: #24221f;*/
+/*    --sg-ink: #181715;*/
+/*    --sg-charcoal: #24221f;*/
 
 /*    !* Surfaces *!*/
-/*    --livora-cream: #f3efe8;*/
-/*    --livora-white: #faf9f6;*/
-/*    --livora-surface: #eee8df;*/
+/*    --sg-cream: #f3efe8;*/
+/*    --sg-white: #faf9f6;*/
+/*    --sg-surface: #eee8df;*/
 
 /*    !* Warm neutrals *!*/
-/*    --livora-sand: #d8d0c4;*/
-/*    --livora-stone: #a79f93;*/
+/*    --sg-sand: #d8d0c4;*/
+/*    --sg-stone: #a79f93;*/
 
 /*    !* Accent *!*/
-/*    --livora-accent: #9a7658;*/
-/*    --livora-accent-dark: #76583f;*/
-/*    --livora-accent-soft: #ede2d7;*/
+/*    --sg-accent: #9a7658;*/
+/*    --sg-accent-dark: #76583f;*/
+/*    --sg-accent-soft: #ede2d7;*/
 
 /*    !* Borders *!*/
-/*    --livora-border: #d6d0c7;*/
-/*    --livora-border-dark: #bbb2a6;*/
+/*    --sg-border: #d6d0c7;*/
+/*    --sg-border-dark: #bbb2a6;*/
 
 /*    !* States *!*/
-/*    --livora-success: #15803d;*/
-/*    --livora-success-soft: #ecfdf3;*/
+/*    --sg-success: #15803d;*/
+/*    --sg-success-soft: #ecfdf3;*/
 
-/*    --livora-warning: #b45309;*/
-/*    --livora-warning-soft: #fff7ed;*/
+/*    --sg-warning: #b45309;*/
+/*    --sg-warning-soft: #fff7ed;*/
 
-/*    --livora-danger: #b91c1c;*/
-/*    --livora-danger-soft: #fef2f2;*/
+/*    --sg-danger: #b91c1c;*/
+/*    --sg-danger-soft: #fef2f2;*/
 
-/*    --livora-info: #0369a1;*/
-/*    --livora-info-soft: #f0f9ff;*/
+/*    --sg-info: #0369a1;*/
+/*    --sg-info-soft: #f0f9ff;*/
 
 /*    !* Shadows *!*/
-/*    --livora-shadow-sm:*/
+/*    --sg-shadow-sm:*/
 /*        0 4px 14px rgba(24, 23, 21, 0.05);*/
 
-/*    --livora-shadow-md:*/
+/*    --sg-shadow-md:*/
 /*        0 12px 35px rgba(24, 23, 21, 0.08);*/
 
-/*    --livora-shadow-lg:*/
+/*    --sg-shadow-lg:*/
 /*        0 25px 70px rgba(24, 23, 21, 0.12);*/
 
 /*    !* Radius *!*/
-/*    --livora-radius-sm: 0.75rem;*/
-/*    --livora-radius-md: 1rem;*/
-/*    --livora-radius-lg: 1.5rem;*/
-/*    --livora-radius-xl: 2rem;*/
+/*    --sg-radius-sm: 0.75rem;*/
+/*    --sg-radius-md: 1rem;*/
+/*    --sg-radius-lg: 1.5rem;*/
+/*    --sg-radius-xl: 2rem;*/
 
 /*    !* Motion *!*/
-/*    --livora-duration-fast: 180ms;*/
-/*    --livora-duration: 300ms;*/
-/*    --livora-duration-slow: 650ms;*/
+/*    --sg-duration-fast: 180ms;*/
+/*    --sg-duration: 300ms;*/
+/*    --sg-duration-slow: 650ms;*/
 
 /*    !* Container *!*/
-/*    --livora-container: 1440px;*/
+/*    --sg-container: 1440px;*/
 /*}*/
 
 
@@ -76,10 +76,10 @@
 
 html {
     min-height: 100%;
-    background: var(--livora-cream);
-    color: var(--livora-ink);
+    background: var(--sg-cream);
+    color: var(--sg-ink);
 
-    font-family: var(--livora-font-family);
+    font-family: var(--sg-font-family);
 
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -98,11 +98,11 @@ body {
             rgba(154, 118, 88, 0.035),
             transparent 30rem
         ),
-        var(--livora-cream);
+        var(--sg-cream);
 
-    color: var(--livora-ink);
+    color: var(--sg-ink);
 
-    font-family: var(--livora-font-family);
+    font-family: var(--sg-font-family);
 
     overflow-x: hidden;
 }
@@ -198,7 +198,7 @@ h6 {
 }
 
 ::selection {
-    background: var(--livora-accent);
+    background: var(--sg-accent);
     color: white;
 }
 
@@ -210,7 +210,7 @@ h6 {
 * {
     scrollbar-width: thin;
     scrollbar-color:
-        var(--livora-stone)
+        var(--sg-stone)
         transparent;
 }
 
@@ -224,12 +224,12 @@ h6 {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--livora-stone);
+    background: var(--sg-stone);
     border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--livora-accent);
+    background: var(--sg-accent);
 }
 
 
@@ -242,7 +242,7 @@ h6 {
 }
 
 :focus-visible {
-    outline: 2px solid var(--livora-accent);
+    outline: 2px solid var(--sg-accent);
     outline-offset: 3px;
 }
 
@@ -260,10 +260,10 @@ h6 {
    CONTAINER
    ========================================================= */
 
-.livora-container {
+.sg-container {
     width: min(
         100%,
-        var(--livora-container)
+        var(--sg-container)
     );
 
     margin-inline: auto;
@@ -272,13 +272,13 @@ h6 {
 }
 
 @media (min-width: 640px) {
-    .livora-container {
+    .sg-container {
         padding-inline: 1.5rem;
     }
 }
 
 @media (min-width: 1024px) {
-    .livora-container {
+    .sg-container {
         padding-inline: 2rem;
     }
 }
@@ -288,23 +288,23 @@ h6 {
    GLOBAL CARD
    ========================================================= */
 
-.livora-card {
-    background: var(--livora-white);
-    border: 1px solid var(--livora-border);
-    border-radius: var(--livora-radius-xl);
+.sg-card {
+    background: var(--sg-white);
+    border: 1px solid var(--sg-border);
+    border-radius: var(--sg-radius-xl);
 
-    box-shadow: var(--livora-shadow-sm);
+    box-shadow: var(--sg-shadow-sm);
 
     transition:
-        transform var(--livora-duration),
-        box-shadow var(--livora-duration),
-        border-color var(--livora-duration);
+        transform var(--sg-duration),
+        box-shadow var(--sg-duration),
+        border-color var(--sg-duration);
 }
 
-.livora-card:hover {
+.sg-card:hover {
     transform: translateY(-2px);
-    border-color: var(--livora-border-dark);
-    box-shadow: var(--livora-shadow-md);
+    border-color: var(--sg-border-dark);
+    box-shadow: var(--sg-shadow-md);
 }
 
 
@@ -312,24 +312,24 @@ h6 {
    IMAGE SYSTEM
    ========================================================= */
 
-.livora-image {
+.sg-image {
     overflow: hidden;
-    background: var(--livora-surface);
-    border-radius: var(--livora-radius-xl);
+    background: var(--sg-surface);
+    border-radius: var(--sg-radius-xl);
 }
 
-.livora-image img {
+.sg-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 
     transition:
-        transform var(--livora-duration-slow)
+        transform var(--sg-duration-slow)
         cubic-bezier(0.22, 1, 0.36, 1),
-        opacity var(--livora-duration);
+        opacity var(--sg-duration);
 }
 
-.livora-image:hover img {
+.sg-image:hover img {
     transform: scale(1.04);
 }
 
@@ -338,7 +338,7 @@ h6 {
    BUTTON SYSTEM
    ========================================================= */
 
-.livora-button {
+.sg-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -355,41 +355,41 @@ h6 {
     font-weight: 600;
 
     transition:
-        transform var(--livora-duration-fast),
-        background-color var(--livora-duration-fast),
-        border-color var(--livora-duration-fast),
-        color var(--livora-duration-fast),
-        box-shadow var(--livora-duration-fast);
+        transform var(--sg-duration-fast),
+        background-color var(--sg-duration-fast),
+        border-color var(--sg-duration-fast),
+        color var(--sg-duration-fast),
+        box-shadow var(--sg-duration-fast);
 
     user-select: none;
 }
 
-.livora-button:hover {
+.sg-button:hover {
     transform: translateY(-1px);
 }
 
-.livora-button:active {
+.sg-button:active {
     transform: translateY(0);
 }
 
-.livora-button-primary {
-    background: var(--livora-ink);
+.sg-button-primary {
+    background: var(--sg-ink);
     color: white;
 }
 
-.livora-button-primary:hover {
-    background: var(--livora-accent);
+.sg-button-primary:hover {
+    background: var(--sg-accent);
 }
 
-.livora-button-secondary {
-    background: var(--livora-white);
-    color: var(--livora-ink);
-    border-color: var(--livora-border);
+.sg-button-secondary {
+    background: var(--sg-white);
+    color: var(--sg-ink);
+    border-color: var(--sg-border);
 }
 
-.livora-button-secondary:hover {
-    border-color: var(--livora-ink);
-    background: var(--livora-surface);
+.sg-button-secondary:hover {
+    border-color: var(--sg-ink);
+    background: var(--sg-surface);
 }
 
 
@@ -402,7 +402,7 @@ h6 {
 
     margin-bottom: 0.5rem;
 
-    color: var(--livora-ink);
+    color: var(--sg-ink);
 
     font-size: 0.75rem;
     font-weight: 600;
@@ -413,20 +413,20 @@ h6 {
 .admin-textarea {
     width: 100%;
 
-    border: 1px solid var(--livora-border);
+    border: 1px solid var(--sg-border);
     border-radius: 1rem;
 
-    background: var(--livora-white);
-    color: var(--livora-ink);
+    background: var(--sg-white);
+    color: var(--sg-ink);
 
     font-size: 0.875rem;
 
     outline: none;
 
     transition:
-        border-color var(--livora-duration-fast),
-        box-shadow var(--livora-duration-fast),
-        background-color var(--livora-duration-fast);
+        border-color var(--sg-duration-fast),
+        box-shadow var(--sg-duration-fast),
+        background-color var(--sg-duration-fast);
 }
 
 .admin-input,
@@ -443,19 +443,19 @@ h6 {
 
 .admin-input::placeholder,
 .admin-textarea::placeholder {
-    color: var(--livora-stone);
+    color: var(--sg-stone);
 }
 
 .admin-input:hover,
 .admin-select:hover,
 .admin-textarea:hover {
-    border-color: var(--livora-border-dark);
+    border-color: var(--sg-border-dark);
 }
 
 .admin-input:focus,
 .admin-select:focus,
 .admin-textarea:focus {
-    border-color: var(--livora-ink);
+    border-color: var(--sg-ink);
 
     box-shadow:
         0 0 0 3px
@@ -467,11 +467,11 @@ h6 {
 .admin-textarea:disabled {
     cursor: not-allowed;
     opacity: 0.55;
-    background: var(--livora-surface);
+    background: var(--sg-surface);
 }
 
 .admin-checkbox {
-    accent-color: var(--livora-ink);
+    accent-color: var(--sg-ink);
 }
 
 
@@ -495,10 +495,10 @@ h6 {
     font-weight: 600;
 
     transition:
-        transform var(--livora-duration-fast),
-        background-color var(--livora-duration-fast),
-        border-color var(--livora-duration-fast),
-        color var(--livora-duration-fast);
+        transform var(--sg-duration-fast),
+        background-color var(--sg-duration-fast),
+        border-color var(--sg-duration-fast),
+        color var(--sg-duration-fast);
 }
 
 .admin-btn:hover {
@@ -506,23 +506,23 @@ h6 {
 }
 
 .admin-btn-primary {
-    background: var(--livora-ink);
+    background: var(--sg-ink);
     color: white;
 }
 
 .admin-btn-primary:hover {
-    background: var(--livora-accent);
+    background: var(--sg-accent);
 }
 
 .admin-btn-secondary {
-    border: 1px solid var(--livora-border);
-    background: var(--livora-white);
-    color: var(--livora-ink);
+    border: 1px solid var(--sg-border);
+    background: var(--sg-white);
+    color: var(--sg-ink);
 }
 
 .admin-btn-secondary:hover {
-    border-color: var(--livora-ink);
-    background: var(--livora-surface);
+    border-color: var(--sg-ink);
+    background: var(--sg-surface);
 }
 
 
@@ -531,12 +531,12 @@ h6 {
    ========================================================= */
 
 .admin-card {
-    border: 1px solid var(--livora-border);
-    border-radius: var(--livora-radius-xl);
+    border: 1px solid var(--sg-border);
+    border-radius: var(--sg-radius-xl);
 
-    background: var(--livora-white);
+    background: var(--sg-white);
 
-    box-shadow: var(--livora-shadow-sm);
+    box-shadow: var(--sg-shadow-sm);
 }
 
 
@@ -557,8 +557,8 @@ h6 {
 
     border-radius: 999px;
 
-    background: var(--livora-danger-soft);
-    color: var(--livora-danger);
+    background: var(--sg-danger-soft);
+    color: var(--sg-danger);
 
     font-size: 0.7rem;
     font-weight: 700;
@@ -571,7 +571,7 @@ h6 {
 }
 
 .product-price__compare {
-    color: var(--livora-stone);
+    color: var(--sg-stone);
 
     font-size: 0.78rem;
 
@@ -585,7 +585,7 @@ h6 {
 }
 
 .product-price__current strong {
-    color: var(--livora-ink);
+    color: var(--sg-ink);
 
     font-size: 1.4rem;
     font-weight: 800;
@@ -594,7 +594,7 @@ h6 {
 }
 
 .product-price__current > span {
-    color: var(--livora-stone);
+    color: var(--sg-stone);
 
     font-size: 0.72rem;
     font-weight: 600;
@@ -624,7 +624,7 @@ h6 {
     align-items: center;
     gap: 0.45rem;
 
-    color: var(--livora-accent-dark);
+    color: var(--sg-accent-dark);
 
     font-size: 0.76rem;
     font-weight: 800;
@@ -640,7 +640,7 @@ h6 {
 
     border-radius: 50%;
 
-    background: var(--livora-accent);
+    background: var(--sg-accent);
     color: white;
 
     font-size: 0.62rem;
@@ -666,7 +666,7 @@ h6 {
 }
 
 .product-price__installment-row strong {
-    color: var(--livora-ink);
+    color: var(--sg-ink);
     font-weight: 800;
 }
 
@@ -678,7 +678,7 @@ h6 {
         1px solid
         rgba(154, 118, 88, 0.12);
 
-    color: var(--livora-stone);
+    color: var(--sg-stone);
 
     font-size: 0.67rem;
     line-height: 1.8;
@@ -689,15 +689,15 @@ h6 {
    PAGE TRANSITION
    ========================================================= */
 
-.livora-page-enter {
+.sg-page-enter {
     animation:
-        livora-fade-up
+        sg-fade-up
         500ms
         cubic-bezier(0.22, 1, 0.36, 1)
         both;
 }
 
-@keyframes livora-fade-up {
+@keyframes sg-fade-up {
 
     from {
         opacity: 0;
@@ -715,14 +715,14 @@ h6 {
    SHIMMER / SKELETON
    ========================================================= */
 
-.livora-skeleton {
+.sg-skeleton {
     position: relative;
     overflow: hidden;
 
-    background: var(--livora-surface);
+    background: var(--sg-surface);
 }
 
-.livora-skeleton::after {
+.sg-skeleton::after {
     content: "";
 
     position: absolute;
@@ -739,12 +739,12 @@ h6 {
         );
 
     animation:
-        livora-shimmer
+        sg-shimmer
         1.6s
         infinite;
 }
 
-@keyframes livora-shimmer {
+@keyframes sg-shimmer {
 
     100% {
         transform: translateX(100%);
@@ -756,22 +756,22 @@ h6 {
    TEXT UTILITIES
    ========================================================= */
 
-.livora-eyebrow {
+.sg-eyebrow {
     font-size: 0.625rem;
     font-weight: 600;
 
     letter-spacing: 0.22em;
     text-transform: uppercase;
 
-    color: var(--livora-accent);
+    color: var(--sg-accent);
 }
 
-.livora-muted {
-    color: var(--livora-stone);
+.sg-muted {
+    color: var(--sg-stone);
 }
 
-.livora-heading {
-    color: var(--livora-ink);
+.sg-heading {
+    color: var(--sg-ink);
     font-weight: 700;
     letter-spacing: -0.025em;
 }
@@ -787,7 +787,7 @@ h6 {
         font-size: 1.15rem;
     }
 
-    .livora-button {
+    .sg-button {
         min-height: 2.9rem;
     }
 }
@@ -812,37 +812,37 @@ h6 {
 }
 
 
-/* SilaGallery responsive safeguards */
+/* SillaGallery responsive safeguards */
 :root { --site-content-max: 1440px; }
-.livora-container { max-width: var(--site-content-max); }
-.livora-button, .admin-btn { white-space: nowrap; flex: 0 0 auto; }
-@media (max-width: 767px) { .livora-container { padding-inline: 1rem; } .livora-button { min-height: 2.875rem; padding-inline: 1rem; font-size: .8125rem; } }
-@media (min-width: 768px) { .livora-button { min-height: 3rem; } }
+.sg-container { max-width: var(--site-content-max); }
+.sg-button, .admin-btn { white-space: nowrap; flex: 0 0 auto; }
+@media (max-width: 767px) { .sg-container { padding-inline: 1rem; } .sg-button { min-height: 2.875rem; padding-inline: 1rem; font-size: .8125rem; } }
+@media (min-width: 768px) { .sg-button { min-height: 3rem; } }
 
 
-/* SilaGallery wordmark */
-.silagallery-wordmark {
+/* SillaGallery wordmark */
+.sillagallery-wordmark {
     display: inline-flex;
     align-items: baseline;
     gap: 0.04em;
-    color: var(--livora-ink);
+    color: var(--sg-ink);
     font-family: Georgia, "Times New Roman", serif;
     line-height: 1;
     letter-spacing: -0.035em;
     transition: opacity 180ms ease, transform 180ms ease;
 }
-.silagallery-wordmark__main {
+.sillagallery-wordmark__main {
     font-size: 1.48rem;
     font-weight: 700;
     letter-spacing: -0.045em;
 }
-.silagallery-wordmark__sub {
+.sillagallery-wordmark__sub {
     font-size: 0.92rem;
     font-weight: 400;
     letter-spacing: 0.02em;
     opacity: 0.82;
 }
-a:hover .silagallery-wordmark {
+a:hover .sillagallery-wordmark {
     opacity: 0.72;
     transform: translateY(-1px);
 }
@@ -856,7 +856,7 @@ a:hover .silagallery-wordmark {
         overflow-x: hidden;
     }
 
-    .livora-container {
+    .sg-container {
         width: 100%;
         max-width: 100%;
         padding-inline: 1rem;
@@ -932,18 +932,18 @@ a:hover .silagallery-wordmark {
 
 /* Stable storefront CTA hover
    Keep dark CTA text readable while only the visual surface animates. */
-a[class*="bg-[var(--livora-ink)]"][class*="text-white"],
-button[class*="bg-[var(--livora-ink)]"][class*="text-white"] {
+a[class*="bg-[var(--sg-ink)]"][class*="text-white"],
+button[class*="bg-[var(--sg-ink)]"][class*="text-white"] {
     color: #fff !important;
     transition-property: background-color, border-color, color, transform, box-shadow !important;
     transition-duration: 180ms !important;
     transition-timing-function: ease-out !important;
 }
 
-a[class*="bg-[var(--livora-ink)]"][class*="text-white"]:hover,
-a[class*="bg-[var(--livora-ink)]"][class*="text-white"]:focus-visible,
-button[class*="bg-[var(--livora-ink)]"][class*="text-white"]:hover,
-button[class*="bg-[var(--livora-ink)]"][class*="text-white"]:focus-visible {
+a[class*="bg-[var(--sg-ink)]"][class*="text-white"]:hover,
+a[class*="bg-[var(--sg-ink)]"][class*="text-white"]:focus-visible,
+button[class*="bg-[var(--sg-ink)]"][class*="text-white"]:hover,
+button[class*="bg-[var(--sg-ink)]"][class*="text-white"]:focus-visible {
     color: #fff !important;
 }
 
@@ -1020,7 +1020,7 @@ body {
     min-width: 0;
 }
 
-.livora-container {
+.sg-container {
     width: 100%;
     max-width: min(100%, var(--site-content-max, 1440px));
     padding-inline: clamp(1rem, 3vw, 2.5rem);
@@ -1063,7 +1063,7 @@ body {
     width: 100%;
     aspect-ratio: 4 / 5;
     overflow: hidden;
-    background: var(--livora-surface);
+    background: var(--sg-surface);
 }
 
 .product-card-image,
@@ -1104,14 +1104,14 @@ body {
 
 .mobile-bottom-search {
     min-height: 3.25rem;
-    background: var(--livora-ink);
+    background: var(--sg-ink);
     color: #fff;
     box-shadow: 0 6px 18px rgba(24, 23, 21, 0.16);
 }
 
 .mobile-bottom-search:hover,
 .mobile-bottom-search:focus-visible {
-    background: var(--livora-accent);
+    background: var(--sg-accent);
     color: #fff;
 }
 
@@ -1139,7 +1139,7 @@ body {
 }
 
 @media (max-width: 639px) {
-    .livora-container {
+    .sg-container {
         padding-inline: 1rem;
     }
 
@@ -1204,7 +1204,7 @@ body {
 }
 
 /* Responsive hero media scale */
-.livora-hero-product-image {
+.sg-hero-product-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -1223,7 +1223,7 @@ body {
         border-radius: 1.25rem;
     }
 
-    .livora-hero-product-image {
+    .sg-hero-product-image {
         transform: scale(1.02);
         object-position: center 45%;
     }
@@ -1232,7 +1232,7 @@ body {
 
 /* Public rich-content renderer used by CMS pages and articles */
 .cms-content { overflow-wrap: anywhere; }
-.cms-content h1, .cms-content h2, .cms-content h3, .cms-content h4 { margin: 1.6em 0 .65em; color: var(--livora-ink); font-weight: 700; line-height: 1.6; }
+.cms-content h1, .cms-content h2, .cms-content h3, .cms-content h4 { margin: 1.6em 0 .65em; color: var(--sg-ink); font-weight: 700; line-height: 1.6; }
 .cms-content h1 { font-size: clamp(1.6rem, 3vw, 2.1rem); }
 .cms-content h2 { font-size: clamp(1.25rem, 2.4vw, 1.65rem); }
 .cms-content h3 { font-size: 1.15rem; }
@@ -1240,11 +1240,11 @@ body {
 .cms-content ul, .cms-content ol { margin: 1rem 1.4rem; padding-inline-start: 1rem; }
 .cms-content ul { list-style: disc; }
 .cms-content ol { list-style: decimal; }
-.cms-content blockquote { margin: 1.25rem 0; padding: .9rem 1rem; border-inline-start: 3px solid var(--livora-accent); background: var(--livora-surface); border-radius: 1rem; }
-.cms-content a { color: var(--livora-accent); text-decoration: underline; text-underline-offset: .2em; }
+.cms-content blockquote { margin: 1.25rem 0; padding: .9rem 1rem; border-inline-start: 3px solid var(--sg-accent); background: var(--sg-surface); border-radius: 1rem; }
+.cms-content a { color: var(--sg-accent); text-decoration: underline; text-underline-offset: .2em; }
 .cms-content img { max-width: 100%; height: auto; border-radius: 1rem; margin: 1.25rem auto; }
 .cms-content figure { margin: 1.5rem 0; }
-.cms-content figcaption { color: var(--livora-stone); text-align: center; font-size: .8rem; }
+.cms-content figcaption { color: var(--sg-stone); text-align: center; font-size: .8rem; }
 .cms-content table { width: 100%; display: block; overflow-x: auto; border-collapse: collapse; }
-.cms-content th, .cms-content td { border: 1px solid var(--livora-border); padding: .65rem; }
-.cms-content pre { overflow-x: auto; padding: 1rem; border-radius: 1rem; background: var(--livora-ink); color: #fff; direction: ltr; text-align: left; }
+.cms-content th, .cms-content td { border: 1px solid var(--sg-border); padding: .65rem; }
+.cms-content pre { overflow-x: auto; padding: 1rem; border-radius: 1rem; background: var(--sg-ink); color: #fff; direction: ltr; text-align: left; }

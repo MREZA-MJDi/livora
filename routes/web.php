@@ -247,9 +247,9 @@ Route::middleware(['auth', 'customer'])->group(function () {
             )->name('installment');
 
             Route::post(
-                '/payment/{order}/livora-installment',
+                '/payment/{order}/internal-installment',
                 [CheckoutController::class, 'startInternalInstallment']
-            )->name('payment.livora-installment');
+            )->name('payment.internal-installment');
         });
 
 

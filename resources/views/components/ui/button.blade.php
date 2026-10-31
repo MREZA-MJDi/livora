@@ -19,24 +19,24 @@
 
         'primary' => [
             'base' => '
-                !bg-[var(--livora-ink)]
+                !bg-[var(--sg-ink)]
                 !text-white
-                !border-[var(--livora-ink)]
-                hover:!bg-[var(--livora-accent)]
+                !border-[var(--sg-ink)]
+                hover:!bg-[var(--sg-accent)]
                 hover:!text-white
-                hover:!border-[var(--livora-accent)]
+                hover:!border-[var(--sg-accent)]
             ',
             'hover' => 'hover:-translate-y-0.5 hover:shadow-md',
         ],
 
         'secondary' => [
             'base' => '
-                !bg-[var(--livora-white)]
-                !text-[var(--livora-ink)]
-                !border-[var(--livora-border)]
-                hover:!bg-[var(--livora-surface)]
-                hover:!text-[var(--livora-ink)]
-                hover:!border-[var(--livora-ink)]
+                !bg-[var(--sg-white)]
+                !text-[var(--sg-ink)]
+                !border-[var(--sg-border)]
+                hover:!bg-[var(--sg-surface)]
+                hover:!text-[var(--sg-ink)]
+                hover:!border-[var(--sg-ink)]
             ',
             'hover' => 'hover:-translate-y-0.5 hover:shadow-sm',
         ],
@@ -44,10 +44,10 @@
         'ghost' => [
             'base' => '
                 !bg-transparent
-                !text-[var(--livora-ink)]
+                !text-[var(--sg-ink)]
                 !border-transparent
-                hover:!bg-[var(--livora-surface)]
-                hover:!text-[var(--livora-ink)]
+                hover:!bg-[var(--sg-surface)]
+                hover:!text-[var(--sg-ink)]
             ',
             'hover' => 'hover:-translate-y-0.5',
         ],
@@ -57,9 +57,9 @@
                 !bg-black
                 !text-white
                 !border-black
-                hover:!bg-[var(--livora-accent)]
+                hover:!bg-[var(--sg-accent)]
                 hover:!text-white
-                hover:!border-[var(--livora-accent)]
+                hover:!border-[var(--sg-accent)]
             ',
             'hover' => 'hover:-translate-y-0.5 hover:shadow-md',
         ],
@@ -92,8 +92,8 @@
             'base' => '
                 !border-transparent
                 !bg-transparent
-                !text-[var(--livora-accent)]
-                hover:!text-[var(--livora-ink)]
+                !text-[var(--sg-accent)]
+                hover:!text-[var(--sg-ink)]
             ',
             'hover' => 'hover:underline underline-offset-4',
         ],
@@ -186,7 +186,7 @@
         // Interaction
         'focus:outline-none',
         'focus-visible:ring-2',
-        'focus-visible:ring-[var(--livora-accent)]',
+        'focus-visible:ring-[var(--sg-accent)]',
         'focus-visible:ring-offset-2',
 
         // Active

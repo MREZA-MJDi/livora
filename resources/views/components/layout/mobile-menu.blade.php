@@ -24,7 +24,7 @@
         role="dialog"
         aria-modal="true"
         aria-label="منوی موبایل"
-        data-livora-mobile-menu
+        data-sg-mobile-menu
         tabindex="-1"
         x-transition:enter="transition ease-out duration-300"
         x-transition:enter-start="translate-x-full"
@@ -32,16 +32,16 @@
         x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="translate-x-0"
         x-transition:leave-end="translate-x-full"
-        class="absolute right-0 top-0 flex h-full w-[88%] max-w-md flex-col bg-[var(--livora-cream)] shadow-2xl"
+        class="absolute right-0 top-0 flex h-full w-[88%] max-w-md flex-col bg-[var(--sg-cream)] shadow-2xl"
     >
 
         {{-- Header --}}
-        <div class="flex h-[76px] items-center justify-between border-b border-[var(--livora-border)] bg-[var(--livora-white)] px-5">
+        <div class="flex h-[76px] items-center justify-between border-b border-[var(--sg-border)] bg-[var(--sg-white)] px-5">
 
             <a
                 href="{{ route('home') }}"
                 @click="mobileOpen = false"
-                class="text-xl font-semibold tracking-[0.22em] text-[var(--livora-ink)]"
+                class="text-xl font-semibold tracking-[0.22em] text-[var(--sg-ink)]"
             >
                 SillaGallery
             </a>
@@ -50,7 +50,7 @@
                 type="button"
                 aria-label="بستن منو"
                 @click="mobileOpen = false"
-                class="flex h-10 w-10 items-center justify-center rounded-full text-[var(--livora-ink)] transition hover:bg-[var(--livora-surface)]"
+                class="flex h-10 w-10 items-center justify-center rounded-full text-[var(--sg-ink)] transition hover:bg-[var(--sg-surface)]"
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -78,7 +78,7 @@
             <button
                 type="button"
                 @click="openSearch($event.currentTarget)"
-                class="flex w-full items-center gap-3 rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] px-4 py-4 text-right"
+                class="flex w-full items-center gap-3 rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] px-4 py-4 text-right"
             >
 
                 <svg
@@ -87,7 +87,7 @@
                     viewBox="0 0 24 24"
                     stroke-width="1.5"
                     stroke="currentColor"
-                    class="h-5 w-5 shrink-0 text-[var(--livora-stone)]"
+                    class="h-5 w-5 shrink-0 text-[var(--sg-stone)]"
                 >
                     <path
                         stroke-linecap="round"
@@ -96,7 +96,7 @@
                     />
                 </svg>
 
-                <span class="text-sm text-[var(--livora-stone)]">
+                <span class="text-sm text-[var(--sg-stone)]">
                     جستجوی محصول، دسته‌بندی...
                 </span>
 
@@ -109,11 +109,11 @@
                 class="mt-7"
             >
 
-                <p class="px-2 text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--livora-accent)]">
+                <p class="px-2 text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--sg-accent)]">
                     DISCOVER
                 </p>
 
-                <div class="mt-3 divide-y divide-[var(--livora-border)] rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)]">
+                <div class="mt-3 divide-y divide-[var(--sg-border)] rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)]">
 
                     <a
                         href="{{ route('home') }}"
@@ -121,7 +121,7 @@
                         class="flex items-center justify-between px-4 py-4 text-sm font-medium"
                     >
                         <span>خانه</span>
-                        <span class="text-[var(--livora-stone)]">←</span>
+                        <span class="text-[var(--sg-stone)]">←</span>
                     </a>
 
                     <a
@@ -130,7 +130,7 @@
                         class="flex items-center justify-between px-4 py-4 text-sm font-medium"
                     >
                         <span>فروشگاه</span>
-                        <span class="text-[var(--livora-stone)]">←</span>
+                        <span class="text-[var(--sg-stone)]">←</span>
                     </a>
 
                     <a
@@ -139,7 +139,7 @@
                         class="flex items-center justify-between px-4 py-4 text-sm font-medium"
                     >
                         <span>دسته‌بندی‌ها</span>
-                        <span class="text-[var(--livora-stone)]">←</span>
+                        <span class="text-[var(--sg-stone)]">←</span>
                     </a>
 
                     <a
@@ -148,11 +148,11 @@
                         class="flex items-center justify-between px-4 py-4 text-sm font-medium"
                     >
                         <span>درباره SillaGallery</span>
-                        <span class="text-[var(--livora-stone)]">←</span>
+                        <span class="text-[var(--sg-stone)]">←</span>
                     </a>
 
                     <a href="{{ route('blog.index') }}" @click="mobileOpen = false" class="flex items-center justify-between px-4 py-4 text-sm font-medium">
-                        <span>مجله و مقالات</span><span class="text-[var(--livora-stone)]">←</span>
+                        <span>مجله و مقالات</span><span class="text-[var(--sg-stone)]">←</span>
                     </a>
 
                     <a
@@ -161,7 +161,7 @@
                         class="flex items-center justify-between px-4 py-4 text-sm font-medium"
                     >
                         <span>تماس با ما</span>
-                        <span class="text-[var(--livora-stone)]">←</span>
+                        <span class="text-[var(--sg-stone)]">←</span>
                     </a>
 
                 </div>
@@ -172,7 +172,7 @@
             {{-- Customer --}}
             <div class="mt-8">
 
-                <p class="px-2 text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--livora-accent)]">
+                <p class="px-2 text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--sg-accent)]">
                     MY SillaGallery
                 </p>
 
@@ -181,10 +181,10 @@
                     <a
                         href="{{ route('cart.index') }}"
                         @click="mobileOpen = false"
-                        class="rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-4"
+                        class="rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-4"
                     >
 
-                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--livora-surface)] text-xs font-semibold">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--sg-surface)] text-xs font-semibold">
                             01
                         </div>
 
@@ -192,7 +192,7 @@
                             سبد خرید
                         </p>
 
-                        <p class="mt-1 text-[11px] text-[var(--livora-stone)]">
+                        <p class="mt-1 text-[11px] text-[var(--sg-stone)]">
                             محصولات انتخاب‌شده
                         </p>
 
@@ -206,10 +206,10 @@
                             <a
                                 href="{{ route('account.index') }}"
                                 @click="mobileOpen = false"
-                                class="rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-4"
+                                class="rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-4"
                             >
 
-                                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--livora-surface)] text-xs font-semibold">
+                                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--sg-surface)] text-xs font-semibold">
                                     02
                                 </div>
 
@@ -217,7 +217,7 @@
                                     حساب من
                                 </p>
 
-                                <p class="mt-1 text-[11px] text-[var(--livora-stone)]">
+                                <p class="mt-1 text-[11px] text-[var(--sg-stone)]">
                                     سفارش‌ها و علاقه‌مندی‌ها
                                 </p>
 
@@ -228,10 +228,10 @@
                             <a
                                 href="{{ route('admin.dashboard') }}"
                                 @click="mobileOpen = false"
-                                class="rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-4"
+                                class="rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-4"
                             >
 
-                                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--livora-surface)] text-xs font-semibold">
+                                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--sg-surface)] text-xs font-semibold">
                                     02
                                 </div>
 
@@ -239,7 +239,7 @@
                                     پنل مدیریت
                                 </p>
 
-                                <p class="mt-1 text-[11px] text-[var(--livora-stone)]">
+                                <p class="mt-1 text-[11px] text-[var(--sg-stone)]">
                                     مدیریت فروشگاه
                                 </p>
 
@@ -252,10 +252,10 @@
                         <a
                             href="{{ route('login') }}"
                             @click="mobileOpen = false"
-                            class="rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-4"
+                            class="rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-4"
                         >
 
-                            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--livora-surface)] text-xs font-semibold">
+                            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--sg-surface)] text-xs font-semibold">
                                 02
                             </div>
 
@@ -263,7 +263,7 @@
                                 ورود
                             </p>
 
-                            <p class="mt-1 text-[11px] text-[var(--livora-stone)]">
+                            <p class="mt-1 text-[11px] text-[var(--sg-stone)]">
                                 ورود به حساب
                             </p>
 
@@ -277,7 +277,7 @@
 
 
             {{-- Installment Highlight --}}
-            <div class="mt-8 rounded-3xl bg-[var(--livora-ink)] p-5 text-white">
+            <div class="mt-8 rounded-3xl bg-[var(--sg-ink)] p-5 text-white">
 
                 <p class="text-[10px] uppercase tracking-[0.18em] text-white/40">
                     FLEXIBLE PAYMENT
@@ -294,7 +294,7 @@
                 <a
                     href="{{ route('shop.index') }}"
                     @click="mobileOpen = false"
-                    class="mt-5 inline-flex rounded-2xl bg-white px-5 py-3 text-xs font-medium text-[var(--livora-ink)]"
+                    class="mt-5 inline-flex rounded-2xl bg-white px-5 py-3 text-xs font-medium text-[var(--sg-ink)]"
                 >
                     مشاهده محصولات
                 </a>
@@ -305,17 +305,17 @@
 
 
         {{-- Footer --}}
-        <div class="border-t border-[var(--livora-border)] bg-[var(--livora-white)] p-5">
+        <div class="border-t border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
 
             <div class="flex items-center justify-between gap-4">
 
                 <div>
 
-                    <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-stone)]">
+                    <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-stone)]">
                         SillaGallery
                     </p>
 
-                    <p class="mt-1 text-[11px] text-[var(--livora-stone)]">
+                    <p class="mt-1 text-[11px] text-[var(--sg-stone)]">
                         Furniture & Living
                     </p>
 
@@ -324,7 +324,7 @@
                 <a
                     href="{{ route('contact') }}"
                     @click="mobileOpen = false"
-                    class="text-xs font-medium text-[var(--livora-ink)]"
+                    class="text-xs font-medium text-[var(--sg-ink)]"
                 >
                     تماس با ما
                 </a>

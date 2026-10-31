@@ -7,8 +7,8 @@
 @php
     $variants = [
         'default' => [
-            'wrapper' => 'border-[var(--livora-border)] bg-[var(--livora-white)] text-[var(--livora-ink)]',
-            'dot' => 'bg-[var(--livora-stone)]',
+            'wrapper' => 'border-[var(--sg-border)] bg-[var(--sg-white)] text-[var(--sg-ink)]',
+            'dot' => 'bg-[var(--sg-stone)]',
         ],
 
         'success' => [
@@ -32,17 +32,17 @@
         ],
 
         'dark' => [
-            'wrapper' => 'border-transparent bg-[var(--livora-ink)] text-white',
+            'wrapper' => 'border-transparent bg-[var(--sg-ink)] text-white',
             'dot' => 'bg-white/70',
         ],
 
         'accent' => [
-            'wrapper' => 'border-transparent bg-[var(--livora-accent)] text-white',
+            'wrapper' => 'border-transparent bg-[var(--sg-accent)] text-white',
             'dot' => 'bg-white/75',
         ],
 
         'installment' => [
-            'wrapper' => 'border-transparent bg-[var(--livora-ink)] text-white',
+            'wrapper' => 'border-transparent bg-[var(--sg-ink)] text-white',
             'dot' => 'bg-white',
         ],
     ];

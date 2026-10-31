@@ -14,13 +14,13 @@
 
 @section('content')
 
-    <div class="overflow-hidden bg-[var(--livora-cream)]">
+    <div class="overflow-hidden bg-[var(--sg-cream)]">
 
         {{-- =========================================================
              HERO
         ========================================================== --}}
 
-        <section class="border-b border-[var(--livora-border)] bg-[var(--livora-white)]">
+        <section class="border-b border-[var(--sg-border)] bg-[var(--sg-white)]">
 
             <x-layout.container>
 
@@ -28,19 +28,19 @@
 
                     <nav
                         aria-label="breadcrumb"
-                        class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--livora-stone)]"
+                        class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--sg-stone)]"
                     >
 
                         <a
                             href="{{ route('home') }}"
-                            class="transition hover:text-[var(--livora-ink)]"
+                            class="transition hover:text-[var(--sg-ink)]"
                         >
                             خانه
                         </a>
 
                         <span>/</span>
 
-                        <span class="text-[var(--livora-ink)]">
+                        <span class="text-[var(--sg-ink)]">
                             تماس با ما
                         </span>
 
@@ -51,13 +51,13 @@
 
                         <div class="max-w-4xl">
 
-                            <p class="text-[10px] font-medium uppercase tracking-[0.24em] text-[var(--livora-accent)]">
+                            <p class="text-[10px] font-medium uppercase tracking-[0.24em] text-[var(--sg-accent)]">
                                 GET IN TOUCH
                             </p>
 
                             <h1 class="mt-5 text-5xl font-semibold leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl">
                                 برای انتخاب بهتر،
-                                <span class="block text-[var(--livora-accent)]">
+                                <span class="block text-[var(--sg-accent)]">
                                     کنار شما هستیم.
                                 </span>
                             </h1>
@@ -67,14 +67,14 @@
 
                         <div>
 
-                            <p class="text-sm leading-8 text-[var(--livora-stone)] sm:text-base">
+                            <p class="text-sm leading-8 text-[var(--sg-stone)] sm:text-base">
                                 برای مشاوره خرید، پیگیری سفارش، پرسش درباره شرایط اقساط
                                 یا هر موضوع دیگری می‌توانید با SillaGallery در ارتباط باشید.
                             </p>
 
                             <a
                                 href="#contact-form"
-                                class="mt-7 inline-flex items-center rounded-2xl bg-[var(--livora-ink)] px-6 py-4 text-sm font-medium text-white transition hover:bg-[var(--livora-accent)]"
+                                class="mt-7 inline-flex items-center rounded-2xl bg-[var(--sg-ink)] px-6 py-4 text-sm font-medium text-white transition hover:bg-[var(--sg-accent)]"
                             >
                                 ارسال پیام
                             </a>
@@ -94,7 +94,7 @@
              CONTACT METHODS
         ========================================================== --}}
 
-        <section class="border-b border-[var(--livora-border)]">
+        <section class="border-b border-[var(--sg-border)]">
 
             <x-layout.container>
 
@@ -106,22 +106,22 @@
 
                         <a
                             href="tel:{{ $contactSetting->phone }}"
-                            class="group rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-6 transition duration-300 hover:-translate-y-1 hover:border-[var(--livora-ink)]"
+                            class="group rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-6 transition duration-300 hover:-translate-y-1 hover:border-[var(--sg-ink)]"
                         >
 
                             @else
 
                                 <div
-                                    class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-6"
+                                    class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-6"
                                 >
 
                                     @endif
 
-                                    <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--livora-surface)] text-xs font-semibold">
+                                    <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--sg-surface)] text-xs font-semibold">
                                         01
                                     </div>
 
-                                    <p class="mt-7 text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                                    <p class="mt-7 text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
                                         PHONE
                                     </p>
 
@@ -129,7 +129,7 @@
                                         {{ $contactSetting?->phone_label ?? 'تماس تلفنی' }}
                                     </h2>
 
-                                    <p class="mt-3 break-all text-xs leading-6 text-[var(--livora-stone)]">
+                                    <p class="mt-3 break-all text-xs leading-6 text-[var(--sg-stone)]">
                                         {{ $contactSetting?->phone ?? 'شماره تماس ثبت نشده است.' }}
                                     </p>
 
@@ -150,22 +150,22 @@
 
                     <a
                         href="mailto:{{ $contactSetting->email }}"
-                        class="group rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-6 transition duration-300 hover:-translate-y-1 hover:border-[var(--livora-ink)]"
+                        class="group rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-6 transition duration-300 hover:-translate-y-1 hover:border-[var(--sg-ink)]"
                     >
 
                         @else
 
                             <div
-                                class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-6"
+                                class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-6"
                             >
 
                                 @endif
 
-                                <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--livora-surface)] text-xs font-semibold">
+                                <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--sg-surface)] text-xs font-semibold">
                                     02
                                 </div>
 
-                                <p class="mt-7 text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                                <p class="mt-7 text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
                                     EMAIL
                                 </p>
 
@@ -173,7 +173,7 @@
                                     {{ $contactSetting?->email_label ?? 'ایمیل' }}
                                 </h2>
 
-                                <p class="mt-3 break-all text-xs leading-6 text-[var(--livora-stone)]">
+                                <p class="mt-3 break-all text-xs leading-6 text-[var(--sg-stone)]">
                                     {{ $contactSetting?->email ?? 'ایمیل ثبت نشده است.' }}
                                 </p>
 
@@ -190,13 +190,13 @@
 
     {{-- SUPPORT --}}
 
-    <div class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-6">
+    <div class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-6">
 
-        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--livora-surface)] text-xs font-semibold">
+        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--sg-surface)] text-xs font-semibold">
             03
         </div>
 
-        <p class="mt-7 text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+        <p class="mt-7 text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
             SUPPORT
         </p>
 
@@ -204,7 +204,7 @@
             {{ $contactSetting?->support_label ?? 'پشتیبانی' }}
         </h2>
 
-        <p class="mt-3 text-xs leading-6 text-[var(--livora-stone)]">
+        <p class="mt-3 text-xs leading-6 text-[var(--sg-stone)]">
             {{ $contactSetting?->support_description ?? 'پاسخ‌گویی به پرسش‌های خرید و سفارش.' }}
         </p>
 
@@ -213,13 +213,13 @@
 
     {{-- ONLINE --}}
 
-    <div class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-6">
+    <div class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-6">
 
-        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--livora-surface)] text-xs font-semibold">
+        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--sg-surface)] text-xs font-semibold">
             04
         </div>
 
-        <p class="mt-7 text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+        <p class="mt-7 text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
             ONLINE
         </p>
 
@@ -227,7 +227,7 @@
             {{ $contactSetting?->online_label ?? 'ارتباط آنلاین' }}
         </h2>
 
-        <p class="mt-3 text-xs leading-6 text-[var(--livora-stone)]">
+        <p class="mt-3 text-xs leading-6 text-[var(--sg-stone)]">
             {{ $contactSetting?->online_description ?? 'پیام خود را ارسال کنید تا با شما تماس بگیریم.' }}
         </p>
 
@@ -254,7 +254,7 @@
 
                 <div>
 
-                    <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--livora-accent)]">
+                    <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
                         LET'S TALK
                     </p>
 
@@ -262,7 +262,7 @@
                         چه کمکی از دست ما برمی‌آید؟
                     </h2>
 
-                    <p class="mt-5 max-w-xl text-sm leading-8 text-[var(--livora-stone)]">
+                    <p class="mt-5 max-w-xl text-sm leading-8 text-[var(--sg-stone)]">
                         اگر درباره محصول، موجودی، قیمت، شرایط خرید اقساطی،
                         ارسال یا سفارش خود سؤالی دارید، پیام بگذارید.
                     </p>
@@ -272,13 +272,13 @@
 
                     <div class="mt-10 space-y-3">
 
-                        <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-5">
+                        <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
 
-                            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
                                 ADDRESS
                             </p>
 
-                            <p class="mt-3 text-sm leading-8 text-[var(--livora-stone)]">
+                            <p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">
                                 {{ $contactSetting?->address ?? 'آدرس فروشگاه ثبت نشده است.' }}
                             </p>
 
@@ -287,13 +287,13 @@
 
                         {{-- HOURS --}}
 
-                        <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-5">
+                        <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
 
-                            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
                                 HOURS
                             </p>
 
-                            <p class="mt-3 text-sm leading-8 text-[var(--livora-stone)]">
+                            <p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">
                                 {{ $contactSetting?->hours ?? 'ساعات کاری فروشگاه ثبت نشده است.' }}
                             </p>
 
@@ -302,13 +302,13 @@
 
                         {{-- INSTALLMENT --}}
 
-                        <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-5">
+                        <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
 
-                            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
                                 INSTALLMENT
                             </p>
 
-                            <p class="mt-3 text-sm leading-8 text-[var(--livora-stone)]">
+                            <p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">
                                 برای اطلاع از شرایط اقساط هر محصول،
                                 صفحه همان محصول را بررسی کنید یا از طریق فرم با ما تماس بگیرید.
                             </p>
@@ -322,11 +322,11 @@
 
                 {{-- FORM --}}
 
-                <div class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-6 sm:p-8 lg:p-10">
+                <div class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-6 sm:p-8 lg:p-10">
 
                     <div class="mb-8">
 
-                        <p class="text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--livora-accent)]">
+                        <p class="text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--sg-accent)]">
                             CONTACT FORM
                         </p>
 
@@ -334,7 +334,7 @@
                             پیام خود را ارسال کنید
                         </h2>
 
-                        <p class="mt-2 text-xs leading-7 text-[var(--livora-stone)]">
+                        <p class="mt-2 text-xs leading-7 text-[var(--sg-stone)]">
                             اطلاعات تماس خود را وارد کنید تا بتوانیم پاسخ دقیق‌تری ارائه دهیم.
                         </p>
 
@@ -345,9 +345,9 @@
 
                     @if(session('success'))
 
-                        <div class="mb-6 rounded-2xl border border-[var(--livora-success)]/20 bg-[var(--livora-success-soft)] p-4">
+                        <div class="mb-6 rounded-2xl border border-[var(--sg-success)]/20 bg-[var(--sg-success-soft)] p-4">
 
-                            <p class="text-xs leading-7 text-[var(--livora-success)]">
+                            <p class="text-xs leading-7 text-[var(--sg-success)]">
                                 {{ session('success') }}
                             </p>
 
@@ -360,9 +360,9 @@
 
                     @if($errors->any())
 
-                        <div class="mb-6 rounded-2xl border border-[var(--livora-danger)]/20 bg-[var(--livora-danger-soft)] p-4">
+                        <div class="mb-6 rounded-2xl border border-[var(--sg-danger)]/20 bg-[var(--sg-danger-soft)] p-4">
 
-                            <ul class="space-y-1 text-xs leading-6 text-[var(--livora-danger)]">
+                            <ul class="space-y-1 text-xs leading-6 text-[var(--sg-danger)]">
 
                                 @foreach($errors->all() as $error)
 
@@ -410,14 +410,14 @@
                                     name="name"
                                     type="text"
                                     value="{{ old('name', auth()->user()?->name) }}"
-                                    class="admin-input mt-2 w-full @error('name') border-[var(--livora-danger)] @enderror"
+                                    class="admin-input mt-2 w-full @error('name') border-[var(--sg-danger)] @enderror"
                                     autocomplete="name"
                                     placeholder="نام شما"
                                 >
 
                                 @error('name')
 
-                                <p class="mt-1 text-[11px] text-[var(--livora-danger)]">
+                                <p class="mt-1 text-[11px] text-[var(--sg-danger)]">
                                     {{ $message }}
                                 </p>
 
@@ -442,7 +442,7 @@
                                     name="phone"
                                     type="tel"
                                     value="{{ old('phone', auth()->user()?->phone) }}"
-                                    class="admin-input mt-2 w-full @error('phone') border-[var(--livora-danger)] @enderror"
+                                    class="admin-input mt-2 w-full @error('phone') border-[var(--sg-danger)] @enderror"
                                     autocomplete="tel"
                                     dir="ltr"
                                     placeholder="09xxxxxxxxx"
@@ -450,7 +450,7 @@
 
                                 @error('phone')
 
-                                <p class="mt-1 text-[11px] text-[var(--livora-danger)]">
+                                <p class="mt-1 text-[11px] text-[var(--sg-danger)]">
                                     {{ $message }}
                                 </p>
 
@@ -477,7 +477,7 @@
                                 name="email"
                                 type="email"
                                 value="{{ old('email', auth()->user()?->email) }}"
-                                class="admin-input mt-2 w-full @error('email') border-[var(--livora-danger)] @enderror"
+                                class="admin-input mt-2 w-full @error('email') border-[var(--sg-danger)] @enderror"
                                 autocomplete="email"
                                 dir="ltr"
                                 placeholder="you@example.com"
@@ -485,7 +485,7 @@
 
                             @error('email')
 
-                            <p class="mt-1 text-[11px] text-[var(--livora-danger)]">
+                            <p class="mt-1 text-[11px] text-[var(--sg-danger)]">
                                 {{ $message }}
                             </p>
 
@@ -508,7 +508,7 @@
                             <select
                                 id="subject"
                                 name="subject"
-                                class="admin-select mt-2 w-full @error('subject') border-[var(--livora-danger)] @enderror"
+                                class="admin-select mt-2 w-full @error('subject') border-[var(--sg-danger)] @enderror"
                             >
 
                                 <option value="">
@@ -554,7 +554,7 @@
 
                             @error('subject')
 
-                            <p class="mt-1 text-[11px] text-[var(--livora-danger)]">
+                            <p class="mt-1 text-[11px] text-[var(--sg-danger)]">
                                 {{ $message }}
                             </p>
 
@@ -578,13 +578,13 @@
                                 id="message"
                                 name="message"
                                 rows="7"
-                                class="admin-textarea mt-2 w-full @error('message') border-[var(--livora-danger)] @enderror"
+                                class="admin-textarea mt-2 w-full @error('message') border-[var(--sg-danger)] @enderror"
                                 placeholder="پیام خود را بنویسید..."
                             >{{ old('message') }}</textarea>
 
                             @error('message')
 
-                            <p class="mt-1 text-[11px] text-[var(--livora-danger)]">
+                            <p class="mt-1 text-[11px] text-[var(--sg-danger)]">
                                 {{ $message }}
                             </p>
 
@@ -595,9 +595,9 @@
 
                         {{-- FORM NOTE --}}
 
-                        <div class="rounded-2xl bg-[var(--livora-surface)] p-4">
+                        <div class="rounded-2xl bg-[var(--sg-surface)] p-4">
 
-                            <p class="text-[11px] leading-7 text-[var(--livora-stone)]">
+                            <p class="text-[11px] leading-7 text-[var(--sg-stone)]">
                                 پیام شما پس از ارسال بررسی می‌شود و در صورت نیاز
                                 از طریق اطلاعات تماس واردشده با شما ارتباط خواهیم گرفت.
                             </p>
@@ -609,7 +609,7 @@
 
                         <button
                             type="submit"
-                            class="w-full rounded-2xl bg-[var(--livora-ink)] px-6 py-4 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:bg-[var(--livora-accent)]"
+                            class="w-full rounded-2xl bg-[var(--sg-ink)] px-6 py-4 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:bg-[var(--sg-accent)]"
                         >
                             ارسال پیام
                         </button>
@@ -630,7 +630,7 @@
          FAQ is intentionally static for the first version.
     ========================================================== --}}
 
-    <section class="border-t border-[var(--livora-border)] bg-[var(--livora-white)]">
+    <section class="border-t border-[var(--sg-border)] bg-[var(--sg-white)]">
 
         <x-layout.container>
 
@@ -641,7 +641,7 @@
 
                 <div>
 
-                    <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--livora-accent)]">
+                    <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
                         FAQ
                     </p>
 
@@ -649,7 +649,7 @@
                         پرسش‌های متداول
                     </h2>
 
-                    <p class="mt-4 text-sm leading-8 text-[var(--livora-stone)]">
+                    <p class="mt-4 text-sm leading-8 text-[var(--sg-stone)]">
                         پاسخ چند سؤال رایج درباره ارتباط با SillaGallery و خرید از فروشگاه.
                     </p>
 
@@ -660,7 +660,7 @@
 
                     @forelse($faqs as $index => $faq)
 
-                        <article class="overflow-hidden rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-cream)]">
+                        <article class="overflow-hidden rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-cream)]">
 
                             <button
                                 type="button"
@@ -698,7 +698,7 @@
                                 x-cloak
                             >
 
-                                <div class="border-t border-[var(--livora-border)] px-5 py-5 text-xs leading-7 text-[var(--livora-stone)] sm:px-6">
+                                <div class="border-t border-[var(--sg-border)] px-5 py-5 text-xs leading-7 text-[var(--sg-stone)] sm:px-6">
                                     {{ $faq['answer'] }}
                                 </div>
 
@@ -708,9 +708,9 @@
 
                     @empty
 
-                        <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-cream)] p-6">
+                        <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-cream)] p-6">
 
-                            <p class="text-sm leading-7 text-[var(--livora-stone)]">
+                            <p class="text-sm leading-7 text-[var(--sg-stone)]">
                                 در حال حاضر پرسش متداولی ثبت نشده است.
                             </p>
 
@@ -731,7 +731,7 @@
          FINAL CTA
     ========================================================== --}}
 
-    <section class="border-t border-[var(--livora-border)] bg-[var(--livora-surface)]">
+    <section class="border-t border-[var(--sg-border)] bg-[var(--sg-surface)]">
 
         <x-layout.container>
 
@@ -739,7 +739,7 @@
 
                 <div>
 
-                    <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--livora-accent)]">
+                    <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--sg-accent)]">
                         SillaGallery
                     </p>
 
@@ -747,7 +747,7 @@
                         آماده‌ای انتخابت را پیدا کنی؟
                     </h2>
 
-                    <p class="mt-2 text-sm leading-7 text-[var(--livora-stone)]">
+                    <p class="mt-2 text-sm leading-7 text-[var(--sg-stone)]">
                         مجموعه محصولات را ببین و انتخاب بعدی‌ات را پیدا کن.
                     </p>
 
@@ -756,7 +756,7 @@
 
                 <a
                     href="{{ route('shop.index') }}"
-                    class="inline-flex w-fit rounded-2xl bg-[var(--livora-ink)] px-6 py-4 text-sm font-medium text-white transition hover:bg-[var(--livora-accent)]"
+                    class="inline-flex w-fit rounded-2xl bg-[var(--sg-ink)] px-6 py-4 text-sm font-medium text-white transition hover:bg-[var(--sg-accent)]"
                 >
                     ورود به فروشگاه
                 </a>

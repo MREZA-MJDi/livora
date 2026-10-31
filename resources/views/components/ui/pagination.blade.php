@@ -90,22 +90,22 @@
             ====================================================== --}}
             @if($from && $to)
 
-                <p class="text-[11px] text-[var(--livora-stone)]">
+                <p class="text-[11px] text-[var(--sg-stone)]">
 
                     نمایش
-                    <span class="font-medium text-[var(--livora-ink)]">
+                    <span class="font-medium text-[var(--sg-ink)]">
                         {{ number_format($from) }}
                     </span>
 
                     تا
 
-                    <span class="font-medium text-[var(--livora-ink)]">
+                    <span class="font-medium text-[var(--sg-ink)]">
                         {{ number_format($to) }}
                     </span>
 
                     از
 
-                    <span class="font-medium text-[var(--livora-ink)]">
+                    <span class="font-medium text-[var(--sg-ink)]">
                         {{ number_format($total) }}
                     </span>
 
@@ -127,7 +127,7 @@
                     <span
                         aria-disabled="true"
                         aria-label="صفحه قبلی"
-                        class="flex h-10 w-10 cursor-not-allowed items-center justify-center rounded-xl border border-[var(--livora-border)] bg-[var(--livora-surface)] text-[var(--livora-stone)] opacity-40"
+                        class="flex h-10 w-10 cursor-not-allowed items-center justify-center rounded-xl border border-[var(--sg-border)] bg-[var(--sg-surface)] text-[var(--sg-stone)] opacity-40"
                     >
 
                         <svg
@@ -153,7 +153,7 @@
                         href="{{ $pagination->previousPageUrl() }}"
                         rel="prev"
                         aria-label="صفحه قبلی"
-                        class="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--livora-border)] bg-[var(--livora-white)] text-[var(--livora-ink)] transition hover:border-[var(--livora-ink)] hover:bg-[var(--livora-surface)]"
+                        class="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--sg-border)] bg-[var(--sg-white)] text-[var(--sg-ink)] transition hover:border-[var(--sg-ink)] hover:bg-[var(--sg-surface)]"
                     >
 
                         <svg
@@ -185,7 +185,7 @@
 
                             <span
                                 aria-hidden="true"
-                                class="flex h-10 min-w-10 items-center justify-center rounded-xl px-2 text-xs text-[var(--livora-stone)]"
+                                class="flex h-10 min-w-10 items-center justify-center rounded-xl px-2 text-xs text-[var(--sg-stone)]"
                             >
                                 …
                             </span>
@@ -195,7 +195,7 @@
                             <span
                                 aria-current="page"
                                 aria-label="صفحه {{ $page }}"
-                                class="flex h-10 min-w-10 items-center justify-center rounded-xl bg-[var(--livora-ink)] px-3 text-xs font-semibold text-white"
+                                class="flex h-10 min-w-10 items-center justify-center rounded-xl bg-[var(--sg-ink)] px-3 text-xs font-semibold text-white"
                             >
                                 {{ number_format($page) }}
                             </span>
@@ -205,7 +205,7 @@
                             <a
                                 href="{{ $pagination->url($page) }}"
                                 aria-label="صفحه {{ $page }}"
-                                class="flex h-10 min-w-10 items-center justify-center rounded-xl border border-transparent px-3 text-xs font-medium text-[var(--livora-stone)] transition hover:border-[var(--livora-border)] hover:bg-[var(--livora-white)] hover:text-[var(--livora-ink)]"
+                                class="flex h-10 min-w-10 items-center justify-center rounded-xl border border-transparent px-3 text-xs font-medium text-[var(--sg-stone)] transition hover:border-[var(--sg-border)] hover:bg-[var(--sg-white)] hover:text-[var(--sg-ink)]"
                             >
                                 {{ number_format($page) }}
                             </a>
@@ -224,7 +224,7 @@
                         href="{{ $pagination->nextPageUrl() }}"
                         rel="next"
                         aria-label="صفحه بعدی"
-                        class="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--livora-border)] bg-[var(--livora-white)] text-[var(--livora-ink)] transition hover:border-[var(--livora-ink)] hover:bg-[var(--livora-surface)]"
+                        class="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--sg-border)] bg-[var(--sg-white)] text-[var(--sg-ink)] transition hover:border-[var(--sg-ink)] hover:bg-[var(--sg-surface)]"
                     >
 
                         <svg
@@ -249,7 +249,7 @@
                     <span
                         aria-disabled="true"
                         aria-label="صفحه بعدی"
-                        class="flex h-10 w-10 cursor-not-allowed items-center justify-center rounded-xl border border-[var(--livora-border)] bg-[var(--livora-surface)] text-[var(--livora-stone)] opacity-40"
+                        class="flex h-10 w-10 cursor-not-allowed items-center justify-center rounded-xl border border-[var(--sg-border)] bg-[var(--sg-surface)] text-[var(--sg-stone)] opacity-40"
                     >
 
                         <svg

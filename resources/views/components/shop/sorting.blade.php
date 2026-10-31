@@ -44,17 +44,17 @@
         @click="open = !open"
         :aria-expanded="open.toString()"
         aria-haspopup="listbox"
-        class="flex w-full items-center justify-between gap-4 rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] px-4 py-3.5 text-right transition hover:border-[var(--livora-ink)]"
+        class="flex w-full items-center justify-between gap-4 rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] px-4 py-3.5 text-right transition hover:border-[var(--sg-ink)]"
     >
 
         <span>
-            <span class="block text-[10px] uppercase tracking-[0.16em] text-[var(--livora-stone)]">
+            <span class="block text-[10px] uppercase tracking-[0.16em] text-[var(--sg-stone)]">
                 SORT
             </span>
 
             <span
                 x-text="label"
-                class="mt-1 block text-xs font-medium text-[var(--livora-ink)]"
+                class="mt-1 block text-xs font-medium text-[var(--sg-ink)]"
             >
                 {{ $currentLabel }}
             </span>
@@ -66,7 +66,7 @@
             viewBox="0 0 24 24"
             stroke-width="1.5"
             stroke="currentColor"
-            class="h-4 w-4 shrink-0 text-[var(--livora-stone)] transition-transform"
+            class="h-4 w-4 shrink-0 text-[var(--sg-stone)] transition-transform"
             :class="open ? 'rotate-180' : ''"
         >
             <path
@@ -91,7 +91,7 @@
         x-transition:leave="transition ease-in duration-100"
         x-transition:leave-start="translate-y-0 opacity-100"
         x-transition:leave-end="translate-y-1 opacity-0"
-        class="absolute left-0 right-0 top-[calc(100%+8px)] z-30 overflow-hidden rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-2 shadow-xl"
+        class="absolute left-0 right-0 top-[calc(100%+8px)] z-30 overflow-hidden rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-2 shadow-xl"
     >
 
         <div
@@ -125,9 +125,9 @@
                     "
                     @class([
                         'flex items-center justify-between rounded-xl px-3 py-3 text-xs transition',
-                        'bg-[var(--livora-surface)] font-semibold text-[var(--livora-ink)]'
+                        'bg-[var(--sg-surface)] font-semibold text-[var(--sg-ink)]'
                             => $currentSort === $value,
-                        'text-[var(--livora-stone)] hover:bg-[var(--livora-surface)] hover:text-[var(--livora-ink)]'
+                        'text-[var(--sg-stone)] hover:bg-[var(--sg-surface)] hover:text-[var(--sg-ink)]'
                             => $currentSort !== $value,
                     ])
                 >

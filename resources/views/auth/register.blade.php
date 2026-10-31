@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'ثبت نام | SilaGallery')
+@section('title', 'ثبت نام | SillaGallery')
 
-@section('description', 'ایجاد حساب کاربری در SilaGallery')
+@section('description', 'ایجاد حساب کاربری در SillaGallery')
 
 @section('content')
 
@@ -16,16 +16,16 @@
 
                     <div class="text-center">
 
-                        <p class="text-xs font-medium uppercase tracking-[0.2em] text-[var(--livora-accent)]">
-                            JOIN SilaGallery
+                        <p class="text-xs font-medium uppercase tracking-[0.2em] text-[var(--sg-accent)]">
+                            JOIN SillaGallery
                         </p>
 
-                        <h1 class="mt-3 text-3xl font-semibold text-[var(--livora-ink)]">
+                        <h1 class="mt-3 text-3xl font-semibold text-[var(--sg-ink)]">
                             ایجاد حساب
                         </h1>
 
-                        <p class="mt-3 text-sm leading-7 text-[var(--livora-stone)]">
-                            برای خرید و پیگیری سفارش‌ها حساب SilaGallery خود را ایجاد کنید.
+                        <p class="mt-3 text-sm leading-7 text-[var(--sg-stone)]">
+                            برای خرید و پیگیری سفارش‌ها حساب SillaGallery خود را ایجاد کنید.
                         </p>
 
                     </div>
@@ -42,7 +42,7 @@
                     @endif
 
 
-                    <div class="mt-8 rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-6 sm:p-8">
+                    <div class="mt-8 rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-6 sm:p-8">
 
                         <form
                             action="{{ route('register.store') }}"
@@ -121,18 +121,18 @@
                                     value="1"
                                     @checked(old('terms'))
                                 required
-                                class="mt-1 h-4 w-4 rounded border-[var(--livora-border)] accent-[var(--livora-accent)]"
+                                class="mt-1 h-4 w-4 rounded border-[var(--sg-border)] accent-[var(--sg-accent)]"
                                 >
 
-                                <span class="text-xs leading-6 text-[var(--livora-stone)]">
+                                <span class="text-xs leading-6 text-[var(--sg-stone)]">
                                     با ایجاد حساب، با
                                     <a
                                         href="{{ route('terms') }}"
-                                        class="font-medium text-[var(--livora-accent)] hover:underline"
+                                        class="font-medium text-[var(--sg-accent)] hover:underline"
                                     >
                                         قوانین و شرایط
                                     </a>
-                                    SilaGallery موافقم.
+                                    SillaGallery موافقم.
                                 </span>
 
                             </label>
@@ -159,15 +159,15 @@
                         </form>
 
 
-                        <div class="mt-7 border-t border-[var(--livora-border)] pt-6 text-center">
+                        <div class="mt-7 border-t border-[var(--sg-border)] pt-6 text-center">
 
-                            <p class="text-sm text-[var(--livora-stone)]">
+                            <p class="text-sm text-[var(--sg-stone)]">
                                 قبلاً حساب ساخته‌اید؟
                             </p>
 
                             <a
                                 href="{{ route('login') }}"
-                                class="mt-2 inline-block text-sm font-medium text-[var(--livora-accent)]"
+                                class="mt-2 inline-block text-sm font-medium text-[var(--sg-accent)]"
                             >
                                 ورود به حساب
                             </a>

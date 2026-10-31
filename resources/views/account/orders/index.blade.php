@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'سفارش‌های من | SilaGallery')
+@section('title', 'سفارش‌های من | SillaGallery')
 
 @section(
     'description',
-    'مشاهده و مدیریت سفارش‌های شما در SilaGallery.'
+    'مشاهده و مدیریت سفارش‌های شما در SillaGallery.'
 )
 
 @push('seo')
@@ -45,17 +45,17 @@
         ];
     @endphp
 
-    <div class="min-h-[70vh] bg-[var(--livora-cream)]">
+    <div class="min-h-[70vh] bg-[var(--sg-cream)]">
 
-        <section class="border-b border-[var(--livora-border)] bg-[var(--livora-white)]">
+        <section class="border-b border-[var(--sg-border)] bg-[var(--sg-white)]">
             <x-layout.container>
 
                 <div class="py-8 sm:py-12">
 
-                    <nav class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--livora-stone)]">
+                    <nav class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--sg-stone)]">
                         <a
                             href="{{ route('home') }}"
-                            class="transition hover:text-[var(--livora-ink)]"
+                            class="transition hover:text-[var(--sg-ink)]"
                         >
                             خانه
                         </a>
@@ -64,14 +64,14 @@
 
                         <a
                             href="{{ route('account.index') }}"
-                            class="transition hover:text-[var(--livora-ink)]"
+                            class="transition hover:text-[var(--sg-ink)]"
                         >
                             حساب کاربری
                         </a>
 
                         <span>/</span>
 
-                        <span class="text-[var(--livora-ink)]">
+                        <span class="text-[var(--sg-ink)]">
                         سفارش‌ها
                     </span>
                     </nav>
@@ -79,7 +79,7 @@
                     <div class="mt-7 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
 
                         <div>
-                            <p class="text-[10px] uppercase tracking-[0.22em] text-[var(--livora-accent)]">
+                            <p class="text-[10px] uppercase tracking-[0.22em] text-[var(--sg-accent)]">
                                 MY ORDERS
                             </p>
 
@@ -87,14 +87,14 @@
                                 سفارش‌های من
                             </h1>
 
-                            <p class="mt-3 text-sm leading-8 text-[var(--livora-stone)]">
+                            <p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">
                                 تاریخچه سفارش‌ها، وضعیت پرداخت و جزئیات هر خرید را اینجا ببین.
                             </p>
                         </div>
 
                         <a
                             href="{{ route('shop.index') }}"
-                            class="inline-flex w-fit items-center rounded-2xl bg-[var(--livora-ink)] px-5 py-3.5 text-sm font-medium text-white transition hover:bg-[var(--livora-accent)]"
+                            class="inline-flex w-fit items-center rounded-2xl bg-[var(--sg-ink)] px-5 py-3.5 text-sm font-medium text-white transition hover:bg-[var(--sg-accent)]"
                         >
                             خرید جدید
                         </a>
@@ -116,11 +116,11 @@
 
                         <div class="mx-auto max-w-xl text-center">
 
-                            <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-[1.75rem] bg-[var(--livora-white)] text-[var(--livora-stone)]">
+                            <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-[1.75rem] bg-[var(--sg-white)] text-[var(--sg-stone)]">
                                 —
                             </div>
 
-                            <p class="mt-7 text-[10px] uppercase tracking-[0.22em] text-[var(--livora-accent)]">
+                            <p class="mt-7 text-[10px] uppercase tracking-[0.22em] text-[var(--sg-accent)]">
                                 NO ORDERS
                             </p>
 
@@ -128,13 +128,13 @@
                                 هنوز سفارشی ثبت نکرده‌ای
                             </h2>
 
-                            <p class="mx-auto mt-4 max-w-md text-sm leading-8 text-[var(--livora-stone)]">
-                                اولین انتخابت را از مجموعه SilaGallery پیدا کن.
+                            <p class="mx-auto mt-4 max-w-md text-sm leading-8 text-[var(--sg-stone)]">
+                                اولین انتخابت را از مجموعه SillaGallery پیدا کن.
                             </p>
 
                             <a
                                 href="{{ route('shop.index') }}"
-                                class="mt-8 inline-flex rounded-2xl bg-[var(--livora-ink)] px-7 py-4 text-sm font-medium text-white transition hover:bg-[var(--livora-accent)]"
+                                class="mt-8 inline-flex rounded-2xl bg-[var(--sg-ink)] px-7 py-4 text-sm font-medium text-white transition hover:bg-[var(--sg-accent)]"
                             >
                                 ورود به فروشگاه
                             </a>
@@ -151,11 +151,11 @@
 
                             @foreach($orders as $order)
 
-                                <article class="overflow-hidden rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)]">
+                                <article class="overflow-hidden rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)]">
 
                                     <a
                                         href="{{ route('account.orders.show', $order) }}"
-                                        class="block p-5 transition hover:bg-[var(--livora-surface)] sm:p-7"
+                                        class="block p-5 transition hover:bg-[var(--sg-surface)] sm:p-7"
                                     >
 
                                         <div class="flex flex-col gap-6">
@@ -179,7 +179,7 @@
 
                                                     </div>
 
-                                                    <p class="mt-2 text-[11px] text-[var(--livora-stone)]">
+                                                    <p class="mt-2 text-[11px] text-[var(--sg-stone)]">
                                                         {{ optional($order->created_at)->format('Y/m/d') }}
                                                     </p>
 
@@ -189,7 +189,7 @@
 
                                                     <p class="text-lg font-semibold">
                                                         {{ number_format((float) $order->total) }}
-                                                        <span class="text-[10px] font-normal text-[var(--livora-stone)]">
+                                                        <span class="text-[10px] font-normal text-[var(--sg-stone)]">
                                                         تومان
                                                     </span>
                                                     </p>
@@ -210,14 +210,14 @@
                                             {{-- Meta --}}
                                             <div class="flex flex-wrap gap-2 text-[11px]">
 
-                                            <span class="rounded-full border border-[var(--livora-border)] px-3 py-1.5 text-[var(--livora-stone)]">
+                                            <span class="rounded-full border border-[var(--sg-border)] px-3 py-1.5 text-[var(--sg-stone)]">
                                                 {{ number_format($order->items->count()) }}
                                                 محصول
                                             </span>
 
                                                 @if($order->payment_method === 'installment')
 
-                                                    <span class="rounded-full border border-[var(--livora-border)] bg-[var(--livora-surface)] px-3 py-1.5 text-[var(--livora-accent)]">
+                                                    <span class="rounded-full border border-[var(--sg-border)] bg-[var(--sg-surface)] px-3 py-1.5 text-[var(--sg-accent)]">
                                                     خرید اقساطی
                                                 </span>
 
@@ -225,7 +225,7 @@
 
                                                 @if($order->payment_provider)
 
-                                                    <span class="rounded-full border border-[var(--livora-border)] px-3 py-1.5 text-[var(--livora-stone)]">
+                                                    <span class="rounded-full border border-[var(--sg-border)] px-3 py-1.5 text-[var(--sg-stone)]">
                                                     {{ $order->payment_provider }}
                                                 </span>
 
@@ -241,7 +241,7 @@
 
                                                     @foreach($order->items->take(4) as $item)
 
-                                                        <div class="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-[var(--livora-surface)]">
+                                                        <div class="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-[var(--sg-surface)]">
 
                                                             @if($item->product?->images?->first()?->url)
 
@@ -254,8 +254,8 @@
 
                                                             @else
 
-                                                                <div class="flex h-full w-full items-center justify-center text-[9px] tracking-wider text-[var(--livora-stone)]">
-                                                                    SilaGallery
+                                                                <div class="flex h-full w-full items-center justify-center text-[9px] tracking-wider text-[var(--sg-stone)]">
+                                                                    SillaGallery
                                                                 </div>
 
                                                             @endif
@@ -270,13 +270,13 @@
 
 
                                             {{-- Footer --}}
-                                            <div class="flex items-center justify-between border-t border-[var(--livora-border)] pt-5">
+                                            <div class="flex items-center justify-between border-t border-[var(--sg-border)] pt-5">
 
-                                            <span class="text-xs text-[var(--livora-stone)]">
+                                            <span class="text-xs text-[var(--sg-stone)]">
                                                 مشاهده جزئیات سفارش
                                             </span>
 
-                                                <span class="text-[var(--livora-ink)] transition-transform group-hover:-translate-x-1">
+                                                <span class="text-[var(--sg-ink)] transition-transform group-hover:-translate-x-1">
                                                 ←
                                             </span>
 

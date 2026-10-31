@@ -1,11 +1,11 @@
 @extends('errors.layout')
 
-@section('title', 'صفحه پیدا نشد | SilaGallery')
+@section('title', 'صفحه پیدا نشد | SillaGallery')
 
 @section('content')
 <div class="wrap">
     <main class="card">
-        <div class="brand">SilaGallery</div>
+        <div class="brand">SillaGallery</div>
         <div class="code ">404</div>
         <h1>این صفحه را پیدا نکردیم.</h1>
         <p>ممکن است نشانی اشتباه باشد، یا محصول/صفحه تغییر کرده یا حذف شده باشد.</p>

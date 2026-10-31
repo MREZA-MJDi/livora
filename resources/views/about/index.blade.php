@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'درباره SilaGallery | مبلمان و سبک زندگی')
+@section('title', 'درباره SillaGallery | مبلمان و سبک زندگی')
 
 @section(
     'description',
-    'با SilaGallery آشنا شوید؛ مجموعه‌ای برای انتخاب مبلمان و عناصر خانه با تمرکز بر طراحی، کیفیت، تجربه خرید و پرداخت منعطف.'
+    'با SillaGallery آشنا شوید؛ مجموعه‌ای برای انتخاب مبلمان و عناصر خانه با تمرکز بر طراحی، کیفیت، تجربه خرید و پرداخت منعطف.'
 )
 
 @section('canonical', route('about'))
@@ -18,12 +18,12 @@
 
     <meta
         property="og:title"
-        content="درباره SilaGallery | مبلمان و سبک زندگی"
+        content="درباره SillaGallery | مبلمان و سبک زندگی"
     >
 
     <meta
         property="og:description"
-        content="SilaGallery برای انتخاب دقیق‌تر، خرید ساده‌تر و ساختن خانه‌ای ماندگار شکل گرفته است."
+        content="SillaGallery برای انتخاب دقیق‌تر، خرید ساده‌تر و ساختن خانه‌ای ماندگار شکل گرفته است."
     >
 
     <meta
@@ -38,19 +38,19 @@
 
     <meta
         name="twitter:title"
-        content="درباره SilaGallery"
+        content="درباره SillaGallery"
     >
 
     <meta
         name="twitter:description"
-        content="داستان، فلسفه و تجربه برند SilaGallery."
+        content="داستان، فلسفه و تجربه برند SillaGallery."
     >
 
     <script type="application/ld+json">
 {
     "@@context": "https://schema.org",
     "@@type": "WebSite",
-    "name": "SilaGallery",
+    "name": "SillaGallery",
     "url": @json(url('/')),
     "potentialAction": {
         "@@type": "SearchAction",
@@ -64,7 +64,7 @@
 {
     "@@context": "https://schema.org",
     "@@type": "Organization",
-    "name": "SilaGallery",
+    "name": "SillaGallery",
     "url": @json(url('/'))
         }
 </script>
@@ -73,12 +73,12 @@
 
 @section('content')
 
-    <div class="overflow-hidden bg-[var(--livora-cream)]">
+    <div class="overflow-hidden bg-[var(--sg-cream)]">
 
         {{-- =========================================================
              HERO
         ========================================================== --}}
-        <section class="border-b border-[var(--livora-border)] bg-[var(--livora-white)]">
+        <section class="border-b border-[var(--sg-border)] bg-[var(--sg-white)]">
 
             <x-layout.container>
 
@@ -86,19 +86,19 @@
 
                     <nav
                         aria-label="breadcrumb"
-                        class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--livora-stone)]"
+                        class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--sg-stone)]"
                     >
 
                         <a
                             href="{{ route('home') }}"
-                            class="transition hover:text-[var(--livora-ink)]"
+                            class="transition hover:text-[var(--sg-ink)]"
                         >
                             خانه
                         </a>
 
                         <span>/</span>
 
-                        <span class="text-[var(--livora-ink)]">
+                        <span class="text-[var(--sg-ink)]">
                         درباره ما
                     </span>
 
@@ -108,13 +108,13 @@
 
                         <div class="max-w-4xl">
 
-                            <p class="text-[10px] font-medium uppercase tracking-[0.24em] text-[var(--livora-accent)]">
-                                ABOUT SilaGallery
+                            <p class="text-[10px] font-medium uppercase tracking-[0.24em] text-[var(--sg-accent)]">
+                                ABOUT SillaGallery
                             </p>
 
                             <h1 class="mt-5 text-5xl font-semibold leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl">
                                 خانه فقط یک فضا نیست.
-                                <span class="block text-[var(--livora-accent)]">
+                                <span class="block text-[var(--sg-accent)]">
                                 بخشی از زندگی ماست.
                             </span>
                             </h1>
@@ -123,17 +123,17 @@
 
                         <div>
 
-                            <p class="text-sm leading-8 text-[var(--livora-stone)] sm:text-base">
-                                SilaGallery با یک ایده ساده شکل گرفته است:
+                            <p class="text-sm leading-8 text-[var(--sg-stone)] sm:text-base">
+                                SillaGallery با یک ایده ساده شکل گرفته است:
                                 انتخاب مبلمان نباید فقط خرید یک محصول باشد؛
                                 باید بخشی از ساختن فضایی باشد که هر روز در آن زندگی می‌کنیم.
                             </p>
 
                             <a
                                 href="{{ route('shop.index') }}"
-                                class="mt-7 inline-flex items-center rounded-2xl bg-[var(--livora-ink)] px-6 py-4 text-sm font-medium !text-white transition-colors duration-300 hover:bg-[var(--livora-accent)] hover:!text-white"
+                                class="mt-7 inline-flex items-center rounded-2xl bg-[var(--sg-ink)] px-6 py-4 text-sm font-medium !text-white transition-colors duration-300 hover:bg-[var(--sg-accent)] hover:!text-white"
                             >
-                                کشف مجموعه SilaGallery
+                                کشف مجموعه SillaGallery
                             </a>
                         </div>
 
@@ -149,7 +149,7 @@
         {{-- =========================================================
              BRAND STATEMENT
         ========================================================== --}}
-        <section class="border-b border-[var(--livora-border)]">
+        <section class="border-b border-[var(--sg-border)]">
 
             <x-layout.container>
 
@@ -157,7 +157,7 @@
 
                     <div>
 
-                        <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--livora-accent)]">
+                        <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
                             OUR APPROACH
                         </p>
 
@@ -169,14 +169,14 @@
 
                     <div class="max-w-3xl">
 
-                        <p class="text-lg leading-9 text-[var(--livora-ink)] sm:text-xl">
+                        <p class="text-lg leading-9 text-[var(--sg-ink)] sm:text-xl">
                             ما باور داریم محصول خوب محصولی نیست که فقط در عکس زیبا باشد؛
                             باید در استفاده روزمره، در کیفیت متریال، در تناسب با فضا
                             و در سال‌هایی که کنار شما می‌ماند هم ارزش خودش را نشان دهد.
                         </p>
 
-                        <p class="mt-6 text-sm leading-8 text-[var(--livora-stone)]">
-                            به همین دلیل در SilaGallery تلاش می‌کنیم تجربه کشف و خرید را
+                        <p class="mt-6 text-sm leading-8 text-[var(--sg-stone)]">
+                            به همین دلیل در SillaGallery تلاش می‌کنیم تجربه کشف و خرید را
                             ساده، شفاف و بدون شلوغی نگه داریم؛ از اطلاعات محصول و قیمت
                             گرفته تا شرایط پرداخت و مسیر سفارش.
                         </p>
@@ -193,7 +193,7 @@
         {{-- =========================================================
              VALUES
         ========================================================== --}}
-        <section class="bg-[var(--livora-surface)]">
+        <section class="bg-[var(--sg-surface)]">
 
             <x-layout.container>
 
@@ -201,7 +201,7 @@
 
                     <div class="max-w-2xl">
 
-                        <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--livora-accent)]">
+                        <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
                             WHAT MATTERS
                         </p>
 
@@ -213,9 +213,9 @@
 
                     <div class="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
 
-                        <article class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-6 sm:p-7">
+                        <article class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-6 sm:p-7">
 
-                        <span class="text-[10px] uppercase tracking-[0.2em] text-[var(--livora-accent)]">
+                        <span class="text-[10px] uppercase tracking-[0.2em] text-[var(--sg-accent)]">
                             01
                         </span>
 
@@ -223,15 +223,15 @@
                                 طراحی
                             </h3>
 
-                            <p class="mt-3 text-sm leading-8 text-[var(--livora-stone)]">
+                            <p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">
                                 فرم و ظاهر باید در خدمت فضای شما باشد، نه اینکه فضا را تحت‌الشعاع قرار دهد.
                             </p>
 
                         </article>
 
-                        <article class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-6 sm:p-7">
+                        <article class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-6 sm:p-7">
 
-                        <span class="text-[10px] uppercase tracking-[0.2em] text-[var(--livora-accent)]">
+                        <span class="text-[10px] uppercase tracking-[0.2em] text-[var(--sg-accent)]">
                             02
                         </span>
 
@@ -239,15 +239,15 @@
                                 کیفیت
                             </h3>
 
-                            <p class="mt-3 text-sm leading-8 text-[var(--livora-stone)]">
+                            <p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">
                                 انتخاب متریال و ساخت خوب، چیزی است که ارزش یک محصول را در طول زمان حفظ می‌کند.
                             </p>
 
                         </article>
 
-                        <article class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-6 sm:p-7">
+                        <article class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-6 sm:p-7">
 
-                        <span class="text-[10px] uppercase tracking-[0.2em] text-[var(--livora-accent)]">
+                        <span class="text-[10px] uppercase tracking-[0.2em] text-[var(--sg-accent)]">
                             03
                         </span>
 
@@ -255,15 +255,15 @@
                                 شفافیت
                             </h3>
 
-                            <p class="mt-3 text-sm leading-8 text-[var(--livora-stone)]">
+                            <p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">
                                 قیمت، مشخصات، موجودی و شرایط پرداخت باید قبل از تصمیم‌گیری روشن باشند.
                             </p>
 
                         </article>
 
-                        <article class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-6 sm:p-7">
+                        <article class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-6 sm:p-7">
 
-                        <span class="text-[10px] uppercase tracking-[0.2em] text-[var(--livora-accent)]">
+                        <span class="text-[10px] uppercase tracking-[0.2em] text-[var(--sg-accent)]">
                             04
                         </span>
 
@@ -271,7 +271,7 @@
                                 تجربه
                             </h3>
 
-                            <p class="mt-3 text-sm leading-8 text-[var(--livora-stone)]">
+                            <p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">
                                 خرید باید ساده و آرام باشد؛ از اولین مشاهده محصول تا سفارش نهایی.
                             </p>
 
@@ -289,7 +289,7 @@
         {{-- =========================================================
              PROCESS
         ========================================================== --}}
-        <section class="border-t border-[var(--livora-border)] bg-[var(--livora-white)]">
+        <section class="border-t border-[var(--sg-border)] bg-[var(--sg-white)]">
 
             <x-layout.container>
 
@@ -297,7 +297,7 @@
 
                     <div>
 
-                        <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--livora-accent)]">
+                        <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
                             THE EXPERIENCE
                         </p>
 
@@ -305,8 +305,8 @@
                             از کشف تا انتخاب.
                         </h2>
 
-                        <p class="mt-4 text-sm leading-8 text-[var(--livora-stone)]">
-                            تجربه SilaGallery فقط به صفحه محصول محدود نمی‌شود.
+                        <p class="mt-4 text-sm leading-8 text-[var(--sg-stone)]">
+                            تجربه SillaGallery فقط به صفحه محصول محدود نمی‌شود.
                             تمام مسیر برای انتخاب راحت‌تر طراحی شده است.
                         </p>
 
@@ -314,11 +314,11 @@
 
                     <div class="space-y-3">
 
-                        <article class="rounded-3xl border border-[var(--livora-border)] p-5 sm:p-6">
+                        <article class="rounded-3xl border border-[var(--sg-border)] p-5 sm:p-6">
 
                             <div class="flex gap-5">
 
-                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--livora-surface)] text-xs font-semibold">
+                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--sg-surface)] text-xs font-semibold">
                                 01
                             </span>
 
@@ -328,7 +328,7 @@
                                         کشف
                                     </h3>
 
-                                    <p class="mt-2 text-xs leading-7 text-[var(--livora-stone)]">
+                                    <p class="mt-2 text-xs leading-7 text-[var(--sg-stone)]">
                                         دسته‌بندی‌ها و مجموعه‌های مختلف را بررسی می‌کنید و محصول مناسب فضای خود را پیدا می‌کنید.
                                     </p>
 
@@ -338,11 +338,11 @@
 
                         </article>
 
-                        <article class="rounded-3xl border border-[var(--livora-border)] p-5 sm:p-6">
+                        <article class="rounded-3xl border border-[var(--sg-border)] p-5 sm:p-6">
 
                             <div class="flex gap-5">
 
-                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--livora-surface)] text-xs font-semibold">
+                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--sg-surface)] text-xs font-semibold">
                                 02
                             </span>
 
@@ -352,7 +352,7 @@
                                         بررسی
                                     </h3>
 
-                                    <p class="mt-2 text-xs leading-7 text-[var(--livora-stone)]">
+                                    <p class="mt-2 text-xs leading-7 text-[var(--sg-stone)]">
                                         قیمت، مشخصات، موجودی و در صورت وجود، شرایط خرید اقساطی محصول را می‌بینید.
                                     </p>
 
@@ -362,11 +362,11 @@
 
                         </article>
 
-                        <article class="rounded-3xl border border-[var(--livora-border)] p-5 sm:p-6">
+                        <article class="rounded-3xl border border-[var(--sg-border)] p-5 sm:p-6">
 
                             <div class="flex gap-5">
 
-                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--livora-surface)] text-xs font-semibold">
+                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--sg-surface)] text-xs font-semibold">
                                 03
                             </span>
 
@@ -376,7 +376,7 @@
                                         انتخاب
                                     </h3>
 
-                                    <p class="mt-2 text-xs leading-7 text-[var(--livora-stone)]">
+                                    <p class="mt-2 text-xs leading-7 text-[var(--sg-stone)]">
                                         محصول و ویژگی‌های موردنظر را انتخاب و وارد سبد خرید می‌کنید.
                                     </p>
 
@@ -386,11 +386,11 @@
 
                         </article>
 
-                        <article class="rounded-3xl border border-[var(--livora-border)] p-5 sm:p-6">
+                        <article class="rounded-3xl border border-[var(--sg-border)] p-5 sm:p-6">
 
                             <div class="flex gap-5">
 
-                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--livora-surface)] text-xs font-semibold">
+                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--sg-surface)] text-xs font-semibold">
                                 04
                             </span>
 
@@ -400,7 +400,7 @@
                                         پرداخت
                                     </h3>
 
-                                    <p class="mt-2 text-xs leading-7 text-[var(--livora-stone)]">
+                                    <p class="mt-2 text-xs leading-7 text-[var(--sg-stone)]">
                                         مسیر پرداخت متناسب با سفارش انتخاب می‌شود و شرایط اقساطی در صورت فعال بودن، شفاف نمایش داده خواهد شد.
                                     </p>
 
@@ -422,7 +422,7 @@
         {{-- =========================================================
              INSTALLMENT
         ========================================================== --}}
-        <section class="border-t border-white/10 bg-[var(--livora-ink)] text-white">
+        <section class="border-t border-white/10 bg-[var(--sg-ink)] text-white">
 
             <x-layout.container>
 
@@ -439,13 +439,13 @@
                         </h2>
 
                         <p class="mt-5 max-w-2xl text-sm leading-8 text-white/55">
-                            برخی محصولات SilaGallery می‌توانند با شرایط اقساطی تعریف‌شده توسط فروشگاه خریداری شوند.
+                            برخی محصولات SillaGallery می‌توانند با شرایط اقساطی تعریف‌شده توسط فروشگاه خریداری شوند.
                             درصد پیش‌پرداخت، تعداد چک و فاصله سررسید برای هر محصول مشخص است.
                         </p>
 
                         <a
                             href="{{ route('shop.index') }}"
-                            class="mt-8 inline-flex items-center rounded-2xl bg-white px-6 py-4 text-sm font-medium text-[var(--livora-ink)] transition hover:bg-[var(--livora-cream)]"
+                            class="mt-8 inline-flex items-center rounded-2xl bg-white px-6 py-4 text-sm font-medium text-[var(--sg-ink)] transition hover:bg-[var(--sg-cream)]"
                         >
                             مشاهده محصولات
                         </a>
@@ -510,7 +510,7 @@
         {{-- =========================================================
              FINAL STATEMENT
         ========================================================== --}}
-        <section class="border-t border-[var(--livora-border)] bg-[var(--livora-surface)]">
+        <section class="border-t border-[var(--sg-border)] bg-[var(--sg-surface)]">
 
             <x-layout.container>
 
@@ -518,16 +518,16 @@
 
                     <div class="mx-auto max-w-3xl text-center">
 
-                        <p class="text-[10px] font-medium uppercase tracking-[0.24em] text-[var(--livora-accent)]">
-                            SilaGallery
+                        <p class="text-[10px] font-medium uppercase tracking-[0.24em] text-[var(--sg-accent)]">
+                            SillaGallery
                         </p>
 
                         <h2 class="mt-5 text-4xl font-semibold tracking-tight sm:text-5xl">
                             برای فضاهایی که قرار است ماندگار باشند.
                         </h2>
 
-                        <p class="mx-auto mt-5 max-w-2xl text-sm leading-8 text-[var(--livora-stone)]">
-                            مجموعه SilaGallery را ببین و محصولی را پیدا کن که فقط خانه را پر نکند؛
+                        <p class="mx-auto mt-5 max-w-2xl text-sm leading-8 text-[var(--sg-stone)]">
+                            مجموعه SillaGallery را ببین و محصولی را پیدا کن که فقط خانه را پر نکند؛
                             بلکه بخشی از شخصیت آن شود.
                         </p>
 
@@ -535,14 +535,14 @@
 
                             <a
                                 href="{{ route('shop.index') }}"
-                                class="inline-flex items-center justify-center rounded-2xl bg-[var(--livora-ink)] px-7 py-4 text-sm font-medium text-white transition hover:bg-[var(--livora-accent)]"
+                                class="inline-flex items-center justify-center rounded-2xl bg-[var(--sg-ink)] px-7 py-4 text-sm font-medium text-white transition hover:bg-[var(--sg-accent)]"
                             >
                                 ورود به فروشگاه
                             </a>
 
                             <a
                                 href="{{ route('contact') }}"
-                                class="inline-flex items-center justify-center rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] px-7 py-4 text-sm font-medium text-[var(--livora-ink)] transition hover:border-[var(--livora-ink)]"
+                                class="inline-flex items-center justify-center rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] px-7 py-4 text-sm font-medium text-[var(--sg-ink)] transition hover:border-[var(--sg-ink)]"
                             >
                                 تماس با ما
                             </a>

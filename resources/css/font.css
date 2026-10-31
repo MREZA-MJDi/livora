@@ -1,9 +1,9 @@
 /* =========================================================
-   LIVORA — IRANYEKANX FANUM
+   SILLAGALLERY — IRANYEKANX FANUM
    ========================================================= */
 
 @import "../fonts/iranyekanx-fanum/font-face.css";
 
 :root {
-    --livora-font-family: "IRANYekanX FaNum", sans-serif;
+    --sg-font-family: "IRANYekanX FaNum", sans-serif;
 }

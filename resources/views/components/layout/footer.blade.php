@@ -1,4 +1,4 @@
-<footer class="border-t border-white/10 bg-[var(--livora-ink)] text-[var(--livora-cream)]">
+<footer class="border-t border-white/10 bg-[var(--sg-ink)] text-[var(--sg-cream)]">
 
     <x-layout.container>
 
@@ -15,7 +15,7 @@
                     aria-label="SillaGallery"
                     class="inline-flex items-center"
                 >
-                    <span class="text-2xl font-semibold tracking-[0.24em] text-white transition hover:text-[var(--livora-cream)]">
+                    <span class="text-2xl font-semibold tracking-[0.24em] text-white transition hover:text-[var(--sg-cream)]">
                         SillaGallery
                     </span>
                 </a>

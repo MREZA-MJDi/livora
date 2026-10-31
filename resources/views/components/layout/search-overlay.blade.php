@@ -8,7 +8,7 @@
     x-transition:leave="transition ease-in duration-200"
     x-transition:leave-start="opacity-100"
     x-transition:leave-end="opacity-0"
-    class="livora-search-overlay fixed inset-0 z-[110]"
+    class="sg-search-overlay fixed inset-0 z-[110]"
 >
 
     {{-- Backdrop --}}
@@ -29,11 +29,11 @@
         x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="translate-y-0 opacity-100"
         x-transition:leave-end="-translate-y-4 opacity-0"
-        class="livora-search-panel search-overlay-panel relative mx-auto w-full max-w-4xl overflow-hidden rounded-b-[2rem] bg-[var(--livora-cream)] shadow-2xl"
+        class="sg-search-panel search-overlay-panel relative mx-auto w-full max-w-4xl overflow-hidden rounded-b-[2rem] bg-[var(--sg-cream)] shadow-2xl"
     >
 
         {{-- Header --}}
-        <div class="border-b border-[var(--livora-border)] bg-[var(--livora-white)]">
+        <div class="border-b border-[var(--sg-border)] bg-[var(--sg-white)]">
 
             <x-layout.container>
 
@@ -41,11 +41,11 @@
 
                     <div>
 
-                        <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--livora-accent)]">
-                            LIVORA SEARCH
+                        <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
+                            SILLAGALLERY SEARCH
                         </p>
 
-                        <p class="mt-1 text-xs text-[var(--livora-stone)]">
+                        <p class="mt-1 text-xs text-[var(--sg-stone)]">
                             محصول، دسته‌بندی یا عبارت موردنظر را جستجو کنید.
                         </p>
 
@@ -55,7 +55,7 @@
                         type="button"
                         aria-label="بستن جستجو"
                         @click="closeSearch()"
-                        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[var(--livora-ink)] transition hover:bg-[var(--livora-surface)]"
+                        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[var(--sg-ink)] transition hover:bg-[var(--sg-surface)]"
                     >
 
                         <svg
@@ -133,7 +133,7 @@
                         x-model="searchValue"
                         autocomplete="off"
                         placeholder="مثلاً: مبل راحتی، میز ناهارخوری، مبل چستر..."
-                        class="storefront-search-input w-full rounded-[1.5rem] border border-[var(--livora-border)] bg-[var(--livora-white)] px-14 py-5 text-sm text-[var(--livora-ink)] outline-none transition placeholder:text-[var(--livora-stone)] focus:border-[var(--livora-ink)]"
+                        class="storefront-search-input w-full rounded-[1.5rem] border border-[var(--sg-border)] bg-[var(--sg-white)] px-14 py-5 text-sm text-[var(--sg-ink)] outline-none transition placeholder:text-[var(--sg-stone)] focus:border-[var(--sg-ink)]"
                     >
 
                     <svg
@@ -142,7 +142,7 @@
                         viewBox="0 0 24 24"
                         stroke-width="1.5"
                         stroke="currentColor"
-                        class="pointer-events-none absolute right-5 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--livora-stone)]"
+                        class="pointer-events-none absolute right-5 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--sg-stone)]"
                     >
                         <path
                             stroke-linecap="round"
@@ -158,7 +158,7 @@
                             x-cloak
                             aria-label="پاک کردن جستجو"
                             title="پاک کردن جستجو"
-                            class="flex h-10 w-10 items-center justify-center rounded-xl text-[var(--livora-stone)] transition hover:bg-[var(--livora-surface)] hover:text-[var(--livora-ink)]"
+                            class="flex h-10 w-10 items-center justify-center rounded-xl text-[var(--sg-stone)] transition hover:bg-[var(--sg-surface)] hover:text-[var(--sg-ink)]"
                             @click="searchValue = ''"
                         >
                             <svg
@@ -179,7 +179,7 @@
 
                         <button
                             type="submit"
-                            class="rounded-2xl bg-[var(--livora-ink)] px-5 py-3 text-xs font-medium text-white transition hover:bg-[var(--livora-accent)]"
+                            class="rounded-2xl bg-[var(--sg-ink)] px-5 py-3 text-xs font-medium text-white transition hover:bg-[var(--sg-accent)]"
                         >
                             جستجو
                         </button>
@@ -195,11 +195,11 @@
 
                         <div>
 
-                            <p class="text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--livora-accent)]">
+                            <p class="text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--sg-accent)]">
                                 QUICK DISCOVER
                             </p>
 
-                            <p class="mt-1 text-xs text-[var(--livora-stone)]">
+                            <p class="mt-1 text-xs text-[var(--sg-stone)]">
                                 جستجو را از دسته‌بندی‌های محبوب شروع کنید.
                             </p>
 
@@ -208,7 +208,7 @@
                         <a
                             href="{{ route('categories.index') }}"
                             @click="searchOpen = false"
-                            class="text-xs font-medium text-[var(--livora-accent)]"
+                            class="text-xs font-medium text-[var(--sg-accent)]"
                         >
                             همه دسته‌بندی‌ها
                         </a>
@@ -221,16 +221,16 @@
                             <a
                                 href="{{ route('categories.show', $category->slug) }}"
                                 @click="closeSearch()"
-                                class="min-w-0 rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-3 transition hover:border-[var(--livora-ink)] sm:p-4"
+                                class="min-w-0 rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-3 transition hover:border-[var(--sg-ink)] sm:p-4"
                             >
                                 <p class="truncate text-sm font-medium">{{ $category->name }}</p>
-                                <p class="mt-1 text-[11px] text-[var(--livora-stone)]">مشاهده محصولات</p>
+                                <p class="mt-1 text-[11px] text-[var(--sg-stone)]">مشاهده محصولات</p>
                             </a>
                         @empty
                             <a
                                 href="{{ route('shop.index') }}"
                                 @click="closeSearch()"
-                                class="col-span-2 rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-4 text-sm font-medium transition hover:border-[var(--livora-ink)] sm:col-span-4"
+                                class="col-span-2 rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-4 text-sm font-medium transition hover:border-[var(--sg-ink)] sm:col-span-4"
                             >مشاهده همه محصولات فروشگاه</a>
                         @endforelse
                     </div>
@@ -239,7 +239,7 @@
 
 
                 {{-- SEO / Discovery Hint --}}
-                <div class="mt-8 rounded-3xl bg-[var(--livora-ink)] p-5 text-white sm:p-6">
+                <div class="mt-8 rounded-3xl bg-[var(--sg-ink)] p-5 text-white sm:p-6">
 
                     <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
 
@@ -263,7 +263,7 @@
                         <a
                             href="{{ route('shop.index') }}"
                             @click="searchOpen = false"
-                            class="inline-flex w-fit shrink-0 rounded-2xl bg-white px-5 py-3 text-xs font-medium text-[var(--livora-ink)] transition hover:bg-[var(--livora-cream)]"
+                            class="inline-flex w-fit shrink-0 rounded-2xl bg-white px-5 py-3 text-xs font-medium text-[var(--sg-ink)] transition hover:bg-[var(--sg-cream)]"
                         >
                             مشاهده فروشگاه
                         </a>

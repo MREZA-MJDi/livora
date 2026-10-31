@@ -39,7 +39,7 @@
         x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="translate-x-0"
         x-transition:leave-end="translate-x-full"
-        class="absolute right-0 top-0 flex h-full w-[88%] max-w-md flex-col bg-[var(--livora-cream)] shadow-2xl"
+        class="absolute right-0 top-0 flex h-full w-[88%] max-w-md flex-col bg-[var(--sg-cream)] shadow-2xl"
     >
 
         {{-- =====================================================
@@ -47,12 +47,12 @@
         ====================================================== --}}
 
         <div
-            class="flex h-[76px] shrink-0 items-center justify-between border-b border-[var(--livora-border)] bg-[var(--livora-white)] px-5"
+            class="flex h-[76px] shrink-0 items-center justify-between border-b border-[var(--sg-border)] bg-[var(--sg-white)] px-5"
         >
 
             <div>
 
-                <p class="text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--livora-accent)]">
+                <p class="text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--sg-accent)]">
                     FILTERS
                 </p>
 
@@ -67,7 +67,7 @@
                 type="button"
                 aria-label="بستن"
                 @click="filterOpen = false"
-                class="flex h-10 w-10 items-center justify-center rounded-full text-[var(--livora-ink)] transition hover:bg-[var(--livora-surface)]"
+                class="flex h-10 w-10 items-center justify-center rounded-full text-[var(--sg-ink)] transition hover:bg-[var(--sg-surface)]"
             >
 
                 <svg
@@ -120,7 +120,7 @@
             ================================================== --}}
 
             <div
-                class="shrink-0 border-t border-[var(--livora-border)] bg-[var(--livora-white)] p-5"
+                class="shrink-0 border-t border-[var(--sg-border)] bg-[var(--sg-white)] p-5"
             >
 
                 <div class="grid grid-cols-2 gap-3">
@@ -130,7 +130,7 @@
                     <a
                         href="{{ route('shop.index') }}"
                         @click="filterOpen = false"
-                        class="flex items-center justify-center rounded-2xl border border-[var(--livora-border)] px-4 py-3.5 text-xs font-medium text-[var(--livora-ink)] transition hover:border-[var(--livora-ink)]"
+                        class="flex items-center justify-center rounded-2xl border border-[var(--sg-border)] px-4 py-3.5 text-xs font-medium text-[var(--sg-ink)] transition hover:border-[var(--sg-ink)]"
                     >
                         پاک کردن
                     </a>
@@ -141,7 +141,7 @@
                     <button
                         type="submit"
                         @click="filterOpen = false"
-                        class="rounded-2xl bg-[var(--livora-ink)] px-4 py-3.5 text-xs font-medium text-white transition hover:bg-[var(--livora-accent)]"
+                        class="rounded-2xl bg-[var(--sg-ink)] px-4 py-3.5 text-xs font-medium text-white transition hover:bg-[var(--sg-accent)]"
                     >
                         اعمال فیلتر
                     </button>

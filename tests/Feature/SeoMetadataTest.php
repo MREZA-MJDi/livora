@@ -145,4 +145,18 @@ class SeoMetadataTest extends TestCase
         $this->get('/about')->assertOk()->assertSee('درباره SillaGallery - ویرایش');
     }
 
+    public function test_public_storefront_routes_use_sillagallery_brand_without_internal_livora_namespace(): void
+    {
+        $routes = ['/', '/shop', '/categories', '/about', '/terms', '/blog', '/contact', '/login', '/register', '/cart'];
+
+        foreach ($routes as $path) {
+            $response = $this->get($path)->assertOk();
+            $html = (string) $response->getContent();
+
+            $this->assertStringContainsString('SillaGallery', $html, $path . ' must identify SillaGallery');
+            $this->assertDoesNotMatchRegularExpression('/SilaGallery/i', $html, $path . ' exposes a misspelled public brand');
+            $this->assertDoesNotMatchRegularExpression('/Livora/i', $html, $path . ' exposes the internal project name');
+        }
+    }
+
 }

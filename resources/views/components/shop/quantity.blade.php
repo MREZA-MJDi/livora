@@ -41,7 +41,7 @@
             }
         }
     }"
-    class="inline-flex items-center rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-1"
+    class="inline-flex items-center rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-1"
     {{ $attributes }}
 >
 
@@ -51,7 +51,7 @@
         aria-label="کاهش تعداد"
         @click="decrease()"
         :disabled="value <= min"
-        class="flex h-9 w-9 items-center justify-center rounded-xl text-[var(--livora-ink)] transition hover:bg-[var(--livora-surface)] disabled:cursor-not-allowed disabled:opacity-30"
+        class="flex h-9 w-9 items-center justify-center rounded-xl text-[var(--sg-ink)] transition hover:bg-[var(--sg-surface)] disabled:cursor-not-allowed disabled:opacity-30"
     >
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -81,7 +81,7 @@
         inputmode="numeric"
         autocomplete="off"
         aria-label="تعداد"
-        class="w-12 border-0 bg-transparent p-0 text-center text-sm font-semibold text-[var(--livora-ink)] outline-none focus:ring-0"
+        class="w-12 border-0 bg-transparent p-0 text-center text-sm font-semibold text-[var(--sg-ink)] outline-none focus:ring-0"
     >
 
     {{-- Increase --}}
@@ -90,7 +90,7 @@
         aria-label="افزایش تعداد"
         @click="increase()"
         :disabled="max !== null && value >= max"
-        class="flex h-9 w-9 items-center justify-center rounded-xl text-[var(--livora-ink)] transition hover:bg-[var(--livora-surface)] disabled:cursor-not-allowed disabled:opacity-30"
+        class="flex h-9 w-9 items-center justify-center rounded-xl text-[var(--sg-ink)] transition hover:bg-[var(--sg-surface)] disabled:cursor-not-allowed disabled:opacity-30"
     >
         <svg
             xmlns="http://www.w3.org/2000/svg"

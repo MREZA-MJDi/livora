@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'علاقه‌مندی‌های من | SilaGallery')
+@section('title', 'علاقه‌مندی‌های من | SillaGallery')
 
 @section(
     'description',
-    'محصولات مورد علاقه خود را در SilaGallery ذخیره کنید و هر زمان برای خرید به آن‌ها برگردید.'
+    'محصولات مورد علاقه خود را در SillaGallery ذخیره کنید و هر زمان برای خرید به آن‌ها برگردید.'
 )
 
 @push('seo')
@@ -20,12 +20,12 @@
         $wishlistItems = $wishlist->items ?? $wishlist;
     @endphp
 
-    <div class="min-h-[70vh] bg-[var(--livora-cream)]">
+    <div class="min-h-[70vh] bg-[var(--sg-cream)]">
 
         {{-- =========================================================
              HEADER
         ========================================================== --}}
-        <section class="border-b border-[var(--livora-border)] bg-[var(--livora-white)]">
+        <section class="border-b border-[var(--sg-border)] bg-[var(--sg-white)]">
 
             <x-layout.container>
 
@@ -33,12 +33,12 @@
 
                     <nav
                         aria-label="breadcrumb"
-                        class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--livora-stone)]"
+                        class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--sg-stone)]"
                     >
 
                         <a
                             href="{{ route('home') }}"
-                            class="transition hover:text-[var(--livora-ink)]"
+                            class="transition hover:text-[var(--sg-ink)]"
                         >
                             خانه
                         </a>
@@ -47,14 +47,14 @@
 
                         <a
                             href="{{ route('account.index') }}"
-                            class="transition hover:text-[var(--livora-ink)]"
+                            class="transition hover:text-[var(--sg-ink)]"
                         >
                             حساب کاربری
                         </a>
 
                         <span>/</span>
 
-                        <span class="text-[var(--livora-ink)]">
+                        <span class="text-[var(--sg-ink)]">
                         علاقه‌مندی‌ها
                     </span>
 
@@ -64,7 +64,7 @@
 
                         <div>
 
-                            <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--livora-accent)]">
+                            <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
                                 SAVED ITEMS
                             </p>
 
@@ -72,7 +72,7 @@
                                 علاقه‌مندی‌های من
                             </h1>
 
-                            <p class="mt-3 max-w-2xl text-sm leading-8 text-[var(--livora-stone)]">
+                            <p class="mt-3 max-w-2xl text-sm leading-8 text-[var(--sg-stone)]">
                                 محصولاتی که برای بعد ذخیره کرده‌ای را اینجا پیدا کن.
                             </p>
 
@@ -80,7 +80,7 @@
 
                         <a
                             href="{{ route('shop.index') }}"
-                            class="inline-flex w-fit items-center rounded-2xl bg-[var(--livora-ink)] px-5 py-3.5 text-sm font-medium text-white transition hover:bg-[var(--livora-accent)]"
+                            class="inline-flex w-fit items-center rounded-2xl bg-[var(--sg-ink)] px-5 py-3.5 text-sm font-medium text-white transition hover:bg-[var(--sg-accent)]"
                         >
                             ادامه خرید
                         </a>
@@ -108,7 +108,7 @@
 
                         <div class="mx-auto max-w-xl text-center">
 
-                            <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-[1.75rem] bg-[var(--livora-white)] text-[var(--livora-stone)]">
+                            <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-[1.75rem] bg-[var(--sg-white)] text-[var(--sg-stone)]">
 
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -127,7 +127,7 @@
 
                             </div>
 
-                            <p class="mt-7 text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--livora-accent)]">
+                            <p class="mt-7 text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
                                 NOTHING SAVED
                             </p>
 
@@ -135,13 +135,13 @@
                                 هنوز چیزی ذخیره نکرده‌ای
                             </h2>
 
-                            <p class="mx-auto mt-4 max-w-md text-sm leading-8 text-[var(--livora-stone)]">
+                            <p class="mx-auto mt-4 max-w-md text-sm leading-8 text-[var(--sg-stone)]">
                                 محصولاتی که دوست داری را ذخیره کن تا بعداً راحت‌تر به آن‌ها برگردی.
                             </p>
 
                             <a
                                 href="{{ route('shop.index') }}"
-                                class="mt-8 inline-flex items-center rounded-2xl bg-[var(--livora-ink)] px-7 py-4 text-sm font-medium text-white transition hover:bg-[var(--livora-accent)]"
+                                class="mt-8 inline-flex items-center rounded-2xl bg-[var(--sg-ink)] px-7 py-4 text-sm font-medium text-white transition hover:bg-[var(--sg-accent)]"
                             >
                                 کشف محصولات
                             </a>
@@ -159,11 +159,11 @@
 
                             <div>
 
-                                <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--livora-accent)]">
+                                <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--sg-accent)]">
                                     MY PICKS
                                 </p>
 
-                                <p class="mt-2 text-sm text-[var(--livora-stone)]">
+                                <p class="mt-2 text-sm text-[var(--sg-stone)]">
                                     {{ number_format($wishlistItems->count()) }}
                                     محصول ذخیره شده
                                 </p>
@@ -172,7 +172,7 @@
 
                             <a
                                 href="{{ route('shop.index') }}"
-                                class="text-sm font-medium text-[var(--livora-accent)]"
+                                class="text-sm font-medium text-[var(--sg-accent)]"
                             >
                                 مشاهده فروشگاه
                                 <span class="mr-1">←</span>
@@ -252,7 +252,7 @@
         ========================================================== --}}
         @if($wishlistItems->isNotEmpty())
 
-            <section class="border-t border-[var(--livora-border)] bg-[var(--livora-surface)]">
+            <section class="border-t border-[var(--sg-border)] bg-[var(--sg-surface)]">
 
                 <x-layout.container>
 
@@ -260,7 +260,7 @@
 
                         <div>
 
-                            <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--livora-accent)]">
+                            <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--sg-accent)]">
                                 KEEP EXPLORING
                             </p>
 
@@ -268,15 +268,15 @@
                                 شاید انتخاب بعدی‌ات همین نزدیکی باشد.
                             </h2>
 
-                            <p class="mt-2 text-sm leading-7 text-[var(--livora-stone)]">
-                                مجموعه کامل SilaGallery را بررسی کن.
+                            <p class="mt-2 text-sm leading-7 text-[var(--sg-stone)]">
+                                مجموعه کامل SillaGallery را بررسی کن.
                             </p>
 
                         </div>
 
                         <a
                             href="{{ route('shop.index') }}"
-                            class="inline-flex w-fit rounded-2xl bg-[var(--livora-ink)] px-6 py-4 text-sm font-medium text-white transition hover:bg-[var(--livora-accent)]"
+                            class="inline-flex w-fit rounded-2xl bg-[var(--sg-ink)] px-6 py-4 text-sm font-medium text-white transition hover:bg-[var(--sg-accent)]"
                         >
                             رفتن به فروشگاه
                         </a>

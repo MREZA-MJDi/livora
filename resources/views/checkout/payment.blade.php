@@ -2,12 +2,12 @@
 
 @section(
     'title',
-    'انتخاب روش پرداخت | ' . $order->order_number . ' | SilaGallery'
+    'انتخاب روش پرداخت | ' . $order->order_number . ' | SillaGallery'
 )
 
 @section(
     'description',
-    'انتخاب روش پرداخت سفارش در SilaGallery؛ پرداخت آنلاین یا خرید اقساطی با شرایط مشخص.'
+    'انتخاب روش پرداخت سفارش در SillaGallery؛ پرداخت آنلاین یا خرید اقساطی با شرایط مشخص.'
 )
 
 @section(
@@ -159,11 +159,11 @@
         },
 
         selectInstallment() {
-            this.selected = 'livora-installment';
+            this.selected = 'internal-installment';
             this.installmentOpen = true;
         }
     }"
-        class="overflow-hidden bg-[var(--livora-cream)]"
+        class="overflow-hidden bg-[var(--sg-cream)]"
     >
 
 
@@ -171,7 +171,7 @@
              HEADER
         ========================================================== --}}
 
-        <section class="border-b border-[var(--livora-border)] bg-[var(--livora-white)]">
+        <section class="border-b border-[var(--sg-border)] bg-[var(--sg-white)]">
 
             <x-layout.container>
 
@@ -179,12 +179,12 @@
 
                     <nav
                         aria-label="breadcrumb"
-                        class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--livora-stone)]"
+                        class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--sg-stone)]"
                     >
 
                         <a
                             href="{{ route('home') }}"
-                            class="transition hover:text-[var(--livora-ink)]"
+                            class="transition hover:text-[var(--sg-ink)]"
                         >
                             خانه
                         </a>
@@ -193,14 +193,14 @@
 
                         <a
                             href="{{ route('cart.index') }}"
-                            class="transition hover:text-[var(--livora-ink)]"
+                            class="transition hover:text-[var(--sg-ink)]"
                         >
                             سبد خرید
                         </a>
 
                         <span>/</span>
 
-                        <span class="text-[var(--livora-ink)]">
+                        <span class="text-[var(--sg-ink)]">
                         پرداخت
                     </span>
 
@@ -209,7 +209,7 @@
 
                     <div class="mt-8 max-w-3xl">
 
-                        <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--livora-accent)]">
+                        <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
                             PAYMENT
                         </p>
 
@@ -217,9 +217,9 @@
                             روش پرداخت را انتخاب کنید.
                         </h1>
 
-                        <p class="mt-4 text-sm leading-8 text-[var(--livora-stone)]">
+                        <p class="mt-4 text-sm leading-8 text-[var(--sg-stone)]">
                             سفارش
-                            <span class="font-medium text-[var(--livora-ink)]">
+                            <span class="font-medium text-[var(--sg-ink)]">
                             {{ $order->order_number }}
                         </span>
                             برای پرداخت آماده است.
@@ -310,13 +310,13 @@
                          ONLINE PAYMENT
                     ================================================== --}}
 
-                    <section class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-5 sm:p-7">
+                    <section class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-5 sm:p-7">
 
                         <div class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
 
                             <div>
 
-                                <p class="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                                <p class="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--sg-accent)]">
                                     ONLINE PAYMENT
                                 </p>
 
@@ -324,13 +324,13 @@
                                     پرداخت آنلاین
                                 </h2>
 
-                                <p class="mt-2 text-xs leading-7 text-[var(--livora-stone)]">
+                                <p class="mt-2 text-xs leading-7 text-[var(--sg-stone)]">
                                     یکی از درگاه‌های فعال را انتخاب کنید.
                                 </p>
 
                             </div>
 
-                            <span class="w-fit rounded-full border border-[var(--livora-border)] bg-[var(--livora-surface)] px-3 py-1.5 text-[10px] text-[var(--livora-stone)]">
+                            <span class="w-fit rounded-full border border-[var(--sg-border)] bg-[var(--sg-surface)] px-3 py-1.5 text-[10px] text-[var(--sg-stone)]">
                             مبلغ کامل سفارش
                         </span>
 
@@ -348,14 +348,14 @@
                                         'relative rounded-3xl border p-5 transition duration-300',
                                         'cursor-pointer' => $gateway['enabled'],
                                         'cursor-not-allowed opacity-50' => ! $gateway['enabled'],
-                                        'border-[var(--livora-ink)] bg-[var(--livora-surface)] shadow-sm'
+                                        'border-[var(--sg-ink)] bg-[var(--sg-surface)] shadow-sm'
                                             => $gateway['enabled'],
-                                        'border-[var(--livora-border)] bg-[var(--livora-white)]'
+                                        'border-[var(--sg-border)] bg-[var(--sg-white)]'
                                             => ! $gateway['enabled'],
                                     ])
                                     :class="
                                     selected === '{{ $gateway['key'] }}'
-                                        ? 'ring-2 ring-[var(--livora-accent)] ring-offset-2'
+                                        ? 'ring-2 ring-[var(--sg-accent)] ring-offset-2'
                                         : ''
                                 "
                                 >
@@ -364,7 +364,7 @@
 
                                         {{-- Logo --}}
                                         <div
-                                            class="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--livora-ink)] text-[9px] font-bold tracking-[0.08em] text-white"
+                                            class="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--sg-ink)] text-[9px] font-bold tracking-[0.08em] text-white"
                                         >
                                             {{ $gateway['badge'] }}
                                         </div>
@@ -375,8 +375,8 @@
                                             class="flex h-5 w-5 items-center justify-center rounded-full border"
                                             :class="
                                             selected === '{{ $gateway['key'] }}'
-                                                ? 'border-[var(--livora-ink)] bg-[var(--livora-ink)]'
-                                                : 'border-[var(--livora-border)]'
+                                                ? 'border-[var(--sg-ink)] bg-[var(--sg-ink)]'
+                                                : 'border-[var(--sg-border)]'
                                         "
                                         >
                                         <span
@@ -392,7 +392,7 @@
                                         {{ $gateway['fa_name'] }}
                                     </p>
 
-                                    <p class="mt-2 text-[11px] leading-6 text-[var(--livora-stone)]">
+                                    <p class="mt-2 text-[11px] leading-6 text-[var(--sg-stone)]">
                                         {{ $gateway['description'] }}
                                     </p>
 
@@ -405,7 +405,7 @@
 
                                     @else
 
-                                        <span class="mt-4 inline-flex rounded-full bg-[var(--livora-surface)] px-2.5 py-1 text-[9px] text-[var(--livora-stone)]">
+                                        <span class="mt-4 inline-flex rounded-full bg-[var(--sg-surface)] px-2.5 py-1 text-[9px] text-[var(--sg-stone)]">
                                         به‌زودی
                                     </span>
 
@@ -447,7 +447,7 @@
                                         }
                                     "
                                         :disabled="!['digipay', 'snappay', 'torobpay'].includes(selected)"
-                                        class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[var(--livora-ink)] px-6 py-4 text-sm font-medium text-white transition hover:bg-[var(--livora-accent)] disabled:cursor-not-allowed disabled:opacity-40"
+                                        class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[var(--sg-ink)] px-6 py-4 text-sm font-medium text-white transition hover:bg-[var(--sg-accent)] disabled:cursor-not-allowed disabled:opacity-40"
                                     >
 
                                     <span>
@@ -466,9 +466,9 @@
 
                         @else
 
-                            <div class="mt-6 rounded-2xl bg-[var(--livora-surface)] p-4">
+                            <div class="mt-6 rounded-2xl bg-[var(--sg-surface)] p-4">
 
-                                <p class="text-xs leading-7 text-[var(--livora-stone)]">
+                                <p class="text-xs leading-7 text-[var(--sg-stone)]">
                                     در حال حاضر هیچ درگاه آنلاینی فعال نیست.
                                 </p>
 
@@ -480,11 +480,11 @@
 
 
                     {{-- =================================================
-                         SilaGallery INSTALLMENT
+                         SillaGallery INSTALLMENT
                     ================================================== --}}
 
                     <section
-                        class="overflow-hidden rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-ink)] text-white"
+                        class="overflow-hidden rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-ink)] text-white"
                     >
 
                         <div class="p-5 sm:p-7">
@@ -494,7 +494,7 @@
                                 <div>
 
                                     <p class="text-[10px] font-medium uppercase tracking-[0.2em] text-white/40">
-                                        SilaGallery INSTALLMENT
+                                        SillaGallery INSTALLMENT
                                     </p>
 
                                     <h2 class="mt-3 text-2xl font-semibold">
@@ -634,7 +634,7 @@
                                 <div class="mt-6">
 
                                     <form
-                                        action="{{ route('checkout.payment.livora-installment', $order) }}"
+                                        action="{{ route('checkout.payment.internal-installment', $order) }}"
                                         method="POST"
                                     >
 
@@ -642,7 +642,7 @@
 
                                         <button
                                             type="submit"
-                                            class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-6 py-4 text-sm font-medium text-[var(--livora-ink)] transition hover:bg-[var(--livora-cream)]"
+                                            class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-6 py-4 text-sm font-medium text-[var(--sg-ink)] transition hover:bg-[var(--sg-cream)]"
                                         >
                                         <span>
                                             ادامه فرآیند خرید اقساطی
@@ -686,7 +686,7 @@
 
 
                                 <form
-                                    action="{{ route('checkout.payment.livora-installment', $order) }}"
+                                    action="{{ route('checkout.payment.internal-installment', $order) }}"
                                     method="POST"
                                     class="mt-5"
                                 >
@@ -717,13 +717,13 @@
 
                 <aside class="lg:sticky lg:top-24 lg:self-start">
 
-                    <div class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-5 sm:p-7">
+                    <div class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-5 sm:p-7">
 
                         <div class="flex items-center justify-between gap-4">
 
                             <div>
 
-                                <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                                <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
                                     ORDER SUMMARY
                                 </p>
 
@@ -733,7 +733,7 @@
 
                             </div>
 
-                            <span class="rounded-full bg-[var(--livora-surface)] px-3 py-1.5 text-[10px] text-[var(--livora-stone)]">
+                            <span class="rounded-full bg-[var(--sg-surface)] px-3 py-1.5 text-[10px] text-[var(--sg-stone)]">
                             {{ $order->order_number }}
                         </span>
 
@@ -753,9 +753,9 @@
                                         collect($item->variant_options ?? []);
                                 @endphp
 
-                                <div class="flex gap-3 rounded-2xl bg-[var(--livora-surface)] p-3">
+                                <div class="flex gap-3 rounded-2xl bg-[var(--sg-surface)] p-3">
 
-                                    <div class="h-16 w-14 shrink-0 overflow-hidden rounded-xl bg-[var(--livora-white)]">
+                                    <div class="h-16 w-14 shrink-0 overflow-hidden rounded-xl bg-[var(--sg-white)]">
 
                                         @if($itemImage)
 
@@ -767,7 +767,7 @@
 
                                         @else
 
-                                            <div class="flex h-full w-full items-center justify-center text-[8px] tracking-widest text-[var(--livora-stone)]">
+                                            <div class="flex h-full w-full items-center justify-center text-[8px] tracking-widest text-[var(--sg-stone)]">
                                                 LV
                                             </div>
 
@@ -788,10 +788,10 @@
 
                                                 @foreach($variantOptions as $option)
 
-                                                    <span class="rounded-full border border-[var(--livora-border)] px-2 py-1 text-[9px] text-[var(--livora-stone)]">
+                                                    <span class="rounded-full border border-[var(--sg-border)] px-2 py-1 text-[9px] text-[var(--sg-stone)]">
 
                                                         {{ $option['name'] ?? $option['type'] ?? 'ویژگی' }}:
-                                                        <span class="font-medium text-[var(--livora-ink)]">
+                                                        <span class="font-medium text-[var(--sg-ink)]">
                                                             {{ $option['value'] ?? '—' }}
                                                         </span>
 
@@ -803,7 +803,7 @@
 
                                         @endif
 
-                                        <p class="mt-2 text-[10px] text-[var(--livora-stone)]">
+                                        <p class="mt-2 text-[10px] text-[var(--sg-stone)]">
                                             تعداد:
                                             {{ number_format($item->quantity) }}
                                         </p>
@@ -823,11 +823,11 @@
 
 
                         {{-- Total --}}
-                        <div class="mt-6 space-y-3 border-t border-[var(--livora-border)] pt-5">
+                        <div class="mt-6 space-y-3 border-t border-[var(--sg-border)] pt-5">
 
                             <div class="flex items-center justify-between gap-4 text-xs">
 
-                            <span class="text-[var(--livora-stone)]">
+                            <span class="text-[var(--sg-stone)]">
                                 مبلغ سفارش
                             </span>
 
@@ -841,7 +841,7 @@
 
                             <div class="flex items-center justify-between gap-4 text-xs">
 
-                            <span class="text-[var(--livora-stone)]">
+                            <span class="text-[var(--sg-stone)]">
                                 ارسال
                             </span>
 
@@ -857,7 +857,7 @@
 
                                 <div class="flex items-center justify-between gap-4 text-xs">
 
-                                <span class="text-[var(--livora-stone)]">
+                                <span class="text-[var(--sg-stone)]">
                                     تخفیف
                                 </span>
 
@@ -872,7 +872,7 @@
                             @endif
 
 
-                            <div class="flex items-end justify-between gap-4 border-t border-[var(--livora-border)] pt-4">
+                            <div class="flex items-end justify-between gap-4 border-t border-[var(--sg-border)] pt-4">
 
                             <span class="text-sm font-semibold">
                                 مبلغ نهایی
@@ -884,7 +884,7 @@
                                         {{ number_format($orderTotal) }}
                                     </p>
 
-                                    <p class="mt-1 text-[10px] text-[var(--livora-stone)]">
+                                    <p class="mt-1 text-[10px] text-[var(--sg-stone)]">
                                         تومان
                                     </p>
 
@@ -898,15 +898,15 @@
                         {{-- Installment Summary --}}
                         @if($hasInstallmentPlan)
 
-                            <div class="mt-5 rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-surface)] p-4">
+                            <div class="mt-5 rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-surface)] p-4">
 
-                                <p class="text-[10px] uppercase tracking-[0.16em] text-[var(--livora-accent)]">
+                                <p class="text-[10px] uppercase tracking-[0.16em] text-[var(--sg-accent)]">
                                     INSTALLMENT SUMMARY
                                 </p>
 
                                 <div class="mt-4 flex items-center justify-between gap-3">
 
-                                <span class="text-xs text-[var(--livora-stone)]">
+                                <span class="text-xs text-[var(--sg-stone)]">
                                     امروز
                                 </span>
 
@@ -919,7 +919,7 @@
 
                                 <div class="mt-3 flex items-center justify-between gap-3">
 
-                                <span class="text-xs text-[var(--livora-stone)]">
+                                <span class="text-xs text-[var(--sg-stone)]">
                                     باقی‌مانده
                                 </span>
 
@@ -936,13 +936,13 @@
 
 
                         {{-- Security --}}
-                        <div class="mt-5 flex items-start gap-3 rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-4">
+                        <div class="mt-5 flex items-start gap-3 rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-4">
 
-                        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[var(--livora-surface)] text-[10px]">
+                        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[var(--sg-surface)] text-[10px]">
                             ✓
                         </span>
 
-                            <p class="text-[10px] leading-6 text-[var(--livora-stone)]">
+                            <p class="text-[10px] leading-6 text-[var(--sg-stone)]">
                                 مبلغ پرداخت از اطلاعات ثبت‌شده سفارش محاسبه می‌شود و
                                 مبلغ ارسالی از سمت مرورگر مبنای پرداخت نیست.
                             </p>

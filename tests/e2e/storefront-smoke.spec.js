@@ -63,9 +63,9 @@ for (const viewport of viewports) {
             await expect(page.locator('footer'), path + ' footer').toBeAttached();
 
             if (viewport.width < 1024) {
-                await expect(page.locator('.livora-mobile-nav'), path + ' mobile navigation').toBeVisible();
+                await expect(page.locator('.sg-mobile-nav'), path + ' mobile navigation').toBeVisible();
             } else {
-                await expect(page.locator('.livora-mobile-nav'), path + ' desktop hides mobile navigation').toBeHidden();
+                await expect(page.locator('.sg-mobile-nav'), path + ' desktop hides mobile navigation').toBeHidden();
             }
 
             const overflow = await page.evaluate(() => (
@@ -89,14 +89,14 @@ test('mobile search opens, focuses its input and restores focus when closed', as
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-    const searchTrigger = page.locator('.livora-mobile-nav button[aria-label="جستجو"]');
+    const searchTrigger = page.locator('.sg-mobile-nav button[aria-label="جستجو"]');
     await searchTrigger.click();
 
-    const searchOverlay = page.locator('.livora-search-overlay');
+    const searchOverlay = page.locator('.sg-search-overlay');
     await expect(searchOverlay).toBeVisible();
     await expect(page.locator('#global-search')).toBeFocused();
 
-    await page.locator('.livora-search-panel button[aria-label="بستن جستجو"]').click();
+    await page.locator('.sg-search-panel button[aria-label="بستن جستجو"]').click();
     await expect(searchOverlay).toBeHidden();
     await expect(searchTrigger).toBeFocused();
 });

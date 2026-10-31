@@ -14,7 +14,7 @@
 
         <div>
 
-            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
                 CATEGORY
             </p>
 
@@ -34,7 +34,7 @@
                     @foreach($categories as $category)
 
                         <label
-                            class="flex cursor-pointer items-center justify-between gap-3 rounded-2xl bg-[var(--livora-surface)] px-4 py-3 transition hover:border-[var(--livora-border)]"
+                            class="flex cursor-pointer items-center justify-between gap-3 rounded-2xl bg-[var(--sg-surface)] px-4 py-3 transition hover:border-[var(--sg-border)]"
                         >
 
                             <span class="flex min-w-0 items-center gap-3">
@@ -45,10 +45,10 @@
                                     value="{{ $category->slug }}"
                                     @checked((string) $selectedCategory === (string) $category->slug)
                                     @change="$el.form.submit()"
-                                    class="h-4 w-4 border-[var(--livora-border)] text-[var(--livora-ink)] focus:ring-[var(--livora-ink)]"
+                                    class="h-4 w-4 border-[var(--sg-border)] text-[var(--sg-ink)] focus:ring-[var(--sg-ink)]"
                                 >
 
-                                <span class="truncate text-xs text-[var(--livora-ink)]">
+                                <span class="truncate text-xs text-[var(--sg-ink)]">
                                     {{ $category->name }}
                                 </span>
 
@@ -57,7 +57,7 @@
 
                             @if(isset($category->products_count))
 
-                                <span class="shrink-0 text-[10px] text-[var(--livora-stone)]">
+                                <span class="shrink-0 text-[10px] text-[var(--sg-stone)]">
                                     {{ number_format($category->products_count) }}
                                 </span>
 
@@ -71,7 +71,7 @@
 
             @else
 
-                <p class="text-xs leading-6 text-[var(--livora-stone)]">
+                <p class="text-xs leading-6 text-[var(--sg-stone)]">
                     دسته‌بندی‌ای برای نمایش وجود ندارد.
                 </p>
 
@@ -90,7 +90,7 @@
 
         <div>
 
-            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
                 SEARCH
             </p>
 
@@ -109,7 +109,7 @@
                 value="{{ request('search') }}"
                 placeholder="نام یا مدل محصول..."
                 @keydown.enter.prevent="$el.form.submit()"
-                class="w-full rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-surface)] px-4 py-3.5 text-sm outline-none transition placeholder:text-[var(--livora-stone)] focus:border-[var(--livora-ink)]"
+                class="w-full rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-surface)] px-4 py-3.5 text-sm outline-none transition placeholder:text-[var(--sg-stone)] focus:border-[var(--sg-ink)]"
             >
 
         </div>
@@ -125,7 +125,7 @@
 
         <div>
 
-            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
                 PAYMENT
             </p>
 
@@ -139,7 +139,7 @@
         <div class="mt-5 space-y-2">
 
             <label
-                class="flex cursor-pointer items-center gap-3 rounded-2xl bg-[var(--livora-surface)] px-4 py-3"
+                class="flex cursor-pointer items-center gap-3 rounded-2xl bg-[var(--sg-surface)] px-4 py-3"
             >
 
                 <input
@@ -148,7 +148,7 @@
                     value="1"
                     @checked(request()->boolean('installment'))
                 @change="$el.form.submit()"
-                class="h-4 w-4 rounded border-[var(--livora-border)] text-[var(--livora-ink)] focus:ring-[var(--livora-ink)]"
+                class="h-4 w-4 rounded border-[var(--sg-border)] text-[var(--sg-ink)] focus:ring-[var(--sg-ink)]"
                 >
 
                 <span class="text-xs">
@@ -168,7 +168,7 @@
 
     <section>
         <div>
-            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
                 AVAILABILITY
             </p>
 
@@ -178,14 +178,14 @@
         </div>
 
         <div class="mt-5">
-            <label class="flex cursor-pointer items-center gap-3 rounded-2xl bg-[var(--livora-surface)] px-4 py-3">
+            <label class="flex cursor-pointer items-center gap-3 rounded-2xl bg-[var(--sg-surface)] px-4 py-3">
                 <input
                     type="checkbox"
                     name="in_stock"
                     value="1"
                     @checked(request()->boolean('in_stock'))
                     @change="$el.form.submit()"
-                    class="h-4 w-4 rounded border-[var(--livora-border)] text-[var(--livora-ink)] focus:ring-[var(--livora-ink)]"
+                    class="h-4 w-4 rounded border-[var(--sg-border)] text-[var(--sg-ink)] focus:ring-[var(--sg-ink)]"
                 >
 
                 <span class="text-xs">
@@ -204,7 +204,7 @@
 
         <div>
 
-            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
                 PRICE
             </p>
 
@@ -221,7 +221,7 @@
 
                 <label
                     for="{{ $mobile ? 'min_price_mobile' : 'min_price_desktop' }}"
-                    class="mb-2 block text-[10px] text-[var(--livora-stone)]"
+                    class="mb-2 block text-[10px] text-[var(--sg-stone)]"
                 >
                     حداقل
                 </label>
@@ -234,7 +234,7 @@
                     value="{{ request('min_price') }}"
                     placeholder="0"
                     @keydown.enter.prevent="$el.form.submit()"
-                    class="w-full rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-surface)] px-3 py-3 text-xs outline-none focus:border-[var(--livora-ink)]"
+                    class="w-full rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-surface)] px-3 py-3 text-xs outline-none focus:border-[var(--sg-ink)]"
                 >
 
             </div>
@@ -244,7 +244,7 @@
 
                 <label
                     for="{{ $mobile ? 'max_price_mobile' : 'max_price_desktop' }}"
-                    class="mb-2 block text-[10px] text-[var(--livora-stone)]"
+                    class="mb-2 block text-[10px] text-[var(--sg-stone)]"
                 >
                     حداکثر
                 </label>
@@ -257,7 +257,7 @@
                     value="{{ request('max_price') }}"
                     placeholder="مثلاً 100000000"
                     @keydown.enter.prevent="$el.form.submit()"
-                    class="w-full rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-surface)] px-3 py-3 text-xs outline-none focus:border-[var(--livora-ink)]"
+                    class="w-full rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-surface)] px-3 py-3 text-xs outline-none focus:border-[var(--sg-ink)]"
                 >
 
             </div>
@@ -275,7 +275,7 @@
 
         <div>
 
-            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
                 DISCOVERY
             </p>
 
@@ -291,7 +291,7 @@
             {{-- FEATURED --}}
 
             <label
-                class="flex cursor-pointer items-center gap-3 rounded-2xl bg-[var(--livora-surface)] px-4 py-3"
+                class="flex cursor-pointer items-center gap-3 rounded-2xl bg-[var(--sg-surface)] px-4 py-3"
             >
 
                 <input
@@ -300,7 +300,7 @@
                     value="1"
                     @checked(request()->boolean('featured'))
                 @change="$el.form.submit()"
-                class="h-4 w-4 rounded border-[var(--livora-border)] text-[var(--livora-ink)] focus:ring-[var(--livora-ink)]"
+                class="h-4 w-4 rounded border-[var(--sg-border)] text-[var(--sg-ink)] focus:ring-[var(--sg-ink)]"
                 >
 
                 <span class="text-xs">
@@ -313,7 +313,7 @@
             {{-- NEW --}}
 
             <label
-                class="flex cursor-pointer items-center gap-3 rounded-2xl bg-[var(--livora-surface)] px-4 py-3"
+                class="flex cursor-pointer items-center gap-3 rounded-2xl bg-[var(--sg-surface)] px-4 py-3"
             >
 
                 <input
@@ -322,7 +322,7 @@
                     value="1"
                     @checked(request()->boolean('new'))
                 @change="$el.form.submit()"
-                class="h-4 w-4 rounded border-[var(--livora-border)] text-[var(--livora-ink)] focus:ring-[var(--livora-ink)]"
+                class="h-4 w-4 rounded border-[var(--sg-border)] text-[var(--sg-ink)] focus:ring-[var(--sg-ink)]"
                 >
 
                 <span class="text-xs">

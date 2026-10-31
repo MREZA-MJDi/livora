@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'ورود | SilaGallery')
+@section('title', 'ورود | SillaGallery')
 
-@section('description', 'ورود به حساب کاربری SilaGallery')
+@section('description', 'ورود به حساب کاربری SillaGallery')
 
 @section('content')
 
@@ -16,16 +16,16 @@
 
                     <div class="text-center">
 
-                        <p class="text-xs font-medium uppercase tracking-[0.2em] text-[var(--livora-accent)]">
+                        <p class="text-xs font-medium uppercase tracking-[0.2em] text-[var(--sg-accent)]">
                             WELCOME BACK
                         </p>
 
-                        <h1 class="mt-3 text-3xl font-semibold text-[var(--livora-ink)]">
+                        <h1 class="mt-3 text-3xl font-semibold text-[var(--sg-ink)]">
                             ورود به حساب
                         </h1>
 
-                        <p class="mt-3 text-sm text-[var(--livora-stone)]">
-                            برای ادامه وارد حساب SilaGallery خود شوید.
+                        <p class="mt-3 text-sm text-[var(--sg-stone)]">
+                            برای ادامه وارد حساب SillaGallery خود شوید.
                         </p>
 
                     </div>
@@ -42,7 +42,7 @@
                     @endif
 
 
-                    <div class="mt-8 rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-6 sm:p-8">
+                    <div class="mt-8 rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-6 sm:p-8">
 
                         <form
                             action="{{ route('login.store') }}"
@@ -67,14 +67,14 @@
 
                                     <label
                                         for="password"
-                                        class="text-sm font-medium text-[var(--livora-ink)]"
+                                        class="text-sm font-medium text-[var(--sg-ink)]"
                                     >
                                         رمز عبور
                                     </label>
 
                                     <a
                                         href="{{ route('password.request') }}"
-                                        class="text-xs text-[var(--livora-accent)] transition hover:underline"
+                                        class="text-xs text-[var(--sg-accent)] transition hover:underline"
                                     >
                                         رمز عبور را فراموش کرده‌اید؟
                                     </a>
@@ -87,7 +87,7 @@
                                     name="password"
                                     placeholder="رمز عبور"
                                     required
-                                    class="w-full rounded-xl border border-[var(--livora-border)] bg-[var(--livora-white)] px-4 py-3 text-sm text-[var(--livora-ink)] outline-none transition-all duration-300 placeholder:text-[var(--livora-stone)] focus:border-[var(--livora-accent)] focus:ring-1 focus:ring-[var(--livora-accent)] @error('password') border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror"
+                                    class="w-full rounded-xl border border-[var(--sg-border)] bg-[var(--sg-white)] px-4 py-3 text-sm text-[var(--sg-ink)] outline-none transition-all duration-300 placeholder:text-[var(--sg-stone)] focus:border-[var(--sg-accent)] focus:ring-1 focus:ring-[var(--sg-accent)] @error('password') border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror"
                                     aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}"
                                 >
 
@@ -111,10 +111,10 @@
                                     name="remember"
                                     value="1"
                                     @checked(old('remember'))
-                                class="h-4 w-4 rounded border-[var(--livora-border)] accent-[var(--livora-accent)]"
+                                class="h-4 w-4 rounded border-[var(--sg-border)] accent-[var(--sg-accent)]"
                                 >
 
-                                <span class="text-sm text-[var(--livora-stone)]">
+                                <span class="text-sm text-[var(--sg-stone)]">
                                     مرا به خاطر بسپار
                                 </span>
 
@@ -132,15 +132,15 @@
                         </form>
 
 
-                        <div class="mt-7 border-t border-[var(--livora-border)] pt-6 text-center">
+                        <div class="mt-7 border-t border-[var(--sg-border)] pt-6 text-center">
 
-                            <p class="text-sm text-[var(--livora-stone)]">
+                            <p class="text-sm text-[var(--sg-stone)]">
                                 هنوز حساب کاربری ندارید؟
                             </p>
 
                             <a
                                 href="{{ route('register') }}"
-                                class="mt-2 inline-block text-sm font-medium text-[var(--livora-accent)]"
+                                class="mt-2 inline-block text-sm font-medium text-[var(--sg-accent)]"
                             >
                                 ایجاد حساب جدید
                             </a>

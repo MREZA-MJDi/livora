@@ -1,29 +1,29 @@
 @extends('layouts.app')
 
-@section('title', 'ویرایش پروفایل | SilaGallery')
+@section('title', 'ویرایش پروفایل | SillaGallery')
 
-@section('description', 'مدیریت اطلاعات حساب کاربری در SilaGallery.')
+@section('description', 'مدیریت اطلاعات حساب کاربری در SillaGallery.')
 
 @push('seo')
     <meta name="robots" content="noindex,nofollow,noarchive">
 @endpush
 
 @section('content')
-    <section class="min-h-[70vh] bg-[var(--livora-cream)] py-8 sm:py-12">
+    <section class="min-h-[70vh] bg-[var(--sg-cream)] py-8 sm:py-12">
         <x-layout.container>
-            <nav aria-label="مسیر صفحه" class="mb-6 flex flex-wrap items-center gap-2 text-xs text-[var(--livora-stone)]">
-                <a href="{{ route('home') }}" class="hover:text-[var(--livora-ink)]">خانه</a>
+            <nav aria-label="مسیر صفحه" class="mb-6 flex flex-wrap items-center gap-2 text-xs text-[var(--sg-stone)]">
+                <a href="{{ route('home') }}" class="hover:text-[var(--sg-ink)]">خانه</a>
                 <span aria-hidden="true">/</span>
-                <a href="{{ route('account.index') }}" class="hover:text-[var(--livora-ink)]">حساب کاربری</a>
+                <a href="{{ route('account.index') }}" class="hover:text-[var(--sg-ink)]">حساب کاربری</a>
                 <span aria-hidden="true">/</span>
-                <span class="text-[var(--livora-ink)]">ویرایش پروفایل</span>
+                <span class="text-[var(--sg-ink)]">ویرایش پروفایل</span>
             </nav>
 
-            <div class="mx-auto max-w-3xl overflow-hidden rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)]">
-                <div class="border-b border-[var(--livora-border)] p-6 sm:p-8">
-                    <p class="text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--livora-accent)]">ACCOUNT SETTINGS</p>
+            <div class="mx-auto max-w-3xl overflow-hidden rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)]">
+                <div class="border-b border-[var(--sg-border)] p-6 sm:p-8">
+                    <p class="text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--sg-accent)]">ACCOUNT SETTINGS</p>
                     <h1 class="mt-3 text-2xl font-semibold sm:text-3xl">اطلاعات حساب</h1>
-                    <p class="mt-3 text-sm leading-7 text-[var(--livora-stone)]">نام و ایمیلی را ثبت کنید که برای پیگیری سفارش‌ها از آن استفاده می‌کنید.</p>
+                    <p class="mt-3 text-sm leading-7 text-[var(--sg-stone)]">نام و ایمیلی را ثبت کنید که برای پیگیری سفارش‌ها از آن استفاده می‌کنید.</p>
                 </div>
 
                 <div class="p-6 sm:p-8">
@@ -48,7 +48,7 @@
 
                         <div>
                             <label for="profile-name" class="mb-2 block text-sm font-medium">نام و نام خانوادگی</label>
-                            <input id="profile-name" name="name" type="text" value="{{ old('name', $user->name) }}" required minlength="2" maxlength="150" autocomplete="name" class="w-full rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-cream)] px-4 py-3.5 text-sm outline-none transition focus:border-[var(--livora-ink)] @error('name') border-red-500 @enderror" aria-invalid="{{ $errors->has('name') ? 'true' : 'false' }}" aria-describedby="profile-name-error">
+                            <input id="profile-name" name="name" type="text" value="{{ old('name', $user->name) }}" required minlength="2" maxlength="150" autocomplete="name" class="w-full rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-cream)] px-4 py-3.5 text-sm outline-none transition focus:border-[var(--sg-ink)] @error('name') border-red-500 @enderror" aria-invalid="{{ $errors->has('name') ? 'true' : 'false' }}" aria-describedby="profile-name-error">
                             @error('name')
                                 <p id="profile-name-error" class="mt-2 text-xs text-red-600">{{ $message }}</p>
                             @enderror
@@ -56,7 +56,7 @@
 
                         <div>
                             <label for="profile-phone" class="mb-2 block text-sm font-medium">شماره موبایل (اختیاری)</label>
-                            <input id="profile-phone" name="phone" type="tel" inputmode="tel" dir="ltr" value="{{ old('phone', $user->phone) }}" maxlength="11" autocomplete="tel" placeholder="09123456789" class="w-full rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-cream)] px-4 py-3.5 text-left text-sm outline-none transition focus:border-[var(--livora-ink)] @error('phone') border-red-500 @enderror" aria-invalid="{{ $errors->has('phone') ? 'true' : 'false' }}" aria-describedby="profile-phone-error">
+                            <input id="profile-phone" name="phone" type="tel" inputmode="tel" dir="ltr" value="{{ old('phone', $user->phone) }}" maxlength="11" autocomplete="tel" placeholder="09123456789" class="w-full rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-cream)] px-4 py-3.5 text-left text-sm outline-none transition focus:border-[var(--sg-ink)] @error('phone') border-red-500 @enderror" aria-invalid="{{ $errors->has('phone') ? 'true' : 'false' }}" aria-describedby="profile-phone-error">
                             @error('phone')
                                 <p id="profile-phone-error" class="mt-2 text-xs text-red-600">{{ $message }}</p>
                             @enderror
@@ -64,15 +64,15 @@
 
                         <div>
                             <label for="profile-email" class="mb-2 block text-sm font-medium">ایمیل</label>
-                            <input id="profile-email" name="email" type="email" value="{{ old('email', $user->email) }}" required maxlength="255" autocomplete="email" dir="ltr" class="w-full rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-cream)] px-4 py-3.5 text-left text-sm outline-none transition focus:border-[var(--livora-ink)] @error('email') border-red-500 @enderror" aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}" aria-describedby="profile-email-error">
+                            <input id="profile-email" name="email" type="email" value="{{ old('email', $user->email) }}" required maxlength="255" autocomplete="email" dir="ltr" class="w-full rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-cream)] px-4 py-3.5 text-left text-sm outline-none transition focus:border-[var(--sg-ink)] @error('email') border-red-500 @enderror" aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}" aria-describedby="profile-email-error">
                             @error('email')
                                 <p id="profile-email-error" class="mt-2 text-xs text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <div class="flex flex-col gap-3 border-t border-[var(--livora-border)] pt-6 sm:flex-row">
-                            <button type="submit" class="inline-flex min-h-12 items-center justify-center rounded-2xl bg-[var(--livora-ink)] px-6 py-3 text-sm font-medium text-white transition hover:bg-[var(--livora-accent)]">ذخیره تغییرات</button>
-                            <a href="{{ route('account.index') }}" class="inline-flex min-h-12 items-center justify-center rounded-2xl border border-[var(--livora-border)] px-6 py-3 text-sm font-medium transition hover:border-[var(--livora-ink)]">بازگشت به حساب</a>
+                        <div class="flex flex-col gap-3 border-t border-[var(--sg-border)] pt-6 sm:flex-row">
+                            <button type="submit" class="inline-flex min-h-12 items-center justify-center rounded-2xl bg-[var(--sg-ink)] px-6 py-3 text-sm font-medium text-white transition hover:bg-[var(--sg-accent)]">ذخیره تغییرات</button>
+                            <a href="{{ route('account.index') }}" class="inline-flex min-h-12 items-center justify-center rounded-2xl border border-[var(--sg-border)] px-6 py-3 text-sm font-medium transition hover:border-[var(--sg-ink)]">بازگشت به حساب</a>
                         </div>
                     </form>
                 </div>

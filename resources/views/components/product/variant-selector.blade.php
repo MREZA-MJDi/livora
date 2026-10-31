@@ -33,11 +33,11 @@
     <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
 
         <div>
-            <p class="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+            <p class="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--sg-accent)]">
                 {{ strtoupper($typeLabel) }}
             </p>
 
-            <h3 class="mt-1 text-sm font-semibold text-[var(--livora-ink)]">
+            <h3 class="mt-1 text-sm font-semibold text-[var(--sg-ink)]">
                 {{ $title }}
             </h3>
         </div>
@@ -45,7 +45,7 @@
         <div
             x-show="selected !== null"
             x-cloak
-            class="rounded-full bg-[var(--livora-surface)] px-3 py-1.5 text-[11px] text-[var(--livora-stone)]"
+            class="rounded-full bg-[var(--sg-surface)] px-3 py-1.5 text-[11px] text-[var(--sg-stone)]"
         >
             <span>انتخاب شده:</span>
             <span
@@ -54,7 +54,7 @@
                     .find(input => input.value == selected)
                     ?.dataset.label || ''
                 "
-                class="font-medium text-[var(--livora-ink)]"
+                class="font-medium text-[var(--sg-ink)]"
             ></span>
         </div>
 
@@ -127,8 +127,8 @@
                         class="flex h-11 w-11 items-center justify-center rounded-full border-2 transition-all duration-300"
                         :class="
                             selected == {{ $optionId }}
-                            ? 'border-[var(--livora-ink)] scale-105 shadow-sm'
-                            : 'border-[var(--livora-border)] group-hover:border-[var(--livora-accent)]'
+                            ? 'border-[var(--sg-ink)] scale-105 shadow-sm'
+                            : 'border-[var(--sg-border)] group-hover:border-[var(--sg-accent)]'
 "
                         title="{{ $optionLabel }}"
                     >
@@ -147,8 +147,8 @@
                         class="inline-flex min-w-[84px] flex-col items-center justify-center rounded-2xl border px-4 py-3 text-center transition-all duration-300"
                         :class="
                             selected == {{ $optionId }}
-                            ? 'border-[var(--livora-ink)] bg-[var(--livora-ink)] text-white shadow-sm'
-                            : 'border-[var(--livora-border)] bg-[var(--livora-white)] text-[var(--livora-ink)] hover:border-[var(--livora-accent)] hover:-translate-y-0.5'
+                            ? 'border-[var(--sg-ink)] bg-[var(--sg-ink)] text-white shadow-sm'
+                            : 'border-[var(--sg-border)] bg-[var(--sg-white)] text-[var(--sg-ink)] hover:border-[var(--sg-accent)] hover:-translate-y-0.5'
 "
                     >
 
@@ -163,7 +163,7 @@
                                 :class="
                                     selected == {{ $optionId }}
                                     ? 'text-white/60'
-                                    : 'text-[var(--livora-stone)]'
+                                    : 'text-[var(--sg-stone)]'
 "
                             >
                                 @if($isUnavailable)
@@ -201,9 +201,9 @@
     {{-- Empty State --}}
     @if($options->isEmpty())
 
-        <div class="rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-surface)] px-4 py-3">
+        <div class="rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-surface)] px-4 py-3">
 
-            <p class="text-xs leading-6 text-[var(--livora-stone)]">
+            <p class="text-xs leading-6 text-[var(--sg-stone)]">
                 در حال حاضر گزینه‌ای برای {{ $title }} ثبت نشده است.
             </p>
 
@@ -216,10 +216,10 @@
     <div
         x-show="selected !== null"
         x-cloak
-        class="flex items-center gap-2 text-[11px] text-[var(--livora-stone)]"
+        class="flex items-center gap-2 text-[11px] text-[var(--sg-stone)]"
     >
 
-        <span class="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--livora-ink)] text-[9px] text-white">
+        <span class="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--sg-ink)] text-[9px] text-white">
             ✓
         </span>
 

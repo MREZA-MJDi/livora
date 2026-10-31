@@ -44,7 +44,7 @@
 <article class="group relative flex h-full min-w-0 flex-col">
 
     {{-- Image --}}
-    <div class="relative overflow-hidden rounded-[1.5rem] bg-[var(--livora-surface)]">
+    <div class="relative overflow-hidden rounded-[1.5rem] bg-[var(--sg-surface)]">
 
         <a
             href="{{ route('product.show', $product->slug) }}"
@@ -63,8 +63,8 @@
             @else
 
                 <div class="flex h-full w-full items-center justify-center">
-                    <span class="text-xs tracking-[0.2em] text-[var(--livora-stone)]">
-                        SilaGallery
+                    <span class="text-xs tracking-[0.2em] text-[var(--sg-stone)]">
+                        SillaGallery
                     </span>
                 </div>
 
@@ -80,7 +80,7 @@
 
             @if($product->is_new)
 
-                <span class="rounded-full bg-white/90 px-3 py-1.5 text-[10px] font-medium text-[var(--livora-ink)] backdrop-blur">
+                <span class="rounded-full bg-white/90 px-3 py-1.5 text-[10px] font-medium text-[var(--sg-ink)] backdrop-blur">
                     جدید
                 </span>
 
@@ -88,7 +88,7 @@
 
             @if($hasDiscount)
 
-                <span class="rounded-full bg-[var(--livora-accent)] px-3 py-1.5 text-[10px] font-medium text-white">
+                <span class="rounded-full bg-[var(--sg-accent)] px-3 py-1.5 text-[10px] font-medium text-white">
                     {{ number_format($discountPercent) }}٪
                 </span>
 
@@ -101,7 +101,7 @@
 
             <div class="absolute right-3 top-3">
 
-                <span class="rounded-full border border-white/30 bg-[var(--livora-ink)]/90 px-3 py-1.5 text-[10px] font-medium text-white backdrop-blur">
+                <span class="rounded-full border border-white/30 bg-[var(--sg-ink)]/90 px-3 py-1.5 text-[10px] font-medium text-white backdrop-blur">
                     اقساطی
                 </span>
 
@@ -124,7 +124,7 @@
                     <button
                         type="submit"
                         aria-label="افزودن به علاقه‌مندی‌ها"
-                        class="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/30 text-white shadow-sm backdrop-blur-xl transition hover:bg-white hover:text-[var(--livora-ink)] focus-visible:bg-white focus-visible:text-[var(--livora-ink)]"
+                        class="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/30 text-white shadow-sm backdrop-blur-xl transition hover:bg-white hover:text-[var(--sg-ink)] focus-visible:bg-white focus-visible:text-[var(--sg-ink)]"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -156,7 +156,7 @@
         {{-- Category --}}
         @if($product->category)
 
-            <p class="min-h-[1rem] line-clamp-1 text-[10px] uppercase tracking-[0.18em] text-[var(--livora-stone)]">
+            <p class="min-h-[1rem] line-clamp-1 text-[10px] uppercase tracking-[0.18em] text-[var(--sg-stone)]">
                 {{ $product->category->name }}
             </p>
 
@@ -167,7 +167,7 @@
             href="{{ route('product.show', $product->slug) }}"
             class="mt-2 block"
         >
-            <h3 class="min-h-[3rem] line-clamp-2 text-sm font-semibold leading-6 text-[var(--livora-ink)] transition duration-300 group-hover:text-[var(--livora-accent)] sm:text-[15px]">
+            <h3 class="min-h-[3rem] line-clamp-2 text-sm font-semibold leading-6 text-[var(--sg-ink)] transition duration-300 group-hover:text-[var(--sg-accent)] sm:text-[15px]">
                 {{ $product->name }}
             </h3>
         </a>
@@ -179,14 +179,14 @@
 
                 <div class="flex flex-wrap items-center gap-2">
 
-                    <span class="text-sm font-semibold text-[var(--livora-ink)]">
+                    <span class="text-sm font-semibold text-[var(--sg-ink)]">
                         {{ number_format((float) $product->price) }}
-                        <span class="text-[10px] font-normal text-[var(--livora-stone)]">
+                        <span class="text-[10px] font-normal text-[var(--sg-stone)]">
                             تومان
                         </span>
                     </span>
 
-                    <span class="text-xs text-[var(--livora-stone)] line-through">
+                    <span class="text-xs text-[var(--sg-stone)] line-through">
                         {{ number_format((float) $product->compare_at_price) }}
                     </span>
 
@@ -194,9 +194,9 @@
 
             @else
 
-                <p class="text-sm font-semibold text-[var(--livora-ink)]">
+                <p class="text-sm font-semibold text-[var(--sg-ink)]">
                     {{ number_format((float) $product->price) }}
-                    <span class="text-[10px] font-normal text-[var(--livora-stone)]">
+                    <span class="text-[10px] font-normal text-[var(--sg-stone)]">
                         تومان
                     </span>
                 </p>
@@ -208,17 +208,17 @@
         {{-- Installment --}}
         @if($installmentEnabled && $cashAmount > 0)
 
-            <div class="mt-3 min-h-[74px] rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-surface)] p-3">
+            <div class="mt-3 min-h-[74px] rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-surface)] p-3">
 
                 <div class="flex items-center justify-between gap-3">
 
                     <div>
 
-                        <p class="text-[10px] text-[var(--livora-stone)]">
+                        <p class="text-[10px] text-[var(--sg-stone)]">
                             پیش‌پرداخت
                         </p>
 
-                        <p class="mt-1 text-xs font-semibold text-[var(--livora-ink)]">
+                        <p class="mt-1 text-xs font-semibold text-[var(--sg-ink)]">
                             {{ number_format($cashAmount) }}
                             تومان
                         </p>
@@ -227,11 +227,11 @@
 
                     <div class="text-left">
 
-                        <p class="text-[10px] text-[var(--livora-stone)]">
+                        <p class="text-[10px] text-[var(--sg-stone)]">
                             شرایط
                         </p>
 
-                        <p class="mt-1 text-xs font-medium text-[var(--livora-accent)]">
+                        <p class="mt-1 text-xs font-medium text-[var(--sg-accent)]">
                             {{ number_format($cashPercent) }}٪
                             @if($chequeCount)
                                 + {{ number_format($chequeCount) }} چک
@@ -249,7 +249,7 @@
         {{-- CTA --}}
         <a
             href="{{ route('product.show', $product->slug) }}"
-            class="mt-auto pt-4 inline-flex items-center text-xs font-medium text-[var(--livora-ink)] transition duration-300 group-hover:text-[var(--livora-accent)]"
+            class="mt-auto pt-4 inline-flex items-center text-xs font-medium text-[var(--sg-ink)] transition duration-300 group-hover:text-[var(--sg-accent)]"
         >
             مشاهده محصول
             <span class="mr-2 transition-transform duration-300 group-hover:-translate-x-1">

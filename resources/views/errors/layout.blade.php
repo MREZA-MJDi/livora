@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex,nofollow,noarchive">
-    <title>@yield('title', 'خطا | SilaGallery')</title>
+    <title>@yield('title', 'خطا | SillaGallery')</title>
     <style>
         :root{color-scheme:light;--cream:#f5f1ea;--white:#fffdf9;--ink:#201f1c;--stone:#77736b;--accent:#a66f43;--border:rgba(32,31,28,.10);--danger:#a24e4e}
         *{box-sizing:border-box}
