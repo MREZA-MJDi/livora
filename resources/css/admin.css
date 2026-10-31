@@ -3,7 +3,7 @@
 
 
 /* =========================================================
-   LIVORA ADMIN DESIGN SYSTEM
+   SILLAGALLERY ADMIN DESIGN SYSTEM
    ========================================================= */
 
 :root {
@@ -76,7 +76,7 @@ html {
     background: var(--admin-bg);
     color: var(--admin-text);
 
-    font-family: var(--livora-font-family);
+    font-family: var(--sg-font-family);
 
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;

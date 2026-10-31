@@ -4,86 +4,86 @@
        BRAND
     ====================================================== */
 
-    --livora-ink: #181715;
-    --livora-charcoal: #24221f;
+    --sg-ink: #181715;
+    --sg-charcoal: #24221f;
 
     /* Chocolate */
-    --livora-chocolate: #5a4638;
-    --livora-chocolate-dark: #3f3027;
-    --livora-chocolate-soft: #eee5de;
+    --sg-chocolate: #5a4638;
+    --sg-chocolate-dark: #3f3027;
+    --sg-chocolate-soft: #eee5de;
 
 
     /* =====================================================
        SURFACES
     ====================================================== */
 
-    --livora-cream: #f3efe8;
-    --livora-white: #faf9f6;
-    --livora-surface: #eee8df;
+    --sg-cream: #f3efe8;
+    --sg-white: #faf9f6;
+    --sg-surface: #eee8df;
 
 
     /* =====================================================
        WARM NEUTRALS
     ====================================================== */
 
-    --livora-sand: #d8d0c4;
-    --livora-stone: #a79f93;
+    --sg-sand: #d8d0c4;
+    --sg-stone: #a79f93;
 
 
     /* =====================================================
        ORIGINAL WARM ACCENT
     ====================================================== */
 
-    --livora-accent: #9a7658;
-    --livora-accent-dark: #76583f;
-    --livora-accent-soft: #ede2d7;
+    --sg-accent: #9a7658;
+    --sg-accent-dark: #76583f;
+    --sg-accent-soft: #ede2d7;
 
 
     /* =====================================================
        SAGE GREEN
     ====================================================== */
 
-    --livora-sage: #68755d;
-    --livora-sage-dark: #4f5c46;
-    --livora-sage-soft: #e5e9df;
+    --sg-sage: #68755d;
+    --sg-sage-dark: #4f5c46;
+    --sg-sage-soft: #e5e9df;
 
 
     /* =====================================================
        BORDERS
     ====================================================== */
 
-    --livora-border: #d6d0c7;
-    --livora-border-dark: #bbb2a6;
+    --sg-border: #d6d0c7;
+    --sg-border-dark: #bbb2a6;
 
 
     /* =====================================================
        STATES
     ====================================================== */
 
-    --livora-success: #3f7650;
-    --livora-success-soft: #e8f1e9;
+    --sg-success: #3f7650;
+    --sg-success-soft: #e8f1e9;
 
-    --livora-warning: #b45309;
-    --livora-warning-soft: #fff7ed;
+    --sg-warning: #b45309;
+    --sg-warning-soft: #fff7ed;
 
-    --livora-danger: #b91c1c;
-    --livora-danger-soft: #fef2f2;
+    --sg-danger: #b91c1c;
+    --sg-danger-soft: #fef2f2;
 
-    --livora-info: #0369a1;
-    --livora-info-soft: #f0f9ff;
+    --sg-info: #0369a1;
+    --sg-info-soft: #f0f9ff;
 
 
     /* =====================================================
        SHADOWS
     ====================================================== */
 
-    --livora-shadow-sm:
+    --sg-shadow-sm:
         0 4px 14px rgba(24, 23, 21, 0.05);
 
-    --livora-shadow-md:
+    --sg-shadow-md:
         0 12px 35px rgba(24, 23, 21, 0.08);
 
-    --livora-shadow-lg:
+    --sg-shadow-lg:
         0 25px 70px rgba(24, 23, 21, 0.12);
 
 
@@ -91,34 +91,34 @@
        RADIUS
     ====================================================== */
 
-    --livora-radius-sm: 0.75rem;
-    --livora-radius-md: 1rem;
-    --livora-radius-lg: 1.5rem;
-    --livora-radius-xl: 2rem;
+    --sg-radius-sm: 0.75rem;
+    --sg-radius-md: 1rem;
+    --sg-radius-lg: 1.5rem;
+    --sg-radius-xl: 2rem;
 
 
     /* =====================================================
        MOTION
     ====================================================== */
 
-    --livora-duration-fast: 180ms;
-    --livora-duration: 300ms;
-    --livora-duration-slow: 650ms;
+    --sg-duration-fast: 180ms;
+    --sg-duration: 300ms;
+    --sg-duration-slow: 650ms;
 
 
     /* =====================================================
        CONTAINER
     ====================================================== */
 
-    --livora-container: 1440px;}
+    --sg-container: 1440px;}
 
 /* =========================================================
-LIVORA CONTAINER SYSTEM
+SILLAGALLERY CONTAINER SYSTEM
 ========================================================= */
 
-.livora-container {
+.sg-container {
     width: 100%;
-    max-width: var(--livora-container);
+    max-width: var(--sg-container);
 
     margin-inline: auto;
 
