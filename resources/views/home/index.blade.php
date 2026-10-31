@@ -50,8 +50,8 @@
                     <img
                         src="{{ $heroBackgroundUrl }}"
                         alt=""
-                        width="1672"
-                        height="941"
+                        width="1200"
+                        height="2000"
                         fetchpriority="high"
                         decoding="async"
                     >
