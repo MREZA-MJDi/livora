@@ -28,6 +28,8 @@ class Product extends Model
         'is_new',
         'meta_title',
         'meta_description',
+        'canonical_url',
+        'og_image',
         'seo_index',
         'seo_follow',
 
