@@ -45,7 +45,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="{{ $seoRobots }}">
     <meta name="description" content="{{ $seoDescription }}">
-    <meta name="theme-color" content="#f3f1ed">
+    <meta name="theme-color" content="{{ request()->routeIs('shop.index') ? '#2c2d31' : '#f3f1ed' }}">
     <meta property="og:site_name" content="SillaGallery">
     <meta property="og:type" content="{{ $seoOgType }}">
     <meta property="og:title" content="{{ $seoOgTitle }}">
@@ -91,7 +91,6 @@
 <div id="app" x-data="{
     mobileOpen: false,
     searchOpen: false,
-    filterOpen: false,
     searchReturnFocus: null,
     openSearch(trigger) {
         const openedFromMenu = trigger?.closest?.('[data-sg-mobile-menu]');
@@ -114,7 +113,6 @@
     <x-layout.navbar />
     <x-layout.mobile-menu />
     <x-layout.search-overlay />
-    <x-shop.filter-drawer />
     <main class="storefront-content">@yield('content')</main>
     <x-layout.footer />
     <x-layout.mobile-bottom-bar />

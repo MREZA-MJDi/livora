@@ -78,3 +78,4 @@ window.richTextEditor = (uploadUrl) => ({
 });
 
 Alpine.start();
+
