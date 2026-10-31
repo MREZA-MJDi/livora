@@ -21,7 +21,7 @@ body:has(.sg-shop-page) {
 
 body:has(.sg-shop-page) nav[aria-label="ناوبری اصلی فروشگاه"],
 body:has(.sg-shop-page) [data-sg-mobile-menu],
-body:has(.sg-shop-page) [data-sg-search-overlay] {
+body:has(.sg-shop-page) .sg-search-overlay {
     --sg-ink: #f2f2f2;
     --sg-cream: #2c2d31;
     --sg-white: #25262a;
@@ -31,6 +31,17 @@ body:has(.sg-shop-page) [data-sg-search-overlay] {
     --sg-accent-dark: #f18ab6;
     --sg-border: rgba(255, 255, 255, .11);
     --sg-border-dark: rgba(255, 255, 255, .22);
+    color: #f2f2f2;
+}
+
+body:has(.sg-shop-page) .mobile-bottom-nav > div {
+    --sg-ink: #f2f2f2;
+    --sg-cream: #25262a;
+    --sg-white: #2c2d31;
+    --sg-surface: #383a41;
+    --sg-stone: #92969d;
+    --sg-accent: #e6629a;
+    --sg-border: rgba(255, 255, 255, .12);
     color: #f2f2f2;
 }
 
@@ -510,40 +521,39 @@ body:has(.sg-shop-page) footer {
     background: var(--sg-shop-bg);
 }
 
+/* The original Codrops column widths and gutters, scaled by viewport. */
 .sg-shop-grid .grid__item,
 .sg-shop-grid .grid__sizer {
-    width: calc(50% - 12px);
-    margin: 0 6px 18px;
+    width: calc(50% - 20px);
+    margin: 0 10px 20px;
     box-sizing: border-box;
 }
 
 @media (min-width: 60em) {
     .sg-shop-grid .grid__item,
     .sg-shop-grid .grid__sizer {
-        width: calc((100% / 3) - 16px);
-        margin: 0 8px 24px;
+        width: calc((100% / 3) - 20px);
+        margin: 0 10px 20px;
     }
 }
 
 @media (min-width: 70em) {
     .sg-shop-grid.grid--type-a .grid__item,
-    .sg-shop-grid.grid--type-a .grid__sizer,
-    .sg-shop-grid.grid--type-c .grid__item,
-    .sg-shop-grid.grid--type-c .grid__sizer {
-        width: calc(25% - 24px);
-        margin: 0 12px 24px;
+    .sg-shop-grid.grid--type-a .grid__sizer {
+        width: calc(25% - 30px);
+        margin: 0 15px 30px;
     }
 
     .sg-shop-grid.grid--type-b .grid__item,
     .sg-shop-grid.grid--type-b .grid__sizer {
-        width: calc(20% - 16px);
-        margin: 0 8px 16px;
+        width: calc(20% - 20px);
+        margin: 0 10px 20px;
     }
 
     .sg-shop-grid.grid--type-c .grid__item,
     .sg-shop-grid.grid--type-c .grid__sizer {
-        width: calc(25% - 14px);
-        margin: 0 7px 14px;
+        width: calc(25% - 16px);
+        margin: 0 8px 16px;
     }
 }
 
@@ -593,6 +603,7 @@ body:has(.sg-shop-page) footer {
     border: 1px solid currentColor;
     background: rgba(255, 255, 255, .12);
 }
+.sg-shop-layout-icon--c { gap: 1px; }
 
 .sg-shop-layout-hint {
     margin-top: 1rem;

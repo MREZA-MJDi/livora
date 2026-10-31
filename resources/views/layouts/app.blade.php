@@ -45,7 +45,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="{{ $seoRobots }}">
     <meta name="description" content="{{ $seoDescription }}">
-    <meta name="theme-color" content="#f3f1ed">
+    <meta name="theme-color" content="{{ request()->routeIs('shop.index') ? '#2c2d31' : '#f3f1ed' }}">
     <meta property="og:site_name" content="SillaGallery">
     <meta property="og:type" content="{{ $seoOgType }}">
     <meta property="og:title" content="{{ $seoOgTitle }}">

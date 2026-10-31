@@ -100,6 +100,9 @@
             action="{{ route('shop.index') }}"
             class="flex min-h-0 flex-1 flex-col"
         >
+            @if(request()->filled('category'))
+                <input type="hidden" name="category" value="{{ request('category') }}">
+            @endif
             @if(request()->filled('sort'))
                 <input type="hidden" name="sort" value="{{ request('sort') }}">
             @endif

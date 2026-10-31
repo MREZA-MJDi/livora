@@ -100,6 +100,9 @@
                     </div>
 
                     <form method="GET" action="{{ route('shop.index') }}" class="sg-shop-filter-form">
+                        @if(request()->filled('category'))
+                            <input type="hidden" name="category" value="{{ request('category') }}">
+                        @endif
                         @if(request()->filled('sort'))
                             <input type="hidden" name="sort" value="{{ request('sort') }}">
                         @endif
