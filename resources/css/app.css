@@ -2102,6 +2102,7 @@ body:has(.sg-shop-page) footer {
     .sg-shop-workspace { grid-template-columns: minmax(180px, 23vw) minmax(0, 1fr); gap: 1.25rem; }
     .sg-shop-sidebar { position: static; max-height: none; overflow: visible; }
     .sg-shop-filter-panel { display: none; }
+    .sg-shop-mobile-filter { display: inline-flex; }
 
     .sg-shop-layout-panel {
         position: static;

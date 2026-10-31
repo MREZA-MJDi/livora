@@ -1,3 +1,5 @@
+import './vendor/codrops-grid-libs.js';
+
 /**
  * main.js
  * http://www.codrops.com
