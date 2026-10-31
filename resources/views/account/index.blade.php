@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'حساب کاربری | SilaGallery')
+@section('title', 'حساب کاربری | SillaGallery')
 
 @section(
     'description',
-    'مدیریت حساب کاربری، سفارش‌ها، آدرس‌ها و علاقه‌مندی‌های شما در SilaGallery.'
+    'مدیریت حساب کاربری، سفارش‌ها، آدرس‌ها و علاقه‌مندی‌های شما در SillaGallery.'
 )
 
 @push('seo')
@@ -17,7 +17,7 @@
 @section('content')
 
     @php
-        $userName = $user->name ?: 'کاربر SilaGallery';
+        $userName = $user->name ?: 'کاربر SillaGallery';
 
         $recentOrders = $orders;
 
@@ -71,29 +71,29 @@
         ];
     @endphp
 
-    <div class="bg-[var(--livora-cream)]">
+    <div class="bg-[var(--sg-cream)]">
 
         {{-- =========================================================
              HEADER
         ========================================================== --}}
-        <section class="border-b border-[var(--livora-border)] bg-[var(--livora-white)]">
+        <section class="border-b border-[var(--sg-border)] bg-[var(--sg-white)]">
 
             <x-layout.container>
 
                 <div class="py-8 sm:py-12">
 
-                    <div class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--livora-stone)]">
+                    <div class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--sg-stone)]">
 
                         <a
                             href="{{ route('home') }}"
-                            class="transition hover:text-[var(--livora-ink)]"
+                            class="transition hover:text-[var(--sg-ink)]"
                         >
                             خانه
                         </a>
 
                         <span>/</span>
 
-                        <span class="text-[var(--livora-ink)]">
+                        <span class="text-[var(--sg-ink)]">
                         حساب کاربری
                     </span>
 
@@ -103,15 +103,15 @@
 
                         <div>
 
-                            <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--livora-accent)]">
-                                MY SilaGallery
+                            <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
+                                MY SillaGallery
                             </p>
 
                             <h1 class="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
                                 خوش آمدی، {{ $userName }}
                             </h1>
 
-                            <p class="mt-3 max-w-2xl text-sm leading-8 text-[var(--livora-stone)]">
+                            <p class="mt-3 max-w-2xl text-sm leading-8 text-[var(--sg-stone)]">
                                 سفارش‌ها، پرداخت‌ها و اطلاعات حساب خود را از اینجا مدیریت کن.
                             </p>
 
@@ -121,7 +121,7 @@
 
                             <a
                                 href="{{ route('shop.index') }}"
-                                class="inline-flex items-center rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-white)] px-5 py-3 text-sm font-medium transition hover:border-[var(--livora-ink)]"
+                                class="inline-flex items-center rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] px-5 py-3 text-sm font-medium transition hover:border-[var(--sg-ink)]"
                             >
                                 ادامه خرید
                             </a>
@@ -134,7 +134,7 @@
 
                                 <button
                                     type="submit"
-                                    class="inline-flex items-center rounded-2xl bg-[var(--livora-ink)] px-5 py-3 text-sm font-medium text-white transition hover:bg-[var(--livora-accent)]"
+                                    class="inline-flex items-center rounded-2xl bg-[var(--sg-ink)] px-5 py-3 text-sm font-medium text-white transition hover:bg-[var(--sg-accent)]"
                                 >
                                     خروج
                                 </button>
@@ -168,9 +168,9 @@
                         {{-- Stats --}}
                         <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
 
-                            <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-5">
+                            <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
 
-                                <p class="text-[10px] uppercase tracking-[0.16em] text-[var(--livora-stone)]">
+                                <p class="text-[10px] uppercase tracking-[0.16em] text-[var(--sg-stone)]">
                                     ORDERS
                                 </p>
 
@@ -178,15 +178,15 @@
                                     {{ number_format($totalOrders) }}
                                 </p>
 
-                                <p class="mt-1 text-[11px] text-[var(--livora-stone)]">
+                                <p class="mt-1 text-[11px] text-[var(--sg-stone)]">
                                     کل سفارش‌ها
                                 </p>
 
                             </div>
 
-                            <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-5">
+                            <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
 
-                                <p class="text-[10px] uppercase tracking-[0.16em] text-[var(--livora-stone)]">
+                                <p class="text-[10px] uppercase tracking-[0.16em] text-[var(--sg-stone)]">
                                     PROCESSING
                                 </p>
 
@@ -194,15 +194,15 @@
                                     {{ number_format($processingOrders) }}
                                 </p>
 
-                                <p class="mt-1 text-[11px] text-[var(--livora-stone)]">
+                                <p class="mt-1 text-[11px] text-[var(--sg-stone)]">
                                     در حال پردازش
                                 </p>
 
                             </div>
 
-                            <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-5">
+                            <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
 
-                                <p class="text-[10px] uppercase tracking-[0.16em] text-[var(--livora-stone)]">
+                                <p class="text-[10px] uppercase tracking-[0.16em] text-[var(--sg-stone)]">
                                     PAID
                                 </p>
 
@@ -210,15 +210,15 @@
                                     {{ number_format($paidOrders) }}
                                 </p>
 
-                                <p class="mt-1 text-[11px] text-[var(--livora-stone)]">
+                                <p class="mt-1 text-[11px] text-[var(--sg-stone)]">
                                     سفارش پرداخت‌شده
                                 </p>
 
                             </div>
 
-                            <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-white)] p-5">
+                            <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
 
-                                <p class="text-[10px] uppercase tracking-[0.16em] text-[var(--livora-stone)]">
+                                <p class="text-[10px] uppercase tracking-[0.16em] text-[var(--sg-stone)]">
                                     WISHLIST
                                 </p>
 
@@ -226,7 +226,7 @@
                                     {{ number_format($wishlistCount) }}
                                 </p>
 
-                                <p class="mt-1 text-[11px] text-[var(--livora-stone)]">
+                                <p class="mt-1 text-[11px] text-[var(--sg-stone)]">
                                     علاقه‌مندی‌ها
                                 </p>
 
@@ -236,11 +236,11 @@
 
 
                         {{-- Quick Actions --}}
-                        <div class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-5 sm:p-7">
+                        <div class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-5 sm:p-7">
 
                             <div class="mb-6">
 
-                                <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--livora-accent)]">
+                                <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--sg-accent)]">
                                     QUICK ACCESS
                                 </p>
 
@@ -254,9 +254,9 @@
 
                                 <a
                                     href="{{ route('account.orders.index') }}"
-                                    class="group rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-surface)] p-4 transition hover:border-[var(--livora-ink)]"
+                                    class="group rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-surface)] p-4 transition hover:border-[var(--sg-ink)]"
                                 >
-                                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--livora-white)] text-xs font-semibold">
+                                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--sg-white)] text-xs font-semibold">
                                         01
                                     </div>
 
@@ -264,16 +264,16 @@
                                         سفارش‌ها
                                     </p>
 
-                                    <p class="mt-1 text-[11px] leading-6 text-[var(--livora-stone)]">
+                                    <p class="mt-1 text-[11px] leading-6 text-[var(--sg-stone)]">
                                         مشاهده تاریخچه سفارش‌ها
                                     </p>
                                 </a>
 
                                 <a
                                     href="{{ route('account.wishlist.index') }}"
-                                    class="group rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-surface)] p-4 transition hover:border-[var(--livora-ink)]"
+                                    class="group rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-surface)] p-4 transition hover:border-[var(--sg-ink)]"
                                 >
-                                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--livora-white)] text-xs font-semibold">
+                                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--sg-white)] text-xs font-semibold">
                                         02
                                     </div>
 
@@ -281,16 +281,16 @@
                                         علاقه‌مندی‌ها
                                     </p>
 
-                                    <p class="mt-1 text-[11px] leading-6 text-[var(--livora-stone)]">
+                                    <p class="mt-1 text-[11px] leading-6 text-[var(--sg-stone)]">
                                         محصولات ذخیره‌شده شما
                                     </p>
                                 </a>
 
                                 <a
                                     href="{{ route('account.addresses.index') }}"
-                                    class="group rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-surface)] p-4 transition hover:border-[var(--livora-ink)]"
+                                    class="group rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-surface)] p-4 transition hover:border-[var(--sg-ink)]"
                                 >
-                                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--livora-white)] text-xs font-semibold">
+                                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--sg-white)] text-xs font-semibold">
                                         03
                                     </div>
 
@@ -298,16 +298,16 @@
                                         آدرس‌ها
                                     </p>
 
-                                    <p class="mt-1 text-[11px] leading-6 text-[var(--livora-stone)]">
+                                    <p class="mt-1 text-[11px] leading-6 text-[var(--sg-stone)]">
                                         مدیریت آدرس‌های ارسال
                                     </p>
                                 </a>
 
                                 <a
                                     href="{{ route('account.profile.edit') ?? '#' }}"
-                                    class="group rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-surface)] p-4 transition hover:border-[var(--livora-ink)]"
+                                    class="group rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-surface)] p-4 transition hover:border-[var(--sg-ink)]"
                                 >
-                                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--livora-white)] text-xs font-semibold">
+                                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--sg-white)] text-xs font-semibold">
                                         04
                                     </div>
 
@@ -315,7 +315,7 @@
                                         پروفایل
                                     </p>
 
-                                    <p class="mt-1 text-[11px] leading-6 text-[var(--livora-stone)]">
+                                    <p class="mt-1 text-[11px] leading-6 text-[var(--sg-stone)]">
                                         اطلاعات شخصی و حساب
                                     </p>
                                 </a>
@@ -326,13 +326,13 @@
 
 
                         {{-- Recent Orders --}}
-                        <div class="overflow-hidden rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)]">
+                        <div class="overflow-hidden rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)]">
 
-                            <div class="flex flex-col gap-4 border-b border-[var(--livora-border)] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-7">
+                            <div class="flex flex-col gap-4 border-b border-[var(--sg-border)] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-7">
 
                                 <div>
 
-                                    <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--livora-accent)]">
+                                    <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--sg-accent)]">
                                         RECENT ORDERS
                                     </p>
 
@@ -344,7 +344,7 @@
 
                                 <a
                                     href="{{ route('account.orders.index') }}"
-                                    class="text-sm font-medium text-[var(--livora-accent)]"
+                                    class="text-sm font-medium text-[var(--sg-accent)]"
                                 >
                                     مشاهده همه
                                     <span class="mr-1">←</span>
@@ -357,7 +357,7 @@
 
                                 <a
                                     href="{{ route('account.orders.show', $order) }}"
-                                    class="group block border-b border-[var(--livora-border)] p-5 transition last:border-0 hover:bg-[var(--livora-surface)] sm:p-7"
+                                    class="group block border-b border-[var(--sg-border)] p-5 transition last:border-0 hover:bg-[var(--sg-surface)] sm:p-7"
                                 >
 
                                     <div class="flex flex-col gap-5">
@@ -380,7 +380,7 @@
 
                                                 </div>
 
-                                                <p class="mt-2 text-[11px] text-[var(--livora-stone)]">
+                                                <p class="mt-2 text-[11px] text-[var(--sg-stone)]">
                                                     {{ $order->items->count() }}
                                                     محصول
                                                 </p>
@@ -407,11 +407,11 @@
 
 
                                         {{-- Payment / installment hint --}}
-                                        <div class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--livora-stone)]">
+                                        <div class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--sg-stone)]">
 
                                             @if($order->payment_method === 'installment')
 
-                                                <span class="rounded-full border border-[var(--livora-border)] bg-[var(--livora-white)] px-3 py-1.5">
+                                                <span class="rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)] px-3 py-1.5">
                                                 خرید اقساطی
                                             </span>
 
@@ -419,7 +419,7 @@
 
                                             @if($order->payment_provider)
 
-                                                <span class="rounded-full border border-[var(--livora-border)] bg-[var(--livora-white)] px-3 py-1.5">
+                                                <span class="rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)] px-3 py-1.5">
                                                 {{ $order->payment_provider }}
                                             </span>
 
@@ -442,7 +442,7 @@
 
                                 <div class="px-6 py-20 text-center">
 
-                                    <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--livora-surface)] text-[var(--livora-stone)]">
+                                    <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--sg-surface)] text-[var(--sg-stone)]">
                                         —
                                     </div>
 
@@ -450,13 +450,13 @@
                                         هنوز سفارشی نداری
                                     </h3>
 
-                                    <p class="mx-auto mt-2 max-w-md text-sm leading-7 text-[var(--livora-stone)]">
-                                        اولین انتخابت را از فروشگاه SilaGallery پیدا کن.
+                                    <p class="mx-auto mt-2 max-w-md text-sm leading-7 text-[var(--sg-stone)]">
+                                        اولین انتخابت را از فروشگاه SillaGallery پیدا کن.
                                     </p>
 
                                     <a
                                         href="{{ route('shop.index') }}"
-                                        class="mt-6 inline-flex rounded-2xl bg-[var(--livora-ink)] px-6 py-3.5 text-sm font-medium text-white transition hover:bg-[var(--livora-accent)]"
+                                        class="mt-6 inline-flex rounded-2xl bg-[var(--sg-ink)] px-6 py-3.5 text-sm font-medium text-white transition hover:bg-[var(--sg-accent)]"
                                     >
                                         ورود به فروشگاه
                                     </a>
@@ -476,7 +476,7 @@
                     <aside class="space-y-5 lg:sticky lg:top-28 lg:self-start">
 
                         {{-- Profile --}}
-                        <div class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-ink)] p-6 text-white sm:p-7">
+                        <div class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-ink)] p-6 text-white sm:p-7">
 
                             <p class="text-[10px] uppercase tracking-[0.2em] text-white/45">
                                 ACCOUNT
@@ -536,11 +536,11 @@
 
 
                         {{-- Account Navigation --}}
-                        <div class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-3">
+                        <div class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-3">
 
                             <div class="px-3 py-3">
 
-                                <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-stone)]">
+                                <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-stone)]">
                                     MY SPACE
                                 </p>
 
@@ -548,40 +548,40 @@
 
                             <a
                                 href="{{ route('account.orders.index') }}"
-                                class="flex items-center justify-between rounded-2xl px-3 py-3 text-sm transition hover:bg-[var(--livora-surface)]"
+                                class="flex items-center justify-between rounded-2xl px-3 py-3 text-sm transition hover:bg-[var(--sg-surface)]"
                             >
                             <span>
                                 سفارش‌ها
                             </span>
 
-                                <span class="text-[11px] text-[var(--livora-stone)]">
+                                <span class="text-[11px] text-[var(--sg-stone)]">
                                 {{ number_format($totalOrders) }}
                             </span>
                             </a>
 
                             <a
                                 href="{{ route('account.wishlist.index') }}"
-                                class="flex items-center justify-between rounded-2xl px-3 py-3 text-sm transition hover:bg-[var(--livora-surface)]"
+                                class="flex items-center justify-between rounded-2xl px-3 py-3 text-sm transition hover:bg-[var(--sg-surface)]"
                             >
                             <span>
                                 علاقه‌مندی‌ها
                             </span>
 
-                                <span class="text-[11px] text-[var(--livora-stone)]">
+                                <span class="text-[11px] text-[var(--sg-stone)]">
                                 {{ number_format($wishlistCount) }}
                             </span>
                             </a>
 
                             <a
                                 href="{{ route('account.addresses.index') }}"
-                                class="block rounded-2xl px-3 py-3 text-sm transition hover:bg-[var(--livora-surface)]"
+                                class="block rounded-2xl px-3 py-3 text-sm transition hover:bg-[var(--sg-surface)]"
                             >
                                 آدرس‌های من
                             </a>
 
                             <a
                                 href="{{ route('account.profile.edit') ?? '#' }}"
-                                class="block rounded-2xl px-3 py-3 text-sm transition hover:bg-[var(--livora-surface)]"
+                                class="block rounded-2xl px-3 py-3 text-sm transition hover:bg-[var(--sg-surface)]"
                             >
                                 اطلاعات حساب
                             </a>
@@ -592,9 +592,9 @@
                         {{-- Installment note --}}
                         @if($installmentOrders > 0)
 
-                            <div class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-surface)] p-5 sm:p-6">
+                            <div class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-surface)] p-5 sm:p-6">
 
-                                <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                                <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
                                     INSTALLMENT
                                 </p>
 
@@ -602,14 +602,14 @@
                                     سفارش اقساطی داری
                                 </h3>
 
-                                <p class="mt-2 text-xs leading-7 text-[var(--livora-stone)]">
+                                <p class="mt-2 text-xs leading-7 text-[var(--sg-stone)]">
                                     برای مشاهده وضعیت سفارش و جزئیات پرداخت،
                                     وارد جزئیات سفارش موردنظر شو.
                                 </p>
 
                                 <a
                                     href="{{ route('account.orders.index') }}"
-                                    class="mt-4 inline-flex text-xs font-medium text-[var(--livora-ink)] underline underline-offset-4"
+                                    class="mt-4 inline-flex text-xs font-medium text-[var(--sg-ink)] underline underline-offset-4"
                                 >
                                     مشاهده سفارش‌ها
                                 </a>
@@ -620,9 +620,9 @@
 
 
                         {{-- Support --}}
-                        <div class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-5 sm:p-6">
+                        <div class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-5 sm:p-6">
 
-                            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
                                 NEED HELP?
                             </p>
 
@@ -630,15 +630,15 @@
                                 نیاز به راهنمایی داری؟
                             </h3>
 
-                            <p class="mt-2 text-xs leading-7 text-[var(--livora-stone)]">
+                            <p class="mt-2 text-xs leading-7 text-[var(--sg-stone)]">
                                 برای پرسش درباره سفارش یا خرید با ما در تماس باش.
                             </p>
 
                             <a
                                 href="{{ route('contact') }}"
-                                class="mt-4 inline-flex text-xs font-medium text-[var(--livora-ink)] underline underline-offset-4"
+                                class="mt-4 inline-flex text-xs font-medium text-[var(--sg-ink)] underline underline-offset-4"
                             >
-                                تماس با SilaGallery
+                                تماس با SillaGallery
                             </a>
 
                         </div>
