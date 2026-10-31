@@ -32,6 +32,7 @@ if (track) {
     let scrollLength = 1;
     let stageWidth = 0;
     let stageHeight = 0;
+    let handHeight = 0;
     let frameRequested = false;
     let completionSent = false;
     let resizeObserver = null;
@@ -76,27 +77,7 @@ if (track) {
 
         stageWidth = stage.clientWidth;
         stageHeight = stage.clientHeight;
-
-        const aspectRatio = 1672 / 941;
-        const imageWidth = Math.min(
-            Math.max(stageWidth, stageHeight * aspectRatio),
-            stageWidth * 1.55
-        );
-        const imageHeight = imageWidth / aspectRatio;
-        const imageLeft = Math.min(
-            0,
-            Math.max(stageWidth - imageWidth, stageWidth / 2 - 0.557 * imageWidth)
-        );
-        const imageTop = imageHeight >= stageHeight
-            ? Math.min(stageHeight - imageHeight, stageHeight / 2 - 0.6 * imageHeight)
-            : (stageHeight - imageHeight) / 2;
-
-        Object.assign(roomImage.style, {
-            width: imageWidth + 'px',
-            height: imageHeight + 'px',
-            left: imageLeft + 'px',
-            top: imageTop + 'px',
-        });
+        handHeight = hand.getBoundingClientRect().height;
 
         startY = track.getBoundingClientRect().top + window.scrollY;
         scrollLength = Math.max(1, track.offsetHeight - stage.offsetHeight);
@@ -131,22 +112,22 @@ if (track) {
             'translate3d(' + curtainShift + 'px, ' + (-curtainLift) + 'px, 0) rotate(' + (-angle) + 'deg) scale(' + curtainScale + ')';
 
         room.style.transform = 'scale(' + (1 + 0.045 * reveal) + ')';
-        cloth.style.clipPath =
-            'ellipse(' + (reveal * 92) + '% ' + (reveal * 118) + '% at 50% 61%)';
+        cloth.style.opacity = String(1 - reveal);
 
         const lampTop = lerp(stageHeight * 0.72, stageHeight * 0.19, lampGlow);
-        lamp.style.top = lampTop + 'px';
+        const lampOffset = stageHeight * (0.72 - 0.19) * (1 - lampGlow);
+        lamp.style.setProperty('--sg-intro-lamp-offset', lampOffset + 'px');
         lamp.style.setProperty('--sg-intro-glow', String(lampGlow));
 
-        const handHeight = hand.getBoundingClientRect().height;
         const handTop = stageHeight * -0.08;
         const handY = lerp(stageHeight * 0.16, stageHeight * -0.62, handLift);
         hand.style.transform = 'translate3d(-50%, ' + handY + 'px, 0)';
         hand.style.opacity = String(handIn * handFade);
 
         const cordTop = Math.max(0, handTop + handHeight * 0.77 + handY);
-        cord.style.top = cordTop + 'px';
-        cord.style.height = Math.max(0, lampTop - cordTop) + 'px';
+        const cordScale = Math.max(0, lampTop - cordTop) / Math.max(1, stageHeight);
+        cord.style.transform =
+            'translate3d(0, ' + cordTop + 'px, 0) scaleY(' + cordScale + ')';
         cord.style.opacity = String(handIn * (1 - handLift));
 
         const brandOpacity = brandIn * brandOut;

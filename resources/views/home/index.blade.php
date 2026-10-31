@@ -68,7 +68,6 @@
                 aria-label="معرفی تصویری SillaGallery"
             >
                 <div class="sg-intro-room" data-sg-intro-room aria-hidden="true">
-                    <img class="sg-intro-room-backdrop" src="{{ asset('images/home-intro/room.webp') }}" alt="" width="1672" height="941" decoding="async">
                     <img class="sg-intro-room-image" data-sg-intro-room-image src="{{ asset('images/home-intro/room.webp') }}" alt="" width="1672" height="941" fetchpriority="high" decoding="async">
                 </div>
 
