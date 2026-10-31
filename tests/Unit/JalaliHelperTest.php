@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\\Unit;
+namespace Tests\Unit;
 
-use App\\Helpers\\JalaliHelper;
+use App\Helpers\JalaliHelper;
 use DateTimeImmutable;
 use DateTimeZone;
-use PHPUnit\\Framework\\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class JalaliHelperTest extends TestCase
 {
