@@ -57,6 +57,13 @@ class SeoMetadataTest extends TestCase
             ->assertSee('<title>SillaGallery Contact SEO Test</title>', false)
             ->assertSee('<meta name="description" content="Contact page metadata controlled from the SEO panel.">', false)
             ->assertSee('<meta name="robots" content="index, follow">', false);
+
+        // Private commerce routes must stay noindex even after global indexing
+        // is enabled for public catalogue and content pages.
+        $this->get('/cart')
+            ->assertOk()
+            ->assertSee('<meta name="robots" content="noindex, nofollow">', false)
+            ->assertHeader('X-Robots-Tag', 'noindex, nofollow');
     }
 
     public function test_category_meta_title_is_used_while_global_noindex_lock_remains_enforced(): void
