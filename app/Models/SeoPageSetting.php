@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class SeoPageSetting extends Model
 {
@@ -34,7 +35,12 @@ class SeoPageSetting extends Model
             default => null,
         };
 
-        return $key ? static::query()->where('route_key', $key)->first() : null;
+        return $key
+            ? Cache::rememberForever(
+                "seo_page_settings.{$key}",
+                static fn (): ?self => static::query()->where('route_key', $key)->first()
+            )
+            : null;
     }
 
     public function robots(): string
