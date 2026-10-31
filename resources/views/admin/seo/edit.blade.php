@@ -28,7 +28,7 @@
 
         <section class="admin-card space-y-5 p-6">
             <h2 class="text-base font-bold">هویت سایت و متادیتای پیش‌فرض</h2>
-            <div><label class="admin-label" for="site_name">نام برند</label><input id="site_name" name="site_name" class="admin-input" maxlength="255" required readonly value="SillaGallery"><p class="admin-help">نام برند عمومی قفل شده است؛ Livora فقط نام فنی مخزن است.</p></div>
+            <div><label class="admin-label" for="site_name">نام برند</label><input id="site_name" name="site_name" class="admin-input" maxlength="255" required readonly value="SillaGallery"><p class="admin-help">نام برند عمومی قفل شده است؛ SillaGallery فقط نام فنی مخزن است.</p></div>
             <div><label class="admin-label" for="default_title">عنوان پیش‌فرض</label><input id="default_title" name="default_title" class="admin-input" maxlength="255" value="{{ old('default_title', $settings->default_title) }}"></div>
             <div><label class="admin-label" for="default_description">توضیحات پیش‌فرض</label><textarea id="default_description" name="default_description" rows="3" maxlength="1000" class="admin-textarea">{{ old('default_description', $settings->default_description) }}</textarea></div>
             <div><label class="admin-label" for="default_og_image">تصویر پیش‌فرض اشتراک‌گذاری</label><input id="default_og_image" name="default_og_image" type="file" accept="image/jpeg,image/png,image/webp" class="admin-input p-2"><p class="admin-help">تصویر مربعی یا افقی با کیفیت مناسب؛ JPG، PNG یا WEBP تا ۱۰ مگابایت.</p>@if($settings->default_og_image_url)<img src="{{ $settings->default_og_image_url }}" alt="تصویر اشتراک‌گذاری پیش‌فرض" class="mt-3 aspect-[1200/630] max-h-48 rounded-xl object-cover">@endif</div>
