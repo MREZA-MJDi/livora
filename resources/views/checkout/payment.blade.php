@@ -159,7 +159,7 @@
         },
 
         selectInstallment() {
-            this.selected = 'sg-installment';
+            this.selected = 'internal-installment';
             this.installmentOpen = true;
         }
     }"
@@ -634,7 +634,7 @@
                                 <div class="mt-6">
 
                                     <form
-                                        action="{{ route('checkout.payment.sg-installment', $order) }}"
+                                        action="{{ route('checkout.payment.internal-installment', $order) }}"
                                         method="POST"
                                     >
 
@@ -686,7 +686,7 @@
 
 
                                 <form
-                                    action="{{ route('checkout.payment.sg-installment', $order) }}"
+                                    action="{{ route('checkout.payment.internal-installment', $order) }}"
                                     method="POST"
                                     class="mt-5"
                                 >
