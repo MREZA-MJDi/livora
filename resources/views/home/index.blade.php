@@ -1,13 +1,14 @@
 @extends('layouts.app')
 
-@section('title', 'سیلا گالری | مبلمان و لوازم خانه')
+@section('title', \\App\\Models\\SeoPageSetting::forRoute('home')?->meta_title ?: 'SillaGallery | مبلمان و لوازم خانه')
 
 @section(
     'description',
-    'SilaGallery؛ انتخابی دقیق برای خانه‌ای که قرار است ماندگار باشد. کشف مجموعه مبلمان، دکوراسیون و خرید اقساطی.'
+    (\\App\\Models\\SeoPageSetting::forRoute('home')?->meta_description ?: 'SillaGallery؛ انتخابی دقیق برای خانه‌ای که قرار است ماندگار باشد. کشف مجموعه مبلمان، دکوراسیون و خرید اقساطی.')
 )
 
-@section('canonical', url('/'))
+@section('canonical', \\App\\Models\\SeoPageSetting::forRoute('home')?->canonical_url ?: url('/'))
+@section('robots', \\App\\Models\\SeoPageSetting::forRoute('home')?->robots() ?? \\App\\Models\\SeoSetting::current()->robots())
 
 @push('seo')
 

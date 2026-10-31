@@ -37,6 +37,10 @@ class SeoController extends Controller
         ]);
 
         $settings = SeoSetting::current();
+        $oldFiles = [
+            'default_og_image' => $settings->default_og_image,
+            'organization_logo' => $settings->organization_logo,
+        ];
         $newFiles = [];
 
         foreach (['default_og_image' => 'seo', 'organization_logo' => 'brand'] as $field => $folder) {
@@ -73,9 +77,10 @@ class SeoController extends Controller
         }
 
         $settings->update($data);
+        \\Illuminate\\Support\\Facades\\Cache::forget('seo_settings.current');
 
         foreach ($newFiles as $field => $path) {
-            $old = $settings->getOriginal($field);
+            $old = $oldFiles[$field] ?? null;
             if ($old && $old !== $path && ! str_starts_with($old, 'http://') && ! str_starts_with($old, 'https://')) {
                 Storage::disk('public')->delete($old);
             }
