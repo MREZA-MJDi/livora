@@ -16,6 +16,17 @@
     background: #11120d;
 }
 body:has(.sila-home) {
+    --sg-ink: #f2efe7;
+    --sg-charcoal: #090a07;
+    --sg-chocolate: #d2b58d;
+    --sg-cream: #11120d;
+    --sg-white: #1a1b14;
+    --sg-surface: #202119;
+    --sg-sand: #39392f;
+    --sg-stone: #aaa999;
+    --sg-accent: #c1a078;
+    --sg-accent-dark: #ddc29b;
+    --sg-border: rgba(242, 238, 227, .14);
     background: #11120d;
 }
 body:has(.sila-home) nav[aria-label="ناوبری اصلی فروشگاه"] {
