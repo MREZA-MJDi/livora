@@ -17,14 +17,61 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  dependency-remediation:
+    name: Remediate npm advisories on main
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Apply compatible security updates
+        run: npm audit fix
+
+      - name: Require zero high or critical advisories
+        run: npm audit --audit-level=high
+
+      - name: Commit the updated lockfile
+        run: |
+          if ! git diff --quiet -- package-lock.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add package-lock.json
+            git commit -m "fix(deps): remediate npm security advisories"
+            git push origin HEAD:main
+          else
+            echo "package-lock.json already has no changes"
+          fi
+
   quality:
     name: Laravel tests and storefront smoke checks
+    needs: dependency-remediation
+    if: ${{ !cancelled() && (needs.dependency-remediation.result == 'success' || needs.dependency-remediation.result == 'skipped') }}
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'main' || github.sha }}
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
