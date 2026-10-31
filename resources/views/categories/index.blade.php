@@ -9,10 +9,10 @@
 
 @section('canonical', route('categories.index'))
 
-@section('robots', \\App\\Models\\SeoPageSetting::forRoute('categories')?->robots() ?? \\App\\Models\\SeoSetting::current()->robots())
-@section('title', \\App\\Models\\SeoPageSetting::forRoute('categories')?->meta_title ?: 'دسته‌بندی محصولات | SillaGallery')
-@section('description', \\App\\Models\\SeoPageSetting::forRoute('categories')?->meta_description ?: 'دسته‌بندی‌های مختلف مبلمان و لوازم خانه در SillaGallery را ببینید و محصول مناسب فضای خود را پیدا کنید.')
-@section('canonical', \\App\\Models\\SeoPageSetting::forRoute('categories')?->canonical_url ?: route('categories.index'))
+@section('robots', \App\Models\SeoPageSetting::forRoute('categories')?->robots() ?? \App\Models\SeoSetting::current()->robots())
+@section('title', \App\Models\SeoPageSetting::forRoute('categories')?->meta_title ?: 'دسته‌بندی محصولات | SillaGallery')
+@section('description', \App\Models\SeoPageSetting::forRoute('categories')?->meta_description ?: 'دسته‌بندی‌های مختلف مبلمان و لوازم خانه در SillaGallery را ببینید و محصول مناسب فضای خود را پیدا کنید.')
+@section('canonical', \App\Models\SeoPageSetting::forRoute('categories')?->canonical_url ?: route('categories.index'))
 
 @section('content')
 

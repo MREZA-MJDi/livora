@@ -2,7 +2,7 @@
 
 @section('title', ($activeTag->name ?? null) ? ('مطالب برچسب ' . $activeTag->name . ' | SillaGallery') : 'مجله SillaGallery')
 @section('description', 'مقاله‌ها و راهنمای انتخاب مبلمان و لوازم خانه از SillaGallery.')
-@section('robots', \\App\\Models\\SeoSetting::current()->robotsFor(false, false))
+@section('robots', \App\Models\SeoSetting::current()->robotsFor(false, false))
 @section('canonical', isset($activeTag) ? route('blog.tag', $activeTag->slug) : route('blog.index'))
 
 @section('content')
