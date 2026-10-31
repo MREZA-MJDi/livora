@@ -1,4 +1,5 @@
 @import './font.css';
+@import './admin-image-cropper.css';
 @import "tailwindcss";
 
 
@@ -7,59 +8,46 @@
    ========================================================= */
 
 :root {
-    /* Brand */
-    --admin-text: #1c1b19;
-    --admin-text-soft: #4e4a44;
-    --admin-muted: #8b857c;
+    /* Dark editorial palette inspired by the supplied UI reference. */
+    --admin-text: #f1eee5;
+    --admin-text-soft: #c8c4b7;
+    --admin-muted: #999889;
 
-    /* Background */
-    --admin-bg: #f3f1ed;
-    --admin-surface: #ece9e3;
-    --admin-white: #fbfaf8;
+    --admin-bg: #14150f;
+    --admin-surface: #1c1d16;
+    --admin-white: #22231b;
 
-    /* Brand Accent */
-    --admin-accent: #9a7658;
-    --admin-accent-dark: #76583f;
-    --admin-accent-soft: #eee3d8;
+    --admin-accent: #c4a27a;
+    --admin-accent-dark: #dfc29a;
+    --admin-accent-soft: #30281d;
 
-    /* Borders */
-    --admin-border: #ddd8d0;
-    --admin-border-dark: #c5beb4;
+    --admin-border: #35362c;
+    --admin-border-dark: #555546;
 
-    /* States */
-    --admin-success: #15803d;
-    --admin-success-bg: #ecfdf3;
+    --admin-success: #82c59a;
+    --admin-success-bg: #1b3023;
 
-    --admin-warning: #b45309;
-    --admin-warning-bg: #fff7ed;
+    --admin-warning: #e1b56e;
+    --admin-warning-bg: #342918;
 
-    --admin-danger: #b91c1c;
-    --admin-danger-bg: #fef2f2;
+    --admin-danger: #ed8f86;
+    --admin-danger-bg: #351f1d;
 
-    --admin-info: #0369a1;
-    --admin-info-bg: #f0f9ff;
+    --admin-info: #8dc2df;
+    --admin-info-bg: #1b2e38;
 
-    /* Shadows */
-    --admin-shadow-sm:
-        0 2px 10px rgba(28, 27, 25, 0.04);
+    --admin-shadow-sm: 0 2px 14px rgba(0, 0, 0, 0.16);
+    --admin-shadow-md: 0 12px 34px rgba(0, 0, 0, 0.22);
+    --admin-shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.28);
 
-    --admin-shadow-md:
-        0 10px 30px rgba(28, 27, 25, 0.07);
-
-    --admin-shadow-lg:
-        0 20px 60px rgba(28, 27, 25, 0.10);
-
-    /* Radius */
     --admin-radius-sm: 0.75rem;
     --admin-radius-md: 1rem;
     --admin-radius-lg: 1.5rem;
     --admin-radius-xl: 2rem;
 
-    /* Layout */
     --admin-sidebar-width: 260px;
     --admin-navbar-height: 72px;
 
-    /* Motion */
     --admin-duration-fast: 160ms;
     --admin-duration: 280ms;
     --admin-duration-slow: 500ms;
@@ -1491,3 +1479,12 @@ p {
 .cms-editor figcaption { color: var(--admin-muted); font-size: .75rem; }
 .cms-editor a { color: var(--admin-accent-dark); text-decoration: underline; }
 @media (max-width: 640px) { .cms-editor { min-height: 18rem; padding: 1rem; } }
+
+
+/* Dark editorial status surfaces: keep semantic colors legible on charcoal. */
+.admin-content .bg-emerald-50 { background-color: #1c3024 !important; color: #a9d8b7 !important; }
+.admin-content .bg-amber-50 { background-color: #352b19 !important; color: #e5c68e !important; }
+.admin-content .bg-sky-50 { background-color: #1c2d38 !important; color: #a7d3eb !important; }
+.admin-content .bg-indigo-50 { background-color: #25263a !important; color: #b8b9ec !important; }
+.admin-content .bg-red-50 { background-color: #351f1e !important; color: #efaaa2 !important; }
+.admin-content .bg-white\/90 { background-color: rgba(31, 32, 25, .92) !important; }

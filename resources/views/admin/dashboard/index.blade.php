@@ -169,13 +169,13 @@
                 <div class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
                     <div>
                         <label for="hero-background-image" class="admin-label">تصویر پس‌زمینه Hero</label>
-                        <input id="hero-background-image" name="background_image" type="file" accept="image/jpeg,image/png,image/webp" class="admin-input p-2" data-hero-preview-input data-preview-target="hero-background-preview">
-                        <p class="mt-2 text-[10px] leading-5 text-[var(--admin-muted)]">تصویر عریض 16:9، ترجیحاً WEBP؛ حداکثر ۱۵ مگابایت. تصویر جدید جایگزین قبلی می‌شود.</p>
+                        <input id="hero-background-image" name="background_image" type="file" accept="image/jpeg,image/png,image/webp" class="admin-input p-2" data-image-cropper data-crop-ratio="16:9" data-crop-width="2400" data-crop-height="1350" data-crop-label="تصویر پس‌زمینه Hero" data-preview-target="hero-background-preview">
+                        <p class="mt-2 text-[10px] leading-5 text-[var(--admin-muted)]">تصویر عریض 16:9؛ حداکثر ۱۵ مگابایت. پس از انتخاب، کادر را با ماوس یا لمس جابه‌جا کن و با کنترل زوم اندازه را تنظیم کن.</p>
                         @error('background_image')
                             <p class="mt-2 text-xs text-[var(--admin-danger)]">{{ $message }}</p>
                         @enderror
                     </div>
-                    <div class="hidden w-32 overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] lg:block">
+                    <div class="w-full max-w-[260px] overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]">
                         <img id="hero-background-preview" src="{{ $heroSetting?->background_url ?? '' }}" alt="پیش‌نمایش تصویر جدید پس‌زمینه" class="hidden aspect-[16/9] w-full object-cover">
                     </div>
                 </div>
@@ -218,8 +218,8 @@
                             </div>
 
                             <label for="hero-product-image-{{ $slot }}" class="admin-label mt-4">تصویر باکیفیت اختصاصی (اختیاری)</label>
-                            <input id="hero-product-image-{{ $slot }}" name="images[{{ $slot }}]" type="file" accept="image/jpeg,image/png,image/webp" class="admin-input p-2 text-[11px]" data-hero-preview-input data-preview-target="hero-product-preview-{{ $slot }}">
-                            <p class="mt-2 text-[10px] leading-5 text-[var(--admin-muted)]">اگر خالی باشد، تصویر اصلی محصول نمایش داده می‌شود.</p>
+                            <input id="hero-product-image-{{ $slot }}" name="images[{{ $slot }}]" type="file" accept="image/jpeg,image/png,image/webp" class="admin-input p-2 text-[11px]" data-image-cropper data-crop-ratio="4:3" data-crop-width="1600" data-crop-height="1200" data-crop-label="تصویر اختصاصی جایگاه {{ $slot }}" data-preview-target="hero-product-preview-{{ $slot }}">
+                            <p class="mt-2 text-[10px] leading-5 text-[var(--admin-muted)]">اگر خالی باشد، تصویر اصلی محصول نمایش داده می‌شود. برای تصویر اختصاصی، کادر 4:3 را با کشیدن و زوم تنظیم کن.</p>
                             @error('images.' . $slot)
                                 <p class="mt-2 text-[11px] text-[var(--admin-danger)]">{{ $message }}</p>
                             @enderror
@@ -241,29 +241,7 @@
             </form>
         </section>
 
-        <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('[data-hero-preview-input]').forEach((input) => {
-                const target = document.getElementById(input.dataset.previewTarget || '');
-                let previewUrl = null;
-                if (!target) return;
-
-                input.addEventListener('change', () => {
-                    const file = input.files?.[0];
-                    if (previewUrl) URL.revokeObjectURL(previewUrl);
-                    previewUrl = null;
-                    if (!file || !file.type.startsWith('image/')) return;
-                    previewUrl = URL.createObjectURL(file);
-                    target.src = previewUrl;
-                    target.classList.remove('hidden');
-                    target.classList.add('block');
-                    target.parentElement?.querySelector('[data-hero-empty]')?.classList.add('hidden');
-                });
-            });
-        });
-        </script>
-
-        {{-- =========================================================
+{{-- =========================================================
              KPI CARDS
         ========================================================== --}}
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
