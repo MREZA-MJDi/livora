@@ -1,9 +1,9 @@
 <?php
 
-namespace App\\Http\\Requests\\Shop;
+namespace App\Http\Requests\Shop;
 
-use Illuminate\\Foundation\\Http\\FormRequest;
-use Illuminate\\Validation\\Rule;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class ShopFilterRequest extends FormRequest
 {
