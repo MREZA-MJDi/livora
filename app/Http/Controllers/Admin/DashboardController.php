@@ -4,10 +4,16 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use AppModelsHomepageHeroItem;
+use AppModelsHomepageHeroSetting;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Support\Collection;
+use IlluminateHttpRequest;
+use IlluminateSupportFacadesDB;
+use IlluminateSupportFacadesStorage;
+use IlluminateValidationValidationException;
 
 class DashboardController extends Controller
 {
@@ -135,6 +141,21 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        $heroSetting = HomepageHeroSetting::query()->first();
+
+        $heroItems = HomepageHeroItem::query()
+            ->with(['product.images' => fn ($imageQuery) => $imageQuery->limit(1)])
+            ->orderBy('slot')
+            ->get()
+            ->keyBy('slot');
+
+        $heroProductOptions = Product::query()
+            ->active()
+            ->whereHas('category', fn ($query) => $query->where('is_active', true))
+            ->with(['images' => fn ($imageQuery) => $imageQuery->limit(1)])
+            ->orderBy('name')
+            ->get();
+
         return view('admin.dashboard.index', [
             'totalProducts' => (int) ($productStats->total_products ?? 0),
             'activeProducts' => (int) ($productStats->active_products ?? 0),
@@ -175,6 +196,9 @@ class DashboardController extends Controller
             'featuredProductsCount' => (int) ($productStats->featured_products ?? 0),
             'newProductsCount' => (int) ($productStats->new_products ?? 0),
             'installmentProductsCount' => (int) ($productStats->installment_products ?? 0),
+            'heroSetting' => $heroSetting,
+            'heroItems' => $heroItems,
+            'heroProductOptions' => $heroProductOptions,
         ]);
     }
 
@@ -211,4 +235,135 @@ class DashboardController extends Controller
                 ];
             });
     }
+
+
+    /**
+     * Save the storefront hero background and its four selected product cards.
+     */
+    public function updateHomepageHero(Request $request)
+    {
+        $validated = $request->validate([
+            'background_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:15360'],
+            'products' => ['nullable', 'array'],
+            'products.*' => ['nullable', 'integer', 'exists:products,id'],
+            'images' => ['nullable', 'array'],
+            'images.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:12288'],
+            'remove_image' => ['nullable', 'array'],
+            'remove_image.*' => ['nullable', 'boolean'],
+        ], [
+            'background_image.image' => 'تصویر پس‌زمینه معتبر نیست.',
+            'background_image.mimes' => 'فرمت تصویر پس‌زمینه باید JPG، PNG یا WEBP باشد.',
+            'background_image.max' => 'حجم تصویر پس‌زمینه نباید بیشتر از ۱۵ مگابایت باشد.',
+            'products.*.exists' => 'یکی از محصولات انتخاب‌شده وجود ندارد.',
+            'images.*.image' => 'تصویر کارت محصول معتبر نیست.',
+            'images.*.mimes' => 'فرمت تصویر کارت باید JPG، PNG یا WEBP باشد.',
+            'images.*.max' => 'حجم هر تصویر کارت نباید بیشتر از ۱۲ مگابایت باشد.',
+        ]);
+
+        $selectedProductIds = collect($validated['products'] ?? [])
+            ->filter(fn ($productId) => filled($productId))
+            ->map(fn ($productId) => (int) $productId);
+
+        if ($selectedProductIds->count() !== $selectedProductIds->unique()->count()) {
+            throw ValidationException::withMessages([
+                'products' => 'هر محصول را فقط یک‌بار می‌توانید در Hero انتخاب کنید.',
+            ]);
+        }
+
+        $activeProductCount = $selectedProductIds->isEmpty()
+            ? 0
+            : Product::query()
+                ->active()
+                ->whereHas('category', fn ($query) => $query->where('is_active', true))
+                ->whereIn('id', $selectedProductIds->values())
+                ->count();
+
+        if ($activeProductCount !== $selectedProductIds->count()) {
+            throw ValidationException::withMessages([
+                'products' => 'فقط محصولات فعال از دسته‌بندی‌های فعال قابل انتخاب هستند.',
+            ]);
+        }
+
+        foreach (range(1, 4) as $slot) {
+            if ($request->hasFile('images.' . $slot) && ! filled(data_get($validated, 'products.' . $slot))) {
+                throw ValidationException::withMessages([
+                    'products.' . $slot => 'ابتدا محصول این جایگاه را انتخاب کنید.',
+                ]);
+            }
+        }
+
+        $heroSetting = HomepageHeroSetting::query()->firstOrCreate([]);
+        $uploadedPaths = [];
+        $pathsToDelete = [];
+
+        try {
+            DB::transaction(function () use ($request, $validated, $heroSetting, &$uploadedPaths, &$pathsToDelete) {
+                if ($request->hasFile('background_image')) {
+                    $oldBackground = $heroSetting->background_path;
+                    $newBackground = $request->file('background_image')->store('homepage-hero/backgrounds', 'public');
+                    $uploadedPaths[] = $newBackground;
+                    $heroSetting->update(['background_path' => $newBackground]);
+
+                    if ($oldBackground) {
+                        $pathsToDelete[] = $oldBackground;
+                    }
+                }
+
+                foreach (range(1, 4) as $slot) {
+                    $productId = data_get($validated, 'products.' . $slot);
+                    $item = HomepageHeroItem::query()->where('slot', $slot)->first();
+
+                    if (! $productId) {
+                        if ($item) {
+                            if ($item->image_path) {
+                                $pathsToDelete[] = $item->image_path;
+                            }
+
+                            $item->delete();
+                        }
+
+                        continue;
+                    }
+
+                    $item ??= new HomepageHeroItem(['slot' => $slot]);
+
+                    if ($request->hasFile('images.' . $slot)) {
+                        $oldImage = $item->image_path;
+                        $newImage = $request->file('images.' . $slot)->store('homepage-hero/products', 'public');
+                        $uploadedPaths[] = $newImage;
+                        $item->image_path = $newImage;
+
+                        if ($oldImage) {
+                            $pathsToDelete[] = $oldImage;
+                        }
+                    } elseif ($request->boolean('remove_image.' . $slot)) {
+                        if ($item->image_path) {
+                            $pathsToDelete[] = $item->image_path;
+                        }
+
+                        $item->image_path = null;
+                    }
+
+                    $item->product_id = (int) $productId;
+                    $item->slot = $slot;
+                    $item->save();
+                }
+            });
+        } catch (\Throwable $exception) {
+            if ($uploadedPaths !== []) {
+                Storage::disk('public')->delete($uploadedPaths);
+            }
+
+            throw $exception;
+        }
+
+        if ($pathsToDelete !== []) {
+            Storage::disk('public')->delete(array_values(array_unique($pathsToDelete)));
+        }
+
+        return redirect()
+            ->route('admin.dashboard')
+            ->with('success', 'تنظیمات Hero صفحه اصلی ذخیره شد.');
+    }
+
 }

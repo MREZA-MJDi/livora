@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
+use AppModelsHomepageHeroItem;
+use AppModelsHomepageHeroSetting;
 use Illuminate\Contracts\View\View;
 
 class HomeController extends Controller
@@ -48,10 +50,29 @@ class HomeController extends Controller
             ->limit(8)
             ->get();
 
+        $heroSetting = HomepageHeroSetting::query()->first();
+
+        $heroItems = HomepageHeroItem::query()
+            ->whereNotNull('product_id')
+            ->whereHas('product', fn ($query) => $query
+                ->active()
+                ->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('is_active', true))
+            )
+            ->with([
+                'product.category',
+                'product.images' => fn ($imageQuery) => $imageQuery->limit(1),
+            ])
+            ->orderBy('slot')
+            ->get()
+            ->filter(fn (HomepageHeroItem $item) => filled($item->image_url))
+            ->values();
+
         return view('home.index', [
             'categories' => $categories,
             'featuredProducts' => $featuredProducts,
             'newProducts' => $newProducts,
+            'heroBackgroundUrl' => $heroSetting?->background_url,
+            'heroItems' => $heroItems,
         ]);
     }
 }
