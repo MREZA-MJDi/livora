@@ -91,6 +91,17 @@
                 </a>
 
                 <a
+                    href="{{ route('blog.index') }}"
+                    @class([
+                        'relative py-2 text-sm font-medium transition duration-300',
+                        'text-[var(--livora-ink)]' => request()->routeIs('blog.*'),
+                        'text-[var(--livora-stone)] hover:text-[var(--livora-ink)]' => !request()->routeIs('blog.*'),
+                    ])
+                >
+                    مجله
+                </a>
+
+                <a
                     href="{{ route('contact') }}"
                     @class([
                         'relative py-2 text-sm font-medium transition duration-300',
