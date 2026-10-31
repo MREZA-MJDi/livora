@@ -79,6 +79,7 @@ class PageController extends Controller
     {
         $data = $this->validated($request, $page);
         $oldImage = $page->featured_image;
+        unset($data['featured_image']);
         $newImage = $request->file('featured_image')?->store('pages', 'public');
         if ($request->hasFile('featured_image') && ! $newImage) {
             throw new \RuntimeException('Page image could not be stored.');

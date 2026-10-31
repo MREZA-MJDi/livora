@@ -8,11 +8,11 @@ use App\Models\ContentPage;
 use App\Models\Product;
 use App\Models\SeoPageSetting;
 use App\Models\SeoSetting;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SitemapController extends Controller
 {
-    public function __invoke(): Response
+    public function __invoke(): StreamedResponse
     {
         $settings = SeoSetting::current();
 
