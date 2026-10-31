@@ -14,7 +14,10 @@ class ShopController extends Controller
         $filters = $request->validated();
 
         $query = Product::query()
-            ->with(['category', 'images'])
+            ->with([
+                'category',
+                'images' => fn ($imageQuery) => $imageQuery->limit(1),
+            ])
             ->active()
             ->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('is_active', true));
 
