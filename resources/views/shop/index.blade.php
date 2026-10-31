@@ -24,7 +24,7 @@
                 : route('shop.index'))
     );
     $shopRobots = $shopHasIndexFilters
-        ? $shopSiteSeo->robotsFor(false, $shopSeo?->seo_follow ?? true)
+        ? $shopSiteSeo->robotsFor(false, true)
         : ($shopSeo?->robots() ?? $shopSiteSeo->robots());
     $shopVendorBaseUrl = rtrim((string) config('app.url'), '/') . '/vendor/codrops';
 @endphp
