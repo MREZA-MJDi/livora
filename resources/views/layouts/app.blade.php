@@ -21,7 +21,21 @@
             : ($pageSeo !== null
                 ? $pageSeo->robots()
                 : (trim($__env->yieldContent('robots')) ?: $siteSeo->robots()));
-        $seoCanonical = $pageSeo?->canonical_url ?: (trim($__env->yieldContent('canonical')) ?: url()->current());
+        // Canonical and social URLs must be bound to this application's configured origin.
+        // Never let an inbound Host header from another virtual host poison SillaGallery metadata.
+        $seoOrigin = rtrim((string) config('app.url', 'https://sillashop.com'), '/');
+        $seoCanonicalSource = $pageSeo?->canonical_url ?: trim($__env->yieldContent('canonical'));
+        $seoCanonicalPath = parse_url($seoCanonicalSource, PHP_URL_PATH);
+        $seoCanonicalPath = is_string($seoCanonicalPath) && $seoCanonicalPath !== ''
+            ? $seoCanonicalPath
+            : request()->getPathInfo();
+        $seoCanonicalPath = '/' . ltrim($seoCanonicalPath, '/');
+        $seoCanonicalQuery = parse_url($seoCanonicalSource, PHP_URL_QUERY);
+        $seoCanonical = $seoOrigin . $seoCanonicalPath;
+        if (is_string($seoCanonicalQuery) && $seoCanonicalQuery !== '') {
+            $seoCanonical .= '?' . $seoCanonicalQuery;
+        }
+        $seoBaseUrl = $seoOrigin . '/';
         $seoOgTitle = trim($__env->yieldContent('og_title')) ?: $seoTitle;
         $seoOgDescription = trim($__env->yieldContent('og_description')) ?: $seoDescription;
         $seoOgImage = $pageSeo?->og_image ?: (trim($__env->yieldContent('og_image')) ?: $siteSeo->default_og_image_url);
@@ -52,7 +66,7 @@
         '@type' => 'Organization',
         'name' => $siteSeo->organization_name ?: 'SillaGallery',
         'description' => $siteSeo->organization_description ?: $siteSeo->default_description,
-        'url' => url('/'),
+        'url' => $seoBaseUrl,
         'logo' => $siteSeo->organization_logo_url,
         'email' => $siteSeo->contact_email,
         'telephone' => $siteSeo->contact_phone,
@@ -62,10 +76,10 @@
         '@context' => 'https://schema.org',
         '@type' => 'WebSite',
         'name' => 'SillaGallery',
-        'url' => url('/'),
+        'url' => $seoBaseUrl,
         'potentialAction' => [
             '@type' => 'SearchAction',
-            'target' => url('/shop') . '?search={search_term_string}',
+            'target' => $seoBaseUrl . 'shop?search={search_term_string}',
             'query-input' => 'required name=search_term_string',
         ],
     ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) !!}</script>
