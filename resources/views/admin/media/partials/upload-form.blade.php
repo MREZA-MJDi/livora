@@ -47,7 +47,7 @@
             </h3>
 
             <p class="mt-1 text-xs text-[var(--admin-text-soft)]">
-                JPG، JPEG، PNG، WEBP، GIF، SVG و فایل‌های مجاز
+                JPG، JPEG، PNG، WEBP، GIF و فایل‌های مجاز
             </p>
 
             <p class="mt-1 text-[10px] text-[var(--admin-muted)]">
@@ -68,15 +68,13 @@
                 name="file"
                 type="file"
                 class="hidden"
-                accept=".jpg,.jpeg,.png,.webp,.gif,.svg,.pdf,.doc,.docx,.xls,.xlsx,.zip"
+                accept=".jpg,.jpeg,.png,.webp,.gif,.pdf,.doc,.docx,.xls,.xlsx,.zip"
                 required
             >
 
 
-            <p
-                id="selected-file-name"
-                class="mt-3 hidden text-xs text-[var(--admin-accent)]"
-            ></p>
+            <p id="selected-file-name" class="mt-3 hidden text-xs text-[var(--admin-accent)]"></p>
+            <img id="selected-image-preview" class="mx-auto mt-4 hidden max-h-64 rounded-2xl object-contain" alt="پیش‌نمایش تصویر انتخاب‌شده">
 
         </div>
 
@@ -183,6 +181,8 @@
 
         const fileInput = document.getElementById('file');
         const fileName = document.getElementById('selected-file-name');
+        const imagePreview = document.getElementById('selected-image-preview');
+        let previewUrl = null;
 
         if (!fileInput || !fileName) {
             return;
@@ -198,6 +198,14 @@
 
             fileName.textContent = 'فایل انتخاب‌شده: ' + this.files[0].name;
             fileName.classList.remove('hidden');
+
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
+            imagePreview?.classList.add('hidden');
+            if (this.files[0].type.startsWith('image/') && imagePreview) {
+                previewUrl = URL.createObjectURL(this.files[0]);
+                imagePreview.src = previewUrl;
+                imagePreview.classList.remove('hidden');
+            }
 
         });
 
