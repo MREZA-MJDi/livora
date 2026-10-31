@@ -11,6 +11,7 @@ use App\Models\ProductVariant;
 use App\Services\Inventory\OrderInventoryService;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -412,6 +413,81 @@ class StorefrontReadinessTest extends TestCase
             ->assertSee('installment=1', false)
             ->assertSee('featured=1', false)
             ->assertSee('new=1', false);
+    }
+
+    public function test_shop_limits_eager_loaded_card_images_to_one_per_product(): void
+    {
+        $category = $this->category();
+
+        for ($i = 1; $i <= 3; $i++) {
+            $product = $this->product($category, [
+                'name' => 'محصول تصویر ' . $i,
+                'slug' => 'product-card-image-' . $i,
+            ]);
+
+            for ($image = 1; $image <= 4; $image++) {
+                ProductImage::create([
+                    'product_id' => $product->id,
+                    'path' => "products/{$product->id}/image-{$image}.webp",
+                    'alt' => $product->name . ' ' . $image,
+                    'sort_order' => $image,
+                    'is_primary' => $image === 1,
+                ]);
+            }
+        }
+
+        $this->get('/shop')
+            ->assertOk()
+            ->assertViewHas('products', function ($products) {
+                return $products->count() === 3
+                    && $products->every(fn ($product) => $product->images->count() === 1);
+            });
+    }
+
+    public function test_dashboard_uses_correct_paid_revenue_aggregates_for_current_and_previous_month(): void
+    {
+        $admin = User::create([
+            'name' => 'Dashboard Metrics Admin',
+            'email' => 'dashboard-metrics-admin@example.test',
+            'password' => Hash::make('DashboardMetrics123'),
+            'role' => 'admin',
+        ]);
+
+        $currentMonthOrder = $this->inventoryOrder();
+        $currentMonthOrder->forceFill([
+            'total' => 300,
+            'status' => 'delivered',
+            'created_at' => now()->startOfMonth()->addDay(),
+            'updated_at' => now()->startOfMonth()->addDay(),
+        ])->save();
+
+        $previousMonthOrder = $this->inventoryOrder();
+        $previousMonthOrder->forceFill([
+            'total' => 150,
+            'status' => 'pending',
+            'created_at' => now()->subMonthNoOverflow()->startOfMonth()->addDay(),
+            'updated_at' => now()->subMonthNoOverflow()->startOfMonth()->addDay(),
+        ])->save();
+
+        $this->actingAs($admin)
+            ->get(route('admin.dashboard'))
+            ->assertOk()
+            ->assertViewHas('totalOrders', 2)
+            ->assertViewHas('paidOrders', 2)
+            ->assertViewHas('totalRevenue', 450.0)
+            ->assertViewHas('currentMonthRevenue', 300.0)
+            ->assertViewHas('previousMonthRevenue', 150.0)
+            ->assertViewHas('currentMonthOrders', 1)
+            ->assertViewHas('revenueGrowthPercent', 100.0)
+            ->assertViewHas('orderStatus', function ($status) {
+                return $status['delivered'] === 1
+                    && $status['pending'] === 1;
+            })
+            ->assertViewHas('monthlyRevenue', function ($months) {
+                return $months->count() === 6
+                    && $months->last()['revenue'] === 300.0
+                    && $months->last()['orders'] === 1;
+            });
     }
 
     public function test_password_recovery_does_not_reveal_whether_an_email_exists(): void
