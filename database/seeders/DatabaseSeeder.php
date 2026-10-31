@@ -33,11 +33,10 @@ class DatabaseSeeder extends Seeder
         }
 
         if (app()->environment('production')) {
-            // Production seeding is limited to safe administrator bootstrap.
-            // UserSeeder preserves an existing admin and rejects unsafe defaults.
+            // Production seeding must never invent catalogue data. Only the
+            // guarded administrator bootstrap is allowed here.
             $this->call([
                 UserSeeder::class,
-                SillaGalleryStarterCatalogSeeder::class,
             ]);
 
             return;
