@@ -139,7 +139,7 @@ class PageController extends Controller
         } else {
             $slug = trim((string) $request->input('slug'));
             if ($slug === '') {
-                $slug = UniqueSlug::make((string) $request->input('title'), 'content_pages');
+                $slug = UniqueSlug::make((string) $request->input('title'), 'content_pages', $page?->id);
             }
         }
         $request->merge([
