@@ -1,14 +1,14 @@
 <?php
 
-namespace App\\Http\\Controllers\\Admin;
+namespace App\Http\Controllers\Admin;
 
-use App\\Helpers\\JalaliHelper;
-use App\\Http\\Controllers\\Controller;
-use App\\Models\\Order;
-use App\\Models\\OrderItem;
-use App\\Models\\Product;
-use App\\Models\\User;
-use Illuminate\\Support\\Collection;
+use App\Helpers\JalaliHelper;
+use App\Http\Controllers\Controller;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Product;
+use App\Models\User;
+use Illuminate\Support\Collection;
 
 class DashboardController extends Controller
 {
