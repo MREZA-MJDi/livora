@@ -30,7 +30,7 @@
         $seoRobots = $privateRoute
             ? 'noindex, nofollow'
             : ($shopHasIndexFilters
-                ? $siteSeo->robotsFor(false, $pageSeo?->seo_follow ?? true)
+                ? $siteSeo->robotsFor(false, true)
                 : ($pageSeo !== null
                     ? $pageSeo->robots()
                     : (trim($__env->yieldContent('robots')) ?: $siteSeo->robots())));
