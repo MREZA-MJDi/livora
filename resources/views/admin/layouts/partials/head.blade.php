@@ -43,8 +43,7 @@
 ========================================================= --}}
 
 @vite([
-    'resources/css/admin.css',
-    'resources/js/admin-image-cropper.js',
+'resources/css/admin.css',
 ])
 
 

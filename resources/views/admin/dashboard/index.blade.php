@@ -151,7 +151,7 @@
                         </p>
                     </div>
                     <div class="w-full max-w-[260px]">
-                        <div class="aspect-[3/5] overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-white)]">
+                        <div class="aspect-[16/9] overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-white)]">
                             @if($heroSetting?->background_url)
                                 <img src="{{ $heroSetting->background_url }}" alt="پیش‌نمایش تصویر پس‌زمینه Hero" class="h-full w-full object-cover">
                             @else
@@ -169,14 +169,14 @@
                 <div class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
                     <div>
                         <label for="hero-background-image" class="admin-label">تصویر پس‌زمینه Hero</label>
-                        <input id="hero-background-image" name="background_image" type="file" accept="image/jpeg,image/png,image/webp" class="admin-input p-2" data-image-cropper data-crop-ratio="3:5" data-crop-width="1200" data-crop-height="2000" data-crop-label="تصویر پس‌زمینه Hero" data-preview-target="hero-background-preview">
-                        <p class="mt-2 text-[10px] leading-5 text-[var(--admin-muted)]">تصویر اصلی با کادر پرتره 3:5؛ حداکثر ۱۵ مگابایت. پس از انتخاب، کادر را با ماوس یا لمس جابه‌جا کن و با کنترل زوم اندازه را تنظیم کن.</p>
+                        <input id="hero-background-image" name="background_image" type="file" accept="image/jpeg,image/png,image/webp" class="admin-input p-2" data-hero-preview-input data-preview-target="hero-background-preview">
+                        <p class="mt-2 text-[10px] leading-5 text-[var(--admin-muted)]">تصویر عریض 16:9، ترجیحاً WEBP؛ حداکثر ۱۵ مگابایت. تصویر جدید جایگزین قبلی می‌شود.</p>
                         @error('background_image')
                             <p class="mt-2 text-xs text-[var(--admin-danger)]">{{ $message }}</p>
                         @enderror
                     </div>
-                    <div class="w-full max-w-[260px] overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]">
-                        <img id="hero-background-preview" src="{{ $heroSetting?->background_url ?? '' }}" alt="پیش‌نمایش تصویر جدید پس‌زمینه" class="hidden aspect-[3/5] w-full object-cover">
+                    <div class="hidden w-32 overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] lg:block">
+                        <img id="hero-background-preview" src="{{ $heroSetting?->background_url ?? '' }}" alt="پیش‌نمایش تصویر جدید پس‌زمینه" class="hidden aspect-[16/9] w-full object-cover">
                     </div>
                 </div>
 
@@ -210,16 +210,16 @@
 
                             <div class="mt-4 overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-white)]">
                                 @if($slotPreviewUrl)
-                                    <img id="hero-product-preview-{{ $slot }}" src="{{ $slotPreviewUrl }}" alt="پیش‌نمایش کارت {{ $slot }}" class="aspect-[1/1.08] w-full object-cover">
+                                    <img id="hero-product-preview-{{ $slot }}" src="{{ $slotPreviewUrl }}" alt="پیش‌نمایش کارت {{ $slot }}" class="aspect-[4/3] w-full object-cover">
                                 @else
-                                    <div data-hero-empty class="flex aspect-[1/1.08] items-center justify-center text-[10px] text-[var(--admin-muted)]">پیش‌نمایش تصویر محصول</div>
-                                    <img id="hero-product-preview-{{ $slot }}" src="" alt="پیش‌نمایش کارت {{ $slot }}" class="hidden aspect-[1/1.08] w-full object-cover">
+                                    <div data-hero-empty class="flex aspect-[4/3] items-center justify-center text-[10px] text-[var(--admin-muted)]">پیش‌نمایش تصویر محصول</div>
+                                    <img id="hero-product-preview-{{ $slot }}" src="" alt="پیش‌نمایش کارت {{ $slot }}" class="hidden aspect-[4/3] w-full object-cover">
                                 @endif
                             </div>
 
                             <label for="hero-product-image-{{ $slot }}" class="admin-label mt-4">تصویر باکیفیت اختصاصی (اختیاری)</label>
-                            <input id="hero-product-image-{{ $slot }}" name="images[{{ $slot }}]" type="file" accept="image/jpeg,image/png,image/webp" class="admin-input p-2 text-[11px]" data-image-cropper data-crop-ratio="1:1.08" data-crop-width="1200" data-crop-height="1296" data-crop-label="تصویر اختصاصی جایگاه {{ $slot }}" data-preview-target="hero-product-preview-{{ $slot }}">
-                            <p class="mt-2 text-[10px] leading-5 text-[var(--admin-muted)]">اگر خالی باشد، تصویر اصلی محصول نمایش داده می‌شود. برای تصویر اختصاصی، کادر هماهنگ با نمایش کارت را با کشیدن و زوم تنظیم کن.</p>
+                            <input id="hero-product-image-{{ $slot }}" name="images[{{ $slot }}]" type="file" accept="image/jpeg,image/png,image/webp" class="admin-input p-2 text-[11px]" data-hero-preview-input data-preview-target="hero-product-preview-{{ $slot }}">
+                            <p class="mt-2 text-[10px] leading-5 text-[var(--admin-muted)]">اگر خالی باشد، تصویر اصلی محصول نمایش داده می‌شود.</p>
                             @error('images.' . $slot)
                                 <p class="mt-2 text-[11px] text-[var(--admin-danger)]">{{ $message }}</p>
                             @enderror
@@ -241,7 +241,29 @@
             </form>
         </section>
 
-{{-- =========================================================
+        <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('[data-hero-preview-input]').forEach((input) => {
+                const target = document.getElementById(input.dataset.previewTarget || '');
+                let previewUrl = null;
+                if (!target) return;
+
+                input.addEventListener('change', () => {
+                    const file = input.files?.[0];
+                    if (previewUrl) URL.revokeObjectURL(previewUrl);
+                    previewUrl = null;
+                    if (!file || !file.type.startsWith('image/')) return;
+                    previewUrl = URL.createObjectURL(file);
+                    target.src = previewUrl;
+                    target.classList.remove('hidden');
+                    target.classList.add('block');
+                    target.parentElement?.querySelector('[data-hero-empty]')?.classList.add('hidden');
+                });
+            });
+        });
+        </script>
+
+        {{-- =========================================================
              KPI CARDS
         ========================================================== --}}
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
