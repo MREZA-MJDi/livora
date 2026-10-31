@@ -2,7 +2,7 @@
 
 @section(
     'title',
-    $category->name . ' | خرید مبلمان و محصولات خانه | SilaGallery'
+    $category->meta_title ?: ($category->name . ' | خرید مبلمان و محصولات خانه | SillaGallery')
 )
 
 @section(
