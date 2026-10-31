@@ -20,7 +20,7 @@ class ProductController extends Controller
     public function index(): View
     {
         $products = Product::query()
-            ->with('category')
+            ->with(['category', 'images'])
             ->latest()
             ->paginate(15);
 
