@@ -19,6 +19,8 @@ class UpdateProductRequest extends FormRequest
             $this->boolean('installment_enabled');
 
         $this->merge([
+            'seo_index' => $this->boolean('seo_index'),
+            'seo_follow' => $this->boolean('seo_follow'),
             'price' => $this->normalizeNumericInput($this->input('price')),
             'compare_at_price' => $this->normalizeNumericInput($this->input('compare_at_price')),
             'slug' =>
@@ -110,7 +112,9 @@ class UpdateProductRequest extends FormRequest
     {
         $product = $this->route('product');
 
-        return [
+        return [            'seo_index' => ['sometimes', 'boolean'],
+            'seo_follow' => ['sometimes', 'boolean'],
+
             'category_id' => [
                 'required',
                 'integer',
