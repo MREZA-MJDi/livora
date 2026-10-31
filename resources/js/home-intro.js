@@ -174,7 +174,7 @@ if (track) {
     };
 
     const onSkip = () => {
-        const target = startY + scrollLength + 1;
+        const target = startY + track.offsetHeight + 1;
         skipButton?.blur();
         window.scrollTo({
             top: target,

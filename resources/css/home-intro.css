@@ -5,12 +5,10 @@
 }
 
 .sg-intro-track {
-    --sg-intro-header-height: 68px;
     --sg-intro-scroll-distance: 125svh;
     position: relative;
-    min-height: calc(100svh - var(--sg-intro-header-height) + var(--sg-intro-scroll-distance));
+    min-height: calc(100svh - var(--sg-intro-header-height, 68px) + var(--sg-intro-scroll-distance));
     background: var(--sg-cream, #f3efe8);
-    direction: ltr;
     isolation: isolate;
 }
 
@@ -20,9 +18,9 @@
 
 .sg-intro-stage {
     position: sticky;
-    top: var(--sg-intro-header-height);
+    top: var(--sg-intro-header-height, 68px);
     width: 100%;
-    height: calc(100svh - var(--sg-intro-header-height));
+    height: calc(100svh - var(--sg-intro-header-height, 68px));
     min-height: 20rem;
     overflow: hidden;
     isolation: isolate;
@@ -174,6 +172,7 @@
 }
 
 .sg-intro-brand__name {
+    direction: ltr;
     font-family: var(--sg-font-family, sans-serif);
     font-size: clamp(1.5rem, 4.3vw, 3.5rem);
     font-weight: 600;
