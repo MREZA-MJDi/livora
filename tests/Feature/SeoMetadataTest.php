@@ -145,15 +145,17 @@ class SeoMetadataTest extends TestCase
         $this->get('/about')->assertOk()->assertSee('درباره SillaGallery - ویرایش');
     }
 
-    public function test_public_homepage_uses_sillagallery_brand_without_internal_livora_namespace(): void
+    public function test_public_storefront_routes_use_sillagallery_brand_without_internal_livora_namespace(): void
     {
-        $response = $this->get('/')->assertOk();
-        $html = strtolower((string) $response->getContent());
+        foreach (['/', '/shop', '/categories', '/about', '/terms', '/blog', '/contact', '/login', '/register', '/cart'] as $path) {
+            $response = $this->get($path)->assertOk();
+            $html = strtolower((string) $response->getContent());
 
-        $this->assertStringContainsString('sillagallery', $html);
-        $this->assertStringNotContainsString('livora', $html);
-        $this->assertStringNotContainsString('silagallery', $html);
-        $this->assertStringNotContainsString('data-livora-', $html);
+            $this->assertStringContainsString('sillagallery', $html, $path . ' must identify SillaGallery');
+            $this->assertStringNotContainsString('livora', $html, $path . ' must not expose Livora');
+            $this->assertStringNotContainsString('silagallery', $html, $path . ' must not expose the misspelled brand');
+            $this->assertStringNotContainsString('data-livora-', $html, $path . ' must not expose old frontend hooks');
+        }
     }
 
 }
