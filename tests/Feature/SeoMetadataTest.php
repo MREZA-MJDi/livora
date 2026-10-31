@@ -145,6 +145,28 @@ class SeoMetadataTest extends TestCase
         $this->get('/about')->assertOk()->assertSee('درباره SillaGallery - ویرایش');
     }
 
+    public function test_canonical_and_open_graph_urls_are_pinned_to_sillagallery_origin_not_inbound_host(): void
+    {
+        config(['app.url' => 'https://sillashop.com']);
+
+        SeoPageSetting::query()
+            ->where('route_key', 'home')
+            ->firstOrFail()
+            ->update(['canonical_url' => 'https://farajihome.com/catalog/sale']);
+        Cache::forget('seo_page_settings.home');
+
+        $this->withServerVariables([
+            'HTTP_HOST' => 'farajihome.com',
+            'HTTPS' => 'on',
+        ])->get('/')
+            ->assertOk()
+            ->assertSee('<link rel="canonical" href="https://sillashop.com/catalog/sale">', false)
+            ->assertSee('<meta property="og:url" content="https://sillashop.com/catalog/sale">', false)
+            ->assertSee('"url":"https://sillashop.com/"', false)
+            ->assertSee('"target":"https://sillashop.com/shop?search={search_term_string}"', false)
+            ->assertDontSee('<meta property="og:url" content="https://farajihome.com/catalog/sale">');
+    }
+
     public function test_public_storefront_routes_use_sillagallery_brand_without_internal_livora_namespace(): void
     {
         $routes = ['/', '/shop', '/categories', '/about', '/terms', '/blog', '/contact', '/login', '/register', '/cart'];
