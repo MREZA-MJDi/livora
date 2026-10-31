@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Category;
 use App\Models\SeoPageSetting;
 use App\Models\SeoSetting;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
@@ -103,4 +104,37 @@ class SeoMetadataTest extends TestCase
             ->assertSee('<meta name="robots" content="noindex, nofollow">', false)
             ->assertHeader('X-Robots-Tag', 'noindex, nofollow');
     }
+    public function test_admin_cms_forms_render_editor_and_fixed_page_slugs_cannot_break_navigation(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $about = \App\Models\ContentPage::query()->where('slug', 'about')->firstOrFail();
+
+        $this->actingAs($admin)
+            ->get(route('admin.pages.create'))
+            ->assertOk()
+            ->assertSee('contenteditable="true"', false);
+
+        $this->actingAs($admin)
+            ->get(route('admin.pages.edit', $about))
+            ->assertOk()
+            ->assertSee('contenteditable="true"', false);
+
+        $this->actingAs($admin)
+            ->put(route('admin.pages.update', $about), [
+                'title' => 'درباره SillaGallery - ویرایش',
+                'slug' => 'changed-about-path',
+                'body' => '<p>متن به‌روزشده</p>',
+                'status' => 'published',
+            ])
+            ->assertRedirect(route('admin.pages.edit', $about));
+
+        $this->assertDatabaseHas('content_pages', [
+            'id' => $about->id,
+            'slug' => 'about',
+            'title' => 'درباره SillaGallery - ویرایش',
+        ]);
+
+        $this->get('/about')->assertOk()->assertSee('متن به‌روزشده');
+    }
+
 }
