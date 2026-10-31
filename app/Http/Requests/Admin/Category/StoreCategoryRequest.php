@@ -31,6 +31,10 @@ class StoreCategoryRequest extends FormRequest
         return [
             'seo_index' => ['sometimes', 'boolean'],
             'seo_follow' => ['sometimes', 'boolean'],
+            'meta_title' => ['nullable', 'string', 'max:255'],
+            'meta_description' => ['nullable', 'string', 'max:1000'],
+            'canonical_url' => ['nullable', 'url', 'max:2048'],
+            'og_image' => ['nullable', 'url', 'max:2048'],
 
             'name' => [
                 'required',

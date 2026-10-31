@@ -22,11 +22,14 @@ class ApplyRobotsHeaders
         $settings = SeoSetting::current();
         $contentType = (string) $response->headers->get('Content-Type');
 
-        // Keep the emergency global noindex policy in an HTTP header so it
-        // still applies if a template is changed or serves a custom HTML page.
-        // Per-page directives are emitted in the HTML when indexing is enabled.
-        if (! $settings->indexing_enabled && str_contains($contentType, 'text/html')) {
-            $response->headers->set('X-Robots-Tag', $settings->robots());
+        // The global switch is authoritative for every public HTML page.
+        // A per-page index/follow checkbox cannot override a closed global gate.
+        if (str_contains($contentType, 'text/html')) {
+            if (! $settings->indexing_enabled || ! $settings->following_enabled) {
+                $response->headers->set('X-Robots-Tag', $settings->robots());
+            } else {
+                $response->headers->remove('X-Robots-Tag');
+            }
         }
 
         return $response;

@@ -117,6 +117,8 @@ class StoreProductRequest extends FormRequest
         return [
             'seo_index' => ['sometimes', 'boolean'],
             'seo_follow' => ['sometimes', 'boolean'],
+            'canonical_url' => ['nullable', 'url', 'max:2048'],
+            'og_image' => ['nullable', 'url', 'max:2048'],
 
             'category_id' => [
                 'required',
