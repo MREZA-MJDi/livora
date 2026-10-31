@@ -14,7 +14,7 @@ window.richTextEditor = (uploadUrl) => ({
     sync() {
         this.$refs.output.value = this.$refs.editor.innerHTML.trim();
         const text = this.$refs.editor.innerText.trim();
-        this.wordCount = text ? text.split(/\\s+/u).filter(Boolean).length : 0;
+        this.wordCount = text ? text.split(/\s+/u).filter(Boolean).length : 0;
     },
     command(name, value = null) {
         this.$refs.editor.focus();
@@ -47,7 +47,7 @@ window.richTextEditor = (uploadUrl) => ({
         const file = event.target.files?.[0];
         event.target.value = '';
         if (!file) return;
-        if (!/^image\\/(jpeg|png|webp)$/i.test(file.type) || file.size > 10 * 1024 * 1024) {
+        if (!/^image\/(jpeg|png|webp)$/i.test(file.type) || file.size > 10 * 1024 * 1024) {
             this.message = 'فقط تصویر JPG، PNG یا WEBP تا ۱۰ مگابایت مجاز است.';
             return;
         }

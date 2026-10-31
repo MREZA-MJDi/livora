@@ -356,10 +356,7 @@ Route::middleware(['auth', 'customer'])->group(function () {
 
 });
 
-// CMS slug route is last so it cannot shadow storefront or admin endpoints.
-Route::get('/{slug}', [PageController::class, 'show'])
-    ->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')
-    ->name('pages.show');
+
 
 
 /*
@@ -548,3 +545,8 @@ Route::middleware(['auth', 'admin'])
             [ContactMessageController::class, 'destroy']
         )->name('contact-messages.destroy');
     });
+
+// Public CMS slug route must remain after all explicit routes, especially /admin.
+Route::get('/{slug}', [PageController::class, 'show'])
+    ->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')
+    ->name('pages.show');

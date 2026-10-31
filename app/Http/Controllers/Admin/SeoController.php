@@ -7,7 +7,6 @@ use App\Models\SeoSetting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class SeoController extends Controller
@@ -77,7 +76,7 @@ class SeoController extends Controller
         }
 
         $settings->update($data);
-        \\Illuminate\\Support\\Facades\\Cache::forget('seo_settings.current');
+        \Illuminate\Support\Facades\Cache::forget('seo_settings.current');
 
         foreach ($newFiles as $field => $path) {
             $old = $oldFiles[$field] ?? null;

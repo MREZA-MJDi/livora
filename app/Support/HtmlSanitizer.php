@@ -85,6 +85,8 @@ final class HtmlSanitizer
             }
 
             if (! in_array($tag, self::ALLOWED_TAGS, true)) {
+                // Sanitize descendants before unwrapping an unknown element.
+                self::cleanChildren($child);
                 while ($child->firstChild) {
                     $parent->insertBefore($child->firstChild, $child);
                 }
