@@ -2,12 +2,12 @@
 
 @section(
     'title',
-    'خرید اقساطی | ' . $order->order_number . ' | SilaGallery'
+    'خرید اقساطی | ' . $order->order_number . ' | SillaGallery'
 )
 
 @section(
     'description',
-    'تکمیل فرآیند خرید اقساطی سفارش در SilaGallery.'
+    'تکمیل فرآیند خرید اقساطی سفارش در SillaGallery.'
 )
 
 @push('seo')
@@ -52,7 +52,7 @@
         x-data="{
         showCheques: false
     }"
-        class="overflow-hidden bg-[var(--livora-cream)]"
+        class="overflow-hidden bg-[var(--sg-cream)]"
     >
 
 
@@ -60,7 +60,7 @@
              HEADER
         ========================================================== --}}
 
-        <section class="border-b border-[var(--livora-border)] bg-[var(--livora-white)]">
+        <section class="border-b border-[var(--sg-border)] bg-[var(--sg-white)]">
 
             <x-layout.container>
 
@@ -68,12 +68,12 @@
 
                     <nav
                         aria-label="breadcrumb"
-                        class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--livora-stone)]"
+                        class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--sg-stone)]"
                     >
 
                         <a
                             href="{{ route('home') }}"
-                            class="transition hover:text-[var(--livora-ink)]"
+                            class="transition hover:text-[var(--sg-ink)]"
                         >
                             خانه
                         </a>
@@ -82,14 +82,14 @@
 
                         <a
                             href="{{ route('checkout.payment', $order) }}"
-                            class="transition hover:text-[var(--livora-ink)]"
+                            class="transition hover:text-[var(--sg-ink)]"
                         >
                             روش پرداخت
                         </a>
 
                         <span>/</span>
 
-                        <span class="text-[var(--livora-ink)]">
+                        <span class="text-[var(--sg-ink)]">
                         خرید اقساطی
                     </span>
 
@@ -98,19 +98,19 @@
 
                     <div class="mt-8">
 
-                        <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--livora-accent)]">
-                            SilaGallery INSTALLMENT
+                        <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
+                            SillaGallery INSTALLMENT
                         </p>
 
                         <h1 class="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
                             تکمیل خرید اقساطی
                         </h1>
 
-                        <p class="mt-4 max-w-2xl text-sm leading-8 text-[var(--livora-stone)]">
+                        <p class="mt-4 max-w-2xl text-sm leading-8 text-[var(--sg-stone)]">
 
                             سفارش
 
-                            <span class="font-semibold text-[var(--livora-ink)]">
+                            <span class="font-semibold text-[var(--sg-ink)]">
                             {{ $order->order_number }}
                         </span>
 
@@ -147,7 +147,7 @@
                          STEP 01
                     ================================================== --}}
 
-                    <section class="overflow-hidden rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-ink)] text-white">
+                    <section class="overflow-hidden rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-ink)] text-white">
 
                         <div class="p-6 sm:p-8">
 
@@ -259,7 +259,7 @@
 
                                 <a
                                     href="{{ route('checkout.payment', $order) }}"
-                                    class="mt-4 flex w-full items-center justify-center rounded-2xl bg-white px-6 py-4 text-sm font-medium text-[var(--livora-ink)] transition hover:bg-[var(--livora-cream)]"
+                                    class="mt-4 flex w-full items-center justify-center rounded-2xl bg-white px-6 py-4 text-sm font-medium text-[var(--sg-ink)] transition hover:bg-[var(--sg-cream)]"
                                 >
                                     انتخاب درگاه پیش‌پرداخت
                                 </a>
@@ -275,26 +275,26 @@
                          STEP 02 — CHEQUES
                     ================================================== --}}
 
-                    <section class="overflow-hidden rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)]">
+                    <section class="overflow-hidden rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)]">
 
                         {{-- Toggle Header --}}
                         <button
                             type="button"
                             @click="showCheques = !showCheques"
-                            class="group flex w-full items-center justify-between gap-4 border-b border-[var(--livora-border)] p-5 text-right transition-colors duration-200 hover:bg-[var(--livora-surface)] sm:p-7"
+                            class="group flex w-full items-center justify-between gap-4 border-b border-[var(--sg-border)] p-5 text-right transition-colors duration-200 hover:bg-[var(--sg-surface)] sm:p-7"
                         >
 
                             <div>
 
-                                <p class="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                                <p class="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--sg-accent)]">
                                     STEP 02
                                 </p>
 
-                                <h2 class="mt-2 text-xl font-semibold text-[var(--livora-ink)]">
+                                <h2 class="mt-2 text-xl font-semibold text-[var(--sg-ink)]">
                                     اطلاعات چک‌ها
                                 </h2>
 
-                                <p class="mt-2 text-xs leading-6 text-[var(--livora-stone)]">
+                                <p class="mt-2 text-xs leading-6 text-[var(--sg-stone)]">
                                     مشاهده برنامه چک‌های باقی‌مانده سفارش
                                 </p>
 
@@ -302,7 +302,7 @@
 
 
                             <span
-                                class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[var(--livora-border)] bg-[var(--livora-surface)] text-[var(--livora-ink)] transition-transform duration-300 ease-out"
+                                class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-surface)] text-[var(--sg-ink)] transition-transform duration-300 ease-out"
                                 :class="showCheques ? 'rotate-180' : 'rotate-0'"
                             >
 
@@ -348,30 +348,30 @@
                                         @foreach($chequeInstallments as $index => $installment)
 
                                             <article
-                                                class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-surface)] p-5"
+                                                class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-surface)] p-5"
                                             >
 
                                                 <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 
                                                     <div>
 
-                                                        <p class="text-[10px] uppercase tracking-[0.16em] text-[var(--livora-stone)]">
+                                                        <p class="text-[10px] uppercase tracking-[0.16em] text-[var(--sg-stone)]">
                                                             CHEQUE {{ $index + 1 }}
                                                         </p>
 
-                                                        <p class="mt-2 text-xl font-semibold text-[var(--livora-ink)]">
+                                                        <p class="mt-2 text-xl font-semibold text-[var(--sg-ink)]">
 
                                                             {{ number_format(
                                                                 (float) $installment->amount
                                                             ) }}
 
-                                                            <span class="text-xs font-normal text-[var(--livora-stone)]">
+                                                            <span class="text-xs font-normal text-[var(--sg-stone)]">
                                                             تومان
                                                         </span>
 
                                                         </p>
 
-                                                        <p class="mt-2 text-xs text-[var(--livora-stone)]">
+                                                        <p class="mt-2 text-xs text-[var(--sg-stone)]">
 
                                                             سررسید:
 
@@ -382,7 +382,7 @@
                                                     </div>
 
 
-                                                    <span class="w-fit rounded-full bg-white px-3 py-1.5 text-[10px] text-[var(--livora-stone)]">
+                                                    <span class="w-fit rounded-full bg-white px-3 py-1.5 text-[10px] text-[var(--sg-stone)]">
                                                     در انتظار ثبت
                                                 </span>
 
@@ -392,39 +392,39 @@
                                                 {{-- Future cheque data --}}
                                                 <div class="mt-6 grid gap-4 sm:grid-cols-3">
 
-                                                    <div class="rounded-2xl border border-[var(--livora-border)] bg-white p-4">
+                                                    <div class="rounded-2xl border border-[var(--sg-border)] bg-white p-4">
 
-                                                        <p class="text-[10px] text-[var(--livora-stone)]">
+                                                        <p class="text-[10px] text-[var(--sg-stone)]">
                                                             شماره چک
                                                         </p>
 
-                                                        <p class="mt-2 text-xs font-medium text-[var(--livora-ink)]">
+                                                        <p class="mt-2 text-xs font-medium text-[var(--sg-ink)]">
                                                             بعداً ثبت می‌شود
                                                         </p>
 
                                                     </div>
 
 
-                                                    <div class="rounded-2xl border border-[var(--livora-border)] bg-white p-4">
+                                                    <div class="rounded-2xl border border-[var(--sg-border)] bg-white p-4">
 
-                                                        <p class="text-[10px] text-[var(--livora-stone)]">
+                                                        <p class="text-[10px] text-[var(--sg-stone)]">
                                                             بانک
                                                         </p>
 
-                                                        <p class="mt-2 text-xs font-medium text-[var(--livora-ink)]">
+                                                        <p class="mt-2 text-xs font-medium text-[var(--sg-ink)]">
                                                             بعداً ثبت می‌شود
                                                         </p>
 
                                                     </div>
 
 
-                                                    <div class="rounded-2xl border border-dashed border-[var(--livora-border)] bg-white p-4">
+                                                    <div class="rounded-2xl border border-dashed border-[var(--sg-border)] bg-white p-4">
 
-                                                        <p class="text-[10px] text-[var(--livora-stone)]">
+                                                        <p class="text-[10px] text-[var(--sg-stone)]">
                                                             تصویر چک
                                                         </p>
 
-                                                        <p class="mt-2 text-xs font-medium text-[var(--livora-ink)]">
+                                                        <p class="mt-2 text-xs font-medium text-[var(--sg-ink)]">
                                                             بعداً فعال می‌شود
                                                         </p>
 
@@ -435,7 +435,7 @@
 
                                                 <div class="mt-4 rounded-2xl bg-white/60 p-4">
 
-                                                    <p class="text-[10px] leading-6 text-[var(--livora-stone)]">
+                                                    <p class="text-[10px] leading-6 text-[var(--sg-stone)]">
                                                         در نسخه فعلی هنوز آپلود و ذخیره اطلاعات چک فعال نشده است.
                                                         پس از تکمیل Backend، همین بخش به فرم واقعی ثبت شماره چک،
                                                         بانک، صاحب چک و تصویر متصل می‌شود.
@@ -451,9 +451,9 @@
 
                                 @else
 
-                                    <div class="rounded-3xl border border-[var(--livora-border)] bg-[var(--livora-surface)] p-6 text-center">
+                                    <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-surface)] p-6 text-center">
 
-                                        <p class="text-sm font-medium text-[var(--livora-ink)]">
+                                        <p class="text-sm font-medium text-[var(--sg-ink)]">
                                             قسط چکی برای این طرح وجود ندارد.
                                         </p>
 
@@ -472,11 +472,11 @@
                          INFORMATION
                     ================================================== --}}
 
-                    <section class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-5 sm:p-7">
+                    <section class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-5 sm:p-7">
 
                         <div class="flex items-start gap-4">
 
-                            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--livora-surface)] text-[var(--livora-ink)]">
+                            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--sg-surface)] text-[var(--sg-ink)]">
                                 i
                             </div>
 
@@ -486,7 +486,7 @@
                                     روند خرید اقساطی
                                 </h2>
 
-                                <div class="mt-3 space-y-2 text-xs leading-7 text-[var(--livora-stone)]">
+                                <div class="mt-3 space-y-2 text-xs leading-7 text-[var(--sg-stone)]">
 
                                     <p>
                                         ۱. مبلغ پیش‌پرداخت پرداخت می‌شود.
@@ -521,9 +521,9 @@
 
                 <aside class="lg:sticky lg:top-24 lg:self-start">
 
-                    <div class="rounded-[2rem] border border-[var(--livora-border)] bg-[var(--livora-white)] p-6">
+                    <div class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-6">
 
-                        <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--livora-accent)]">
+                        <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
                             INSTALLMENT SUMMARY
                         </p>
 
@@ -535,9 +535,9 @@
                         <div class="mt-6 space-y-4">
 
                             {{-- Total --}}
-                            <div class="rounded-2xl bg-[var(--livora-surface)] p-4">
+                            <div class="rounded-2xl bg-[var(--sg-surface)] p-4">
 
-                                <p class="text-[10px] text-[var(--livora-stone)]">
+                                <p class="text-[10px] text-[var(--sg-stone)]">
                                     مبلغ کل سفارش
                                 </p>
 
@@ -555,9 +555,9 @@
 
 
                             {{-- Cash --}}
-                            <div class="flex items-center justify-between border-b border-[var(--livora-border)] pb-4">
+                            <div class="flex items-center justify-between border-b border-[var(--sg-border)] pb-4">
 
-                            <span class="text-xs text-[var(--livora-stone)]">
+                            <span class="text-xs text-[var(--sg-stone)]">
                                 پیش‌پرداخت
                             </span>
 
@@ -573,9 +573,9 @@
 
 
                             {{-- Deferred --}}
-                            <div class="flex items-center justify-between border-b border-[var(--livora-border)] pb-4">
+                            <div class="flex items-center justify-between border-b border-[var(--sg-border)] pb-4">
 
-                            <span class="text-xs text-[var(--livora-stone)]">
+                            <span class="text-xs text-[var(--sg-stone)]">
                                 باقی‌مانده
                             </span>
 
@@ -593,7 +593,7 @@
                             {{-- Cheques --}}
                             <div class="flex items-center justify-between">
 
-                            <span class="text-xs text-[var(--livora-stone)]">
+                            <span class="text-xs text-[var(--sg-stone)]">
                                 تعداد چک
                             </span>
 
@@ -607,7 +607,7 @@
 
 
                         {{-- Status --}}
-                        <div class="mt-6 rounded-2xl border border-[var(--livora-border)] bg-[var(--livora-surface)] p-4">
+                        <div class="mt-6 rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-surface)] p-4">
 
                             @if($cashPaid)
 
@@ -617,7 +617,7 @@
 
                             @else
 
-                                <p class="text-[10px] leading-6 text-[var(--livora-stone)]">
+                                <p class="text-[10px] leading-6 text-[var(--sg-stone)]">
                                     پیش‌پرداخت هنوز انجام نشده است.
                                 </p>
 
@@ -628,7 +628,7 @@
 
                         <a
                             href="{{ route('checkout.payment', $order) }}"
-                            class="mt-5 flex w-full items-center justify-center rounded-2xl border border-[var(--livora-border)] px-5 py-3.5 text-sm font-medium transition hover:border-[var(--livora-ink)]"
+                            class="mt-5 flex w-full items-center justify-center rounded-2xl border border-[var(--sg-border)] px-5 py-3.5 text-sm font-medium transition hover:border-[var(--sg-ink)]"
                         >
                             بازگشت به روش‌های پرداخت
                         </a>

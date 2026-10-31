@@ -1,5 +1,5 @@
 <div {{ $attributes->merge([
-    'class' => 'livora-container'
+    'class' => 'sg-container'
 ]) }}>
     {{ $slot }}
 </div>
