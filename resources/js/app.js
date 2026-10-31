@@ -78,3 +78,11 @@ window.richTextEditor = (uploadUrl) => ({
 });
 
 Alpine.start();
+
+if (document.querySelector('[data-sg-intro-track]')) {
+    import('./home-intro.js').catch(() => {
+        document.querySelector('[data-sg-intro-track]')?.remove();
+        window.dispatchEvent(new Event('sg:intro:complete'));
+    });
+}
+

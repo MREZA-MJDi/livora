@@ -46,7 +46,7 @@
     @endphp
 
 
-    <div class="sila-home overflow-hidden bg-[var(--sg-cream)]">
+    <div class="sila-home bg-[var(--sg-cream)]">
 
 
         {{-- =========================================================
@@ -54,6 +54,53 @@
         ========================================================== --}}
 
         <section class="sila-home-hero relative">
+
+        <div
+            class="sg-intro-track hidden"
+            data-sg-intro-track
+            data-sg-intro-status="idle"
+            data-sg-intro-complete="false"
+        >
+            <div
+                class="sg-intro-stage"
+                data-sg-intro-stage
+                role="region"
+                aria-label="معرفی تصویری SillaGallery"
+            >
+                <div class="sg-intro-room" data-sg-intro-room aria-hidden="true">
+                    <img class="sg-intro-room-backdrop" src="{{ asset('images/home-intro/room.webp') }}" alt="" width="1672" height="941" decoding="async">
+                    <img class="sg-intro-room-image" data-sg-intro-room-image src="{{ asset('images/home-intro/room.webp') }}" alt="" width="1672" height="941" fetchpriority="high" decoding="async">
+                </div>
+
+                <div class="sg-intro-cloth" data-sg-intro-cloth aria-hidden="true"></div>
+
+                <img class="sg-intro-curtain sg-intro-curtain--left" data-sg-intro-curtain-left src="{{ asset('images/home-intro/curtain-left.webp') }}" alt="" width="768" height="992" decoding="async">
+                <img class="sg-intro-curtain sg-intro-curtain--right" data-sg-intro-curtain-right src="{{ asset('images/home-intro/curtain-right.webp') }}" alt="" width="768" height="992" decoding="async">
+
+                <div class="sg-intro-lamp" data-sg-intro-lamp aria-hidden="true">
+                    <img src="{{ asset('images/home-intro/lamp.webp') }}" alt="" width="620" height="689" decoding="async">
+                </div>
+                <div class="sg-intro-cord" data-sg-intro-cord aria-hidden="true"></div>
+                <img class="sg-intro-hand" data-sg-intro-hand src="{{ asset('images/home-intro/hand.webp') }}" alt="" width="804" height="985" decoding="async">
+
+                <div class="sg-intro-brand" data-sg-intro-brand aria-hidden="true">
+                    <span class="sg-intro-brand__name">SillaGallery</span>
+                    <span class="sg-intro-brand__caption">خانه‌ای برای لحظه‌های ماندگار</span>
+                </div>
+
+                <p class="sg-intro-hint" data-sg-intro-hint>برای گشودن فضا، اسکرول کنید</p>
+
+                <button class="sg-intro-skip" data-sg-intro-skip type="button">
+                    رد شدن از معرفی
+                </button>
+
+                <div class="sg-intro-progress" aria-hidden="true">
+                    <span data-sg-intro-progress></span>
+                </div>
+            </div>
+        </div>
+
+
 
             <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
 
@@ -1062,6 +1109,17 @@
             let current = 0;
             let timer = null;
 
+            const introTrack = document.querySelector('[data-sg-intro-track]');
+            let introComplete = !introTrack || introTrack.dataset.sgIntroComplete === 'true';
+            let sliderVisible = false;
+            const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            const canAutoPlay = () =>
+                introComplete &&
+                sliderVisible &&
+                document.visibilityState === 'visible' &&
+                !reducedMotion;
+
 
             /*
             |--------------------------------------------------------------------------
@@ -1280,12 +1338,58 @@
 
                 stopAutoPlay();
 
+                if (!canAutoPlay()) {
+                    return;
+                }
+
+                resetProgress();
+
                 timer = setInterval(() => {
 
                     nextSlide();
 
                 }, interval);
             };
+
+
+            const syncAutoPlay = () => {
+
+                if (canAutoPlay()) {
+                    if (!timer) {
+                        startAutoPlay();
+                    }
+
+                    return;
+                }
+
+                stopAutoPlay();
+
+                if (progressEl) {
+                    progressEl.style.transition = 'none';
+                }
+            };
+
+
+            if ('IntersectionObserver' in window) {
+                const sliderObserver = new IntersectionObserver(([entry]) => {
+                    sliderVisible = Boolean(entry?.isIntersecting);
+                    syncAutoPlay();
+                }, { threshold: 0.35 });
+
+                sliderObserver.observe(slider);
+            } else {
+                sliderVisible = true;
+            }
+
+            document.addEventListener('visibilitychange', syncAutoPlay);
+            window.addEventListener('pagehide', stopAutoPlay, { once: true });
+
+            if (!introComplete) {
+                window.addEventListener('sg:intro:complete', () => {
+                    introComplete = true;
+                    syncAutoPlay();
+                }, { once: true });
+            }
 
 
             /*
@@ -1300,7 +1404,11 @@
 
                     nextSlide();
 
-                    startAutoPlay();
+                    if (canAutoPlay()) {
+                        startAutoPlay();
+                    } else {
+                        syncAutoPlay();
+                    }
 
                 });
             }
@@ -1312,7 +1420,11 @@
 
                     prevSlide();
 
-                    startAutoPlay();
+                    if (canAutoPlay()) {
+                        startAutoPlay();
+                    } else {
+                        syncAutoPlay();
+                    }
 
                 });
             }
@@ -1328,9 +1440,7 @@
 
             animateInfo(slides[0]);
 
-            resetProgress();
-
-            startAutoPlay();
+            syncAutoPlay();
 
         });
     </script>
