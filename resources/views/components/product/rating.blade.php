@@ -87,7 +87,7 @@
 
         {{-- Rating Number --}}
         <span
-            class="text-sm font-semibold text-[var(--livora-ink)]"
+            class="text-sm font-semibold text-[var(--sg-ink)]"
             @if($hasRating)
             itemprop="ratingValue"
             @endif
@@ -108,7 +108,7 @@
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
                     fill="currentColor"
-                    class="h-3.5 w-3.5 text-[var(--livora-accent)]"
+                    class="h-3.5 w-3.5 text-[var(--sg-accent)]"
                     aria-hidden="true"
                 >
                     <path
@@ -133,7 +133,7 @@
                         fill="none"
                         stroke="currentColor"
                         stroke-width="1.5"
-                        class="absolute inset-0 h-3.5 w-3.5 text-[var(--livora-border)]"
+                        class="absolute inset-0 h-3.5 w-3.5 text-[var(--sg-border)]"
                         aria-hidden="true"
                     >
                         <path
@@ -150,7 +150,7 @@
                             xmlns="http://www.w3.org/2000/svg"
                             viewBox="0 0 24 24"
                             fill="currentColor"
-                            class="absolute right-0 h-3.5 w-3.5 text-[var(--livora-accent)]"
+                            class="absolute right-0 h-3.5 w-3.5 text-[var(--sg-accent)]"
                             aria-hidden="true"
                         >
                             <path
@@ -176,7 +176,7 @@
                     fill="none"
                     stroke="currentColor"
                     stroke-width="1.5"
-                    class="h-3.5 w-3.5 text-[var(--livora-border)]"
+                    class="h-3.5 w-3.5 text-[var(--sg-border)]"
                     aria-hidden="true"
                 >
                     <path
@@ -192,7 +192,7 @@
 
         {{-- Review Count --}}
         <span
-            class="text-[11px] text-[var(--livora-stone)]"
+            class="text-[11px] text-[var(--sg-stone)]"
             @if($hasRating)
             itemprop="reviewCount"
             @endif
@@ -216,7 +216,7 @@
 
         {{-- Empty State --}}
         <span
-            class="flex items-center gap-1.5 text-[11px] text-[var(--livora-stone)]"
+            class="flex items-center gap-1.5 text-[11px] text-[var(--sg-stone)]"
         >
 
             <span class="flex items-center gap-0.5">
@@ -229,7 +229,7 @@
                         fill="none"
                         stroke="currentColor"
                         stroke-width="1.5"
-                        class="h-3 w-3 text-[var(--livora-border)]"
+                        class="h-3 w-3 text-[var(--sg-border)]"
                         aria-hidden="true"
                     >
                         <path

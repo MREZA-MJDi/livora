@@ -17,7 +17,7 @@
         aria-label="مشاهده دسته‌بندی {{ $name }}"
     >
 
-        <div class="relative overflow-hidden rounded-[2rem] bg-[var(--livora-surface)]">
+        <div class="relative overflow-hidden rounded-[2rem] bg-[var(--sg-surface)]">
 
             {{-- Image --}}
             <div class="aspect-[4/5] overflow-hidden">
@@ -34,8 +34,8 @@
                 @else
 
                     <div class="flex h-full w-full items-center justify-center">
-                        <span class="text-xs tracking-[0.2em] text-[var(--livora-stone)]">
-                            SilaGallery
+                        <span class="text-xs tracking-[0.2em] text-[var(--sg-stone)]">
+                            SillaGallery
                         </span>
                     </div>
 
@@ -52,7 +52,7 @@
             <div class="absolute left-4 top-4">
 
                 <span class="rounded-full border border-white/20 bg-black/20 px-3 py-1.5 text-[10px] font-medium text-white backdrop-blur-xl">
-                    SilaGallery
+                    SillaGallery
                 </span>
 
             </div>
@@ -87,7 +87,7 @@
 
                     {{-- Arrow --}}
                     <span
-                        class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-xl transition duration-300 group-hover:-translate-x-1 group-hover:bg-white group-hover:text-[var(--livora-ink)]"
+                        class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-xl transition duration-300 group-hover:-translate-x-1 group-hover:bg-white group-hover:text-[var(--sg-ink)]"
                     >
 
                         <svg
