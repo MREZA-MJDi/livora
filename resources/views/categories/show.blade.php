@@ -11,6 +11,8 @@
         ?? ('مشاهده و خرید محصولات دسته‌بندی ' . $category->name . ' در SilaGallery؛ بررسی قیمت، مشخصات و شرایط خرید اقساطی.')
 )
 
+@section('robots', \App\Models\SeoSetting::current()->robotsFor($category->seo_index, $category->seo_follow))
+
 @section(
     'canonical',
     route('categories.show', $category->slug)

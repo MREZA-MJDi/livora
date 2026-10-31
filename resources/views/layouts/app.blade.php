@@ -2,7 +2,10 @@
 <html lang="fa" dir="rtl">
 
 <head>
+    @php($siteSeo = \App\Models\SeoSetting::current())
     <meta charset="UTF-8">
+    <meta name="robots" content="@yield('robots', $siteSeo->robots())">
+    <meta property="og:site_name" content="{{ $siteSeo->site_name }}">
 
     <meta
         name="viewport"
@@ -10,12 +13,12 @@
     >
 
     <title>
-        @yield('title', 'سیلاگالری')
+        @yield('title', $siteSeo->default_title ?: 'SilaGallery')
     </title>
 
     <meta
         name="description"
-        content="@yield('description', 'سیلاگالری — مبلمان و لوازم خانه')"
+        content="@yield('description', $siteSeo->default_description ?: 'سیلاگالری — مبلمان و لوازم خانه')"
     >
 
     @hasSection('keywords')
@@ -30,6 +33,8 @@
             rel="canonical"
             href="@yield('canonical')"
         >
+    @else
+        <link rel="canonical" href="{{ rtrim(config('app.url'), '/') . request()->getPathInfo() }}">
     @endif
 
     @stack('seo')

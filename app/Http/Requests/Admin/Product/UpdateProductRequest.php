@@ -19,6 +19,8 @@ class UpdateProductRequest extends FormRequest
             $this->boolean('installment_enabled');
 
         $this->merge([
+            'seo_index' => $this->boolean('seo_index'),
+            'seo_follow' => $this->boolean('seo_follow'),
             'price' => $this->normalizeNumericInput($this->input('price')),
             'compare_at_price' => $this->normalizeNumericInput($this->input('compare_at_price')),
             'slug' =>
@@ -111,6 +113,9 @@ class UpdateProductRequest extends FormRequest
         $product = $this->route('product');
 
         return [
+            'seo_index' => ['sometimes', 'boolean'],
+            'seo_follow' => ['sometimes', 'boolean'],
+
             'category_id' => [
                 'required',
                 'integer',
@@ -154,7 +159,7 @@ class UpdateProductRequest extends FormRequest
                 'nullable',
                 'image',
                 'mimes:jpg,jpeg,png,webp',
-                'max:2048',
+                'max:10240',
             ],
 
             'price' => [
@@ -282,7 +287,7 @@ class UpdateProductRequest extends FormRequest
 
             'image.image' => 'فایل انتخاب‌شده باید تصویر باشد.',
             'image.mimes' => 'فرمت تصویر باید jpg، jpeg، png یا webp باشد.',
-            'image.max' => 'حجم تصویر نباید بیشتر از ۲ مگابایت باشد.',
+            'image.max' => 'حجم تصویر نباید بیشتر از ۱۰ مگابایت باشد.',
 
             'price.required' => 'وارد کردن قیمت محصول الزامی است.',
             'price.numeric' => 'قیمت محصول باید یک عدد معتبر باشد.',

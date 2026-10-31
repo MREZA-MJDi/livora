@@ -20,6 +20,8 @@ class Category extends Model
         'image',
         'is_active',
         'sort_order',
+        'seo_index',
+        'seo_follow',
     ];
 
     protected function casts(): array
@@ -27,6 +29,8 @@ class Category extends Model
         return [
             'is_active' => 'boolean',
             'sort_order' => 'integer',
+            'seo_index' => 'boolean',
+            'seo_follow' => 'boolean',
         ];
     }
 

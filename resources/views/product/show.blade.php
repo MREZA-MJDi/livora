@@ -154,6 +154,7 @@
 @section('title', $pageTitle)
 
 @section('description', $pageDescription)
+@section('robots', \App\Models\SeoSetting::current()->robotsFor($product->seo_index, $product->seo_follow))
 
 @section(
     'canonical',

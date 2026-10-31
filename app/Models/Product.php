@@ -28,6 +28,8 @@ class Product extends Model
         'is_new',
         'meta_title',
         'meta_description',
+        'seo_index',
+        'seo_follow',
 
         /*
          * Internal installment settings
@@ -57,6 +59,8 @@ class Product extends Model
 
             'is_featured' => 'boolean',
             'is_new' => 'boolean',
+            'seo_index' => 'boolean',
+            'seo_follow' => 'boolean',
 
             /*
              * Internal installment settings

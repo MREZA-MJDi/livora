@@ -44,8 +44,8 @@ return [
             'url' => env('PUBLIC_STORAGE_URL')
                 ?: rtrim(env('ASSET_URL') ?: env('APP_URL', 'http://localhost'), '/').'/storage',
             'visibility' => 'public',
-            'throw' => false,
-            'report' => false,
+            'throw' => true,
+            'report' => true,
         ],
 
         's3' => [

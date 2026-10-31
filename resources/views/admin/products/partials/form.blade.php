@@ -113,7 +113,7 @@
             <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">
                 {{ $editing
                     ? 'با انتخاب فایل جدید، همین تصویر اصلی جایگزین می‌شود؛ تصاویر دیگر و اتصال Variantها باقی می‌مانند.'
-                    : 'تصویر اصلی محصول را انتخاب کنید. حداکثر حجم ۲ مگابایت.' }}
+                    : 'تصویر اصلی محصول را انتخاب کنید. حداکثر حجم ۱۰ مگابایت.' }}
             </p>
 
             @error('image')
@@ -1149,6 +1149,16 @@
 
         </div>
 
+    </div>
+
+
+    <div class="admin-card p-6">
+        <h3 class="text-base font-bold text-[var(--admin-text)]">وضعیت موقت SEO</h3>
+        <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">تا زمان بررسی کارشناس SEO، این محصول Noindex/Nofollow می‌ماند. تنظیم سراسری SEO نیز فعلاً غیرفعال است.</p>
+        <div class="mt-4 grid gap-3 sm:grid-cols-2">
+            <label class="flex items-center gap-3 rounded-xl border border-[var(--admin-border)] p-4"><input type="checkbox" name="seo_index" value="1" class="admin-checkbox" @checked(old('seo_index', $product->seo_index ?? false))><span class="text-sm">اجازه ایندکس این محصول</span></label>
+            <label class="flex items-center gap-3 rounded-xl border border-[var(--admin-border)] p-4"><input type="checkbox" name="seo_follow" value="1" class="admin-checkbox" @checked(old('seo_follow', $product->seo_follow ?? false))><span class="text-sm">اجازه دنبال‌کردن لینک‌ها</span></label>
+        </div>
     </div>
 
 </div>
