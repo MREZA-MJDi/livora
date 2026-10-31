@@ -5,6 +5,7 @@
     @php($siteSeo = \App\Models\SeoSetting::current())
     <meta charset="UTF-8">
     <meta name="robots" content="@yield('robots', $siteSeo->robots())">
+    <meta property="og:site_name" content="{{ $siteSeo->site_name }}">
 
     <meta
         name="viewport"
