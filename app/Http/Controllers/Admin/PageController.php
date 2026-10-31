@@ -152,7 +152,7 @@ class PageController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'slug' => [
                 'required', 'string', 'max:190', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/',
-                Rule::notIn(self::RESERVED),
+                Rule::notIn(array_values(array_diff(self::RESERVED, [$page?->slug]))),
                 Rule::unique('content_pages', 'slug')->ignore($page),
             ],
             'excerpt' => ['nullable', 'string', 'max:500'],
