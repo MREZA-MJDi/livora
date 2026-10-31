@@ -9,32 +9,10 @@
 
 @section('canonical', route('categories.index'))
 
-@push('seo')
-    <meta
-        name="robots"
-        content="index,follow"
-    >
-
-    <meta
-        property="og:type"
-        content="website"
-    >
-
-    <meta
-        property="og:title"
-        content="دسته‌بندی محصولات | SilaGallery"
-    >
-
-    <meta
-        property="og:description"
-        content="دسته‌بندی‌های مختلف مبلمان و لوازم خانه در SilaGallery."
-    >
-
-    <meta
-        property="og:url"
-        content="{{ route('categories.index') }}"
-    >
-@endpush
+@section('robots', \\App\\Models\\SeoPageSetting::forRoute('categories')?->robots() ?? \\App\\Models\\SeoSetting::current()->robots())
+@section('title', \\App\\Models\\SeoPageSetting::forRoute('categories')?->meta_title ?: 'دسته‌بندی محصولات | SillaGallery')
+@section('description', \\App\\Models\\SeoPageSetting::forRoute('categories')?->meta_description ?: 'دسته‌بندی‌های مختلف مبلمان و لوازم خانه در SillaGallery را ببینید و محصول مناسب فضای خود را پیدا کنید.')
+@section('canonical', \\App\\Models\\SeoPageSetting::forRoute('categories')?->canonical_url ?: route('categories.index'))
 
 @section('content')
 

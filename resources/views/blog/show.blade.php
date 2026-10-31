@@ -1,9 +1,13 @@
 @extends('layouts.app')
 
-@section('title', $post->meta_title ?: $post->title)
+@section('title', $post->meta_title ?: ($post->title . ' | SillaGallery'))
 @section('description', $post->meta_description ?: ($post->excerpt ?: 'مقاله‌ای از مجله SillaGallery'))
 @section('robots', $robots)
-@section('canonical', route('blog.show', $post->slug))
+@section('canonical', $post->canonical_url ?: route('blog.show', $post->slug))
+@section('og_title', $post->meta_title ?: ($post->title . ' | SillaGallery'))
+@section('og_description', $post->meta_description ?: ($post->excerpt ?: 'مقاله‌ای از مجله SillaGallery'))
+@section('og_image', $post->og_image_url)
+@section('og_type', 'article')
 
 @section('content')
 <article class="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
@@ -15,6 +19,13 @@
     </header>
     @if($post->featured_image_url)<img src="{{ $post->featured_image_url }}" alt="{{ $post->featured_image_alt ?: $post->title }}" class="mt-8 max-h-[560px] w-full rounded-3xl object-cover">@endif
     @if($post->excerpt)<p class="mt-8 text-lg leading-9 text-[var(--livora-stone)]">{{ $post->excerpt }}</p>@endif
-    <div class="prose prose-lg mt-8 max-w-none whitespace-pre-line leading-9 text-[var(--livora-ink)]">{{ $post->body }}</div>
+    <div class="cms-content prose prose-lg mt-8 max-w-none leading-9 text-[var(--livora-ink)]">{!! $post->body !!}</div>
+    @if($post->tags->isNotEmpty())
+        <footer class="mt-10 flex flex-wrap gap-2 border-t border-[var(--livora-border)] pt-6">
+            @foreach($post->tags as $tag)
+                <a href="{{ route('blog.tag', $tag->slug) }}" class="rounded-full border border-[var(--livora-border)] px-3 py-2 text-xs text-[var(--livora-stone)] hover:border-[var(--livora-accent)]">{{ $tag->name }}</a>
+            @endforeach
+        </footer>
+    @endif
 </article>
 @endsection
