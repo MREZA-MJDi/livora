@@ -4,8 +4,10 @@
     @php
         $siteSeo = \App\Models\SeoSetting::current();
         $pageSeo = \App\Models\SeoPageSetting::forRoute(\Illuminate\Support\Facades\Route::currentRouteName());
-        $seoTitle = trim($__env->yieldContent('title')) ?: ($pageSeo?->meta_title ?: ($siteSeo->default_title ?: 'SillaGallery'));
-        $seoDescription = trim($__env->yieldContent('description')) ?: ($pageSeo?->meta_description ?: ($siteSeo->default_description ?: 'فروشگاه SillaGallery'));
+        // Admin-managed SEO values take precedence on fixed pages, while dynamic
+        // product/category/article metadata continues to come from each view.
+        $seoTitle = $pageSeo?->meta_title ?: (trim($__env->yieldContent('title')) ?: ($siteSeo->default_title ?: 'SillaGallery'));
+        $seoDescription = $pageSeo?->meta_description ?: (trim($__env->yieldContent('description')) ?: ($siteSeo->default_description ?: 'فروشگاه SillaGallery'));
         $routeName = (string) \Illuminate\Support\Facades\Route::currentRouteName();
         $privateRoute = in_array($routeName, [
             'login', 'register', 'password.request', 'password.reset',
@@ -14,11 +16,13 @@
         ], true) || request()->is('account/*', 'cart/*', 'checkout/*', 'login', 'register', 'forgot-password', 'reset-password/*');
         $seoRobots = $privateRoute
             ? 'noindex, nofollow'
-            : (trim($__env->yieldContent('robots')) ?: ($pageSeo?->robots() ?: $siteSeo->robots()));
-        $seoCanonical = trim($__env->yieldContent('canonical')) ?: ($pageSeo?->canonical_url ?: url()->current());
+            : ($pageSeo !== null
+                ? $pageSeo->robots()
+                : (trim($__env->yieldContent('robots')) ?: $siteSeo->robots()));
+        $seoCanonical = $pageSeo?->canonical_url ?: (trim($__env->yieldContent('canonical')) ?: url()->current());
         $seoOgTitle = trim($__env->yieldContent('og_title')) ?: $seoTitle;
         $seoOgDescription = trim($__env->yieldContent('og_description')) ?: $seoDescription;
-        $seoOgImage = trim($__env->yieldContent('og_image')) ?: $pageSeo?->og_image ?: $siteSeo->default_og_image_url;
+        $seoOgImage = $pageSeo?->og_image ?: (trim($__env->yieldContent('og_image')) ?: $siteSeo->default_og_image_url);
         $seoOgType = trim($__env->yieldContent('og_type')) ?: 'website';
     @endphp
     <meta charset="UTF-8">
