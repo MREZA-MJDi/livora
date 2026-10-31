@@ -7,7 +7,9 @@ use App\Models\SeoPageSetting;
 use App\Models\SeoSetting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class SeoMetadataTest extends TestCase
@@ -30,7 +32,8 @@ class SeoMetadataTest extends TestCase
         $sitemap = $this->get('/sitemap.xml');
         $sitemap
             ->assertOk()
-            ->assertHeader('Content-Type', 'application/xml; charset=UTF-8');
+            ->assertHeader('Content-Type', 'application/xml; charset=UTF-8')
+            ->assertHeader('X-Robots-Tag', 'noindex, nofollow');
 
         // StreamedResponse content is emitted only when sendContent() runs;
         // TestResponse::assertSee() cannot inspect an unexecuted stream callback.
@@ -180,5 +183,51 @@ class SeoMetadataTest extends TestCase
             $this->assertDoesNotMatchRegularExpression('/Livora/i', $html, $path . ' exposes the internal project name');
         }
     }
+
+
+    public function test_seo_dashboard_is_admin_only_and_admin_can_upload_the_brand_social_image(): void
+    {
+        Storage::fake('public');
+
+        $customer = User::factory()->create(['role' => 'customer']);
+        $this->actingAs($customer)
+            ->get(route('admin.seo.edit'))
+            ->assertForbidden();
+
+        $this->actingAs($customer)
+            ->put(route('admin.seo.update'), [
+                'site_name' => 'SillaGallery',
+                'default_og_image' => UploadedFile::fake()->image('customer-og.jpg', 1200, 630),
+            ])
+            ->assertForbidden();
+
+        $admin = User::factory()->create(['role' => 'admin']);
+        $this->actingAs($admin)
+            ->get(route('admin.seo.edit'))
+            ->assertOk()
+            ->assertSee('name="default_og_image"', false);
+
+        $this->actingAs($admin)
+            ->put(route('admin.seo.update'), [
+                'site_name' => 'SillaGallery',
+                'default_title' => 'SillaGallery | مبلمان و خانه',
+                'default_description' => 'تصویر و توضیحات رسمی اشتراک‌گذاری SillaGallery.',
+                'organization_name' => 'SillaGallery',
+                'default_og_image' => UploadedFile::fake()->image('sillagallery-og.jpg', 1200, 630),
+            ])
+            ->assertRedirect(route('admin.seo.edit'));
+
+        $settings = SeoSetting::current()->fresh();
+        $this->assertNotEmpty($settings->default_og_image);
+        Storage::disk('public')->assertExists($settings->default_og_image);
+
+        $imageUrl = Storage::disk('public')->url($settings->default_og_image);
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('property="og:image" content="' . $imageUrl . '"', false)
+            ->assertSee('<meta name="twitter:image" content="' . $imageUrl . '">', false)
+            ->assertHeader('X-Robots-Tag', 'noindex, nofollow');
+    }
+
 
 }
