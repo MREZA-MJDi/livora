@@ -151,6 +151,10 @@
                         <span class="text-[var(--livora-stone)]">←</span>
                     </a>
 
+                    <a href="{{ route('blog.index') }}" @click="mobileOpen = false" class="flex items-center justify-between px-4 py-4 text-sm font-medium">
+                        <span>مجله و مقالات</span><span class="text-[var(--livora-stone)]">←</span>
+                    </a>
+
                     <a
                         href="{{ route('contact') }}"
                         @click="mobileOpen = false"
