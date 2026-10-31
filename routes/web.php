@@ -381,6 +381,11 @@ Route::middleware(['auth', 'admin'])
             [AdminDashboardController::class, 'index']
         )->name('dashboard');
 
+        Route::put(
+            '/homepage-hero',
+            [AdminDashboardController::class, 'updateHomepageHero']
+        )->name('dashboard.hero.update');
+
 
         /*
         |--------------------------------------------------------------------------

@@ -10,7 +10,9 @@
 @section('canonical', \App\Models\SeoPageSetting::forRoute('home')?->canonical_url ?: url('/'))
 @section('robots', \App\Models\SeoPageSetting::forRoute('home')?->robots() ?? \App\Models\SeoSetting::current()->robots())
 
-
+@push('styles')
+    @vite('resources/css/home-hero.css')
+@endpush
 
 @section('content')
 
@@ -21,15 +23,6 @@
         | Homepage Data
         |--------------------------------------------------------------------------
         */
-
-        $heroProducts = $featuredProducts
-            ->filter(
-                fn ($product) =>
-                    $product->images?->first()?->url
-            )
-            ->values();
-
-        $heroProduct = $heroProducts->first();
 
         /*
          * Keep all featured products in the collection section.
@@ -45,306 +38,63 @@
 
     @endphp
 
-
-    <div class="sila-home overflow-hidden bg-[var(--sg-cream)]">
-
+    <div class="sila-home bg-[var(--sg-cream)]">
 
         {{-- =========================================================
              HERO
         ========================================================== --}}
 
-        <section class="sila-home-hero relative">
-
-            <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
-
-                <div class="sila-home-hero-grid grid grid-cols-1 gap-6 py-4 sm:gap-7 lg:grid-cols-[0.92fr_1.08fr] lg:py-5">
-
-
-                    {{-- =================================================
-                         HERO CONTENT
-                    ================================================== --}}
-
-                    <div class="sila-home-hero-content relative flex flex-col justify-center rounded-[2rem] bg-[var(--sg-surface)] px-6 py-10 sm:px-9 sm:py-11 lg:px-12 lg:py-12">
-
-                        <div class="max-w-xl">
-
-                            <div class="flex items-center gap-3 text-[10px] font-medium uppercase tracking-[0.24em] text-[var(--sg-accent)]">
-
-                                <span class="h-px w-8 bg-[var(--sg-accent)]"></span>
-
-                                Furniture & Living
-
-                            </div>
-
-
-                            <h1 class="sila-home-hero-title mt-6 font-semibold leading-[1.06] tracking-tight text-[var(--sg-ink)]">
-
-                                خانه‌ای که
-
-                                <span class="block text-[var(--sg-accent)]">
-                                    شبیه توست.
-                                </span>
-
-                            </h1>
-
-
-                            <p class="mt-7 max-w-lg text-sm leading-8 text-[var(--sg-stone)] sm:text-base">
-
-                                مجموعه‌ای منتخب از مبلمان و عناصر خانه برای ساختن فضایی
-                                گرم، ماندگار و دقیق؛ از انتخاب اول تا آخرین جزئیات.
-
-                            </p>
-
-
-                            <div class="mt-9 flex flex-col gap-3 sm:flex-row">
-
-                                {{-- CTA 01 --}}
-
-                                <a
-                                    href="{{ route('shop.index') }}"
-                                    class="inline-flex items-center justify-center rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] px-6 py-4 text-sm font-medium text-[var(--sg-ink)] transition-colors duration-300 hover:border-[var(--sg-ink)]"
-                              >
-                                    کشف مجموعه
-
-
-                                </a>
-
-
-                                {{-- CTA 02 --}}
-
-                                <a
-                                    href="{{ route('categories.index') }}"
-                                    class="inline-flex items-center justify-center rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] px-6 py-4 text-sm font-medium text-[var(--sg-ink)] transition-colors duration-300 hover:border-[var(--sg-ink)]"
-                                >
-                                    مشاهده دسته‌بندی‌ها
-                                </a>
-
-                            </div>
-
-                        </div>
-
-
-                        {{-- Hero Stats --}}
-
-                        <div class="mt-12 grid max-w-xl grid-cols-3 gap-3">
-
-                            <div class="rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-4">
-
-                                <p class="text-[10px] uppercase tracking-[0.16em] text-[var(--sg-stone)]">
-                                    Quality
-                                </p>
-
-                                <p class="mt-2 text-sm font-semibold">
-                                    انتخاب‌شده
-                                </p>
-
-                            </div>
-
-
-                            <div class="rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-4">
-
-                                <p class="text-[10px] uppercase tracking-[0.16em] text-[var(--sg-stone)]">
-                                    Payment
-                                </p>
-
-                                <p class="mt-2 text-sm font-semibold">
-                                    اقساطی
-                                </p>
-
-                            </div>
-
-
-                            <div class="rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-4">
-
-                                <p class="text-[10px] uppercase tracking-[0.16em] text-[var(--sg-stone)]">
-                                    Service
-                                </p>
-
-                                <p class="mt-2 text-sm font-semibold">
-                                    همراه شما
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    {{-- =================================================
-                         HERO PRODUCT SLIDER
-                    ================================================== --}}
-
-                    <div
-                        id="sgHeroSlider"
-                        class="sila-home-hero-slider relative min-h-[430px] overflow-hidden rounded-[2rem] bg-[var(--sg-white)] lg:min-h-0"
+        <section class="sg-home-hero" aria-label="Gallery Silla">
+            @if($heroBackgroundUrl)
+                <div class="sg-home-hero__background" aria-hidden="true">
+                    <img
+                        src="{{ $heroBackgroundUrl }}"
+                        alt=""
+                        width="1672"
+                        height="941"
+                        fetchpriority="high"
+                        decoding="async"
                     >
-
-                        @if($heroProducts->isNotEmpty())
-
-                            <div class="absolute inset-0">
-
-                                @foreach($heroProducts as $index => $product)
-
-                                    @php
-                                        $image = $product->images?->first()?->url;
-                                    @endphp
-
-                                    <div
-                                        class="sg-hero-slide absolute inset-0 transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] {{ $index === 0 ? 'opacity-100 scale-100 z-10' : 'opacity-0 scale-105 z-0' }}"
-                                        data-slide="{{ $index }}"
-                                    >
-
-                                        <img
-                                            src="{{ $image }}"
-                                            alt="{{ $product->name }}"
-                                            class="sg-hero-product-image h-full w-full object-cover"
-                                        >
-
-
-                                        <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent"></div>
-
-                                        <div class="absolute inset-0 bg-gradient-to-r from-black/10 via-transparent to-black/10"></div>
-
-
-                                        {{-- Product info --}}
-
-                                        <div class="absolute bottom-5 left-5 right-5 sm:bottom-7 sm:left-7 sm:right-7">
-
-                                            <div
-                                                class="sg-hero-info max-w-md translate-y-3 rounded-3xl border border-white/20 bg-black/20 p-5 text-white opacity-0 backdrop-blur-xl transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)]"
-                                            >
-
-                                                <div class="flex items-center justify-between gap-4">
-
-                                                    <div class="min-w-0">
-
-                                                        <p class="text-[10px] uppercase tracking-[0.18em] text-white/55">
-                                                            Featured Product
-                                                        </p>
-
-                                                        <h2 class="mt-2 truncate text-lg font-semibold sm:text-xl">
-                                                            {{ $product->name }}
-                                                        </h2>
-
-                                                        <p class="mt-2 text-sm text-white/75">
-                                                            {{ number_format((float) $product->price) }}
-                                                            تومان
-                                                        </p>
-
-                                                    </div>
-
-
-                                                    {{-- Product CTA --}}
-
-                                                    <a
-                                                        href="{{ route('product.show', $product->slug) }}"
-                                                        class="inline-flex shrink-0 items-center rounded-full bg-white px-4 py-2 text-xs font-medium text-[var(--sg-ink)] transition-colors duration-300 hover:bg-[var(--sg-cream)]"
-                                                    >
-                                                        مشاهده
-                                                    </a>
-
-                                                </div>
-
-                                            </div>
-
-                                        </div>
-
-                                    </div>
-
-                                @endforeach
-
-                            </div>
-
-
-                            {{-- Counter --}}
-
-                            <div class="absolute right-5 top-5 z-30 sm:right-7 sm:top-7">
-
-                                <div
-                                    class="rounded-full border border-white/20 bg-black/20 px-4 py-2 text-[10px] font-medium tracking-[0.2em] text-white backdrop-blur-md"
-                                >
-
-                                    <span id="sgHeroCurrent">
-                                        01
-                                    </span>
-
-                                    <span class="mx-1 text-white/40">
-                                        /
-                                    </span>
-
-                                    <span class="text-white/50">
-                                        {{ str_pad($heroProducts->count(), 2, '0', STR_PAD_LEFT) }}
-                                    </span>
-
-                                </div>
-
-                            </div>
-
-
-                            {{-- Progress --}}
-
-                            <div class="absolute bottom-0 left-0 right-0 z-30 h-[2px] bg-white/15">
-
-                                <div
-                                    id="sgHeroProgress"
-                                    class="h-full origin-right bg-white"
-                                    style="transform: scaleX(1);"
-                                ></div>
-
-                            </div>
-
-
-                            {{-- Controls --}}
-
-                            @if($heroProducts->count() > 1)
-
-                                <div class="absolute left-5 top-5 z-30 flex gap-2 sm:left-7 sm:top-7">
-
-                                    <button
-                                        type="button"
-                                        id="sgHeroPrev"
-                                        class="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white backdrop-blur-md transition-colors duration-300 hover:bg-white hover:text-black"
-                                        aria-label="محصول قبلی"
-                                    >
-                                        →
-                                    </button>
-
-
-                                    <button
-                                        type="button"
-                                        id="sgHeroNext"
-                                        class="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white backdrop-blur-md transition-colors duration-300 hover:bg-white hover:text-black"
-                                        aria-label="محصول بعدی"
-                                    >
-                                        ←
-                                    </button>
-
-                                </div>
-
-                            @endif
-
-
-                        @else
-
-                            <div class="flex min-h-[430px] items-center justify-center bg-[var(--sg-surface)]">
-
-                                <span class="text-sm tracking-[0.2em] text-[var(--sg-stone)]">
-                                    SillaGallery
-                                </span>
-
-                            </div>
-
-                        @endif
-
-                    </div>
-
                 </div>
+            @endif
 
-            </div>
+            <h1 class="sg-home-hero__brand" dir="ltr">Gallery Silla</h1>
 
+            @if($heroItems->isNotEmpty())
+                <div class="sg-home-hero__products" aria-label="محصولات منتخب">
+                    @foreach($heroItems as $heroItem)
+                        @php($heroProduct = $heroItem->product)
+
+                        @if($heroProduct && $heroItem->image_url)
+                            <a
+                                href="{{ route('product.show', $heroProduct->slug) }}"
+                                class="sg-home-hero__card"
+                                aria-label="{{ $heroProduct->name }}، {{ number_format((float) $heroProduct->price) }} تومان"
+                            >
+                                <span class="sg-home-hero__card-image">
+                                    <img
+                                        src="{{ $heroItem->image_url }}"
+                                        alt="{{ $heroProduct->name }}"
+                                        width="480"
+                                        height="480"
+                                        loading="lazy"
+                                        decoding="async"
+                                    >
+                                </span>
+                                <span class="sg-home-hero__card-details">
+                                    <span class="sg-home-hero__card-name">{{ $heroProduct->name }}</span>
+                                    <span class="sg-home-hero__card-price">
+                                        {{ number_format((float) $heroProduct->price) }}
+                                        <span>تومان</span>
+                                    </span>
+                                </span>
+                                <span class="sg-home-hero__card-arrow" aria-hidden="true">←</span>
+                            </a>
+                        @endif
+                    @endforeach
+                </div>
+            @endif
         </section>
-
 
         {{-- =========================================================
              CATEGORY DISCOVERY
@@ -377,7 +127,6 @@
 
                         </div>
 
-
                         <a
                             href="{{ route('categories.index') }}"
                             class="inline-flex items-center text-sm font-medium text-[var(--sg-accent)] transition-colors duration-300 hover:text-[var(--sg-ink)]"
@@ -391,7 +140,6 @@
                         </a>
 
                     </div>
-
 
                     <div class="mt-9 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 
@@ -413,7 +161,6 @@
             </x-layout.container>
 
         </section>
-
 
         {{-- =========================================================
              FEATURED COLLECTION
@@ -443,7 +190,6 @@
 
                         </div>
 
-
                         <a
                             href="{{ route('shop.index') }}"
                             class="inline-flex items-center text-sm font-medium text-[var(--sg-accent)] transition-colors duration-300 hover:text-[var(--sg-ink)]"
@@ -457,7 +203,6 @@
                         </a>
 
                     </div>
-
 
                     @if($featuredWithoutHero->isNotEmpty())
 
@@ -491,7 +236,6 @@
 
         </section>
 
-
         {{-- =========================================================
              INSTALLMENT HERO
         ========================================================== --}}
@@ -503,7 +247,6 @@
                 <div class="py-16 sm:py-20">
 
                     <div class="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
-
 
                         <div>
 
@@ -521,7 +264,6 @@
 
                             </h2>
 
-
                             <p class="mt-6 max-w-xl text-sm leading-8 text-white/60">
 
                                 بعضی از محصولات SillaGallery می‌توانند با شرایط اقساطی
@@ -529,7 +271,6 @@
                                 پیش‌پرداخت، تعداد چک و فاصله سررسید از قبل مشخص است.
 
                             </p>
-
 
                             {{-- Installment CTA --}}
 
@@ -541,7 +282,6 @@
                             </a>
 
                         </div>
-
 
                         <div class="grid grid-cols-2 gap-3">
 
@@ -561,7 +301,6 @@
 
                             </div>
 
-
                             <div class="rounded-3xl border border-white/10 bg-white/5 p-5 sm:p-6">
 
                                 <span class="text-[10px] uppercase tracking-[0.18em] text-white/40">
@@ -578,7 +317,6 @@
 
                             </div>
 
-
                             <div class="col-span-2 rounded-3xl border border-white/10 bg-white/[0.07] p-5 sm:p-6">
 
                                 <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -594,7 +332,6 @@
                                         </p>
 
                                     </div>
-
 
                                     <span class="inline-flex w-fit rounded-full border border-white/10 px-4 py-2 text-[11px] text-white/60">
                                         Transparent pricing
@@ -613,7 +350,6 @@
             </x-layout.container>
 
         </section>
-
 
         {{-- =========================================================
              INSTALLMENT PRODUCT PICKS
@@ -645,7 +381,6 @@
 
                             </div>
 
-
                             <a
                                 href="{{ route('shop.index') }}"
                                 class="text-sm font-medium text-[var(--sg-accent)] transition-colors duration-300 hover:text-[var(--sg-ink)]"
@@ -654,7 +389,6 @@
                             </a>
 
                         </div>
-
 
                         <div class="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
 
@@ -675,7 +409,6 @@
             </section>
 
         @endif
-
 
         {{-- =========================================================
              NEW ARRIVALS
@@ -705,7 +438,6 @@
 
                         </div>
 
-
                         <a
                             href="{{ route('shop.index', ['sort' => 'newest']) }}"
                             class="text-sm font-medium text-[var(--sg-accent)] transition-colors duration-300 hover:text-[var(--sg-ink)]"
@@ -714,7 +446,6 @@
                         </a>
 
                     </div>
-
 
                     @if($newProducts->isNotEmpty())
 
@@ -748,7 +479,6 @@
 
         </section>
 
-
         {{-- =========================================================
              INSPIRATION
         ========================================================== --}}
@@ -760,7 +490,6 @@
                 <div class="py-16 sm:py-20">
 
                     <div class="grid items-end gap-8 lg:grid-cols-[0.85fr_1.15fr]">
-
 
                         <div>
 
@@ -778,7 +507,6 @@
 
                             </h2>
 
-
                             <p class="mt-5 max-w-lg text-sm leading-8 text-[var(--sg-stone)]">
 
                                 برای انتخاب بهتر، فقط قیمت کافی نیست؛
@@ -786,7 +514,6 @@
                                 تصمیم‌های درست را ساده‌تر می‌کنیم.
 
                             </p>
-
 
                             <a
                                 href="{{ route('about') }}"
@@ -801,7 +528,6 @@
                             </a>
 
                         </div>
-
 
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
 
@@ -821,7 +547,6 @@
 
                             </article>
 
-
                             <article class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
 
                                 <span class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
@@ -837,7 +562,6 @@
                                 </p>
 
                             </article>
-
 
                             <article class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
 
@@ -865,7 +589,6 @@
 
         </section>
 
-
         {{-- =========================================================
              TRUST
         ========================================================== --}}
@@ -892,7 +615,6 @@
 
                     </div>
 
-
                     <div class="px-2 py-8 sm:px-8">
 
                         <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-stone)]">
@@ -909,7 +631,6 @@
 
                     </div>
 
-
                     <div class="px-2 py-8 sm:px-8">
 
                         <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-stone)]">
@@ -925,7 +646,6 @@
                         </p>
 
                     </div>
-
 
                     <div class="px-2 py-8 sm:px-8">
 
@@ -948,7 +668,6 @@
             </x-layout.container>
 
         </section>
-
 
         {{-- =========================================================
              FINAL CTA
@@ -986,7 +705,6 @@
                                 ورود به فروشگاه
                             </a>
 
-
                             {{-- Final CTA 02 --}}
 
                             <a
@@ -1010,329 +728,3 @@
 
 @endsection
 
-
-@push('scripts')
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-
-            const slider = document.getElementById('sgHeroSlider');
-
-            if (!slider) {
-                return;
-            }
-
-
-            const slides = Array.from(
-                slider.querySelectorAll('.sg-hero-slide')
-            );
-
-
-            if (slides.length <= 1) {
-                return;
-            }
-
-
-            const currentEl = document.getElementById(
-                'sgHeroCurrent'
-            );
-
-            const progressEl = document.getElementById(
-                'sgHeroProgress'
-            );
-
-            const prevButton = document.getElementById(
-                'sgHeroPrev'
-            );
-
-            const nextButton = document.getElementById(
-                'sgHeroNext'
-            );
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Slider timing
-            |--------------------------------------------------------------------------
-            */
-
-            const interval = 7000;
-
-
-            let current = 0;
-            let timer = null;
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Counter
-            |--------------------------------------------------------------------------
-            */
-
-            const updateCounter = () => {
-
-                if (!currentEl) {
-                    return;
-                }
-
-                currentEl.textContent = String(
-                    current + 1
-                ).padStart(2, '0');
-            };
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Product info animation
-            |--------------------------------------------------------------------------
-            */
-
-            const animateInfo = (slide) => {
-
-                slides.forEach((item) => {
-
-                    const info = item.querySelector(
-                        '.sg-hero-info'
-                    );
-
-                    if (!info) {
-                        return;
-                    }
-
-                    info.classList.remove(
-                        'translate-y-0',
-                        'opacity-100'
-                    );
-
-                    info.classList.add(
-                        'translate-y-3',
-                        'opacity-0'
-                    );
-
-                });
-
-
-                const activeInfo = slide.querySelector(
-                    '.sg-hero-info'
-                );
-
-
-                if (!activeInfo) {
-                    return;
-                }
-
-
-                setTimeout(() => {
-
-                    activeInfo.classList.remove(
-                        'translate-y-3',
-                        'opacity-0'
-                    );
-
-                    activeInfo.classList.add(
-                        'translate-y-0',
-                        'opacity-100'
-                    );
-
-                }, 180);
-            };
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Progress
-            |--------------------------------------------------------------------------
-            */
-
-            const resetProgress = () => {
-
-                if (!progressEl) {
-                    return;
-                }
-
-
-                progressEl.style.transition = 'none';
-
-                progressEl.style.transform = 'scaleX(0)';
-
-
-                requestAnimationFrame(() => {
-
-                    requestAnimationFrame(() => {
-
-                        progressEl.style.transition =
-                            `transform ${interval}ms linear`;
-
-                        progressEl.style.transform =
-                            'scaleX(1)';
-
-                    });
-
-                });
-
-            };
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Show slide
-            |--------------------------------------------------------------------------
-            */
-
-            const showSlide = (index) => {
-
-                slides.forEach(
-                    (slide, slideIndex) => {
-
-                        if (slideIndex === index) {
-
-                            slide.classList.remove(
-                                'opacity-0',
-                                'scale-105',
-                                'z-0'
-                            );
-
-                            slide.classList.add(
-                                'opacity-100',
-                                'scale-100',
-                                'z-10'
-                            );
-
-                        } else {
-
-                            slide.classList.remove(
-                                'opacity-100',
-                                'scale-100',
-                                'z-10'
-                            );
-
-                            slide.classList.add(
-                                'opacity-0',
-                                'scale-105',
-                                'z-0'
-                            );
-
-                        }
-
-                    }
-                );
-
-
-                current = index;
-
-                updateCounter();
-
-                animateInfo(slides[current]);
-
-                resetProgress();
-            };
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Next
-            |--------------------------------------------------------------------------
-            */
-
-            const nextSlide = () => {
-
-                const next =
-                    (current + 1) % slides.length;
-
-                showSlide(next);
-            };
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Previous
-            |--------------------------------------------------------------------------
-            */
-
-            const prevSlide = () => {
-
-                const previous =
-                    (current - 1 + slides.length) % slides.length;
-
-                showSlide(previous);
-            };
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Autoplay
-            |--------------------------------------------------------------------------
-            */
-
-            const stopAutoPlay = () => {
-
-                if (!timer) {
-                    return;
-                }
-
-                clearInterval(timer);
-
-                timer = null;
-            };
-
-
-            const startAutoPlay = () => {
-
-                stopAutoPlay();
-
-                timer = setInterval(() => {
-
-                    nextSlide();
-
-                }, interval);
-            };
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Controls
-            |--------------------------------------------------------------------------
-            */
-
-            if (nextButton) {
-
-                nextButton.addEventListener('click', () => {
-
-                    nextSlide();
-
-                    startAutoPlay();
-
-                });
-            }
-
-
-            if (prevButton) {
-
-                prevButton.addEventListener('click', () => {
-
-                    prevSlide();
-
-                    startAutoPlay();
-
-                });
-            }
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Initial state
-            |--------------------------------------------------------------------------
-            */
-
-            updateCounter();
-
-            animateInfo(slides[0]);
-
-            resetProgress();
-
-            startAutoPlay();
-
-        });
-    </script>
-
-@endpush

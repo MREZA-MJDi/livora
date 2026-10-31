@@ -138,6 +138,132 @@
 
 
         {{-- =========================================================
+             STOREFRONT HERO SETTINGS
+        ========================================================== --}}
+        <section class="admin-card overflow-hidden">
+            <div class="border-b border-[var(--admin-border)] bg-[var(--admin-surface)]/70 p-5 sm:p-6">
+                <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                    <div>
+                        <p class="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--admin-accent)]">STOREFRONT / HOME</p>
+                        <h2 class="mt-2 text-lg font-bold text-[var(--admin-text)]">تصویر اصلی و چهار محصول منتخب</h2>
+                        <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">
+                            ترکیب Hero صفحه اصلی را همین‌جا تنظیم کن. عنوان روی تصویر ثابت است: Gallery Silla.
+                        </p>
+                    </div>
+                    <div class="w-full max-w-[260px]">
+                        <div class="aspect-[16/9] overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-white)]">
+                            @if($heroSetting?->background_url)
+                                <img src="{{ $heroSetting->background_url }}" alt="پیش‌نمایش تصویر پس‌زمینه Hero" class="h-full w-full object-cover">
+                            @else
+                                <div class="flex h-full items-center justify-center text-[10px] text-[var(--admin-muted)]">هنوز تصویر پس‌زمینه انتخاب نشده است</div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form action="{{ route('admin.dashboard.hero.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6 p-5 sm:p-6">
+                @csrf
+                @method('PUT')
+
+                <div class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+                    <div>
+                        <label for="hero-background-image" class="admin-label">تصویر پس‌زمینه Hero</label>
+                        <input id="hero-background-image" name="background_image" type="file" accept="image/jpeg,image/png,image/webp" class="admin-input p-2" data-hero-preview-input data-preview-target="hero-background-preview">
+                        <p class="mt-2 text-[10px] leading-5 text-[var(--admin-muted)]">تصویر عریض 16:9، ترجیحاً WEBP؛ حداکثر ۱۵ مگابایت. تصویر جدید جایگزین قبلی می‌شود.</p>
+                        @error('background_image')
+                            <p class="mt-2 text-xs text-[var(--admin-danger)]">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div class="hidden w-32 overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] lg:block">
+                        <img id="hero-background-preview" src="{{ $heroSetting?->background_url ?? '' }}" alt="پیش‌نمایش تصویر جدید پس‌زمینه" class="hidden aspect-[16/9] w-full object-cover">
+                    </div>
+                </div>
+
+                @error('products')
+                    <p class="rounded-xl border border-[var(--admin-danger)]/20 bg-[var(--admin-danger)]/5 px-4 py-3 text-xs text-[var(--admin-danger)]">{{ $message }}</p>
+                @enderror
+
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 2xl:grid-cols-4">
+                    @foreach(range(1, 4) as $slot)
+                        @php
+                            $slotItem = $heroItems->get($slot);
+                            $slotProductId = old('products.' . $slot, $slotItem?->product_id);
+                            $slotPreviewUrl = $slotItem?->image_url;
+                        @endphp
+                        <div class="rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-bg)] p-4">
+                            <div class="mb-3 flex items-center justify-between gap-3">
+                                <span class="text-xs font-bold text-[var(--admin-text)]">جایگاه {{ $slot }}</span>
+                                <span class="text-[10px] text-[var(--admin-muted)]">{{ $slotItem?->product ? 'انتخاب‌شده' : 'خالی' }}</span>
+                            </div>
+
+                            <label for="hero-product-{{ $slot }}" class="admin-label">محصول</label>
+                            <select id="hero-product-{{ $slot }}" name="products[{{ $slot }}]" class="admin-select">
+                                <option value="">انتخاب محصول</option>
+                                @foreach($heroProductOptions as $option)
+                                    <option value="{{ $option->id }}" @selected((string) $slotProductId === (string) $option->id)>{{ $option->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('products.' . $slot)
+                                <p class="mt-2 text-[11px] text-[var(--admin-danger)]">{{ $message }}</p>
+                            @enderror
+
+                            <div class="mt-4 overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-white)]">
+                                @if($slotPreviewUrl)
+                                    <img id="hero-product-preview-{{ $slot }}" src="{{ $slotPreviewUrl }}" alt="پیش‌نمایش کارت {{ $slot }}" class="aspect-[4/3] w-full object-cover">
+                                @else
+                                    <div data-hero-empty class="flex aspect-[4/3] items-center justify-center text-[10px] text-[var(--admin-muted)]">پیش‌نمایش تصویر محصول</div>
+                                    <img id="hero-product-preview-{{ $slot }}" src="" alt="پیش‌نمایش کارت {{ $slot }}" class="hidden aspect-[4/3] w-full object-cover">
+                                @endif
+                            </div>
+
+                            <label for="hero-product-image-{{ $slot }}" class="admin-label mt-4">تصویر باکیفیت اختصاصی (اختیاری)</label>
+                            <input id="hero-product-image-{{ $slot }}" name="images[{{ $slot }}]" type="file" accept="image/jpeg,image/png,image/webp" class="admin-input p-2 text-[11px]" data-hero-preview-input data-preview-target="hero-product-preview-{{ $slot }}">
+                            <p class="mt-2 text-[10px] leading-5 text-[var(--admin-muted)]">اگر خالی باشد، تصویر اصلی محصول نمایش داده می‌شود.</p>
+                            @error('images.' . $slot)
+                                <p class="mt-2 text-[11px] text-[var(--admin-danger)]">{{ $message }}</p>
+                            @enderror
+
+                            @if($slotItem?->image_path)
+                                <label class="mt-3 flex cursor-pointer items-center gap-2 text-[10px] text-[var(--admin-muted)]">
+                                    <input type="checkbox" name="remove_image[{{ $slot }}]" value="1" class="rounded border-[var(--admin-border)] text-[var(--admin-accent)] focus:ring-[var(--admin-accent)]">
+                                    استفاده از تصویر اصلی محصول
+                                </label>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+
+                <div class="flex flex-col gap-3 border-t border-[var(--admin-border)] pt-5 sm:flex-row sm:items-center sm:justify-between">
+                    <p class="text-[10px] leading-5 text-[var(--admin-muted)]">فقط محصولات فعال قابل انتخاب هستند؛ محصول تکراری پذیرفته نمی‌شود.</p>
+                    <button type="submit" class="admin-btn admin-btn-primary">ذخیره تنظیمات Hero</button>
+                </div>
+            </form>
+        </section>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('[data-hero-preview-input]').forEach((input) => {
+                const target = document.getElementById(input.dataset.previewTarget || '');
+                let previewUrl = null;
+                if (!target) return;
+
+                input.addEventListener('change', () => {
+                    const file = input.files?.[0];
+                    if (previewUrl) URL.revokeObjectURL(previewUrl);
+                    previewUrl = null;
+                    if (!file || !file.type.startsWith('image/')) return;
+                    previewUrl = URL.createObjectURL(file);
+                    target.src = previewUrl;
+                    target.classList.remove('hidden');
+                    target.classList.add('block');
+                    target.parentElement?.querySelector('[data-hero-empty]')?.classList.add('hidden');
+                });
+            });
+        });
+        </script>
+
+        {{-- =========================================================
              KPI CARDS
         ========================================================== --}}
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
