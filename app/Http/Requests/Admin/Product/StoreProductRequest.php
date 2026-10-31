@@ -114,7 +114,8 @@ class StoreProductRequest extends FormRequest
 
     public function rules(): array
     {
-        return [            'seo_index' => ['sometimes', 'boolean'],
+        return [
+            'seo_index' => ['sometimes', 'boolean'],
             'seo_follow' => ['sometimes', 'boolean'],
 
             'category_id' => [
