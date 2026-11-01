@@ -20,7 +20,8 @@ class SitemapController extends Controller
             echo '<?xml version="1.0" encoding="UTF-8"?>';
             echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
 
-            if (! $settings->indexing_enabled) {
+            // Never publish URLs until both global SEO switches are enabled.
+            if (! $settings->indexing_enabled || ! $settings->following_enabled) {
                 echo '</urlset>';
                 return;
             }

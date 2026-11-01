@@ -47,8 +47,11 @@ class SeoSetting extends Model
 
     public function robotsFor(bool $pageIndex = true, bool $pageFollow = true): string
     {
-        $index = $this->indexing_enabled && $pageIndex;
-        $follow = $this->following_enabled && $pageFollow;
+        // Public SEO is a two-key release gate: both site-wide switches must
+        // be enabled before any page can be indexed or its links followed.
+        $siteWideSeoEnabled = $this->indexing_enabled && $this->following_enabled;
+        $index = $siteWideSeoEnabled && $pageIndex;
+        $follow = $siteWideSeoEnabled && $pageFollow;
         return ($index ? 'index' : 'noindex') . ', ' . ($follow ? 'follow' : 'nofollow');
     }
 

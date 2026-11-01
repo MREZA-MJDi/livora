@@ -99,21 +99,49 @@ class SeoMetadataTest extends TestCase
             ->assertHeader('X-Robots-Tag', 'noindex, nofollow');
     }
 
-    public function test_page_level_robots_flags_cannot_override_the_global_safety_lock(): void
+    public function test_both_global_seo_switches_are_required_before_any_public_page_can_be_indexed(): void
     {
         SeoPageSetting::query()
-            ->where('route_key', 'blog')
+            ->where('route_key', 'contact')
             ->firstOrFail()
-            ->update([
-                'seo_index' => true,
-                'seo_follow' => true,
-            ]);
-        Cache::forget('seo_page_settings.blog');
+            ->update(['seo_index' => true, 'seo_follow' => true]);
+        Cache::forget('seo_page_settings.contact');
 
-        $this->get('/blog')
-            ->assertOk()
-            ->assertSee('<meta name="robots" content="noindex, nofollow">', false)
-            ->assertHeader('X-Robots-Tag', 'noindex, nofollow');
+        foreach ([[true, false], [false, true]] as [$indexingEnabled, $followingEnabled]) {
+            SeoSetting::current()->update([
+                'indexing_enabled' => $indexingEnabled,
+                'following_enabled' => $followingEnabled,
+            ]);
+            Cache::forget('seo_settings.current');
+
+            $this->get('/contact')
+                ->assertOk()
+                ->assertSee('<meta name="robots" content="noindex, nofollow">', false)
+                ->assertHeader('X-Robots-Tag', 'noindex, nofollow');
+        }
+    }
+
+    public function test_sitemap_stays_empty_when_only_one_global_seo_switch_is_enabled(): void
+    {
+        SeoSetting::current()->update([
+            'indexing_enabled' => true,
+            'following_enabled' => false,
+        ]);
+        Cache::forget('seo_settings.current');
+
+        SeoPageSetting::query()
+            ->where('route_key', 'home')
+            ->firstOrFail()
+            ->update(['seo_index' => true]);
+        Cache::forget('seo_page_settings.home');
+
+        $sitemap = $this->get('/sitemap.xml')->assertOk();
+        ob_start();
+        $sitemap->baseResponse->sendContent();
+        $xml = (string) ob_get_clean();
+
+        $this->assertStringContainsString('<urlset', $xml);
+        $this->assertStringNotContainsString('<url>', $xml);
     }
     public function test_admin_cms_forms_render_editor_and_fixed_page_slugs_cannot_break_navigation(): void
     {
