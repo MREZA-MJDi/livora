@@ -16,9 +16,11 @@ class ContactController extends Controller
             ->where('is_active', true)
             ->first();
 
-        $faqs = [
-            // FAQ های static
-        ];
+        $faqs = collect($contactSetting?->faqs ?? [])
+            ->filter(fn ($faq): bool => is_array($faq)
+                && filled($faq['question'] ?? null)
+                && filled($faq['answer'] ?? null))
+            ->values();
 
         return view('contact.index', [
             'contactSetting' => $contactSetting,
