@@ -17,10 +17,15 @@ class ContactSetting extends Model
         'online_label',
         'support_description',
         'online_description',
+        'faqs',
         'is_active',
     ];
 
-    protected $casts = [
-        'is_active' => 'boolean',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'faqs' => 'array',
+            'is_active' => 'boolean',
+        ];
+    }
 }
