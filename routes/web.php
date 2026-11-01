@@ -545,6 +545,11 @@ Route::middleware(['auth', 'admin'])
             [ContactMessageController::class, 'markAsRead']
         )->name('contact-messages.read');
 
+        Route::patch(
+            '/contact-messages/{contactMessage}/reply',
+            [ContactMessageController::class, 'reply']
+        )->name('contact-messages.reply');
+
         Route::delete(
             '/contact-messages/{contactMessage}',
             [ContactMessageController::class, 'destroy']
