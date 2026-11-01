@@ -24,6 +24,7 @@ class ContentSeoAnalyzer
 
         $sections = is_array($record->content_sections ?? null) ? $record->content_sections : [];
         $faq = is_array($record->faq_items ?? null) ? $record->faq_items : [];
+        $keyFeatures = $isProduct && is_array($record->key_features ?? null) ? $record->key_features : [];
         $specifications = $isProduct && is_array($record->specifications ?? null) ? $record->specifications : [];
         $comparison = $record instanceof Category && is_array($record->comparison_rows ?? null) ? $record->comparison_rows : [];
 
@@ -32,6 +33,7 @@ class ContentSeoAnalyzer
             $record->short_description ?? '',
             $record->care_guide ?? '',
             ...array_map(fn ($row) => is_array($row) ? (($row['heading'] ?? '') . ' ' . ($row['body'] ?? '')) : '', $sections),
+            ...array_map(fn ($row) => is_array($row) ? (($row['label'] ?? '') . ' ' . ($row['value'] ?? '')) : '', $keyFeatures),
             ...array_map(fn ($row) => is_array($row) ? (($row['label'] ?? '') . ' ' . ($row['value'] ?? '')) : '', $specifications),
             ...array_map(fn ($row) => is_array($row) ? (($row['label'] ?? '') . ' ' . ($row['value'] ?? '')) : '', $comparison),
             ...array_map(fn ($row) => is_array($row) ? (($row['question'] ?? '') . ' ' . ($row['answer'] ?? '')) : '', $faq),
