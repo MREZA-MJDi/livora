@@ -59,7 +59,7 @@ class ProductController extends Controller
             $bannerPath = $uploadedBanner->store('products/banners', 'public');
 
             if (! $bannerPath) {
-                throw new \\RuntimeException('Product banner could not be stored.');
+                throw new \RuntimeException('Product banner could not be stored.');
             }
 
             $product->update([
@@ -139,7 +139,7 @@ class ProductController extends Controller
             $newBannerPath = $uploadedBanner->store('products/banners', 'public');
 
             if (! $newBannerPath) {
-                throw new \\RuntimeException('Product banner could not be stored.');
+                throw new \RuntimeException('Product banner could not be stored.');
             }
 
             $product->update([
