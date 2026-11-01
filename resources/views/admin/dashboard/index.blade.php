@@ -1275,4 +1275,40 @@
 
     </div>
 
+
+        <section class="space-y-4">
+            <div>
+                <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--admin-accent)]">CONTENT / SEO</p>
+                <h2 class="mt-2 text-xl font-bold text-[var(--admin-text)]">مدیریت محتوا و سلامت SEO</h2>
+                <p class="mt-1 text-xs text-[var(--admin-muted)]">وضعیت‌ها مستقیماً از جدول‌های عملیاتی سایت محاسبه می‌شوند.</p>
+            </div>
+            <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+                <a href="{{ route('admin.contact-messages.index') }}" class="admin-card admin-card-hover p-5">
+                    <p class="admin-stat-label">پیام‌های خوانده‌نشده</p>
+                    <p class="mt-2 text-3xl font-bold">{{ number_format($unreadContactMessages) }}</p>
+                    <p class="admin-help mt-2">مدیریت پیام‌ها و پاسخ ایمیلی</p>
+                </a>
+                <a href="{{ route('admin.blog.index') }}" class="admin-card admin-card-hover p-5">
+                    <p class="admin-stat-label">مقاله‌های منتشرشده</p>
+                    <p class="mt-2 text-3xl font-bold">{{ number_format($blogPublishedCount) }}</p>
+                    <p class="admin-help mt-2">{{ number_format($blogDraftCount) }} پیش‌نویس</p>
+                </a>
+                <a href="{{ route('admin.pages.index') }}" class="admin-card admin-card-hover p-5">
+                    <p class="admin-stat-label">پیش‌نویس صفحات CMS</p>
+                    <p class="mt-2 text-3xl font-bold">{{ number_format($contentDraftCount) }}</p>
+                    <p class="admin-help mt-2">درباره ما و سایر صفحات</p>
+                </a>
+                <a href="{{ route('admin.contact-settings.edit') }}" class="admin-card admin-card-hover p-5">
+                    <p class="admin-stat-label">صفحه تماس با ما</p>
+                    <p class="mt-2 text-lg font-bold">محتوا و FAQ</p>
+                    <p class="admin-help mt-2">اطلاعات تماس، متن‌ها و پرسش‌ها</p>
+                </a>
+                <a href="{{ route('admin.seo.audit') }}" class="admin-card admin-card-hover p-5">
+                    <p class="admin-stat-label">قفل انتشار SEO</p>
+                    <p class="mt-2 text-lg font-bold">{{ $seoGlobalGateOpen ? 'باز' : 'بسته' }}</p>
+                    <p class="admin-help mt-2">ممیزی متادیتا و Sitemap</p>
+                </a>
+            </div>
+        </section>
+
 @endsection
