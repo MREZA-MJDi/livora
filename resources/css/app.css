@@ -1401,3 +1401,19 @@ body {
         transition: none;
     }
 }
+
+
+/* Product catalog photography should never be cropped like editorial imagery. */
+.product-card-image {
+    object-fit: contain !important;
+    object-position: center;
+    padding: 0;
+    background: var(--sg-white);
+    transform: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .product-card-image {
+        transition: none !important;
+    }
+}
