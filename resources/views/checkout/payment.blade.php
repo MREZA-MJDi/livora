@@ -492,9 +492,15 @@
 
                             <div class="mt-6 rounded-2xl bg-[var(--sg-surface)] p-4">
 
-                                <p class="text-xs leading-7 text-[var(--sg-stone)]">
-                                    در حال حاضر هیچ درگاه آنلاینی فعال نیست.
+                                <p class="text-xs font-semibold text-[var(--sg-ink)]">
+                                    اتصال درگاه پرداخت هنوز تکمیل نشده است.
                                 </p>
+                                <p class="mt-2 text-xs leading-7 text-[var(--sg-stone)]">
+                                    سفارش شما ثبت شده و تا زمان اتصال و تأیید تراکنش توسط درگاه، وضعیت پرداخت «در انتظار پرداخت» باقی می‌ماند. در این مرحله هیچ مبلغی کسر نمی‌شود.
+                                </p>
+                                <a href="{{ route('contact') }}" class="mt-3 inline-flex text-xs font-semibold text-[var(--sg-accent)]">
+                                    برای هماهنگی با پشتیبانی تماس بگیرید ←
+                                </a>
 
                             </div>
 
