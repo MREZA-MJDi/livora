@@ -55,7 +55,7 @@
                         <span>/</span>
 
                         <span class="text-[var(--sg-ink)]">
-                            تماس با ما
+                            {{ $pageContent['breadcrumb_label'] ?? 'تماس با ما' }}
                         </span>
 
                     </nav>
@@ -287,7 +287,7 @@
                         <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
 
                             <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
-                                ADDRESS
+                                {{ $pageContent['address_label'] ?? 'ADDRESS' }}
                             </p>
 
                             <p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">
@@ -302,7 +302,7 @@
                         <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
 
                             <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
-                                HOURS
+                                {{ $pageContent['hours_label'] ?? 'HOURS' }}
                             </p>
 
                             <p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">
@@ -317,7 +317,7 @@
                         <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
 
                             <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
-                                INSTALLMENT
+                                {{ $pageContent['installment_label'] ?? 'INSTALLMENT' }}
                             </p>
 
                             <p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">
