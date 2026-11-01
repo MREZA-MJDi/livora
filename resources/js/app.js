@@ -167,6 +167,7 @@ window.richTextEditor = (uploadUrl) => ({
         image.onload = () => {
             root.hidden = false; document.body.classList.add('sg-crop-open');
             stage.style.aspectRatio = String(ratio);
+            stage.style.width = Math.min(768, window.innerHeight * .58 * ratio, root.querySelector('.sg-crop-body').clientWidth) + 'px';
             baseScale = Math.max(stage.clientWidth / image.naturalWidth, stage.clientHeight / image.naturalHeight);
             scale = 1; x = (stage.clientWidth - image.naturalWidth * baseScale) / 2;
             y = (stage.clientHeight - image.naturalHeight * baseScale) / 2; zoom.value = '1'; render();
@@ -181,7 +182,7 @@ window.richTextEditor = (uploadUrl) => ({
     });
     window.SillaImageCropper = { crop: (file, ratio = 4 / 3) => cropFile(file, ratio) };
     const attachInput = input => {
-        if (input.dataset.cropperReady === '1' || input.closest('.cms-editor')) return;
+        if (input.dataset.cropperReady === '1' || input.getAttribute('x-ref') === 'imageInput') return;
         input.dataset.cropperReady = '1';
         const form = input.closest('form');
         if (!form || !/\/admin(?:\/|$)/.test(new URL(form.action, location.href).pathname)) return;
