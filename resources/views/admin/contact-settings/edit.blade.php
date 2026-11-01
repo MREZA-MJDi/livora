@@ -26,10 +26,10 @@
                     <p class="admin-help mt-1">این مقادیر در کارت‌های تماس و بخش اطلاعات صفحه عمومی استفاده می‌شوند.</p>
                 </div>
                 <label class="flex items-center gap-2 rounded-xl border border-[var(--admin-border)] px-4 py-3 text-xs">
+                    <input type="hidden" name="is_active" value="0">
                     <input type="checkbox" name="is_active" value="1" class="admin-checkbox" @checked(old('is_active', $settings->is_active ?? true))>
                     نمایش اطلاعات تماس در سایت
                 </label>
-                <input type="hidden" name="is_active" value="0">
             </div>
             <div class="grid gap-4 sm:grid-cols-2">
                 <div>
