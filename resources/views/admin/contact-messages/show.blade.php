@@ -118,11 +118,49 @@
         </div>
 
 
+        @if(session('success'))
+            <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">{{ session('success') }}</div>
+        @endif
+        @if(session('error'))
+            <div class="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{{ session('error') }}</div>
+        @endif
+
+        @if($contactMessage->admin_reply)
+            <section class="rounded-3xl border border-emerald-200 bg-emerald-50/50 p-6">
+                <p class="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-700">آخرین پاسخ ثبت‌شده</p>
+                <p class="mt-4 whitespace-pre-line text-sm leading-8 text-[var(--admin-text)]">{{ $contactMessage->admin_reply }}</p>
+                @if($contactMessage->replied_at)
+                    <p class="mt-3 text-xs text-[var(--admin-muted)]">ثبت: {{ $contactMessage->replied_at->format('Y/m/d H:i') }}</p>
+                @endif
+            </section>
+        @endif
+
+        @if($contactMessage->email)
+            <section class="rounded-3xl border border-[var(--admin-border)] bg-[var(--admin-white)] p-6">
+                <h2 class="text-base font-bold">پاسخ ایمیلی به کاربر</h2>
+                <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">پاسخ پس از ارسال از طریق Mail تنظیم‌شده در Laravel ثبت می‌شود. قبل از استفاده در Production، SMTP واقعی را تنظیم و تست کنید.</p>
+                <form method="POST" action="{{ route('admin.contact-messages.reply', $contactMessage) }}" class="mt-5 space-y-4">
+                    @csrf
+                    @method('PATCH')
+                    <div>
+                        <label class="admin-label" for="admin_reply">متن پاسخ</label>
+                        <textarea id="admin_reply" name="admin_reply" rows="7" maxlength="5000" required class="admin-textarea">{{ old('admin_reply', $contactMessage->admin_reply) }}</textarea>
+                        @error('admin_reply')<p class="admin-error">{{ $message }}</p>@enderror
+                    </div>
+                    <button type="submit" class="admin-btn admin-btn-primary">ارسال پاسخ ایمیلی و ثبت در سابقه</button>
+                </form>
+            </section>
+        @else
+            <div class="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-xs leading-7 text-amber-800">
+                برای این پیام آدرس ایمیل ثبت نشده است. پاسخ ایمیلی ممکن نیست؛ از شماره تماس برای پیگیری استفاده کنید.
+            </div>
+        @endif
+
         {{-- Actions --}}
 
         <div class="flex flex-wrap gap-3">
 
-            @if($contactMessage->status !== 'read')
+            @if($contactMessage->status === 'unread')
 
                 <form
                     action="{{ route('admin.contact-messages.read', $contactMessage) }}"

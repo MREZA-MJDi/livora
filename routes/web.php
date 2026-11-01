@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Admin\ContactMessageController;
+use App\Http\Controllers\Admin\ContactSettingController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\SeoController as AdminSeoController;
 use App\Http\Controllers\Admin\BlogPostController as AdminBlogPostController;
@@ -484,6 +485,7 @@ Route::middleware(['auth', 'admin'])
         | SEO Settings and Blog
         |--------------------------------------------------------------------------
         */
+        Route::get('/seo/audit', [\App\Http\Controllers\Admin\SeoAuditController::class, 'index'])->name('seo.audit');
         Route::get('/seo', [AdminSeoController::class, 'edit'])->name('seo.edit');
         Route::put('/seo', [AdminSeoController::class, 'update'])->name('seo.update');
         Route::get('/seo/pages', [PageSeoController::class, 'index'])->name('seo.pages');
@@ -519,6 +521,9 @@ Route::middleware(['auth', 'admin'])
         )->name('media.destroy');
 
 
+        Route::get('/contact-settings', [ContactSettingController::class, 'edit'])->name('contact-settings.edit');
+        Route::put('/contact-settings', [ContactSettingController::class, 'update'])->name('contact-settings.update');
+
         /*
         |--------------------------------------------------------------------------
         | Contact Messages
@@ -539,6 +544,11 @@ Route::middleware(['auth', 'admin'])
             '/contact-messages/{contactMessage}/read',
             [ContactMessageController::class, 'markAsRead']
         )->name('contact-messages.read');
+
+        Route::patch(
+            '/contact-messages/{contactMessage}/reply',
+            [ContactMessageController::class, 'reply']
+        )->name('contact-messages.reply');
 
         Route::delete(
             '/contact-messages/{contactMessage}',

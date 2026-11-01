@@ -12,17 +12,19 @@ class ContactController extends Controller
 {
     public function index(): View
     {
-        $contactSetting = ContactSetting::query()
-            ->where('is_active', true)
-            ->first();
+        $storedSettings = ContactSetting::query()->first();
+        $contactSetting = $storedSettings?->is_active ? $storedSettings : null;
 
-        $faqs = [
-            // FAQ های static
-        ];
+        $faqs = collect($storedSettings?->faqs ?? [])
+            ->filter(fn ($faq): bool => is_array($faq)
+                && filled($faq['question'] ?? null)
+                && filled($faq['answer'] ?? null))
+            ->values();
 
         return view('contact.index', [
             'contactSetting' => $contactSetting,
             'faqs' => $faqs,
+            'pageContent' => $storedSettings?->page_content ?? [],
         ]);
     }
 
@@ -35,8 +37,15 @@ class ContactController extends Controller
             'status' => 'unread',
         ]);
 
+        $contactSetting = ContactSetting::query()->first();
+        $successMessage = data_get(
+            $contactSetting?->page_content ?? [],
+            'success_message',
+            'پیام شما با موفقیت ارسال شد.'
+        );
+
         return redirect()
             ->route('contact')
-            ->with('success', 'پیام شما با موفقیت ارسال شد.');
+            ->with('success', $successMessage);
     }
 }

@@ -151,6 +151,31 @@
             : 'https://schema.org/OutOfStock';
 @endphp
 
+@php
+    $productStructuredData = [
+        '@context' => 'https://schema.org',
+        '@type' => 'Product',
+        'name' => $product->name,
+        'description' => $pageDescription,
+        'sku' => $product->sku,
+        'image' => $product->images->pluck('url')->filter()->values()->all(),
+        'brand' => ['@type' => 'Brand', 'name' => 'SillaGallery'],
+    ];
+
+    // Storefront prices are Toman; Schema.org IRR values are Rial.
+    // Variant prices are dynamic, so avoid publishing a misleading single offer.
+    if ($product->variants->isEmpty()) {
+        $productStructuredData['offers'] = [
+            '@type' => 'Offer',
+            'url' => $product->canonical_url ?: route('product.show', $product->slug),
+            'priceCurrency' => 'IRR',
+            'price' => number_format($productPrice * 10, 0, '.', ''),
+            'availability' => $availability,
+            'itemCondition' => 'https://schema.org/NewCondition',
+        ];
+    }
+@endphp
+
 @section('title', $pageTitle)
 
 @section('description', $pageDescription)
@@ -165,15 +190,7 @@
 )
 
 @push('seo')
-<script type="application/ld+json">{!! json_encode([
-    '@context' => 'https://schema.org',
-    '@type' => 'Product',
-    'name' => $product->name,
-    'description' => $pageDescription,
-    'sku' => $product->sku,
-    'image' => $product->images->pluck('url')->filter()->values()->all(),
-    'brand' => ['@type' => 'Brand', 'name' => 'SillaGallery'],
-], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) !!}</script>
+<script type="application/ld+json">{!! json_encode($productStructuredData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) !!}</script>
 @endpush
 @section('content')
 

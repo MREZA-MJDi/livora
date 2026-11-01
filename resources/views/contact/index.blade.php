@@ -2,13 +2,27 @@
 
 @section('title', 'تماس با SillaGallery | ارتباط با ما')
 
-@section(
-    'description',
-    'برای مشاوره خرید، پیگیری سفارش و دریافت اطلاعات بیشتر درباره محصولات و خدمات SillaGallery با ما در ارتباط باشید.'
-)
+@section('description', $pageContent['hero_description'] ?? 'برای مشاوره خرید، پیگیری سفارش و دریافت اطلاعات بیشتر درباره محصولات و خدمات SillaGallery با ما در ارتباط باشید.')
 
 @section('canonical', \App\Models\SeoPageSetting::forRoute('contact')?->canonical_url ?: route('contact'))
 @section('robots', \App\Models\SeoPageSetting::forRoute('contact')?->robots() ?? \App\Models\SeoSetting::current()->robots())
+
+@push('seo')
+@if($faqs->isNotEmpty())
+<script type="application/ld+json">{!! json_encode([
+    '@context' => 'https://schema.org',
+    '@type' => 'FAQPage',
+    'mainEntity' => $faqs->map(fn ($faq) => [
+        '@type' => 'Question',
+        'name' => $faq['question'],
+        'acceptedAnswer' => [
+            '@type' => 'Answer',
+            'text' => $faq['answer'],
+        ],
+    ])->values()->all(),
+], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) !!}</script>
+@endif
+@endpush
 
 
 
@@ -41,7 +55,7 @@
                         <span>/</span>
 
                         <span class="text-[var(--sg-ink)]">
-                            تماس با ما
+                            {{ $pageContent['breadcrumb_label'] ?? 'تماس با ما' }}
                         </span>
 
                     </nav>
@@ -52,13 +66,13 @@
                         <div class="max-w-4xl">
 
                             <p class="text-[10px] font-medium uppercase tracking-[0.24em] text-[var(--sg-accent)]">
-                                GET IN TOUCH
+                                {{ $pageContent['hero_kicker'] ?? 'GET IN TOUCH' }}
                             </p>
 
                             <h1 class="mt-5 text-5xl font-semibold leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl">
-                                برای انتخاب بهتر،
+                                {{ $pageContent['hero_title'] ?? 'برای انتخاب بهتر،' }}
                                 <span class="block text-[var(--sg-accent)]">
-                                    کنار شما هستیم.
+                                    {{ $pageContent['hero_highlight'] ?? 'کنار شما هستیم.' }}
                                 </span>
                             </h1>
 
@@ -68,15 +82,14 @@
                         <div>
 
                             <p class="text-sm leading-8 text-[var(--sg-stone)] sm:text-base">
-                                برای مشاوره خرید، پیگیری سفارش، پرسش درباره شرایط اقساط
-                                یا هر موضوع دیگری می‌توانید با SillaGallery در ارتباط باشید.
+                                {{ $pageContent['hero_description'] ?? 'برای مشاوره خرید، پیگیری سفارش، پرسش درباره شرایط اقساط یا هر موضوع دیگری می‌توانید با SillaGallery در ارتباط باشید.' }}
                             </p>
 
                             <a
                                 href="#contact-form"
                                 class="mt-7 inline-flex items-center rounded-2xl bg-[var(--sg-ink)] px-6 py-4 text-sm font-medium text-white transition hover:bg-[var(--sg-accent)]"
                             >
-                                ارسال پیام
+                                {{ $pageContent['hero_cta'] ?? 'ارسال پیام' }}
                             </a>
 
                         </div>
@@ -255,16 +268,15 @@
                 <div>
 
                     <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
-                        LET'S TALK
+                        {{ $pageContent['info_kicker'] ?? "LET'S TALK" }}
                     </p>
 
                     <h2 class="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
-                        چه کمکی از دست ما برمی‌آید؟
+                        {{ $pageContent['info_title'] ?? 'چه کمکی از دست ما برمی‌آید؟' }}
                     </h2>
 
                     <p class="mt-5 max-w-xl text-sm leading-8 text-[var(--sg-stone)]">
-                        اگر درباره محصول، موجودی، قیمت، شرایط خرید اقساطی،
-                        ارسال یا سفارش خود سؤالی دارید، پیام بگذارید.
+                        {{ $pageContent['info_description'] ?? 'اگر درباره محصول، موجودی، قیمت، شرایط خرید اقساطی، ارسال یا سفارش خود سؤالی دارید، پیام بگذارید.' }}
                     </p>
 
 
@@ -275,7 +287,7 @@
                         <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
 
                             <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
-                                ADDRESS
+                                {{ $pageContent['address_label'] ?? 'ADDRESS' }}
                             </p>
 
                             <p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">
@@ -290,7 +302,7 @@
                         <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
 
                             <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
-                                HOURS
+                                {{ $pageContent['hours_label'] ?? 'HOURS' }}
                             </p>
 
                             <p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">
@@ -305,12 +317,11 @@
                         <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
 
                             <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
-                                INSTALLMENT
+                                {{ $pageContent['installment_label'] ?? 'INSTALLMENT' }}
                             </p>
 
                             <p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">
-                                برای اطلاع از شرایط اقساط هر محصول،
-                                صفحه همان محصول را بررسی کنید یا از طریق فرم با ما تماس بگیرید.
+                                {{ $pageContent['installment_note'] ?? 'برای اطلاع از شرایط اقساط هر محصول، صفحه همان محصول را بررسی کنید یا از طریق فرم با ما تماس بگیرید.' }}
                             </p>
 
                         </div>
@@ -327,15 +338,15 @@
                     <div class="mb-8">
 
                         <p class="text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--sg-accent)]">
-                            CONTACT FORM
+                            {{ $pageContent['form_kicker'] ?? 'CONTACT FORM' }}
                         </p>
 
                         <h2 class="mt-3 text-2xl font-semibold">
-                            پیام خود را ارسال کنید
+                            {{ $pageContent['form_title'] ?? 'پیام خود را ارسال کنید' }}
                         </h2>
 
                         <p class="mt-2 text-xs leading-7 text-[var(--sg-stone)]">
-                            اطلاعات تماس خود را وارد کنید تا بتوانیم پاسخ دقیق‌تری ارائه دهیم.
+                            {{ $pageContent['form_description'] ?? 'اطلاعات تماس خود را وارد کنید تا بتوانیم پاسخ دقیق‌تری ارائه دهیم.' }}
                         </p>
 
                     </div>
@@ -642,15 +653,15 @@
                 <div>
 
                     <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
-                        FAQ
+                        {{ $pageContent['faq_kicker'] ?? 'FAQ' }}
                     </p>
 
                     <h2 class="mt-4 text-3xl font-semibold tracking-tight">
-                        پرسش‌های متداول
+                        {{ $pageContent['faq_title'] ?? 'پرسش‌های متداول' }}
                     </h2>
 
                     <p class="mt-4 text-sm leading-8 text-[var(--sg-stone)]">
-                        پاسخ چند سؤال رایج درباره ارتباط با SillaGallery و خرید از فروشگاه.
+                        {{ $pageContent['faq_description'] ?? 'پاسخ چند سؤال رایج درباره ارتباط با SillaGallery و خرید از فروشگاه.' }}
                     </p>
 
                 </div>
@@ -740,15 +751,15 @@
                 <div>
 
                     <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--sg-accent)]">
-                        SillaGallery
+                        {{ $pageContent['final_kicker'] ?? 'SillaGallery' }}
                     </p>
 
                     <h2 class="mt-2 text-2xl font-semibold">
-                        آماده‌ای انتخابت را پیدا کنی؟
+                        {{ $pageContent['final_title'] ?? 'آماده‌ای انتخابت را پیدا کنی؟' }}
                     </h2>
 
                     <p class="mt-2 text-sm leading-7 text-[var(--sg-stone)]">
-                        مجموعه محصولات را ببین و انتخاب بعدی‌ات را پیدا کن.
+                        {{ $pageContent['final_description'] ?? 'مجموعه محصولات را ببین و انتخاب بعدی‌ات را پیدا کن.' }}
                     </p>
 
                 </div>
@@ -758,7 +769,7 @@
                     href="{{ route('shop.index') }}"
                     class="inline-flex w-fit rounded-2xl bg-[var(--sg-ink)] px-6 py-4 text-sm font-medium text-white transition hover:bg-[var(--sg-accent)]"
                 >
-                    ورود به فروشگاه
+                    {{ $pageContent['final_cta'] ?? 'ورود به فروشگاه' }}
                 </a>
 
             </div>

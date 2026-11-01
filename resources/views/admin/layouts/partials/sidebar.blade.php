@@ -494,6 +494,16 @@
                     <span class="flex-1">وبلاگ و مقاله‌ها</span>
                 </a>
 
+                <a href="{{ route('admin.contact-settings.edit') }}" class="group flex items-center gap-3 rounded-2xl px-3 py-3 text-xs font-medium text-[var(--admin-text-soft)] transition hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text)]">
+                    <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">☎</span>
+                    <span class="flex-1">اطلاعات تماس و FAQ</span>
+                </a>
+
+                <a href="{{ route('admin.seo.audit') }}" class="group flex items-center gap-3 rounded-2xl px-3 py-3 text-xs font-medium text-[var(--admin-text-soft)] transition hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text)]">
+                    <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">✓</span>
+                    <span class="flex-1">ممیزی فنی SEO</span>
+                </a>
+
                 <a href="{{ route('admin.seo.pages') }}" class="group flex items-center gap-3 rounded-2xl px-3 py-3 text-xs font-medium text-[var(--admin-text-soft)] transition hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text)]">
                     <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">⌗</span>
                     <span class="flex-1">SEO صفحات ثابت</span>
