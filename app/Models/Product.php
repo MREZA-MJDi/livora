@@ -32,6 +32,7 @@ class Product extends Model
         'meta_description',
         'focus_keyword',
         'content_sections',
+        'key_features',
         'specifications',
         'care_guide',
         'faq_items',
@@ -73,6 +74,7 @@ class Product extends Model
             'seo_index' => 'boolean',
             'seo_follow' => 'boolean',
             'content_sections' => 'array',
+            'key_features' => 'array',
             'specifications' => 'array',
             'faq_items' => 'array',
 
