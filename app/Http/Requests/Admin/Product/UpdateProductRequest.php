@@ -164,6 +164,15 @@ class UpdateProductRequest extends FormRequest
                 'max:10240',
             ],
 
+            'banner_image' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:10240',
+            ],
+
+            'banner_image_alt' => ['nullable', 'string', 'max:255'],
+
             'price' => [
                 'required',
                 'numeric',
@@ -288,6 +297,9 @@ class UpdateProductRequest extends FormRequest
             'short_description.max' => 'توضیح کوتاه نباید بیشتر از ۲۵۵ کاراکتر باشد.',
 
             'image.image' => 'فایل انتخاب‌شده باید تصویر باشد.',
+            'banner_image.image' => 'فایل بنر باید تصویر معتبر باشد.',
+            'banner_image.mimes' => 'فرمت بنر باید JPG، PNG یا WEBP باشد.',
+            'banner_image.max' => 'حجم بنر نباید بیشتر از ۱۰ مگابایت باشد.',
             'image.mimes' => 'فرمت تصویر باید jpg، jpeg، png یا webp باشد.',
             'image.max' => 'حجم تصویر نباید بیشتر از ۱۰ مگابایت باشد.',
 

@@ -178,7 +178,7 @@
 
                     @if($products->isNotEmpty())
 
-                        <div class="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-2 xl:grid-cols-4">
+                        <div class="mt-8 sg-product-grid sg-product-grid--category">
 
                             @foreach($products as $product)
 

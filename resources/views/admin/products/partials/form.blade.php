@@ -61,18 +61,18 @@
 
                 <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">
                     {{ $editing
-                        ? 'تصویر اصلی را عوض کنید؛ تصاویر دیگر و اتصال Variantها حفظ می‌شوند.'
-                        : 'برای محصول جدید یک تصویر اصلی انتخاب کنید. اتصال تصاویر Variantها بعداً در مدیریت Variant انجام می‌شود.' }}
+                        ? 'قاب نهایی تصویر با کارت فروشگاه یکسان است (۴:۵)؛ تصویر کامل محصول بدون برش ناخواسته نمایش داده می‌شود.'
+                        : 'تصویر اصلی محصول را در قاب ۴:۵ انتخاب کنید. این نسبت در پیش‌نمایش پنل، کارت فروشگاه و تصویر محصول یکسان خواهد بود.' }}
                 </p>
             </div>
 
-            <div class="admin-image-preview mb-5 aspect-[4/3]">
+            <div class="admin-image-preview mb-5 aspect-[4/5] bg-[var(--admin-white)]">
 
                 <img
                     id="product-image-preview"
                     src="{{ $productImageUrl ?: '' }}"
                     alt="{{ $primaryImage?->alt ?: ($product->name ?? 'تصویر محصول') }}"
-                    class="admin-image {{ $productImageUrl ? '' : 'hidden' }}"
+                    class="admin-image product-primary-preview {{ $productImageUrl ? '' : 'hidden' }}"
                 >
 
                 <div
@@ -107,6 +107,7 @@
                 name="image"
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
+                data-crop-ratio="0.8"
                 class="admin-input p-2"
             >
 
@@ -123,6 +124,55 @@
             @enderror
 
         </div>
+
+        {{-- Product Marketing Banner --}}
+        <section class="admin-card space-y-5 p-6">
+            <div>
+                <h3 class="text-base font-bold text-[var(--admin-text)]">بنر بالای صفحه محصول</h3>
+                <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">
+                    بنر اختصاصی این محصول در ابتدای صفحه نمایش داده می‌شود. نسبت تصویر ۱۲:۵ است؛ بهتر است پیام اصلی را داخل خود تصویر طراحی کنی و فضای امن اطراف متن را رعایت کنی.
+                </p>
+            </div>
+
+            @if($editing && $product->banner_image)
+                <div class="overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)]">
+                    <img
+                        src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($product->banner_image) }}"
+                        alt="{{ $product->banner_image_alt ?: $product->name }}"
+                        class="aspect-[12/5] w-full object-cover"
+                    >
+                </div>
+            @endif
+
+            <div>
+                <label for="banner_image" class="admin-label">انتخاب یا جایگزینی بنر</label>
+                <input
+                    id="banner_image"
+                    name="banner_image"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    data-crop-ratio="2.4"
+                    class="admin-input p-2"
+                >
+                <p class="admin-help">اندازه پیشنهادی ۱۹۲۰×۸۰۰ پیکسل؛ JPG، PNG یا WEBP تا ۱۰ مگابایت.</p>
+                @error('banner_image')<p class="admin-error">{{ $message }}</p>@enderror
+            </div>
+
+            <div>
+                <label for="banner_image_alt" class="admin-label">Alt بنر برای دسترس‌پذیری و SEO</label>
+                <input
+                    id="banner_image_alt"
+                    name="banner_image_alt"
+                    maxlength="255"
+                    class="admin-input"
+                    value="{{ old('banner_image_alt', $product->banner_image_alt ?? ($product->name ?? '')) }}"
+                    placeholder="توضیح کوتاه و واقعی تصویر بنر"
+                >
+                @error('banner_image_alt')<p class="admin-error">{{ $message }}</p>@enderror
+            </div>
+
+            <p class="admin-help">در صورت عدم انتخاب فایل جدید، بنر فعلی حفظ می‌شود.</p>
+        </section>
 
 
         {{-- ========================================================

@@ -2,7 +2,7 @@
 
 @section(
     'title',
-    'انتخاب روش پرداخت | ' . $order->order_number . ' | SillaGallery'
+    ($preview ? 'پیش‌نمایش روش پرداخت | ' : 'انتخاب روش پرداخت | ') . $order->order_number . ' | SillaGallery'
 )
 
 @section(
@@ -12,7 +12,7 @@
 
 @section(
     'canonical',
-    route('checkout.payment', $order)
+    $preview ? route('admin.checkout.preview') : route('checkout.payment', $order)
 )
 
 @push('seo')
@@ -25,127 +25,12 @@
 @endpush
 
 
+
+
+
 @section('content')
 
-    @php
 
-        /*
-        |--------------------------------------------------------------------------
-        | Gateway Configuration
-        |--------------------------------------------------------------------------
-        */
-
-        $gateways = [
-            [
-                'key' => 'digipay',
-                'name' => 'DigiPay',
-                'fa_name' => 'دیجی‌پی',
-                'description' => 'پرداخت از طریق درگاه دیجی‌پی',
-                'enabled' => (bool) config('payment.digipay.enabled', false),
-                'badge' => 'DIGIPAY',
-            ],
-
-            [
-                'key' => 'snappay',
-                'name' => 'SnappPay',
-                'fa_name' => 'اسنپ‌پی',
-                'description' => 'پرداخت از طریق درگاه اسنپ‌پی',
-                'enabled' => (bool) config('payment.snappay.enabled', false),
-                'badge' => 'SNAPPAY',
-            ],
-
-            [
-                'key' => 'torobpay',
-                'name' => 'TorobPay',
-                'fa_name' => 'ترب‌پی',
-                'description' => 'پرداخت از طریق درگاه ترب‌پی',
-                'enabled' => (bool) config('payment.torobpay.enabled', false),
-                'badge' => 'TOROBPAY',
-            ],
-        ];
-
-        $enabledGateways = collect($gateways)
-            ->where('enabled', true)
-            ->values();
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Order Totals
-        |--------------------------------------------------------------------------
-        */
-
-        $orderTotal = (float) $order->total;
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Existing Installment Plan
-        |--------------------------------------------------------------------------
-        */
-
-        $hasInstallmentPlan =
-            (bool) $order->installment_enabled
-            && $order->installments
-                ->isNotEmpty();
-
-        $cashInstallment =
-            $order->installments
-                ->firstWhere('type', 'cash');
-
-        $chequeInstallments =
-            $order->installments
-                ->where('type', 'cheque')
-                ->values();
-
-        $cashPercent =
-            (int) (
-                $order->installment_cash_percent
-                ?? 0
-            );
-
-        $cashAmount =
-            $cashInstallment
-                ? (float) $cashInstallment->amount
-                : null;
-
-        $deferredAmount =
-            (float) (
-                $order->installment_deferred_amount
-                ?? 0
-            );
-
-        $chequeCount =
-            $chequeInstallments->count();
-
-        $intervalMonths =
-            (int) (
-                $order->installment_interval_months
-                ?? 0
-            );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Payment Status
-        |--------------------------------------------------------------------------
-        */
-
-        $isPaid =
-            $order->payment_status === 'paid';
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Current Payment
-        |--------------------------------------------------------------------------
-        */
-
-        $latestPayment =
-            $order->latestPayment;
-
-
-    @endphp
 
 
     <div
@@ -241,6 +126,21 @@
         <x-layout.container>
 
             <div class="grid gap-6 py-8 sm:py-10 lg:grid-cols-[1fr_380px] lg:py-14">
+
+                @if($preview)
+                    <div class="lg:col-span-2 rounded-3xl border border-amber-200 bg-amber-50 p-5 text-amber-950">
+                        <div class="flex flex-wrap items-start justify-between gap-4">
+                            <div>
+                                <p class="text-xs font-bold">پیش‌نمایش مدیریتی Checkout</p>
+                                <p class="mt-2 max-w-3xl text-xs leading-7">
+                                    این صفحه با اطلاعات نمونه نمایش داده می‌شود. هیچ سفارش، پرداخت، رزرو موجودی یا طرح اقساطی واقعی ایجاد نمی‌شود و تمام دکمه‌های عملیاتی غیرفعال‌اند.
+                                </p>
+                            </div>
+                            <span class="rounded-full border border-amber-300 bg-white/70 px-3 py-1.5 text-[10px] font-semibold">DEMO · READ ONLY</span>
+                        </div>
+                    </div>
+                @endif
+
 
 
                 {{-- =================================================
@@ -418,7 +318,12 @@
                         </div>
 
 
-                        @if($enabledGateways->isNotEmpty())
+                        @if($preview)
+                            <div class="mt-6 rounded-2xl border border-dashed border-[var(--sg-border)] bg-[var(--sg-surface)] p-4">
+                                <p class="text-xs font-semibold">وضعیت اتصال درگاه‌ها</p>
+                                <p class="mt-2 text-xs leading-7 text-[var(--sg-stone)]">درگاه واقعی هنوز برای دریافت وجه فعال نشده است. کارت‌های بالا صرفاً وضعیت پیکربندی را نشان می‌دهند؛ در این پیش‌نمایش هیچ درخواست پرداختی ارسال نمی‌شود.</p>
+                            </div>
+                        @elseif($enabledGateways->isNotEmpty())
 
                             <div class="mt-6">
 
@@ -468,9 +373,15 @@
 
                             <div class="mt-6 rounded-2xl bg-[var(--sg-surface)] p-4">
 
-                                <p class="text-xs leading-7 text-[var(--sg-stone)]">
-                                    در حال حاضر هیچ درگاه آنلاینی فعال نیست.
+                                <p class="text-xs font-semibold text-[var(--sg-ink)]">
+                                    اتصال درگاه پرداخت هنوز تکمیل نشده است.
                                 </p>
+                                <p class="mt-2 text-xs leading-7 text-[var(--sg-stone)]">
+                                    سفارش شما ثبت شده و تا زمان اتصال و تأیید تراکنش توسط درگاه، وضعیت پرداخت «در انتظار پرداخت» باقی می‌ماند. در این مرحله هیچ مبلغی کسر نمی‌شود.
+                                </p>
+                                <a href="{{ route('contact') }}" class="mt-3 inline-flex text-xs font-semibold text-[var(--sg-accent)]">
+                                    برای هماهنگی با پشتیبانی تماس بگیرید ←
+                                </a>
 
                             </div>
 
@@ -514,6 +425,12 @@
                                     <span class="w-fit rounded-full bg-white/10 px-3 py-1.5 text-[10px] text-white/60">
                                     طرح آماده است
                                 </span>
+
+                                @elseif($preview)
+
+                                    <span class="w-fit rounded-full border border-white/15 bg-white/5 px-4 py-2 text-[10px] text-white/55">
+                                        فقط پیش‌نمایش
+                                    </span>
 
                                 @else
 
@@ -685,6 +602,11 @@
                                 </div>
 
 
+                                @if($preview)
+                                    <div class="mt-5 rounded-2xl border border-white/10 bg-white/5 p-4 text-xs leading-7 text-white/55">
+                                        محاسبه و ثبت طرح اقساطی فقط در سفارش واقعی مشتری انجام می‌شود.
+                                    </div>
+                                @else
                                 <form
                                     action="{{ route('checkout.payment.internal-installment', $order) }}"
                                     method="POST"
@@ -701,6 +623,7 @@
                                     </button>
 
                                 </form>
+                                @endif
 
                             @endif
 

@@ -26,7 +26,7 @@
                             <td class="p-4"><p class="text-sm font-semibold">{{ $post->title }}</p><p class="mt-1 text-xs text-[var(--admin-muted)]" dir="ltr">/blog/{{ $post->slug }}</p></td>
                             <td class="p-4 text-xs">{{ $post->category ?: '—' }}</td>
                             <td class="p-4"><span class="admin-badge {{ $post->status === 'published' ? 'admin-badge-success' : 'admin-badge-warning' }}">{{ $post->status === 'published' ? 'منتشرشده' : 'پیش‌نویس' }}</span></td>
-                            <td class="p-4 text-xs">{{ $post->published_at?->format('Y/m/d H:i') ?: '—' }}</td>
+                            <td class="p-4 text-xs">{{ $post->published_at ? \App\Helpers\JalaliHelper::formatDateTime($post->published_at) : '—' }}</td>
                             <td class="p-4 text-xs" dir="ltr">{{ $post->seo_index ? 'index' : 'noindex' }} / {{ $post->seo_follow ? 'follow' : 'nofollow' }}</td>
                             <td class="p-4">
                                 <div class="flex items-center gap-3">

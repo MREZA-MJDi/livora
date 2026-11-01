@@ -9,7 +9,7 @@
     $hasCount = $count !== null;
 @endphp
 
-<article class="group relative min-w-0">
+<article class="category-card group relative h-full min-w-0">
 
     <a
         href="{{ $href }}"
@@ -20,16 +20,20 @@
         <div class="relative overflow-hidden rounded-[2rem] bg-[var(--sg-surface)]">
 
             {{-- Image --}}
-            <div class="aspect-[4/5] overflow-hidden">
+            <div class="category-card-media relative aspect-[4/5] overflow-hidden" data-card-media>
 
                 @if($image)
 
+                    <span class="sg-card-image-skeleton sg-skeleton absolute inset-0" aria-hidden="true"></span>
                     <img
                         src="{{ $image }}"
                         alt="{{ $name }}"
                         loading="lazy"
-                        class="category-card-image h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.05]"
+                        decoding="async"
+                        data-card-image
+                        class="category-card-image h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.035]"
                     >
+                    <span data-card-image-fallback class="hidden h-full w-full items-center justify-center text-xs tracking-[0.2em] text-white/70" aria-hidden="true">SillaGallery</span>
 
                 @else
 

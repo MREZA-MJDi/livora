@@ -393,7 +393,7 @@
                     </div>
 
 
-                    <div class="mt-9 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <div class="mt-9 sg-category-grid sg-category-grid--showcase grid gap-4">
 
                         @foreach($categories->take(4) as $category)
 
@@ -461,7 +461,7 @@
 
                     @if($featuredWithoutHero->isNotEmpty())
 
-                        <div class="mt-10 grid grid-cols-2 gap-x-4 gap-y-8 lg:grid-cols-4">
+                        <div class="mt-10 sg-product-grid sg-product-grid--showcase">
 
                             @foreach($featuredWithoutHero as $product)
 
@@ -656,7 +656,7 @@
                         </div>
 
 
-                        <div class="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
+                        <div class="mt-10 sg-product-grid sg-product-grid--showcase">
 
                             @foreach($installmentProducts as $product)
 
@@ -718,7 +718,7 @@
 
                     @if($newProducts->isNotEmpty())
 
-                        <div class="mt-10 grid grid-cols-2 gap-x-4 gap-y-8 lg:grid-cols-4">
+                        <div class="mt-10 sg-product-grid sg-product-grid--showcase">
 
                             @foreach($newProducts as $product)
 

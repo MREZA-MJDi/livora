@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Services\Installments\InstallmentPlanService;
 use App\Services\Payments\PaymentService;
+use App\Services\Payments\CheckoutPaymentViewData;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -375,7 +376,8 @@ class CheckoutController extends Controller
      * Show payment selection page.
      */
     public function payment(
-        Order $order
+        Order $order,
+        CheckoutPaymentViewData $viewData
     ): View {
         abort_unless(
             $order->user_id === Auth::id(),
@@ -390,7 +392,8 @@ class CheckoutController extends Controller
 
         return view('checkout.payment', [
             'order' => $order,
-        ]);
+            'preview' => false,
+        ] + $viewData->forOrder($order));
     }
 
     /**

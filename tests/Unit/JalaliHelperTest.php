@@ -28,6 +28,13 @@ class JalaliHelperTest extends TestCase
         $this->assertSame('۱۴۰۴/۰۱/۰۱', JalaliHelper::formatDate($date));
     }
 
+    public function test_blog_schedule_date_and_time_render_as_persian_jalali_values(): void
+    {
+        $date = new DateTimeImmutable('2025-03-21 12:35:00', new DateTimeZone('Asia/Tehran'));
+
+        $this->assertSame('۱۴۰۴/۰۱/۰۱ ۱۲:۳۵', JalaliHelper::formatDateTime($date));
+    }
+
     public function test_jalali_month_start_maps_to_gregorian_month_boundary(): void
     {
         $start = JalaliHelper::monthStart(1404, 1, new DateTimeZone('Asia/Tehran'));

@@ -1,4 +1,10 @@
-@php($editing = isset($post))
+@php
+    $editing = isset($post);
+    $publishedAtGregorian = old(
+        'published_at',
+        $editing && $post->published_at ? $post->published_at->format('Y-m-d\TH:i') : ''
+    );
+@endphp
 @csrf
 <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
     <div class="space-y-6 xl:col-span-2">
@@ -49,7 +55,51 @@
         <section class="admin-card space-y-4 p-6">
             <h2 class="text-base font-bold">انتشار</h2>
             <div><label class="admin-label" for="status">وضعیت</label><select id="status" name="status" class="admin-select"><option value="draft" @selected(old('status', $post->status ?? 'draft') === 'draft')>پیش‌نویس</option><option value="published" @selected(old('status', $post->status ?? 'draft') === 'published')>منتشرشده</option></select></div>
-            <div><label class="admin-label" for="published_at">زمان انتشار</label><input id="published_at" name="published_at" type="datetime-local" class="admin-input" value="{{ old('published_at', isset($post) && $post->published_at ? $post->published_at->format('Y-m-d\TH:i') : '') }}"></div>
+<div
+                x-data="jalaliDatePicker(@js($publishedAtGregorian))"
+                x-init="init()"
+                @click.outside="open = false"
+                class="relative"
+            >
+                <label class="admin-label" for="published_at_display">زمان انتشار (تقویم شمسی)</label>
+                <input type="hidden" name="published_at" :value="gregorianValue">
+
+                <div class="grid grid-cols-[minmax(0,1fr)_minmax(110px,140px)_48px] gap-2">
+                    <input id="published_at_display" type="text" readonly :value="displayValue" placeholder="انتخاب تاریخ شمسی" class="admin-input" aria-label="تاریخ انتشار شمسی">
+                    <input type="time" x-model="time" @change="updateValue()" class="admin-input" aria-label="ساعت انتشار">
+                    <button type="button" @click="open = !open" class="admin-btn admin-btn-secondary !min-h-0 !px-0" :aria-expanded="open.toString()" aria-label="بازکردن تقویم شمسی">▦</button>
+                </div>
+
+                <div x-show="open" x-cloak x-transition.origin.top class="absolute left-0 right-0 z-50 mt-2 rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-white)] p-4 shadow-xl sm:right-auto sm:w-[340px]">
+                    <div class="flex items-center justify-between gap-3">
+                        <button type="button" @click="changeMonth(-1)" class="admin-btn admin-btn-secondary !min-h-9 !px-3" aria-label="ماه قبل">‹</button>
+                        <p class="text-sm font-bold" x-text="monthTitle"></p>
+                        <button type="button" @click="changeMonth(1)" class="admin-btn admin-btn-secondary !min-h-9 !px-3" aria-label="ماه بعد">›</button>
+                    </div>
+                    <div class="mt-4 grid grid-cols-7 gap-1 text-center">
+                        <template x-for="(weekday, index) in weekdays" :key="index">
+                            <span class="py-2 text-[10px] font-semibold text-[var(--admin-muted)]" x-text="weekday"></span>
+                        </template>
+                        <template x-for="(day, index) in calendarDays" :key="index">
+                            <button type="button" :disabled="!day" @click="selectDay(day)"
+                                :class="{
+                                    'invisible': !day,
+                                    'bg-[var(--admin-text)] text-white': day && isSelected(day),
+                                    'bg-[var(--admin-accent-soft)] text-[var(--admin-accent-dark)]': day && isToday(day) && !isSelected(day),
+                                    'hover:bg-[var(--admin-surface)]': day && !isSelected(day)
+                                }"
+                                class="flex aspect-square items-center justify-center rounded-xl text-xs transition"
+                                x-text="day ? persianDigits(day) : ''"></button>
+                        </template>
+                    </div>
+                    <div class="mt-4 flex items-center justify-between border-t border-[var(--admin-border)] pt-3">
+                        <button type="button" @click="selectToday()" class="text-xs font-semibold text-[var(--admin-accent)]">امروز</button>
+                        <button type="button" @click="clearDate()" class="text-xs text-[var(--admin-muted)]">پاک‌کردن تاریخ</button>
+                    </div>
+                </div>
+                <p class="admin-help">تقویم و تاریخ نمایشی شمسی است؛ مقدار استاندارد میلادی فقط در فرم داخلی و دیتابیس ذخیره می‌شود.</p>
+                @error('published_at')<p class="admin-error">{{ $message }}</p>@enderror
+            </div>
             <button type="submit" class="admin-btn admin-btn-primary w-full">{{ $editing ? 'ذخیره مقاله' : 'ایجاد مقاله' }}</button><a href="{{ route('admin.blog.index') }}" class="admin-btn admin-btn-secondary w-full">بازگشت</a>
         </section>
         <section class="admin-card space-y-4 p-6">

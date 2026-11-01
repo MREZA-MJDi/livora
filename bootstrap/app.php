@@ -71,19 +71,47 @@ return Application::configure(
             HttpExceptionInterface $e,
             Request $request
         ) {
-            if ($request->expectsJson()) {
-                return null;
-            }
-
-            // An expired admin form/session must send the administrator back
-            // through authentication instead of displaying a generic 419 page.
+            // Give expired dashboard sessions a distinct response for both
+            // browser navigation and fetch/XHR requests.
             if (
                 $e->getStatusCode() === 419
                 && $request->is('admin', 'admin/*')
             ) {
+                if ($request->expectsJson()) {
+                    $referer = $request->headers->get('referer');
+                    $refererHost = is_string($referer)
+                        ? parse_url($referer, PHP_URL_HOST)
+                        : null;
+                    $refererPath = is_string($referer)
+                        ? parse_url($referer, PHP_URL_PATH)
+                        : null;
+
+                    if (
+                        $refererHost
+                        && hash_equals(strtolower($request->getHost()), strtolower($refererHost))
+                        && is_string($refererPath)
+                        && preg_match('#^/admin(?:/|$)#', $refererPath) === 1
+                    ) {
+                        $request->session()->put('url.intended', $referer);
+                    } else {
+                        $request->session()->put('url.intended', route('admin.dashboard'));
+                    }
+
+                    return response()->json([
+                        'success' => false,
+                        'code' => 'admin_session_expired',
+                        'message' => 'نشست مدیریت منقضی شده است. برای ادامه دوباره وارد شوید.',
+                        'login_url' => route('login'),
+                    ], 419);
+                }
+
                 return redirect()
                     ->guest(route('login'))
-                    ->with('warning', 'نشست شما منقضی شده است؛ لطفاً دوباره وارد شوید.');
+                    ->with('warning', 'نشست مدیریت منقضی شده است؛ دوباره وارد شوید تا به صفحه قبلی بازگردید.');
+            }
+
+            if ($request->expectsJson()) {
+                return null;
             }
 
             $view = match ($e->getStatusCode()) {

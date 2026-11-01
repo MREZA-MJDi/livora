@@ -15,7 +15,7 @@
             'account.orders.index', 'account.wishlist.index',
         ], true)
             || preg_match('/^(account|cart|checkout|login|register|password|logout)(\\.|$)/', $routeName) === 1
-            || request()->is('account/*', 'cart/*', 'checkout/*', 'cart', 'login', 'register', 'forgot-password', 'reset-password/*');
+            || request()->is('admin', 'admin/*', 'account/*', 'cart/*', 'checkout/*', 'cart', 'login', 'register', 'forgot-password', 'reset-password/*');
         $seoRobots = $privateRoute
             ? 'noindex, nofollow'
             : ($pageSeo !== null
