@@ -38,6 +38,27 @@ class ContactSettingController extends Controller
             'faqs' => ['nullable', 'array', 'max:20'],
             'faqs.*.question' => ['required', 'string', 'max:255'],
             'faqs.*.answer' => ['required', 'string', 'max:2000'],
+            'page_content' => ['nullable', 'array'],
+            'page_content.hero_kicker' => ['nullable', 'string', 'max:120],
+            'page_content.hero_title' => ['nullable', 'string', 'max:255],
+            'page_content.hero_highlight' => ['nullable', 'string', 'max:120],
+            'page_content.hero_description' => ['nullable', 'string', 'max:1000],
+            'page_content.hero_cta' => ['nullable', 'string', 'max:120],
+            'page_content.info_kicker' => ['nullable', 'string', 'max:120],
+            'page_content.info_title' => ['nullable', 'string', 'max:255],
+            'page_content.info_description' => ['nullable', 'string', 'max:1000],
+            'page_content.installment_note' => ['nullable', 'string', 'max:1000],
+            'page_content.form_kicker' => ['nullable', 'string', 'max:120],
+            'page_content.form_title' => ['nullable', 'string', 'max:255],
+            'page_content.form_description' => ['nullable', 'string', 'max:1000],
+            'page_content.faq_kicker' => ['nullable', 'string', 'max:120],
+            'page_content.faq_title' => ['nullable', 'string', 'max:255],
+            'page_content.faq_description' => ['nullable', 'string', 'max:1000],
+            'page_content.final_kicker' => ['nullable', 'string', 'max:120],
+            'page_content.final_title' => ['nullable', 'string', 'max:255],
+            'page_content.final_description' => ['nullable', 'string', 'max:1000],
+            'page_content.final_cta' => ['nullable', 'string', 'max:120],
+            'page_content.success_message' => ['nullable', 'string', 'max:120],
         ]);
 
         $validated['faqs'] = collect($validated['faqs'] ?? [])
@@ -47,6 +68,9 @@ class ContactSettingController extends Controller
             ])
             ->filter(fn (array $faq): bool => $faq['question'] !== '' && $faq['answer'] !== '')
             ->values()
+            ->all();
+        $validated['page_content'] = collect($validated['page_content'] ?? [])
+            ->map(fn ($value): string => trim((string) $value))
             ->all();
         $validated['is_active'] = $request->boolean('is_active');
 
