@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Category\StoreCategoryRequest;
 use App\Http\Requests\Admin\Category\UpdateCategoryRequest;
 use App\Models\Category;
+use App\Models\Product;
+use App\Services\Seo\ContentSeoAnalyzer;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
@@ -29,9 +32,18 @@ class CategoryController extends Controller
     /**
      * Show the form for creating a new category.
      */
-    public function create(): View
+    public function create(ContentSeoAnalyzer $seoAnalyzer): View
     {
-        return view('admin.categories.create');
+        $category = new Category();
+
+        return view('admin.categories.create', [
+            'category' => $category,
+            'seoAnalysis' => $seoAnalyzer->analyze($category),
+            'availableRelatedCategories' => Category::query()->active()->orderBy('name')->limit(100)->get(['id', 'name']),
+            'availableRelatedProducts' => Product::query()->active()->orderBy('name')->limit(200)->get(['id', 'name']),
+            'selectedRelatedCategoryIds' => [],
+            'selectedRelatedProductIds' => [],
+        ]);
     }
 
     /**
@@ -40,6 +52,9 @@ class CategoryController extends Controller
     public function store(StoreCategoryRequest $request): RedirectResponse
     {
         $data = $request->validated();
+        $relatedCategoryIds = $data['related_category_ids'] ?? [];
+        $relatedProductIds = $data['related_product_ids'] ?? [];
+        unset($data['related_category_ids'], $data['related_product_ids']);
 
         if ($request->hasFile('image')) {
             $data['image'] = $request
@@ -47,7 +62,11 @@ class CategoryController extends Controller
                 ->store('categories', 'public');
         }
 
-        Category::create($data);
+        DB::transaction(function () use ($data, $relatedCategoryIds, $relatedProductIds): void {
+            $category = Category::create($data);
+            $category->relatedCategories()->sync(array_values(array_diff($relatedCategoryIds, [$category->id])));
+            $category->recommendedProducts()->sync($relatedProductIds);
+        });
         Cache::forget('layout.search_categories');
 
         return redirect()
@@ -66,9 +85,18 @@ class CategoryController extends Controller
     /**
      * Show the form for editing the specified category.
      */
-    public function edit(Category $category): View
+    public function edit(Category $category, ContentSeoAnalyzer $seoAnalyzer): View
     {
-        return view('admin.categories.edit', compact('category'));
+        $category->load(['relatedCategories:id,name', 'recommendedProducts:id,name']);
+
+        return view('admin.categories.edit', [
+            'category' => $category,
+            'seoAnalysis' => $seoAnalyzer->analyze($category),
+            'availableRelatedCategories' => Category::query()->active()->where('id', '!=', $category->id)->orderBy('name')->limit(100)->get(['id', 'name']),
+            'availableRelatedProducts' => Product::query()->active()->orderBy('name')->limit(200)->get(['id', 'name']),
+            'selectedRelatedCategoryIds' => $category->relatedCategories->pluck('id')->map(fn ($id) => (int) $id)->all(),
+            'selectedRelatedProductIds' => $category->recommendedProducts->pluck('id')->map(fn ($id) => (int) $id)->all(),
+        ]);
     }
 
     /**
@@ -79,6 +107,9 @@ class CategoryController extends Controller
         Category $category
     ): RedirectResponse {
         $data = $request->validated();
+        $relatedCategoryIds = array_values(array_diff($data['related_category_ids'] ?? [], [$category->id]));
+        $relatedProductIds = $data['related_product_ids'] ?? [];
+        unset($data['related_category_ids'], $data['related_product_ids']);
 
         $oldImage = $category->image;
         $newImage = null;
@@ -91,7 +122,11 @@ class CategoryController extends Controller
             $data['image'] = $newImage;
         }
 
-        $category->update($data);
+        DB::transaction(function () use ($category, $data, $relatedCategoryIds, $relatedProductIds): void {
+            $category->update($data);
+            $category->relatedCategories()->sync($relatedCategoryIds);
+            $category->recommendedProducts()->sync($relatedProductIds);
+        });
         Cache::forget('layout.search_categories');
 
         if (

@@ -278,15 +278,17 @@ abstract class AbstractGateway implements InstallmentPaymentGatewayInterface
             );
 
             if (! $result['success']) {
+                $statusCode = (int) ($result['status_code'] ?? 0);
+
                 return [
                     'success' => false,
                     'payment_url' => null,
                     'authority' => null,
                     'transaction_id' => null,
-                    'message' =>
-                        $result['message'],
-                    'data' =>
-                        $result['data'],
+                    'retryable' => $statusCode === 0 || $statusCode === 429 || $statusCode >= 500,
+                    'status_code' => $statusCode,
+                    'message' => $result['message'],
+                    'data' => $result['data'],
                 ];
             }
 

@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Category extends Model
 {
@@ -18,8 +19,13 @@ class Category extends Model
         'slug',
         'description',
         'image',
+        'image_alt',
         'meta_title',
         'meta_description',
+        'focus_keyword',
+        'content_sections',
+        'comparison_rows',
+        'faq_items',
         'canonical_url',
         'og_image',
         'is_active',
@@ -35,6 +41,9 @@ class Category extends Model
             'sort_order' => 'integer',
             'seo_index' => 'boolean',
             'seo_follow' => 'boolean',
+            'content_sections' => 'array',
+            'comparison_rows' => 'array',
+            'faq_items' => 'array',
         ];
     }
 
@@ -64,6 +73,18 @@ class Category extends Model
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);
+    }
+
+    public function relatedCategories(): BelongsToMany
+    {
+        return $this->belongsToMany(self::class, 'category_related_categories', 'category_id', 'related_category_id')
+            ->withPivot('sort_order')->orderByPivot('sort_order');
+    }
+
+    public function recommendedProducts(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'category_recommended_products', 'category_id', 'product_id')
+            ->withPivot('sort_order')->orderByPivot('sort_order');
     }
 
     /**

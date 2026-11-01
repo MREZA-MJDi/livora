@@ -1204,6 +1204,14 @@
 
     <div class="admin-card space-y-4 p-6">
         <h3 class="text-base font-bold text-[var(--admin-text)]">تنظیمات تکمیلی SEO</h3>
+        <div><label class="admin-label" for="focus_keyword">کلمه کلیدی کانونی</label><input id="focus_keyword" name="focus_keyword" maxlength="120" class="admin-input" value="{{ old('focus_keyword', $product->focus_keyword ?? '') }}" placeholder="مثلاً مبل راحتی مدرن"></div>
+        @if(isset($seoAnalysis))
+            <div class="rounded-xl border border-[var(--admin-border)] p-4">
+                <div class="flex items-center justify-between gap-3"><strong class="text-xs">ارزیابی محتوای SEO</strong><strong class="text-sm">{{ $seoAnalysis['score'] }} / 100</strong></div>
+                <p class="admin-help mt-1">{{ $seoAnalysis['passed'] }} مورد از {{ $seoAnalysis['total'] }} بررسی داخلی موفق است؛ این امتیاز تضمین رتبه نیست.</p>
+                <ul class="mt-3 space-y-2">@foreach($seoAnalysis['checks'] as $check)<li class="flex items-start gap-2 text-xs"><span class="{{ $check['passed'] ? 'text-emerald-600' : 'text-amber-600' }}">{{ $check['passed'] ? '✓' : '•' }}</span><span><strong>{{ $check['label'] }}</strong><span class="block text-[var(--admin-muted)]">{{ $check['detail'] }}</span></span></li>@endforeach</ul>
+            </div>
+        @endif
         <div><label class="admin-label" for="canonical_url">Canonical URL</label><input id="canonical_url" name="canonical_url" type="url" dir="ltr" class="admin-input" value="{{ old('canonical_url', $product->canonical_url ?? '') }}"></div>
         <div><label class="admin-label" for="og_image">Open Graph Image URL</label><input id="og_image" name="og_image" type="url" dir="ltr" class="admin-input" value="{{ old('og_image', $product->og_image ?? '') }}"></div>
     </div>
@@ -1216,6 +1224,20 @@
             <label class="flex items-center gap-3 rounded-xl border border-[var(--admin-border)] p-4"><input type="checkbox" name="seo_follow" value="1" class="admin-checkbox" @checked(old('seo_follow', $product->seo_follow ?? false))><span class="text-sm">اجازه دنبال‌کردن لینک‌ها</span></label>
         </div>
     </div>
+
+    @include('admin.partials.content-builder', [
+        'sections' => $product->content_sections ?? [],
+        'keyFeatures' => $product->key_features ?? [],
+        'specifications' => $product->specifications ?? [],
+        'careGuide' => $product->care_guide ?? '',
+        'faqItems' => $product->faq_items ?? [],
+        'availableRelatedProducts' => $availableRelatedProducts ?? collect(),
+        'selectedRelatedProductIds' => $selectedRelatedProductIds ?? [],
+        'includeKeyFeatures' => true,
+        'includeSpecifications' => true,
+        'includeCareGuide' => true,
+        'includeRelatedProducts' => true,
+    ])
 
 </div>
 

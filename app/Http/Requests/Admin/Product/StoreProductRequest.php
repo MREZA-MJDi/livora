@@ -63,6 +63,38 @@ class StoreProductRequest extends FormRequest
                     ? ($this->installment_interval_months ?? 2)
                     : null,
         ]);
+
+        $this->merge([
+            'content_sections' => $this->cleanRows('content_sections', ['heading', 'body']),
+            'key_features' => $this->cleanRows('key_features', ['label', 'value']),
+            'specifications' => $this->cleanRows('specifications', ['label', 'value']),
+            'faq_items' => $this->cleanRows('faq_items', ['question', 'answer']),
+            'related_product_ids' => is_array($this->input('related_product_ids')) ? array_values(array_unique(array_map('intval', $this->input('related_product_ids')))) : $this->input('related_product_ids'),
+        ]);
+    }
+
+    private function cleanRows(string $key, array $fields): mixed
+    {
+        $rows = $this->input($key, []);
+        if (! is_array($rows)) {
+            return $rows;
+        }
+
+        return collect($rows)
+            ->filter(function ($row) use ($fields): bool {
+                return ! is_array($row)
+                    || collect($fields)->contains(fn ($field) => filled($row[$field] ?? null));
+            })
+            ->map(function ($row) use ($fields) {
+                if (! is_array($row)) {
+                    return $row;
+                }
+
+                return collect($fields)->mapWithKeys(
+                    fn ($field) => [$field => trim((string) ($row[$field] ?? ''))]
+                )->all();
+            })
+            ->values()->all();
     }
 
     /**
@@ -266,10 +298,23 @@ class StoreProductRequest extends FormRequest
                 'max:255',
             ],
 
-            'meta_description' => [
-                'nullable',
-                'string',
-            ],
+            'meta_description' => ['nullable', 'string', 'max:1000'],
+            'focus_keyword' => ['nullable', 'string', 'max:120'],
+            'content_sections' => ['nullable', 'array', 'max:12'],
+            'content_sections.*.heading' => ['required', 'string', 'max:160'],
+            'content_sections.*.body' => ['required', 'string', 'max:6000'],
+            'key_features' => ['nullable', 'array', 'max:12'],
+            'key_features.*.label' => ['required', 'string', 'max:100'],
+            'key_features.*.value' => ['required', 'string', 'max:300'],
+            'specifications' => ['nullable', 'array', 'max:30'],
+            'specifications.*.label' => ['required', 'string', 'max:100'],
+            'specifications.*.value' => ['required', 'string', 'max:500'],
+            'care_guide' => ['nullable', 'string', 'max:6000'],
+            'faq_items' => ['nullable', 'array', 'max:20'],
+            'faq_items.*.question' => ['required', 'string', 'max:255'],
+            'faq_items.*.answer' => ['required', 'string', 'max:2000'],
+            'related_product_ids' => ['nullable', 'array', 'max:60'],
+            'related_product_ids.*' => ['integer', 'distinct', 'exists:products,id'],
         ];
     }
 

@@ -160,15 +160,23 @@ class PaymentService
             );
 
             if (!($result['success'] ?? false)) {
-                $this->markPaymentAsFailed(
-                    $payment,
-                    $result['message']
-                    ?? 'Payment initialization failed.',
-                    [
+                if ($result['retryable'] ?? false) {
+                    $this->recordGatewayInitiationPending($payment, [
                         'gateway' => $gateway,
-                        'response' => $result,
-                    ]
-                );
+                        'status_code' => $result['status_code'] ?? 0,
+                        'message' => $result['message'] ?? 'Gateway response was inconclusive.',
+                    ]);
+                } else {
+                    $this->markPaymentAsFailed(
+                        $payment,
+                        $result['message'] ?? 'Payment initialization failed.',
+                        [
+                            'gateway' => $gateway,
+                            'status_code' => $result['status_code'] ?? null,
+                            'response' => $this->safeGatewayResponse($result),
+                        ]
+                    );
+                }
 
                 return [
                     'success' => false,
@@ -186,6 +194,7 @@ class PaymentService
 
                     'data' =>
                         $result['data'] ?? [],
+                    'retryable' => (bool) ($result['retryable'] ?? false),
                 ];
             }
 
@@ -205,14 +214,12 @@ class PaymentService
             if (
                 blank($redirectUrl)
             ) {
-                $this->markPaymentAsFailed(
-                    $payment,
-                    'Gateway did not return a valid payment URL.',
-                    [
-                        'gateway' => $gateway,
-                        'response' => $result,
-                    ]
-                );
+                $this->recordGatewayInitiationPending($payment, [
+                    'gateway' => $gateway,
+                    'message' => 'Gateway acknowledged the attempt but returned no redirect URL.',
+                    'authority' => $result['authority'] ?? null,
+                    'transaction_id' => $result['transaction_id'] ?? null,
+                ]);
 
                 return [
                     'success' => false,
@@ -229,6 +236,7 @@ class PaymentService
 
                     'data' =>
                         $result['data'] ?? [],
+                    'retryable' => true,
                 ];
             }
 
@@ -351,18 +359,10 @@ class PaymentService
                 );
 
             if (!($result['success'] ?? false)) {
-                $this->markPaymentAsFailed(
-                    $payment,
-                    $result['message']
-                    ?? 'Payment verification failed.',
-                    [
-                        'callback' =>
-                            $callbackData,
-
-                        'verify_response' =>
-                            $result,
-                    ]
-                );
+                $this->recordVerificationPending($payment, [
+                    'callback' => $this->safeCallbackData($callbackData),
+                    'verify_response' => $this->safeGatewayResponse($result),
+                ]);
 
                 return [
                     'success' => false,
@@ -379,8 +379,9 @@ class PaymentService
                     'message' =>
                         'پرداخت تأیید نشد. در صورت کسر وجه، وضعیت تراکنش بررسی خواهد شد.',
 
-                    'data' =>
-                        $result['data'] ?? [],
+                    'data' => [
+                        'verification_pending' => true,
+                    ],
                 ];
             }
 
@@ -401,10 +402,10 @@ class PaymentService
                 ?? null,
                 [
                     'callback' =>
-                        $callbackData,
+                        $this->safeCallbackData($callbackData),
 
                     'verify_response' =>
-                        $result,
+                        $this->safeGatewayResponse($result),
                 ]
             );
 
@@ -442,7 +443,7 @@ class PaymentService
                 $e->getMessage(),
                 [
                     'callback' =>
-                        $callbackData,
+                        $this->safeCallbackData($callbackData),
 
                     'verification_error' =>
                         $e::class,
@@ -526,15 +527,9 @@ class PaymentService
                 );
 
             if (!($result['success'] ?? false)) {
-                $this->markPaymentAsFailed(
-                    $payment,
-                    $result['message']
-                    ?? 'Payment verification failed.',
-                    [
-                        'verify_response' =>
-                            $result,
-                    ]
-                );
+                $this->recordVerificationPending($payment, [
+                    'verify_response' => $this->safeGatewayResponse($result),
+                ]);
 
                 return [
                     'success' => false,
@@ -562,7 +557,7 @@ class PaymentService
                 ?? null,
                 [
                     'verify_response' =>
-                        $result,
+                        $this->safeGatewayResponse($result),
                 ]
             );
 
@@ -902,7 +897,7 @@ class PaymentService
                             $lockedPayment->metadata ?? [],
                             [
                                 'create_response' =>
-                                    $result,
+                                    $this->safeGatewayResponse($result),
 
                                 'initiated_at' =>
                                     now()->toISOString(),
@@ -1010,7 +1005,7 @@ class PaymentService
                     ],
                 ]);
 
-                \\Illuminate\\Support\\Facades\\Log::critical(
+                \Illuminate\Support\Facades\Log::critical(
                     'Livora received a successful payment after local cancellation; manual refund/reconciliation is required.',
                     [
                         'order_id' => $lockedOrder->id,
@@ -1026,6 +1021,132 @@ class PaymentService
 
             $this->orderInventoryService->deductForPaidOrder($lockedOrder);
         });
+    }
+
+    /**
+     * Persist only normalized, non-secret gateway fields in local metadata.
+     * The opaque provider payload and redirect URL are deliberately excluded.
+     */
+    protected function safeGatewayResponse(array $result): array
+    {
+        $safe = [];
+
+        foreach (['success', 'amount', 'transaction_id', 'authority', 'status', 'status_code', 'retryable', 'message'] as $key) {
+            if (! array_key_exists($key, $result)) {
+                continue;
+            }
+
+            $value = $result[$key];
+
+            if (is_string($value)) {
+                $value = mb_substr($value, 0, 500);
+            } elseif (! is_scalar($value) && $value !== null) {
+                continue;
+            }
+
+            $safe[$key] = $value;
+        }
+
+        return $safe;
+    }
+
+    /**
+     * Record an ambiguous gateway create-payment outcome. Keep the attempt active
+     * to prevent an immediate retry from creating a second remote session.
+     */
+    protected function recordGatewayInitiationPending(Payment $payment, array $context = []): void
+    {
+        DB::transaction(function () use ($payment, $context): void {
+            $lockedOrder = Order::query()
+                ->whereKey($payment->order_id)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $lockedOrder) {
+                return;
+            }
+
+            $lockedPayment = Payment::query()
+                ->whereKey($payment->id)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $lockedPayment || in_array($lockedPayment->status, ['paid', 'refunded', 'failed', 'cancelled'], true)) {
+                return;
+            }
+
+            $lockedPayment->update([
+                'metadata' => array_merge($lockedPayment->metadata ?? [], [
+                    'initiation_pending' => true,
+                    'initiation_pending_at' => now()->toISOString(),
+                    'initiation_context' => $context,
+                ]),
+            ]);
+
+            if ($lockedOrder->payment_status !== 'paid') {
+                $lockedOrder->update(['payment_status' => 'pending']);
+            }
+        });
+    }
+
+    /**
+     * Record an inconclusive verification attempt without marking a charge failed.
+     * A timeout or temporary provider error is not proof that the bank declined it.
+     */
+    protected function recordVerificationPending(Payment $payment, array $context = []): void
+    {
+        DB::transaction(function () use ($payment, $context): void {
+            $lockedOrder = Order::query()
+                ->whereKey($payment->order_id)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $lockedOrder) {
+                return;
+            }
+
+            $lockedPayment = Payment::query()
+                ->whereKey($payment->id)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $lockedPayment || in_array($lockedPayment->status, ['paid', 'refunded', 'failed', 'cancelled'], true)) {
+                return;
+            }
+
+            $lockedPayment->update([
+                'metadata' => array_merge($lockedPayment->metadata ?? [], [
+                    'last_verification_attempt' => $context,
+                    'last_verification_attempt_at' => now()->toISOString(),
+                    'verification_pending' => true,
+                ]),
+            ]);
+
+            if ($lockedOrder->payment_status !== 'paid') {
+                $lockedOrder->update(['payment_status' => 'pending']);
+            }
+        });
+    }
+
+    /**
+     * Store only known scalar callback fields; raw provider payloads may contain
+     * values that should not be retained in order metadata.
+     */
+    protected function safeCallbackData(array $callbackData): array
+    {
+        $allowedKeys = [
+            'authority', 'Authority', 'transaction_id', 'transactionId',
+            'tracking_code', 'trackingCode', 'token', 'Token',
+            'reference_id', 'referenceId', 'invoice_id', 'invoiceId',
+            'order_number', 'orderNumber', 'merchant_order_id', 'merchantOrderId',
+            'status', 'Status', 'success', 'Success',
+        ];
+
+        return collect($callbackData)
+            ->only($allowedKeys)
+            ->filter(fn ($value) => is_scalar($value) || $value === null)
+            ->map(fn ($value) => is_string($value) ? mb_substr($value, 0, 255) : $value)
+            ->all();
     }
 
     /**
@@ -1349,26 +1470,14 @@ class PaymentService
         |--------------------------------------------------------------------------
         */
 
-        if (
-            array_key_exists(
-                'amount',
-                $result
-            )
-            && $result['amount'] !== null
-        ) {
-            $receivedAmount =
-                $this->normalizeAmount(
-                    $result['amount']
-                );
+        if (! array_key_exists('amount', $result) || $result['amount'] === null) {
+            throw new RuntimeException('Gateway verification response did not include a verified amount.');
+        }
 
-            if (
-                $expectedPaymentAmount !==
-                $receivedAmount
-            ) {
-                throw new RuntimeException(
-                    'Payment amount mismatch.'
-                );
-            }
+        $receivedAmount = $this->normalizeAmount($result['amount']);
+
+        if ($expectedPaymentAmount !== $receivedAmount) {
+            throw new RuntimeException('Payment amount mismatch.');
         }
 
         /*

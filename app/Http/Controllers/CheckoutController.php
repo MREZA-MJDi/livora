@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Checkout\PlaceOrderRequest;
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\Category;
 use App\Models\ProductVariant;
 use App\Models\Order;
 use App\Models\Product;
@@ -151,55 +152,104 @@ class CheckoutController extends Controller
                     throw new \RuntimeException('سبد خرید شما خالی است.');
                 }
 
-                // Lock catalogue rows in a stable product order to reduce deadlocks.
-                $lockedCart->setRelation(
-                    'items',
-                    $lockedCart->items
-                        ->sortBy(fn (CartItem $item) => sprintf('%020d:%020d', $item->product_id, $item->id))
-                        ->values()
-                );
+                // Lock catalogue rows once in a stable order. This avoids per-cart-item
+                // product/category/variant queries and keeps pricing and stock reads consistent.
+                $cartItems = $lockedCart->items
+                    ->sortBy(fn (CartItem $item) => sprintf('%020d:%020d', $item->product_id, $item->id))
+                    ->values();
+                $lockedCart->setRelation('items', $cartItems);
 
-                $subtotal = 0;
+                $productIds = $cartItems->pluck('product_id')->filter()->unique()->sort()->values();
 
-                foreach ($lockedCart->items as $item) {
-                    // Re-read and lock the catalogue row inside the order transaction.
-                    // A product/category may have been disabled since it entered the cart.
-                    $product = Product::query()
-                        ->whereKey($item->product_id)
-                        ->lockForUpdate()
-                        ->first();
+                $products = Product::query()
+                    ->whereIn('id', $productIds)
+                    ->orderBy('id')
+                    ->lockForUpdate()
+                    ->get()
+                    ->keyBy('id');
+
+                $categoryIds = $products->pluck('category_id')->filter()->unique()->values();
+                $activeCategoryIds = Category::query()
+                    ->whereIn('id', $categoryIds)
+                    ->where('is_active', true)
+                    ->pluck('id')
+                    ->map(fn ($id) => (int) $id)
+                    ->all();
+
+                $variantsByProduct = ProductVariant::query()
+                    ->whereIn('product_id', $productIds)
+                    ->orderBy('product_id')
+                    ->orderBy('id')
+                    ->lockForUpdate()
+                    ->get()
+                    ->groupBy('product_id');
+
+                $allVariantsById = $variantsByProduct->flatten(1)->keyBy('id');
+                $baseStockRequirements = [];
+                $variantStockRequirements = [];
+                $subtotalMinor = 0;
+
+                foreach ($cartItems as $item) {
+                    $product = $products->get($item->product_id);
 
                     if (
                         ! $product
                         || $product->status !== 'active'
-                        || ! $product->category()->where('is_active', true)->exists()
+                        || ! in_array((int) $product->category_id, $activeCategoryIds, true)
                     ) {
                         throw new \RuntimeException(
                             'یکی از محصولات سبد دیگر برای خرید فعال نیست؛ سبد را به‌روزرسانی کنید.'
                         );
                     }
 
+                    if ((int) $item->quantity < 1) {
+                        throw new \RuntimeException('تعداد یکی از محصولات سبد خرید معتبر نیست.');
+                    }
+
                     $item->setRelation('product', $product);
-                    $variants = $this->resolveCartItemVariants($item);
+
+                    $allProductVariants = $variantsByProduct->get($product->id, collect());
                     $selectedVariantIds = $item->selectedVariantIds();
+                    $selectedIdLookup = array_fill_keys($selectedVariantIds, true);
+
+                    $variants = $allProductVariants
+                        ->filter(fn (ProductVariant $variant) => $variant->is_active && isset($selectedIdLookup[(int) $variant->id]))
+                        ->sortBy('id')
+                        ->values();
+
+                    $allVariantTypes = $allProductVariants
+                        ->pluck('type')
+                        ->map(fn ($type) => (string) $type)
+                        ->unique()
+                        ->sort(SORT_STRING)
+                        ->values()
+                        ->all();
+
+                    $selectedTypes = $variants
+                        ->pluck('type')
+                        ->map(fn ($type) => (string) $type)
+                        ->unique()
+                        ->sort(SORT_STRING)
+                        ->values()
+                        ->all();
 
                     if (
                         count($selectedVariantIds) !== $variants->count()
-                        || $this->activeVariantTypes($product) !== $variants->pluck('type')->map(fn ($type) => (string) $type)->unique()->sort()->values()->all()
+                        || $allVariantTypes !== $selectedTypes
                     ) {
                         throw new \RuntimeException(
                             "گزینه‌های محصول «{$product->name}» تغییر کرده‌اند؛ لطفاً محصول را از صفحه‌اش دوباره انتخاب کنید."
                         );
                     }
 
-                    $stock = $variants->isNotEmpty()
-                        ? (int) $variants->min('stock')
-                        : (int) $product->stock;
-
-                    if ($stock < 1 || $item->quantity > $stock) {
-                        throw new \RuntimeException(
-                            "موجودی محصول «{$product->name}» کافی نیست."
-                        );
+                    if ($variants->isEmpty()) {
+                        $baseStockRequirements[$product->id] =
+                            ($baseStockRequirements[$product->id] ?? 0) + (int) $item->quantity;
+                    } else {
+                        foreach ($variants as $variant) {
+                            $variantStockRequirements[$variant->id] =
+                                ($variantStockRequirements[$variant->id] ?? 0) + (int) $item->quantity;
+                        }
                     }
 
                     $currentUnitPrice = max(
@@ -210,16 +260,38 @@ class CheckoutController extends Controller
                         )
                     );
 
-                    // Never silently charge a stale cart price. The customer must
-                    // revisit/update the item to acknowledge its new price first.
+                    // Do not silently charge a stale cart price.
                     if (round($currentUnitPrice, 2) !== round((float) $item->unit_price, 2)) {
                         throw new \RuntimeException(
                             "قیمت محصول «{$product->name}» تغییر کرده است؛ به سبد خرید برگردید و تعداد آن را دوباره تأیید کنید."
                         );
                     }
 
-                    $subtotal += $currentUnitPrice * (int) $item->quantity;
+                    $subtotalMinor += (int) round($currentUnitPrice * (int) $item->quantity * 100);
                 }
+
+                foreach ($baseStockRequirements as $productId => $requiredQuantity) {
+                    $product = $products->get($productId);
+
+                    if (! $product || (int) $product->stock < $requiredQuantity) {
+                        throw new \RuntimeException(
+                            'موجودی محصول «' . ($product?->name ?? 'نامشخص') . '» برای تعداد درخواستی کافی نیست.'
+                        );
+                    }
+                }
+
+                foreach ($variantStockRequirements as $variantId => $requiredQuantity) {
+                    $variant = $allVariantsById->get($variantId);
+
+                    if (! $variant || ! $variant->is_active || (int) $variant->stock < $requiredQuantity) {
+                        throw new \RuntimeException(
+                            'موجودی یکی از گزینه‌های انتخاب‌شده کافی نیست؛ سبد خرید را به‌روزرسانی کنید.'
+                        );
+                    }
+                }
+
+                // Accumulate in minor units to avoid float drift before persisting DECIMAL(15,2).
+                $subtotal = $subtotalMinor / 100;
 
                 $shippingCost = 0;
                 $discount = 0;
@@ -556,12 +628,19 @@ class CheckoutController extends Controller
                 );
 
             if (!($result['success'] ?? false)) {
+                $orderId = $result['order_id'] ?? null;
+
+                if (($result['data']['verification_pending'] ?? false) && $orderId) {
+                    return redirect()
+                        ->route('account.orders.show', $orderId)
+                        ->with('warning', 'وضعیت تراکنش هنوز از درگاه تأیید نشده است؛ تا استعلام نهایی دوباره پرداخت نکنید.');
+                }
+
                 return redirect()
                     ->route('home')
                     ->with(
                         'error',
-                        $result['message']
-                        ?? 'پرداخت انجام نشد.'
+                        $result['message'] ?? 'پرداخت انجام نشد.'
                     );
             }
 

@@ -8,6 +8,8 @@ use App\Http\Requests\Admin\Product\UpdateProductRequest;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Services\Seo\ContentSeoAnalyzer;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
@@ -33,13 +35,20 @@ class ProductController extends Controller
     /**
      * Show the form for creating a new product.
      */
-    public function create(): View
+    public function create(ContentSeoAnalyzer $seoAnalyzer): View
     {
-        $categories = Category::query()
-            ->orderBy('name')
-            ->get();
+        $categories = Category::query()->orderBy('name')->get();
+        $product = new Product();
+        $product->setRelation('images', collect());
+        $seoAnalysis = $seoAnalyzer->analyze($product);
 
-        return view('admin.products.create', compact('categories'));
+        return view('admin.products.create', [
+            'categories' => $categories,
+            'product' => $product,
+            'seoAnalysis' => $seoAnalysis,
+            'availableRelatedProducts' => Product::query()->active()->orderBy('name')->limit(200)->get(['id', 'name']),
+            'selectedRelatedProductIds' => [],
+        ]);
     }
 
     /**
@@ -48,12 +57,19 @@ class ProductController extends Controller
     public function store(StoreProductRequest $request): RedirectResponse
     {
         $data = $request->validated();
+        $relatedProductIds = $data['related_product_ids'] ?? [];
+        unset($data['related_product_ids']);
 
         $uploadedImage = $request->file('image');
         $uploadedBanner = $request->file('banner_image');
         unset($data['image'], $data['banner_image']);
 
-        $product = Product::create($data);
+        $product = DB::transaction(function () use ($data, $relatedProductIds): Product {
+            $product = Product::create($data);
+            $product->relatedProducts()->sync(array_values(array_diff($relatedProductIds, [$product->id])));
+
+            return $product;
+        });
 
         if ($uploadedBanner) {
             $bannerPath = $uploadedBanner->store('products/banners', 'public');
@@ -105,18 +121,20 @@ class ProductController extends Controller
     /**
      * Show the form for editing the specified product.
      */
-    public function edit(Product $product): View
+    public function edit(Product $product, ContentSeoAnalyzer $seoAnalyzer): View
     {
-        $product->load('images');
+        $product->load(['images', 'relatedProducts:id,name']);
 
-        $categories = Category::query()
-            ->orderBy('name')
-            ->get();
+        $categories = Category::query()->orderBy('name')->get();
+        $seoAnalysis = $seoAnalyzer->analyze($product);
 
-        return view(
-            'admin.products.edit',
-            compact('product', 'categories')
-        );
+        return view('admin.products.edit', [
+            'product' => $product,
+            'categories' => $categories,
+            'seoAnalysis' => $seoAnalysis,
+            'availableRelatedProducts' => Product::query()->active()->where('id', '!=', $product->id)->orderBy('name')->limit(200)->get(['id', 'name']),
+            'selectedRelatedProductIds' => $product->relatedProducts->pluck('id')->map(fn ($id) => (int) $id)->all(),
+        ]);
     }
 
     /**
@@ -127,12 +145,17 @@ class ProductController extends Controller
         Product $product
     ): RedirectResponse {
         $data = $request->validated();
+        $relatedProductIds = $data['related_product_ids'] ?? [];
+        unset($data['related_product_ids']);
 
         $uploadedImage = $request->file('image');
         $uploadedBanner = $request->file('banner_image');
         unset($data['image'], $data['banner_image']);
 
-        $product->update($data);
+        DB::transaction(function () use ($product, $data, $relatedProductIds): void {
+            $product->update($data);
+            $product->relatedProducts()->sync(array_values(array_diff($relatedProductIds, [$product->id])));
+        });
 
         if ($uploadedBanner) {
             $oldBannerPath = $product->banner_image;
