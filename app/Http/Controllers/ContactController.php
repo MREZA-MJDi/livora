@@ -12,11 +12,10 @@ class ContactController extends Controller
 {
     public function index(): View
     {
-        $contactSetting = ContactSetting::query()
-            ->where('is_active', true)
-            ->first();
+        $storedSettings = ContactSetting::query()->first();
+        $contactSetting = $storedSettings?->is_active ? $storedSettings : null;
 
-        $faqs = collect($contactSetting?->faqs ?? [])
+        $faqs = collect($storedSettings?->faqs ?? [])
             ->filter(fn ($faq): bool => is_array($faq)
                 && filled($faq['question'] ?? null)
                 && filled($faq['answer'] ?? null))
@@ -25,7 +24,7 @@ class ContactController extends Controller
         return view('contact.index', [
             'contactSetting' => $contactSetting,
             'faqs' => $faqs,
-            'pageContent' => $contactSetting?->page_content ?? [],
+            'pageContent' => $storedSettings?->page_content ?? [],
         ]);
     }
 
