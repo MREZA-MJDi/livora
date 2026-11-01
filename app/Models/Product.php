@@ -31,6 +31,7 @@ class Product extends Model
         'canonical_url',
         'og_image',
         'banner_image',
+        'banner_image_alt',
         'seo_index',
         'seo_follow',
 
