@@ -41,6 +41,41 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
         $this->assertDatabaseCount('order_installments', 0);
     }
 
+    public function test_admin_can_upload_a_product_banner_from_the_product_crud(): void
+    {
+        Storage::fake('public');
+        $admin = $this->user('admin', 'product-banner-upload-admin@example.test');
+        $category = Category::query()->create([
+            'name' => 'نشیمن',
+            'slug' => 'product-banner-upload-category',
+            'description' => null,
+            'is_active' => true,
+            'sort_order' => 1,
+        ]);
+
+        $this->actingAs($admin)
+            ->post(route('admin.products.store'), [
+                'category_id' => $category->id,
+                'name' => 'مبل با بنر',
+                'slug' => 'sofa-with-banner',
+                'sku' => 'SG-SOFA-BANNER-001',
+                'short_description' => 'مبل نمونه',
+                'description' => 'توضیح محصول نمونه',
+                'price' => '48500000',
+                'stock' => 3,
+                'status' => 'active',
+                'banner_image' => UploadedFile::fake()->image('sofa-banner.jpg', 1200, 500),
+                'banner_image_alt' => 'بنر اختصاصی معرفی مبل',
+            ])
+            ->assertRedirect(route('admin.products.index'));
+
+        $product = Product::query()->where('slug', 'sofa-with-banner')->firstOrFail();
+
+        $this->assertNotEmpty($product->banner_image);
+        $this->assertSame('بنر اختصاصی معرفی مبل', $product->banner_image_alt);
+        Storage::disk('public')->assertExists($product->banner_image);
+    }
+
     public function test_product_page_displays_dashboard_managed_banner_with_its_alt_text(): void
     {
         Storage::fake('public');
