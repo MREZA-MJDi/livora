@@ -50,9 +50,23 @@ class ProductController extends Controller
         $data = $request->validated();
 
         $uploadedImage = $request->file('image');
-        unset($data['image']);
+        $uploadedBanner = $request->file('banner_image');
+        unset($data['image'], $data['banner_image']);
 
         $product = Product::create($data);
+
+        if ($uploadedBanner) {
+            $bannerPath = $uploadedBanner->store('products/banners', 'public');
+
+            if (! $bannerPath) {
+                throw new \\RuntimeException('Product banner could not be stored.');
+            }
+
+            $product->update([
+                'banner_image' => $bannerPath,
+                'banner_image_alt' => $data['banner_image_alt'] ?? $product->name,
+            ]);
+        }
 
         if ($uploadedImage) {
             $path = $uploadedImage->store(
@@ -115,9 +129,34 @@ class ProductController extends Controller
         $data = $request->validated();
 
         $uploadedImage = $request->file('image');
-        unset($data['image']);
+        $uploadedBanner = $request->file('banner_image');
+        unset($data['image'], $data['banner_image']);
 
         $product->update($data);
+
+        if ($uploadedBanner) {
+            $oldBannerPath = $product->banner_image;
+            $newBannerPath = $uploadedBanner->store('products/banners', 'public');
+
+            if (! $newBannerPath) {
+                throw new \\RuntimeException('Product banner could not be stored.');
+            }
+
+            $product->update([
+                'banner_image' => $newBannerPath,
+                'banner_image_alt' => $data['banner_image_alt'] ?? $product->name,
+            ]);
+
+            if (
+                $oldBannerPath
+                && ! str_starts_with($oldBannerPath, 'http://')
+                && ! str_starts_with($oldBannerPath, 'https://')
+                && ! str_starts_with($oldBannerPath, '//')
+                && $oldBannerPath !== $newBannerPath
+            ) {
+                Storage::disk('public')->delete($oldBannerPath);
+            }
+        }
 
         if ($uploadedImage) {
             $primaryImage =
