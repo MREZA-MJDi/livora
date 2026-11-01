@@ -162,6 +162,21 @@
         'brand' => ['@type' => 'Brand', 'name' => 'SillaGallery'],
     ];
 
+    $productProperties = collect($product->key_features ?? [])
+        ->merge($product->specifications ?? [])
+        ->filter(fn ($item) => filled($item['label'] ?? null) && filled($item['value'] ?? null))
+        ->map(fn ($item) => [
+            '@type' => 'PropertyValue',
+            'name' => (string) $item['label'],
+            'value' => (string) $item['value'],
+        ])
+        ->values()
+        ->all();
+
+    if ($productProperties !== []) {
+        $productStructuredData['additionalProperty'] = $productProperties;
+    }
+
     // Storefront prices are Toman; Schema.org IRR values are Rial.
     // Variant prices are dynamic, so avoid publishing a misleading single offer.
     if ($product->variants->isEmpty()) {
@@ -837,6 +852,29 @@
                                 </div>
                             </section>
                         @endif
+                    </div>
+                </x-layout.container>
+            </section>
+        @endif
+
+        @if(!empty($product->key_features))
+            <section class="border-t border-[var(--sg-border)] bg-[var(--sg-surface)]">
+                <x-layout.container>
+                    <div class="py-12 sm:py-16">
+                        <div class="max-w-3xl">
+                            <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">KEY FEATURES</p>
+                            <h2 class="mt-3 text-2xl font-semibold">ویژگی‌های کلیدی {{ $product->name }}</h2>
+                        </div>
+                        <ul class="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                            @foreach($product->key_features as $feature)
+                                @if(filled($feature['label'] ?? null) && filled($feature['value'] ?? null))
+                                    <li class="rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
+                                        <strong class="block text-sm">{{ $feature['label'] }}</strong>
+                                        <span class="mt-2 block text-sm leading-7 text-[var(--sg-stone)]">{{ $feature['value'] }}</span>
+                                    </li>
+                                @endif
+                            @endforeach
+                        </ul>
                     </div>
                 </x-layout.container>
             </section>
