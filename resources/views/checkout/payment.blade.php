@@ -1,7 +1,5 @@
 @extends('layouts.app')
 
-@php($preview = (bool) ($preview ?? false))
-
 @section(
     'title',
     ($preview ? 'پیش‌نمایش روش پرداخت | ' : 'انتخاب روش پرداخت | ') . $order->order_number . ' | SillaGallery'
@@ -27,127 +25,8 @@
 @endpush
 
 
-@php
-
-    /*
-    |--------------------------------------------------------------------------
-    | Gateway Configuration
-    |--------------------------------------------------------------------------
-    */
-
-    $gatewayPaymentsAllowed = ! app()->isProduction() || (bool) config('payment.production_ready', false);
-
-    $gateways = [
-        [
-            'key' => 'digipay',
-            'name' => 'DigiPay',
-            'fa_name' => 'دیجی‌پی',
-            'description' => 'پرداخت از طریق درگاه دیجی‌پی',
-            'enabled' => $gatewayPaymentsAllowed && (bool) config('payment.digipay.enabled', false),
-            'badge' => 'DIGIPAY',
-        ],
-
-        [
-            'key' => 'snappay',
-            'name' => 'SnappPay',
-            'fa_name' => 'اسنپ‌پی',
-            'description' => 'پرداخت از طریق درگاه اسنپ‌پی',
-            'enabled' => $gatewayPaymentsAllowed && (bool) config('payment.snappay.enabled', false),
-            'badge' => 'SNAPPAY',
-        ],
-
-        [
-            'key' => 'torobpay',
-            'name' => 'TorobPay',
-            'fa_name' => 'ترب‌پی',
-            'description' => 'پرداخت از طریق درگاه ترب‌پی',
-            'enabled' => $gatewayPaymentsAllowed && (bool) config('payment.torobpay.enabled', false),
-            'badge' => 'TOROBPAY',
-        ],
-    ];
-
-    $enabledGateways = collect($gateways)
-        ->where('enabled', true)
-        ->values();
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Order Totals
-    |--------------------------------------------------------------------------
-    */
-
-    $orderTotal = (float) $order->total;
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Existing Installment Plan
-    |--------------------------------------------------------------------------
-    */
-
-    $hasInstallmentPlan =
-        (bool) $order->installment_enabled
-        && $order->installments
-            ->isNotEmpty();
-
-    $cashInstallment =
-        $order->installments
-            ->firstWhere('type', 'cash');
-
-    $chequeInstallments =
-        $order->installments
-            ->where('type', 'cheque')
-            ->values();
-
-    $cashPercent =
-        (int) (
-            $order->installment_cash_percent
-            ?? 0
-        );
-
-    $cashAmount =
-        $cashInstallment
-            ? (float) $cashInstallment->amount
-            : null;
-
-    $deferredAmount =
-        (float) (
-            $order->installment_deferred_amount
-            ?? 0
-        );
-
-    $chequeCount =
-        $chequeInstallments->count();
-
-    $intervalMonths =
-        (int) (
-            $order->installment_interval_months
-            ?? 0
-        );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Payment Status
-    |--------------------------------------------------------------------------
-    */
-
-    $isPaid =
-        $order->payment_status === 'paid';
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Current Payment
-    |--------------------------------------------------------------------------
-    */
-
-    $latestPayment =
-        $order->latestPayment;
-
-
-@endphp
 
 @section('content')
 
