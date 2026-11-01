@@ -10,13 +10,14 @@ return new class extends Migration
     {
         Schema::table('products', function (Blueprint $table): void {
             $table->string('banner_image')->nullable()->after('og_image');
+            $table->string('banner_image_alt')->nullable()->after('banner_image');
         });
     }
 
     public function down(): void
     {
         Schema::table('products', function (Blueprint $table): void {
-            $table->dropColumn('banner_image');
+            $table->dropColumn(['banner_image', 'banner_image_alt']);
         });
     }
 };
