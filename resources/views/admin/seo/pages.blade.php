@@ -13,7 +13,7 @@
 
     <div class="admin-card p-5">
         <strong class="text-sm">قفل ایمنی سراسری</strong>
-        <p class="mt-2 text-xs leading-7 text-[var(--admin-muted)]">حتی با روشن‌کردن ایندکس یک صفحه، تا وقتی اجازه ایندکس سراسری در تنظیمات اصلی SEO فعال نشده باشد، تمام صفحات عمومی noindex, nofollow باقی می‌مانند.</p>
+        <p class="mt-2 text-xs leading-7 text-[var(--admin-muted)]">حتی با روشن‌کردن مجوزهای یک صفحه، تا وقتی هر دو کلید سراسری Index و Follow در تنظیمات اصلی SEO فعال نشده باشند، تمام صفحات عمومی noindex, nofollow باقی می‌مانند.</p>
         <a class="mt-3 inline-flex text-xs font-semibold text-[var(--admin-accent)]" href="{{ route('admin.seo.edit') }}">رفتن به تنظیمات اصلی SEO ←</a>
     </div>
 

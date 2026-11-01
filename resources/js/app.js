@@ -91,8 +91,9 @@ window.richTextEditor = (uploadUrl) => ({
         const explicit = Number(input.dataset.cropRatio);
         if (Number.isFinite(explicit) && explicit > 0) return explicit;
         const key = ((input.name || '') + ' ' + (input.id || '') + ' ' + (input.closest('form')?.action || '')).toLowerCase();
-        if (/category/.test(key)) return 1;
-        if (/featured|blog|og_image|banner|hero|editor|pages/.test(key)) return 16 / 9;
+        if (/category|logo|avatar|profile/.test(key)) return 1;
+        if (/og_image/.test(key)) return 1200 / 630;
+        if (/featured|blog|banner|hero|editor|pages/.test(key)) return 16 / 9;
         return 4 / 3;
     };
     const makeDialog = () => {

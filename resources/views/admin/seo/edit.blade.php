@@ -13,7 +13,7 @@
 
     <div class="admin-card border border-amber-300/60 p-5">
         <p class="text-sm font-semibold">حالت محافظتی فعال</p>
-        <p class="mt-2 text-xs leading-7 text-[var(--admin-muted)]">تا زمان تأیید همکار SEO، هر دو گزینه زیر خاموش بمانند. خاموش بودن هر گزینه به‌ترتیب تمام سایت را noindex یا nofollow نگه می‌دارد؛ تنظیمات اختصاصی هر صفحه به‌تنهایی این قفل را باز نمی‌کند.</p>
+        <p class="mt-2 text-xs leading-7 text-[var(--admin-muted)]">تا زمان تأیید همکار SEO، هر دو گزینه زیر خاموش بمانند. فقط وقتی هر دو گزینه سراسری روشن باشند و مجوزهای اختصاصی صفحه هم فعال باشند، صفحه قابلیت ایندکس و دنبال‌کردن لینک‌ها را خواهد داشت؛ تنظیمات یک صفحه به‌تنهایی این قفل را باز نمی‌کند.</p>
         <p class="mt-3 font-mono text-xs" dir="ltr">Current: {{ $settings->robots() }}</p>
     </div>
 
@@ -31,14 +31,14 @@
             <div><label class="admin-label" for="site_name">نام برند</label><input id="site_name" name="site_name" class="admin-input" maxlength="255" required readonly value="SillaGallery"><p class="admin-help">نام برند عمومی قفل شده است؛ SillaGallery فقط نام فنی مخزن است.</p></div>
             <div><label class="admin-label" for="default_title">عنوان پیش‌فرض</label><input id="default_title" name="default_title" class="admin-input" maxlength="255" value="{{ old('default_title', $settings->default_title) }}"></div>
             <div><label class="admin-label" for="default_description">توضیحات پیش‌فرض</label><textarea id="default_description" name="default_description" rows="3" maxlength="1000" class="admin-textarea">{{ old('default_description', $settings->default_description) }}</textarea></div>
-            <div><label class="admin-label" for="default_og_image">تصویر پیش‌فرض اشتراک‌گذاری</label><input id="default_og_image" name="default_og_image" type="file" accept="image/jpeg,image/png,image/webp" class="admin-input p-2"><p class="admin-help">تصویر مربعی یا افقی با کیفیت مناسب؛ JPG، PNG یا WEBP تا ۱۰ مگابایت.</p>@if($settings->default_og_image_url)<img src="{{ $settings->default_og_image_url }}" alt="تصویر اشتراک‌گذاری پیش‌فرض" class="mt-3 aspect-[1200/630] max-h-48 rounded-xl object-cover">@endif</div>
+            <div><label class="admin-label" for="default_og_image">تصویر پیش‌فرض اشتراک‌گذاری</label><input id="default_og_image" name="default_og_image" type="file" accept="image/jpeg,image/png,image/webp" data-crop-ratio="1.9047619" class="admin-input p-2"><p class="admin-help">تصویر مربعی یا افقی با کیفیت مناسب؛ JPG، PNG یا WEBP تا ۱۰ مگابایت.</p>@if($settings->default_og_image_url)<img src="{{ $settings->default_og_image_url }}" alt="تصویر اشتراک‌گذاری پیش‌فرض" class="mt-3 aspect-[1200/630] max-h-48 rounded-xl object-cover">@endif</div>
         </section>
 
         <section class="admin-card space-y-5 p-6">
             <h2 class="text-base font-bold">اطلاعات سازمان و شبکه‌های اجتماعی</h2>
             <div><label class="admin-label" for="organization_name">نام سازمان</label><input id="organization_name" name="organization_name" class="admin-input" value="{{ old('organization_name', $settings->organization_name ?: 'SillaGallery') }}"></div>
             <div><label class="admin-label" for="organization_description">معرفی کوتاه سازمان</label><textarea id="organization_description" name="organization_description" rows="3" class="admin-textarea">{{ old('organization_description', $settings->organization_description) }}</textarea></div>
-            <div><label class="admin-label" for="organization_logo">لوگوی سازمان</label><input id="organization_logo" name="organization_logo" type="file" accept="image/jpeg,image/png,image/webp" class="admin-input p-2">@if($settings->organization_logo_url)<img src="{{ $settings->organization_logo_url }}" alt="لوگوی SillaGallery" class="mt-3 h-20 w-20 rounded-xl object-contain">@endif</div>
+            <div><label class="admin-label" for="organization_logo">لوگوی سازمان</label><input id="organization_logo" name="organization_logo" type="file" accept="image/jpeg,image/png,image/webp" data-crop-ratio="1" class="admin-input p-2">@if($settings->organization_logo_url)<img src="{{ $settings->organization_logo_url }}" alt="لوگوی SillaGallery" class="mt-3 h-20 w-20 rounded-xl object-contain">@endif</div>
             <div class="grid gap-4 sm:grid-cols-2"><div><label class="admin-label">ایمیل</label><input type="email" name="contact_email" class="admin-input" value="{{ old('contact_email', $settings->contact_email) }}"></div><div><label class="admin-label">تلفن</label><input name="contact_phone" class="admin-input" value="{{ old('contact_phone', $settings->contact_phone) }}"></div></div>
             <div><label class="admin-label">شناسه X / Twitter</label><input name="twitter_handle" class="admin-input" dir="ltr" value="{{ old('twitter_handle', $settings->twitter_handle) }}" placeholder="@SillaGallery"></div>
             <div class="grid gap-4 sm:grid-cols-2">
