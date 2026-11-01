@@ -74,6 +74,48 @@
             </div>
         </section>
 
+        @php
+            $copyFields = [
+                'hero_kicker' => ['label' => 'بالای تیتر اصلی', 'type' => 'text', 'default' => 'GET IN TOUCH'],
+                'hero_title' => ['label' => 'تیتر اصلی', 'type' => 'text', 'default' => 'برای انتخاب بهتر،'],
+                'hero_highlight' => ['label' => 'بخش تأکیدی تیتر', 'type' => 'text', 'default' => 'کنار شما هستیم.'],
+                'hero_description' => ['label' => 'توضیح ابتدای صفحه', 'type' => 'textarea', 'default' => 'برای مشاوره خرید، پیگیری سفارش و دریافت اطلاعات بیشتر با ما در ارتباط باشید.'],
+                'hero_cta' => ['label' => 'متن دکمه ابتدای صفحه', 'type' => 'text', 'default' => 'ارسال پیام'],
+                'info_kicker' => ['label' => 'برچسب بخش اطلاعات', 'type' => 'text', 'default' => "LET'S TALK"],
+                'info_title' => ['label' => 'تیتر بخش اطلاعات', 'type' => 'text', 'default' => 'چه کمکی از دست ما برمی‌آید؟'],
+                'info_description' => ['label' => 'توضیح بخش اطلاعات', 'type' => 'textarea', 'default' => 'برای پرسش درباره محصول، موجودی، قیمت، ارسال یا سفارش خود پیام بگذارید.'],
+                'installment_note' => ['label' => 'توضیح شرایط اقساط', 'type' => 'textarea', 'default' => 'برای اطلاع از شرایط اقساط هر محصول، صفحه همان محصول را بررسی کنید یا از طریق فرم با ما تماس بگیرید.'],
+                'form_kicker' => ['label' => 'برچسب فرم', 'type' => 'text', 'default' => 'CONTACT FORM'],
+                'form_title' => ['label' => 'تیتر فرم', 'type' => 'text', 'default' => 'پیام خود را ارسال کنید'],
+                'form_description' => ['label' => 'توضیح فرم', 'type' => 'textarea', 'default' => 'اطلاعات تماس خود را وارد کنید تا بتوانیم پاسخ دقیق‌تری ارائه دهیم.'],
+                'faq_kicker' => ['label' => 'برچسب FAQ', 'type' => 'text', 'default' => 'FAQ'],
+                'faq_title' => ['label' => 'تیتر FAQ', 'type' => 'text', 'default' => 'پرسش‌های متداول'],
+                'faq_description' => ['label' => 'توضیح FAQ', 'type' => 'textarea', 'default' => 'پاسخ چند سؤال رایج درباره ارتباط با فروشگاه و خرید.'],
+                'final_kicker' => ['label' => 'برچسب فراخوان پایانی', 'type' => 'text', 'default' => 'SillaGallery'],
+                'final_title' => ['label' => 'تیتر فراخوان پایانی', 'type' => 'text', 'default' => 'آماده‌ای انتخابت را پیدا کنی؟'],
+                'final_description' => ['label' => 'توضیح فراخوان پایانی', 'type' => 'textarea', 'default' => 'مجموعه محصولات را ببین و انتخاب بعدی‌ات را پیدا کن.'],
+                'final_cta' => ['label' => 'متن دکمه پایانی', 'type' => 'text', 'default' => 'ورود به فروشگاه'],
+                'success_message' => ['label' => 'پیام موفقیت ارسال فرم', 'type' => 'textarea', 'default' => 'پیام شما با موفقیت ارسال شد.'],
+            ];
+        @endphp
+        <section class="admin-card space-y-5 p-6">
+            <h2 class="text-base font-bold">متن‌ها و بخش‌های صفحه تماس</h2>
+            <p class="admin-help">تیترها، توضیحات، دکمه‌ها و پیام موفقیت از این بخش کنترل می‌شوند. ساختار و چیدمان صفحه ثابت می‌ماند.</p>
+            <div class="grid gap-4 sm:grid-cols-2">
+                @foreach($copyFields as $field => $config)
+                    <div class="{{ $config['type'] === 'textarea' ? 'sm:col-span-2' : '' }}">
+                        <label class="admin-label" for="page-content-{{ $field }}">{{ $config['label'] }}</label>
+                        @if($config['type'] === 'textarea')
+                            <textarea id="page-content-{{ $field }}" name="page_content[{{ $field }}]" rows="3" maxlength="1000" class="admin-textarea">{{ old("page_content.{$field}", $settings->page_content[$field] ?? $config['default']) }}</textarea>
+                        @else
+                            <input id="page-content-{{ $field }}" name="page_content[{{ $field }}]" maxlength="255" class="admin-input" value="{{ old("page_content.{$field}", $settings->page_content[$field] ?? $config['default']) }}">
+                        @endif
+                        @error("page_content.{$field}")<p class="admin-error">{{ $message }}</p>@enderror
+                    </div>
+                @endforeach
+            </div>
+        </section>
+
         <section class="admin-card space-y-5 p-6" x-data="{
             items: @js(old('faqs', $settings->faqs ?? [])),
             add() { this.items.push({ question: '', answer: '' }); },
