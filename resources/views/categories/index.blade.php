@@ -76,7 +76,7 @@
 
                     <div class="py-10 sm:py-14 lg:py-16">
 
-                        <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                        <div class="sg-category-grid sg-category-grid--index grid gap-5">
 
                             @foreach($categories as $category)
 
