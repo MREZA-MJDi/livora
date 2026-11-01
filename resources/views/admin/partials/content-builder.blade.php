@@ -1,5 +1,6 @@
 @props([
     'sections' => [],
+    'keyFeatures' => [],
     'specifications' => [],
     'careGuide' => '',
     'comparisonRows' => [],
@@ -8,6 +9,7 @@
     'availableRelatedProducts' => collect(),
     'selectedRelatedCategoryIds' => [],
     'selectedRelatedProductIds' => [],
+    'includeKeyFeatures' => false,
     'includeSpecifications' => false,
     'includeCareGuide' => false,
     'includeComparison' => false,
@@ -17,6 +19,7 @@
 
 @php
     $sections = old('content_sections', $sections);
+    $keyFeatures = old('key_features', $keyFeatures);
     $specifications = old('specifications', $specifications);
     $careGuide = old('care_guide', $careGuide);
     $comparisonRows = old('comparison_rows', $comparisonRows);
@@ -55,6 +58,22 @@
         @error('content_sections.*.heading')<p class="admin-error">{{ $message }}</p>@enderror
         @error('content_sections.*.body')<p class="admin-error">{{ $message }}</p>@enderror
     </section>
+
+    @if($includeKeyFeatures)
+        <section x-data="{ rows: @js(array_values(is_array($keyFeatures) ? $keyFeatures : [])), add() { this.rows.push({label: '', value: ''}) }, remove(index) { this.rows.splice(index, 1) } }" class="space-y-4 border-t border-[var(--admin-border)] pt-6">
+            <div class="flex flex-wrap items-center justify-between gap-3"><div><h3 class="text-sm font-bold">ویژگی‌های کلیدی</h3><p class="admin-help">نکات کوتاه و مهم محصول؛ مانند طراحی، نوع استفاده یا مزیت اصلی.</p></div><button type="button" @click="add()" class="admin-btn admin-btn-secondary">افزودن ویژگی</button></div>
+            <template x-for="(row, index) in rows" :key="index">
+                <div class="grid gap-3 rounded-2xl border border-[var(--admin-border)] p-4 sm:grid-cols-[1fr_2fr_auto]">
+                    <input class="admin-input" maxlength="100" :name="'key_features[' + index + '][label]'" x-model="row.label" placeholder="ویژگی">
+                    <input class="admin-input" maxlength="300" :name="'key_features[' + index + '][value]'" x-model="row.value" placeholder="توضیح کوتاه">
+                    <button type="button" @click="remove(index)" class="text-xs text-[var(--admin-danger)]">حذف</button>
+                </div>
+            </template>
+            @error('key_features')<p class="admin-error">{{ $message }}</p>@enderror
+            @error('key_features.*.label')<p class="admin-error">{{ $message }}</p>@enderror
+            @error('key_features.*.value')<p class="admin-error">{{ $message }}</p>@enderror
+        </section>
+    @endif
 
     @if($includeSpecifications)
         <section x-data="{ rows: @js(array_values(is_array($specifications) ? $specifications : [])), add() { this.rows.push({label: '', value: ''}) }, remove(index) { this.rows.splice(index, 1) } }" class="space-y-4 border-t border-[var(--admin-border)] pt-6">
