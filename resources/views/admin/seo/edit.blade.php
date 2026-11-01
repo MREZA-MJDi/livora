@@ -56,6 +56,7 @@
         </section>
 
         <div class="flex flex-wrap items-center justify-between gap-3">
+            <a href="{{ route('admin.seo.audit') }}" class="admin-btn admin-btn-secondary">ممیزی فنی و پوشش SEO</a>
             <a href="{{ route('admin.seo.pages') }}" class="admin-btn admin-btn-secondary">تنظیم SEO صفحات ثابت</a>
             <a href="{{ route('sitemap') }}" target="_blank" rel="noopener" class="admin-btn admin-btn-secondary">مشاهده Sitemap</a>
             <button type="submit" class="admin-btn admin-btn-primary">ذخیره تنظیمات SEO</button>
