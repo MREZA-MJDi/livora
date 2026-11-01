@@ -25,6 +25,7 @@ class ContactController extends Controller
         return view('contact.index', [
             'contactSetting' => $contactSetting,
             'faqs' => $faqs,
+            'pageContent' => $contactSetting?->page_content ?? [],
         ]);
     }
 
