@@ -52,10 +52,10 @@ class ContactMessageController extends Controller
         }
 
         $reply = trim($validated['admin_reply']);
-        $body = "سلام {$contactMessage->name} عزیز،\\n\\n"
-            . "در پاسخ به پیام شما در SillaGallery:\\n\\n"
+        $body = "سلام {$contactMessage->name} عزیز،\n\n"
+            . "در پاسخ به پیام شما در SillaGallery:\n\n"
             . $reply
-            . "\\n\\nبا احترام،\\nتیم پشتیبانی SillaGallery";
+            . "\n\nبا احترام،\nتیم پشتیبانی SillaGallery";
 
         try {
             Mail::raw($body, function ($message) use ($contactMessage): void {
