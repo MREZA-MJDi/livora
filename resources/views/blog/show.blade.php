@@ -9,6 +9,30 @@
 @section('og_image', $post->og_image_url)
 @section('og_type', 'article')
 
+@push('seo')
+@php
+    $articleSchema = [
+        '@context' => 'https://schema.org',
+        '@type' => 'BlogPosting',
+        'headline' => $post->meta_title ?: $post->title,
+        'description' => $post->meta_description ?: ($post->excerpt ?: \Illuminate\Support\Str::limit(strip_tags($post->body), 300)),
+        'mainEntityOfPage' => route('blog.show', $post->slug),
+        'datePublished' => $post->published_at?->toAtomString(),
+        'dateModified' => $post->updated_at?->toAtomString(),
+        'author' => $post->author
+            ? ['@type' => 'Person', 'name' => $post->author->name]
+            : ['@type' => 'Organization', 'name' => 'SillaGallery'],
+        'publisher' => ['@type' => 'Organization', 'name' => 'SillaGallery'],
+        'articleSection' => $post->category,
+        'keywords' => $post->tags->pluck('name')->values()->all(),
+    ];
+    if ($post->featured_image_url) {
+        $articleSchema['image'] = [$post->featured_image_url];
+    }
+@endphp
+<script type="application/ld+json">{!! json_encode($articleSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) !!}</script>
+@endpush
+
 @section('content')
 <article class="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
     <a href="{{ route('blog.index') }}" class="text-sm text-[var(--sg-accent)]">← بازگشت به مجله</a>
