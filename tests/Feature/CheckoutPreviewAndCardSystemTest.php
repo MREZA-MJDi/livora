@@ -41,6 +41,73 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
         $this->assertDatabaseCount('order_installments', 0);
     }
 
+    public function test_product_page_displays_dashboard_managed_banner_with_its_alt_text(): void
+    {
+        Storage::fake('public');
+        Storage::disk('public')->put('products/banners/sofa-banner.webp', 'fake-banner');
+
+        $category = Category::query()->create([
+            'name' => 'مبلمان',
+            'slug' => 'banner-test-category',
+            'description' => 'دسته تست',
+            'is_active' => true,
+            'sort_order' => 1,
+        ]);
+
+        $product = Product::query()->create([
+            'category_id' => $category->id,
+            'name' => 'مبل تست بنردار',
+            'slug' => 'product-with-page-banner',
+            'sku' => 'SG-BANNER-001',
+            'short_description' => 'توضیح کوتاه محصول',
+            'description' => 'توضیح کامل محصول',
+            'price' => 48500000,
+            'stock' => 3,
+            'status' => 'active',
+            'is_featured' => false,
+            'is_new' => false,
+            'installment_enabled' => false,
+            'banner_image' => 'products/banners/sofa-banner.webp',
+            'banner_image_alt' => 'بنر معرفی مبل تست',
+        ]);
+
+        $this->get(route('product.show', $product->slug))
+            ->assertOk()
+            ->assertSee(Storage::disk('public')->url('products/banners/sofa-banner.webp'), false)
+            ->assertSee('بنر معرفی مبل تست')
+            ->assertSee('aspect-[12/5]', false);
+    }
+
+    public function test_product_admin_form_exposes_matching_primary_crop_and_page_banner_uploads(): void
+    {
+        $admin = $this->user('admin', 'product-banner-admin@example.test');
+        $category = Category::query()->create([
+            'name' => 'دکوراسیون',
+            'slug' => 'product-banner-admin-category',
+            'description' => null,
+            'is_active' => true,
+            'sort_order' => 1,
+        ]);
+        $product = Product::query()->create([
+            'category_id' => $category->id,
+            'name' => 'محصول بنر',
+            'slug' => 'product-banner-admin-form',
+            'sku' => 'SG-BANNER-ADMIN-001',
+            'price' => 1000000,
+            'stock' => 1,
+            'status' => 'active',
+            'installment_enabled' => false,
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.products.edit', $product))
+            ->assertOk()
+            ->assertSee('data-crop-ratio="0.8"', false)
+            ->assertSee('data-crop-ratio="2.4"', false)
+            ->assertSee('بنر بالای صفحه محصول')
+            ->assertSee('banner_image_alt');
+    }
+
     public function test_customers_cannot_open_the_admin_checkout_preview(): void
     {
         $customer = $this->user('customer', 'checkout-preview-customer@example.test');
