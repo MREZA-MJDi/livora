@@ -3,6 +3,7 @@
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Admin\ContactMessageController;
 use App\Http\Controllers\Admin\ContactSettingController;
+use App\Http\Controllers\Admin\CheckoutPreviewController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\SeoController as AdminSeoController;
 use App\Http\Controllers\Admin\BlogPostController as AdminBlogPostController;
@@ -381,6 +382,11 @@ Route::middleware(['auth', 'admin'])
             '/',
             [AdminDashboardController::class, 'index']
         )->name('dashboard');
+
+        Route::get(
+            '/checkout-preview',
+            [CheckoutPreviewController::class, 'show']
+        )->name('checkout.preview');
 
 
         /*
