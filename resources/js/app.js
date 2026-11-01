@@ -92,7 +92,7 @@ window.richTextEditor = (uploadUrl) => ({
         if (Number.isFinite(explicit) && explicit > 0) return explicit;
         const key = ((input.name || '') + ' ' + (input.id || '') + ' ' + (input.closest('form')?.action || '')).toLowerCase();
         if (/category/.test(key)) return 1;
-        if (/featured|blog|og_image|banner|hero|editor/.test(key)) return 16 / 9;
+        if (/featured|blog|og_image|banner|hero|editor|pages/.test(key)) return 16 / 9;
         return 4 / 3;
     };
     const makeDialog = () => {
@@ -190,7 +190,7 @@ window.richTextEditor = (uploadUrl) => ({
         preview.className = 'sg-upload-preview'; preview.hidden = true;
         preview.innerHTML = '<img alt="پیش‌نمایش تصویر نهایی"><div><strong>پیش‌نمایش تصویر</strong><span>تصویر پس از برش آماده ذخیره است.</span><button type="button" class="admin-btn admin-btn-secondary sg-recrop">تنظیم مجدد برش</button></div>';
         input.insertAdjacentElement('afterend', preview);
-        const previewImage = preview.querySelector('img'); let previewUrl = null;
+        const previewImage = preview.querySelector('img'); previewImage.style.aspectRatio = String(ratioFor(input)); let previewUrl = null;
         form.addEventListener('submit', event => {
             if (input.dataset.cropping === '1') {
                 event.preventDefault();
