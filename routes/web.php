@@ -241,7 +241,7 @@ Route::middleware(['auth', 'customer'])->group(function () {
             Route::post(
                 '/payment/{order}/installment',
                 [CheckoutController::class, 'startInstallmentPayment']
-            )->name('payment.installment');
+            )->middleware('throttle:5,1')->name('payment.installment');
 
             Route::get(
                 '/installment/{order}',
@@ -251,7 +251,7 @@ Route::middleware(['auth', 'customer'])->group(function () {
             Route::post(
                 '/payment/{order}/internal-installment',
                 [CheckoutController::class, 'startInternalInstallment']
-            )->name('payment.internal-installment');
+            )->middleware('throttle:5,1')->name('payment.internal-installment');
         });
 
 

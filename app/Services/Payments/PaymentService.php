@@ -351,18 +351,10 @@ class PaymentService
                 );
 
             if (!($result['success'] ?? false)) {
-                $this->markPaymentAsFailed(
-                    $payment,
-                    $result['message']
-                    ?? 'Payment verification failed.',
-                    [
-                        'callback' =>
-                            $callbackData,
-
-                        'verify_response' =>
-                            $result,
-                    ]
-                );
+                $this->recordVerificationPending($payment, [
+                    'callback' => $this->safeCallbackData($callbackData),
+                    'verify_response' => $result,
+                ]);
 
                 return [
                     'success' => false,
@@ -401,7 +393,7 @@ class PaymentService
                 ?? null,
                 [
                     'callback' =>
-                        $callbackData,
+                        $this->safeCallbackData($callbackData),
 
                     'verify_response' =>
                         $result,
@@ -526,15 +518,9 @@ class PaymentService
                 );
 
             if (!($result['success'] ?? false)) {
-                $this->markPaymentAsFailed(
-                    $payment,
-                    $result['message']
-                    ?? 'Payment verification failed.',
-                    [
-                        'verify_response' =>
-                            $result,
-                    ]
-                );
+                $this->recordVerificationPending($payment, [
+                    'verify_response' => $result,
+                ]);
 
                 return [
                     'success' => false,
@@ -1029,6 +1015,66 @@ class PaymentService
     }
 
     /**
+     * Record an inconclusive verification attempt without marking a charge failed.
+     * A timeout or temporary provider error is not proof that the bank declined it.
+     */
+    protected function recordVerificationPending(Payment $payment, array $context = []): void
+    {
+        DB::transaction(function () use ($payment, $context): void {
+            $lockedOrder = Order::query()
+                ->whereKey($payment->order_id)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $lockedOrder) {
+                return;
+            }
+
+            $lockedPayment = Payment::query()
+                ->whereKey($payment->id)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $lockedPayment || in_array($lockedPayment->status, ['paid', 'refunded', 'failed', 'cancelled'], true)) {
+                return;
+            }
+
+            $lockedPayment->update([
+                'metadata' => array_merge($lockedPayment->metadata ?? [], [
+                    'last_verification_attempt' => $context,
+                    'last_verification_attempt_at' => now()->toISOString(),
+                    'verification_pending' => true,
+                ]),
+            ]);
+
+            if ($lockedOrder->payment_status !== 'paid') {
+                $lockedOrder->update(['payment_status' => 'pending']);
+            }
+        });
+    }
+
+    /**
+     * Store only known scalar callback fields; raw provider payloads may contain
+     * values that should not be retained in order metadata.
+     */
+    protected function safeCallbackData(array $callbackData): array
+    {
+        $allowedKeys = [
+            'authority', 'Authority', 'transaction_id', 'transactionId',
+            'tracking_code', 'trackingCode', 'token', 'Token',
+            'reference_id', 'referenceId', 'invoice_id', 'invoiceId',
+            'order_number', 'orderNumber', 'merchant_order_id', 'merchantOrderId',
+            'status', 'Status', 'success', 'Success',
+        ];
+
+        return collect($callbackData)
+            ->only($allowedKeys)
+            ->filter(fn ($value) => is_scalar($value) || $value === null)
+            ->map(fn ($value) => is_string($value) ? mb_substr($value, 0, 255) : $value)
+            ->all();
+    }
+
+    /**
      * Mark payment as failed and synchronize order state.
      */
     protected function markPaymentAsFailed(
@@ -1349,26 +1395,14 @@ class PaymentService
         |--------------------------------------------------------------------------
         */
 
-        if (
-            array_key_exists(
-                'amount',
-                $result
-            )
-            && $result['amount'] !== null
-        ) {
-            $receivedAmount =
-                $this->normalizeAmount(
-                    $result['amount']
-                );
+        if (! array_key_exists('amount', $result) || $result['amount'] === null) {
+            throw new RuntimeException('Gateway verification response did not include a verified amount.');
+        }
 
-            if (
-                $expectedPaymentAmount !==
-                $receivedAmount
-            ) {
-                throw new RuntimeException(
-                    'Payment amount mismatch.'
-                );
-            }
+        $receivedAmount = $this->normalizeAmount($result['amount']);
+
+        if ($expectedPaymentAmount !== $receivedAmount) {
+            throw new RuntimeException('Payment amount mismatch.');
         }
 
         /*
