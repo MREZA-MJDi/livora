@@ -117,6 +117,19 @@ class Product extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    public function getBannerImageUrlAttribute(): ?string
+    {
+        if (! $this->banner_image) {
+            return null;
+        }
+
+        if (str_starts_with($this->banner_image, 'http://') || str_starts_with($this->banner_image, 'https://')) {
+            return $this->banner_image;
+        }
+
+        return Storage::disk('public')->url($this->banner_image);
+    }
+
     public function primaryImage(): ?ProductImage
     {
         return $this->images()
