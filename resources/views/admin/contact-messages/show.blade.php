@@ -160,7 +160,7 @@
 
         <div class="flex flex-wrap gap-3">
 
-            @if($contactMessage->status !== 'read')
+            @if($contactMessage->status === 'unread')
 
                 <form
                     action="{{ route('admin.contact-messages.read', $contactMessage) }}"
