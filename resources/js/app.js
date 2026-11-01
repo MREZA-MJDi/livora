@@ -3,6 +3,225 @@ import Alpine from 'alpinejs';
 
 window.Alpine = Alpine;
 
+const jalaliMonthNames = [
+    'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
+    'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند',
+];
+
+window.jalaliDatePicker = (initialGregorian = '') => ({
+    open: false,
+    year: 1400,
+    month: 1,
+    selectedDate: null,
+    gregorianValue: initialGregorian || '',
+    displayValue: '',
+    time: '09:00',
+    weekdays: ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'],
+    monthNames: jalaliMonthNames,
+
+    init() {
+        const today = new Date();
+        const current = this.toJalali(today.getFullYear(), today.getMonth() + 1, today.getDate());
+        this.year = current[0];
+        this.month = current[1];
+
+        const value = this.normalizeDigits(this.gregorianValue);
+        const match = value.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T\s](\d{2}):(\d{2}))?/);
+
+        if (!match) {
+            this.gregorianValue = '';
+            return;
+        }
+
+        const converted = this.toJalali(Number(match[1]), Number(match[2]), Number(match[3]));
+        this.year = converted[0];
+        this.month = converted[1];
+        this.selectedDate = { year: converted[0], month: converted[1], day: converted[2] };
+        this.time = match[4] && match[5] ? match[4] + ':' + match[5] : '09:00';
+        this.updateValue();
+    },
+
+    get monthTitle() {
+        return this.persianDigits(this.monthNames[this.month - 1] + ' ' + this.year);
+    },
+
+    get calendarDays() {
+        const parts = this.toGregorian(this.year, this.month, 1);
+        const gy = parts[0], gm = parts[1], gd = parts[2];
+        const firstWeekday = (new Date(Date.UTC(gy, gm - 1, gd)).getUTCDay() + 1) % 7;
+        const nextYear = this.month === 12 ? this.year + 1 : this.year;
+        const nextMonth = this.month === 12 ? 1 : this.month + 1;
+        const next = this.toGregorian(nextYear, nextMonth, 1);
+        const daysInMonth = Math.round(
+            (Date.UTC(next[0], next[1] - 1, next[2]) - Date.UTC(gy, gm - 1, gd)) / 86400000,
+        );
+
+        return [
+            ...Array(firstWeekday).fill(null),
+            ...Array.from({ length: daysInMonth }, (_, index) => index + 1),
+        ];
+    },
+
+    changeMonth(delta) {
+        const next = this.month + delta;
+        if (next < 1) {
+            this.month = 12;
+            this.year -= 1;
+        } else if (next > 12) {
+            this.month = 1;
+            this.year += 1;
+        } else {
+            this.month = next;
+        }
+    },
+
+    selectDay(day) {
+        if (!day) return;
+        this.selectedDate = { year: this.year, month: this.month, day: day };
+        this.updateValue();
+        this.open = false;
+    },
+
+    selectToday() {
+        const today = new Date();
+        const current = this.toJalali(today.getFullYear(), today.getMonth() + 1, today.getDate());
+        this.year = current[0];
+        this.month = current[1];
+        this.selectedDate = { year: current[0], month: current[1], day: current[2] };
+        this.updateValue();
+        this.open = false;
+    },
+
+    clearDate() {
+        this.selectedDate = null;
+        this.displayValue = '';
+        this.gregorianValue = '';
+        this.open = false;
+    },
+
+    updateValue() {
+        if (!this.selectedDate) {
+            this.gregorianValue = '';
+            this.displayValue = '';
+            return;
+        }
+
+        const selected = this.selectedDate;
+        const parts = this.toGregorian(selected.year, selected.month, selected.day);
+        const pad = value => String(value).padStart(2, '0');
+
+        this.gregorianValue = parts[0] + '-' + pad(parts[1]) + '-' + pad(parts[2]) + 'T' + (this.time || '09:00');
+        this.displayValue = this.persianDigits(
+            selected.year + '/' + pad(selected.month) + '/' + pad(selected.day),
+        );
+    },
+
+    isSelected(day) {
+        return Boolean(
+            day
+            && this.selectedDate
+            && this.selectedDate.year === this.year
+            && this.selectedDate.month === this.month
+            && this.selectedDate.day === day
+        );
+    },
+
+    isToday(day) {
+        if (!day) return false;
+        const today = new Date();
+        const current = this.toJalali(today.getFullYear(), today.getMonth() + 1, today.getDate());
+        return current[0] === this.year && current[1] === this.month && current[2] === day;
+    },
+
+    normalizeDigits(value) {
+        return String(value).replace(/[۰-۹٠-٩]/g, digit => {
+            const code = digit.charCodeAt(0);
+            return String(code >= 1776 && code <= 1785 ? code - 1776 : code - 1632);
+        });
+    },
+
+    persianDigits(value) {
+        return String(value).replace(/\d/g, digit => '۰۱۲۳۴۵۶۷۸۹'[Number(digit)]);
+    },
+
+    toJalali(gy, gm, gd) {
+        const gDaysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        const jDaysInMonth = [31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29];
+        const leap = year => year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+
+        gy -= 1600;
+        gm -= 1;
+        gd -= 1;
+
+        let gDayNo = 365 * gy
+            + Math.floor((gy + 3) / 4)
+            - Math.floor((gy + 99) / 100)
+            + Math.floor((gy + 399) / 400);
+
+        for (let index = 0; index < gm; index += 1) gDayNo += gDaysInMonth[index];
+        if (gm > 1 && leap(gy + 1600)) gDayNo += 1;
+        gDayNo += gd;
+
+        let jDayNo = gDayNo - 79;
+        const jNp = Math.floor(jDayNo / 12053);
+        jDayNo %= 12053;
+
+        let jy = 979 + (33 * jNp) + (4 * Math.floor(jDayNo / 1461));
+        jDayNo %= 1461;
+
+        if (jDayNo >= 366) {
+            jy += Math.floor((jDayNo - 1) / 365);
+            jDayNo = (jDayNo - 1) % 365;
+        }
+
+        let index = 0;
+        for (; index < 11 && jDayNo >= jDaysInMonth[index]; index += 1) {
+            jDayNo -= jDaysInMonth[index];
+        }
+
+        return [jy, index + 1, jDayNo + 1];
+    },
+
+    toGregorian(jy, jm, jd) {
+        jy += 1595;
+        let days = -355668
+            + (365 * jy)
+            + (Math.floor(jy / 33) * 8)
+            + Math.floor(((jy % 33) + 3) / 4)
+            + jd;
+
+        days += jm < 7 ? ((jm - 1) * 31) : (((jm - 7) * 30) + 186);
+
+        let gy = 400 * Math.floor(days / 146097);
+        days %= 146097;
+
+        if (days > 36524) {
+            gy += 100 * Math.floor(--days / 36524);
+            days %= 36524;
+            if (days >= 365) days += 1;
+        }
+
+        gy += 4 * Math.floor(days / 1461);
+        days %= 1461;
+
+        if (days > 365) {
+            gy += Math.floor((days - 1) / 365);
+            days = (days - 1) % 365;
+        }
+
+        let gd = days + 1;
+        const leap = gy % 4 === 0 && (gy % 100 !== 0 || gy % 400 === 0);
+        const gDaysInMonth = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        let gm = 1;
+
+        for (; gm <= 12 && gd > gDaysInMonth[gm - 1]; gm += 1) {
+            gd -= gDaysInMonth[gm - 1];
+        }
+
+        return [gy, gm, gd];
+    },
+});
+
 window.richTextEditor = (uploadUrl) => ({
     wordCount: 0,
     message: '',
