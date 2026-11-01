@@ -51,6 +51,10 @@ class ContactMessageController extends Controller
             return back()->with('error', 'برای این پیام ایمیلی ثبت نشده است؛ امکان ارسال پاسخ ایمیلی وجود ندارد.');
         }
 
+        if (in_array(config('mail.default'), ['log', 'array'], true)) {
+            return back()->with('error', 'Mailer فعلی فقط Log/Array است و ایمیل واقعی ارسال نمی‌کند. ابتدا SMTP یا سرویس ایمیل Production را تنظیم کنید.');
+        }
+
         $reply = trim($validated['admin_reply']);
         $body = "سلام {$contactMessage->name} عزیز،\n\n"
             . "در پاسخ به پیام شما در SillaGallery:\n\n"
