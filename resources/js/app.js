@@ -105,7 +105,7 @@ window.richTextEditor = (uploadUrl) => ({
     };
     const getDialog = () => activeDialog || (activeDialog = makeDialog());
     const cropFile = (file, ratio) => new Promise((resolve, reject) => {
-        if (!file || !file.type || !file.type.startsWith('image/')) return resolve(file);
+        if (!file || !file.type || !file.type.startsWith('image/') || file.type === 'image/gif') return resolve(file);
         const root = getDialog();
         const stage = root.querySelector('[data-crop-stage]');
         const image = root.querySelector('[data-crop-image]');
@@ -191,22 +191,33 @@ window.richTextEditor = (uploadUrl) => ({
         preview.innerHTML = '<img alt="پیش‌نمایش تصویر نهایی"><div><strong>پیش‌نمایش تصویر</strong><span>تصویر پس از برش آماده ذخیره است.</span><button type="button" class="admin-btn admin-btn-secondary sg-recrop">تنظیم مجدد برش</button></div>';
         input.insertAdjacentElement('afterend', preview);
         const previewImage = preview.querySelector('img'); let previewUrl = null;
+        form.addEventListener('submit', event => {
+            if (input.dataset.cropping === '1') {
+                event.preventDefault();
+                window.alert('لطفاً ابتدا برش تصویر را تأیید کنید.');
+            }
+        });
         input.addEventListener('change', async () => {
             if (processedInputs.has(input)) return;
             const selected = Array.from(input.files || []);
             if (!selected.some(file => file.type.startsWith('image/'))) return;
-            processedInputs.add(input); input.disabled = true;
+            if (selected.some(file => file.type.startsWith('image/') && file.size > 10 * 1024 * 1024)) {
+                input.value = '';
+                window.alert('حجم هر تصویر نباید بیشتر از ۱۰ مگابایت باشد.');
+                return;
+            }
+            processedInputs.add(input); input.dataset.cropping = '1'; input.disabled = true;
             try {
                 const result = [];
-                for (const file of selected) result.push(file.type.startsWith('image/') ? await cropFile(file, ratioFor(input)) : file);
+                for (const file of selected) result.push(file.type.startsWith('image/') && file.type !== 'image/gif' ? await cropFile(file, ratioFor(input)) : file);
                 const transfer = new DataTransfer(); result.forEach(file => transfer.items.add(file)); input.files = transfer.files;
                 const firstImage = result.find(file => file.type.startsWith('image/'));
-                if (firstImage) { if (previewUrl) URL.revokeObjectURL(previewUrl); previewUrl = URL.createObjectURL(firstImage); previewImage.src = previewUrl; preview.hidden = false; }
-                input.disabled = false; processedInputs.delete(input);
+                if (firstImage) { if (previewUrl) URL.revokeObjectURL(previewUrl); previewUrl = URL.createObjectURL(firstImage); previewImage.src = previewUrl; preview.hidden = false; preview.querySelector('.sg-recrop').hidden = firstImage.type === 'image/gif'; }
+                input.disabled = false; input.dataset.cropping = '0'; processedInputs.delete(input);
                 input.dispatchEvent(new Event('input', {bubbles:true}));
                 processedInputs.add(input); input.dispatchEvent(new Event('change', {bubbles:true})); processedInputs.delete(input);
             } catch (error) {
-                input.value = ''; input.disabled = false; processedInputs.delete(input);
+                input.value = ''; input.disabled = false; input.dataset.cropping = '0'; processedInputs.delete(input);
                 if (error?.message !== 'Crop cancelled') console.error('Image crop failed:', error);
             }
         });
