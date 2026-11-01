@@ -47,6 +47,11 @@ class CmsOperationsTest extends TestCase
                 'faqs' => [
                     ['question' => 'چطور سفارش ثبت کنم؟', 'answer' => 'محصول را به سبد خرید اضافه کنید.'],
                 ],
+                'page_content' => [
+                    'hero_title' => 'با تیم ما صحبت کن',
+                    'hero_highlight' => 'همیشه همراه شما',
+                    'faq_title' => 'سوالات مشتریان',
+                ],
             ])
             ->assertRedirect(route('admin.contact-settings.edit'));
 
@@ -66,8 +71,11 @@ class CmsOperationsTest extends TestCase
             ->assertOk()
             ->assertSee('تماس با فروشگاه')
             ->assertSee('+989121234567')
+            ->assertSee('با تیم ما صحبت کن')
+            ->assertSee('سوالات مشتریان')
             ->assertSee('چطور سفارش ثبت کنم؟')
-            ->assertSee('محصول را به سبد خرید اضافه کنید.');
+            ->assertSee('محصول را به سبد خرید اضافه کنید.')
+            ->assertSee('"@type":"FAQPage"', false);
     }
 
     public function test_contact_settings_and_seo_audit_are_admin_only(): void
