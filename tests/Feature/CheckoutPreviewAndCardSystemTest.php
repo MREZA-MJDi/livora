@@ -789,7 +789,8 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
         $this->instance(PaymentManager::class, $manager);
 
         $this->get('/checkout/payment/callback/digipay?authority=AUTH-CALLBACK-003')
-            ->assertRedirect(route('home'));
+            ->assertRedirect(route('account.orders.show', $order))
+            ->assertSessionHas('warning');
 
         $payment = Payment::query()->where('order_id', $order->id)->firstOrFail();
         $this->assertSame('initiated', $payment->status);
