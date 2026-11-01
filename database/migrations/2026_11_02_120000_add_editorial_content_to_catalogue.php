@@ -11,7 +11,8 @@ return new class extends Migration
         Schema::table('products', function (Blueprint $table): void {
             $table->string('focus_keyword', 120)->nullable()->after('meta_description');
             $table->json('content_sections')->nullable()->after('focus_keyword');
-            $table->json('specifications')->nullable()->after('content_sections');
+            $table->json('key_features')->nullable()->after('content_sections');
+            $table->json('specifications')->nullable()->after('key_features');
             $table->text('care_guide')->nullable()->after('specifications');
             $table->json('faq_items')->nullable()->after('care_guide');
         });
@@ -66,7 +67,7 @@ return new class extends Migration
         });
 
         Schema::table('products', function (Blueprint $table): void {
-            $table->dropColumn(['focus_keyword', 'content_sections', 'specifications', 'care_guide', 'faq_items']);
+            $table->dropColumn(['focus_keyword', 'content_sections', 'key_features', 'specifications', 'care_guide', 'faq_items']);
         });
     }
 };
