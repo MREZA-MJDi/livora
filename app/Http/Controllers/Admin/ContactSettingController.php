@@ -47,7 +47,16 @@ class ContactSettingController extends Controller
             ->all();
         $validated['is_active'] = $request->boolean('is_active');
 
-        ContactSetting::query()->updateOrCreate(['id' => 1], $validated);
+        DB::transaction(function () use ($validated): void {
+            ContactSetting::query()->updateOrCreate(['id' => 1], $validated);
+
+            $seo = SeoSetting::current();
+            $seo->update([
+                'contact_email' => $validated['is_active'] ? ($validated['email'] ?? null) : null,
+                'contact_phone' => $validated['is_active'] ? ($validated['phone'] ?? null) : null,
+            ]);
+        });
+        Cache::forget('seo_settings.current');
 
         return redirect()
             ->route('admin.contact-settings.edit')
