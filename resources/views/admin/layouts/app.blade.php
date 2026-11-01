@@ -20,7 +20,7 @@
         userMenuOpen: false,
         notificationOpen: false,
         sessionExpired: false,
-        sessionLoginUrl: @js(route('login'))
+        sessionLoginUrl: '/login'
     }"
     x-on:admin:session-expired.window="sessionExpired = true; sessionLoginUrl = $event.detail?.login_url || sessionLoginUrl"
     class="admin-shell min-h-screen"
