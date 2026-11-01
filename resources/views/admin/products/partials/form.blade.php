@@ -1227,11 +1227,13 @@
 
     @include('admin.partials.content-builder', [
         'sections' => $product->content_sections ?? [],
+        'keyFeatures' => $product->key_features ?? [],
         'specifications' => $product->specifications ?? [],
         'careGuide' => $product->care_guide ?? '',
         'faqItems' => $product->faq_items ?? [],
         'availableRelatedProducts' => $availableRelatedProducts ?? collect(),
         'selectedRelatedProductIds' => $selectedRelatedProductIds ?? [],
+        'includeKeyFeatures' => true,
         'includeSpecifications' => true,
         'includeCareGuide' => true,
         'includeRelatedProducts' => true,
