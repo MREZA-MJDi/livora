@@ -32,7 +32,8 @@ return [
     |
     */
 
-    'lifetime' => (int) env('SESSION_LIFETIME', 120),
+    // Four-hour idle window by default; an explicit SESSION_LIFETIME in .env still wins.
+    'lifetime' => (int) env('SESSION_LIFETIME', 240),
 
     'expire_on_close' => env('SESSION_EXPIRE_ON_CLOSE', false),
 
