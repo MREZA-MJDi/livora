@@ -236,4 +236,38 @@ window.richTextEditor = (uploadUrl) => ({
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', scan); else scan();
 })();
 
+// Resolve media skeletons only after the browser has loaded the actual image.
+// This keeps SSR cards stable and avoids fake loading states for empty results.
+const initCardImageSkeletons = () => {
+    document.querySelectorAll('[data-card-media] [data-card-image]').forEach((image) => {
+        if (image.dataset.skeletonReady === '1') return;
+
+        image.dataset.skeletonReady = '1';
+        const media = image.closest('[data-card-media]');
+        if (!media) return;
+
+        const markLoaded = () => {
+            if (image.naturalWidth > 0) {
+                media.classList.add('is-loaded');
+                media.classList.remove('is-error');
+            } else {
+                media.classList.add('is-error');
+                media.classList.remove('is-loaded');
+            }
+        };
+
+        image.addEventListener('load', markLoaded, { once: true });
+        image.addEventListener('error', markLoaded, { once: true });
+
+        if (image.complete) markLoaded();
+    });
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCardImageSkeletons, { once: true });
+} else {
+    initCardImageSkeletons();
+}
+
+
 Alpine.start();
