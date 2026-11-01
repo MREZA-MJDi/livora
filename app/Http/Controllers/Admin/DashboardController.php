@@ -4,9 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Helpers\JalaliHelper;
 use App\Http\Controllers\Controller;
+use App\Models\BlogPost;
+use App\Models\ContactMessage;
+use App\Models\ContentPage;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\SeoSetting;
 use App\Models\User;
 use Illuminate\Support\Collection;
 
@@ -148,6 +152,14 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        $blogPublishedCount = BlogPost::published()->count();
+        $blogDraftCount = BlogPost::query()->where('status', 'draft')->count();
+        $contentDraftCount = ContentPage::query()->where('status', 'draft')->count();
+        $unreadContactMessages = ContactMessage::query()->where('status', 'unread')->count();
+
+        $seoSettings = SeoSetting::current();
+        $seoGlobalGateOpen = $seoSettings->indexing_enabled && $seoSettings->following_enabled;
+
         return view('admin.dashboard.index', [
             'totalProducts' => (int) ($productStats->total_products ?? 0),
             'activeProducts' => (int) ($productStats->active_products ?? 0),
@@ -184,6 +196,11 @@ class DashboardController extends Controller
 
             'recentOrders' => $recentOrders,
             'recentCustomers' => $recentCustomers,
+            'blogPublishedCount' => $blogPublishedCount,
+            'blogDraftCount' => $blogDraftCount,
+            'contentDraftCount' => $contentDraftCount,
+            'unreadContactMessages' => $unreadContactMessages,
+            'seoGlobalGateOpen' => $seoGlobalGateOpen,
 
             'featuredProductsCount' => (int) ($productStats->featured_products ?? 0),
             'newProductsCount' => (int) ($productStats->new_products ?? 0),
