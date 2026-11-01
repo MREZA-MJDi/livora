@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Services\Payments\CheckoutPaymentViewData;
 use Illuminate\View\View;
 
 class CheckoutPreviewController extends Controller
@@ -15,7 +16,7 @@ class CheckoutPreviewController extends Controller
      * The preview never creates an order, payment attempt, installment plan,
      * inventory reservation, or customer-facing transaction.
      */
-    public function show(): View
+    public function show(CheckoutPaymentViewData $viewData): View
     {
         $order = new Order([
             'order_number' => 'PREVIEW-SG-0001',
@@ -60,6 +61,6 @@ class CheckoutPreviewController extends Controller
         return view('checkout.payment', [
             'order' => $order,
             'preview' => true,
-        ]);
+        ] + $viewData->forOrder($order));
     }
 }
