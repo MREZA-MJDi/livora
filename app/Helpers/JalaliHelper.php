@@ -134,6 +134,13 @@ final class JalaliHelper
         return self::toPersianDigits($formatted);
     }
 
+    public static function formatDateTime(DateTimeInterface $date, bool $withWeekday = false): string
+    {
+        return self::formatDate($date, $withWeekday)
+            .' '
+            .self::toPersianDigits($date->format('H:i'));
+    }
+
     public static function monthName(int $month): string
     {
         return self::MONTHS[$month] ?? throw new \InvalidArgumentException('Invalid Jalali month.');
