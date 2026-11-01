@@ -234,7 +234,7 @@ class CmsOperationsTest extends TestCase
             'slug' => 'jalali-blog-index-date',
             'body' => 'متن مقاله',
             'status' => 'published',
-            'published_at' => \\Carbon\\Carbon::parse('2025-03-21 12:35:00', 'Asia/Tehran'),
+            'published_at' => \Carbon\Carbon::parse('2025-03-21 12:35:00', 'Asia/Tehran'),
             'seo_index' => false,
             'seo_follow' => false,
         ]);
