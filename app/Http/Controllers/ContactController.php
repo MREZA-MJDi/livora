@@ -37,7 +37,7 @@ class ContactController extends Controller
             'status' => 'unread',
         ]);
 
-        $contactSetting = ContactSetting::query()->where('is_active', true)->first();
+        $contactSetting = ContactSetting::query()->first();
         $successMessage = data_get(
             $contactSetting?->page_content ?? [],
             'success_message',
