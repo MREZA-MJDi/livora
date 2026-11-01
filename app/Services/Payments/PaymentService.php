@@ -996,7 +996,7 @@ class PaymentService
                     ],
                 ]);
 
-                \\Illuminate\\Support\\Facades\\Log::critical(
+                \Illuminate\Support\Facades\Log::critical(
                     'Livora received a successful payment after local cancellation; manual refund/reconciliation is required.',
                     [
                         'order_id' => $lockedOrder->id,
