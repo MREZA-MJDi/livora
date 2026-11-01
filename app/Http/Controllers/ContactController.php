@@ -38,8 +38,15 @@ class ContactController extends Controller
             'status' => 'unread',
         ]);
 
+        $contactSetting = ContactSetting::query()->where('is_active', true)->first();
+        $successMessage = data_get(
+            $contactSetting?->page_content ?? [],
+            'success_message',
+            'پیام شما با موفقیت ارسال شد.'
+        );
+
         return redirect()
             ->route('contact')
-            ->with('success', 'پیام شما با موفقیت ارسال شد.');
+            ->with('success', $successMessage);
     }
 }
