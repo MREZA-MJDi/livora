@@ -41,24 +41,28 @@
             : 0;
 @endphp
 
-<article class="group relative flex h-full min-w-0 flex-col">
+<article class="product-card group relative flex h-full min-w-0 flex-col">
 
     {{-- Image --}}
-    <div class="relative overflow-hidden rounded-[1.5rem] bg-[var(--sg-surface)]">
+    <div class="relative overflow-hidden rounded-[1.5rem] bg-[var(--sg-surface)]" data-card-media>
 
         <a
             href="{{ route('product.show', $product->slug) }}"
-            class="product-card-media block aspect-[4/5] overflow-hidden"
+            class="product-card-media relative block aspect-[4/5] overflow-hidden"
         >
 
             @if($image)
 
+                <span class="sg-card-image-skeleton sg-skeleton absolute inset-0" aria-hidden="true"></span>
                 <img
                     src="{{ $image }}"
                     alt="{{ $product->name }}"
                     loading="lazy"
-                    class="product-card-image h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.045]"
+                    decoding="async"
+                    data-card-image
+                    class="product-card-image h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.035]"
                 >
+                <span data-card-image-fallback class="hidden h-full w-full items-center justify-center text-xs tracking-[0.2em] text-[var(--sg-stone)]" aria-hidden="true">SillaGallery</span>
 
             @else
 
@@ -151,15 +155,17 @@
 
 
     {{-- Product Information --}}
-    <div class="flex flex-1 flex-col pt-4">
+    <div class="product-card-content flex flex-1 flex-col pt-4">
 
         {{-- Category --}}
         @if($product->category)
 
-            <p class="min-h-[1rem] line-clamp-1 text-[10px] uppercase tracking-[0.18em] text-[var(--sg-stone)]">
+            <p class="product-card-category min-h-4 line-clamp-1 text-[10px] uppercase tracking-[0.18em] text-[var(--sg-stone)]">
                 {{ $product->category->name }}
             </p>
 
+        @else
+            <p class="product-card-category min-h-4" aria-hidden="true"></p>
         @endif
 
         {{-- Name --}}
@@ -173,7 +179,7 @@
         </a>
 
         {{-- Price --}}
-        <div class="mt-3">
+        <div class="product-card-price mt-3 min-h-10">
 
             @if($hasDiscount)
 
@@ -243,6 +249,9 @@
                 </div>
 
             </div>
+
+        @else
+            <div class="product-card-installment-placeholder mt-3 min-h-[74px]" aria-hidden="true"></div>
 
         @endif
 
