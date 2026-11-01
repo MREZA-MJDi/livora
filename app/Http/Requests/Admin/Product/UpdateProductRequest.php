@@ -62,6 +62,7 @@ class UpdateProductRequest extends FormRequest
 
         $this->merge([
             'content_sections' => $this->cleanRows('content_sections', ['heading', 'body']),
+            'key_features' => $this->cleanRows('key_features', ['label', 'value']),
             'specifications' => $this->cleanRows('specifications', ['label', 'value']),
             'faq_items' => $this->cleanRows('faq_items', ['question', 'answer']),
             'related_product_ids' => is_array($this->input('related_product_ids')) ? array_values(array_unique(array_map('intval', $this->input('related_product_ids')))) : $this->input('related_product_ids'),
@@ -302,6 +303,9 @@ class UpdateProductRequest extends FormRequest
             'content_sections' => ['nullable', 'array', 'max:12'],
             'content_sections.*.heading' => ['required', 'string', 'max:160'],
             'content_sections.*.body' => ['required', 'string', 'max:6000'],
+            'key_features' => ['nullable', 'array', 'max:12'],
+            'key_features.*.label' => ['required', 'string', 'max:100'],
+            'key_features.*.value' => ['required', 'string', 'max:300'],
             'specifications' => ['nullable', 'array', 'max:30'],
             'specifications.*.label' => ['required', 'string', 'max:100'],
             'specifications.*.value' => ['required', 'string', 'max:500'],
