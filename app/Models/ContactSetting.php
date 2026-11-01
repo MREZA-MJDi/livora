@@ -18,6 +18,7 @@ class ContactSetting extends Model
         'support_description',
         'online_description',
         'faqs',
+        'page_content',
         'is_active',
     ];
 
@@ -25,6 +26,7 @@ class ContactSetting extends Model
     {
         return [
             'faqs' => 'array',
+            'page_content' => 'array',
             'is_active' => 'boolean',
         ];
     }
