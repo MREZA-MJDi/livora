@@ -30,6 +30,7 @@ class Product extends Model
         'meta_description',
         'canonical_url',
         'og_image',
+        'banner_image',
         'seo_index',
         'seo_follow',
 
