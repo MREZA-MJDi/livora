@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\JalaliHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -31,6 +32,12 @@ class DashboardController extends Controller
             ->first();
 
         $now = now();
+        [$jalaliYear, $jalaliMonth] = JalaliHelper::toJalali(
+            (int) $now->format('Y'),
+            (int) $now->format('n'),
+            (int) $now->format('j')
+        );
+
         $monthRanges = [];
         $orderSelects = [
             'COUNT(*) AS total_orders',
@@ -48,31 +55,38 @@ class DashboardController extends Controller
         ];
         $orderBindings = [];
 
-        // One conditional-aggregate query supplies the six-month chart,
-        // current-month KPIs, previous-month comparison and status counts.
-        // It uses portable CASE expressions for SQLite and MySQL/MariaDB.
+        // The six chart buckets follow Jalali month boundaries. Each bucket
+        // is queried as [Gregorian start, next Gregorian start), avoiding
+        // end-of-month precision and timezone edge cases.
         for ($monthsAgo = 5; $monthsAgo >= 0; $monthsAgo--) {
-            $date = $now->copy()->startOfMonth()->subMonths($monthsAgo);
-            $key = $date->format('Y_m');
-            $start = $date->copy()->startOfMonth()->toDateTimeString();
-            $end = $date->copy()->endOfMonth()->toDateTimeString();
+            $monthIndex = ($jalaliYear * 12) + ($jalaliMonth - 1) - $monthsAgo;
+            $year = intdiv($monthIndex, 12);
+            $month = ($monthIndex % 12) + 1;
 
+            $start = JalaliHelper::monthStart($year, $month, $now->getTimezone());
+            $nextMonthIndex = $monthIndex + 1;
+            $nextYear = intdiv($nextMonthIndex, 12);
+            $nextMonth = ($nextMonthIndex % 12) + 1;
+            $end = JalaliHelper::monthStart($nextYear, $nextMonth, $now->getTimezone());
+
+            $key = sprintf('j%04d_%02d', $year, $month);
             $monthRanges[] = [
                 'key' => $key,
-                'date' => $date,
+                'year' => $year,
+                'month' => $month,
             ];
 
-            $orderSelects[] = "SUM(CASE WHEN created_at BETWEEN ? AND ? THEN 1 ELSE 0 END) AS all_orders_{$key}";
-            $orderBindings[] = $start;
-            $orderBindings[] = $end;
+            $orderSelects[] = "SUM(CASE WHEN created_at >= ? AND created_at < ? THEN 1 ELSE 0 END) AS all_orders_{$key}";
+            $orderBindings[] = $start->format('Y-m-d H:i:s');
+            $orderBindings[] = $end->format('Y-m-d H:i:s');
 
-            $orderSelects[] = "SUM(CASE WHEN payment_status = 'paid' AND created_at BETWEEN ? AND ? THEN 1 ELSE 0 END) AS orders_{$key}";
-            $orderBindings[] = $start;
-            $orderBindings[] = $end;
+            $orderSelects[] = "SUM(CASE WHEN payment_status = 'paid' AND created_at >= ? AND created_at < ? THEN 1 ELSE 0 END) AS orders_{$key}";
+            $orderBindings[] = $start->format('Y-m-d H:i:s');
+            $orderBindings[] = $end->format('Y-m-d H:i:s');
 
-            $orderSelects[] = "SUM(CASE WHEN payment_status = 'paid' AND created_at BETWEEN ? AND ? THEN total ELSE 0 END) AS revenue_{$key}";
-            $orderBindings[] = $start;
-            $orderBindings[] = $end;
+            $orderSelects[] = "SUM(CASE WHEN payment_status = 'paid' AND created_at >= ? AND created_at < ? THEN total ELSE 0 END) AS revenue_{$key}";
+            $orderBindings[] = $start->format('Y-m-d H:i:s');
+            $orderBindings[] = $end->format('Y-m-d H:i:s');
         }
 
         $orderStats = Order::query()
@@ -87,13 +101,13 @@ class DashboardController extends Controller
         $previousMonthRange = $monthRanges[count($monthRanges) - 2];
 
         $currentMonthRevenue = (float) (
-            $orderStats->{'revenue_' . $currentMonthRange['key']} ?? 0
+            $orderStats->{'revenue_'.$currentMonthRange['key']} ?? 0
         );
         $previousMonthRevenue = (float) (
-            $orderStats->{'revenue_' . $previousMonthRange['key']} ?? 0
+            $orderStats->{'revenue_'.$previousMonthRange['key']} ?? 0
         );
         $currentMonthOrders = (int) (
-            $orderStats->{'all_orders_' . $currentMonthRange['key']} ?? 0
+            $orderStats->{'all_orders_'.$currentMonthRange['key']} ?? 0
         );
 
         $revenueGrowthPercent = 0;
@@ -110,14 +124,13 @@ class DashboardController extends Controller
         $monthlyRevenue = collect($monthRanges)
             ->map(function (array $range) use ($orderStats): array {
                 $key = $range['key'];
-                $date = $range['date'];
 
                 return [
-                    'key' => $date->format('Y-m'),
-                    'label' => $date->copy()->locale('fa')->translatedFormat('M'),
-                    'full_label' => $date->copy()->locale('fa')->translatedFormat('F Y'),
-                    'revenue' => (float) ($orderStats->{'revenue_' . $key} ?? 0),
-                    'orders' => (int) ($orderStats->{'orders_' . $key} ?? 0),
+                    'key' => $key,
+                    'label' => JalaliHelper::monthName($range['month']),
+                    'full_label' => JalaliHelper::formatMonthYear($range['year'], $range['month']),
+                    'revenue' => (float) ($orderStats->{'revenue_'.$key} ?? 0),
+                    'orders' => (int) ($orderStats->{'orders_'.$key} ?? 0),
                 ];
             });
 
