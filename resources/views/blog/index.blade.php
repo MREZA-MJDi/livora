@@ -1,7 +1,8 @@
 @extends('layouts.app')
 
-@section('title', ($activeTag->name ?? null) ? ('مطالب برچسب ' . $activeTag->name . ' | SillaGallery') : 'مجله SillaGallery')
-@section('description', 'مقاله‌ها و راهنمای انتخاب مبلمان و لوازم خانه از SillaGallery.')
+@php($blogPageSeo = \\App\\Models\\SeoPageSetting::forRoute('blog.index'))
+@section('title', isset($activeTag) ? ('مطالب برچسب ' . $activeTag->name . ' | SillaGallery') : ($blogPageSeo?->meta_title ?: 'مجله SillaGallery'))
+@section('description', isset($activeTag) ? ('مقاله‌های برچسب ' . $activeTag->name . ' در مجله SillaGallery.') : ($blogPageSeo?->meta_description ?: 'مقاله‌ها و راهنمای انتخاب مبلمان و لوازم خانه از SillaGallery.'))
 @section('robots', \App\Models\SeoSetting::current()->robotsFor(false, false))
 @section('canonical', isset($activeTag) ? route('blog.tag', $activeTag->slug) : route('blog.index'))
 
@@ -9,8 +10,8 @@
 <section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
     <header class="mb-10 max-w-2xl">
         <p class="text-xs uppercase tracking-[0.2em] text-[var(--sg-accent)]">SILLAGALLERY JOURNAL</p>
-        <h1 class="mt-3 text-3xl font-semibold text-[var(--sg-ink)]">{{ isset($activeTag) ? 'مطالب: '.$activeTag->name : 'مجله SillaGallery' }}</h1>
-        <p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">راهنماها، ایده‌ها و مطالب مرتبط با انتخاب و نگهداری مبلمان و فضای زندگی.</p>
+        <h1 class="mt-3 text-3xl font-semibold text-[var(--sg-ink)]">{{ isset($activeTag) ? 'مطالب: '.$activeTag->name : ($blogPageSeo?->meta_title ?: 'مجله SillaGallery') }}</h1>
+        <p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">{{ isset($activeTag) ? ('مطالب دسته‌بندی ' . $activeTag->name) : ($blogPageSeo?->meta_description ?: 'راهنماها، ایده‌ها و مطالب مرتبط با انتخاب و نگهداری مبلمان و فضای زندگی.') }}</p>
     </header>
     @if($tags->isNotEmpty())
         <nav aria-label="برچسب‌های مجله" class="mb-8 flex flex-wrap gap-2">
