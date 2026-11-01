@@ -98,6 +98,9 @@
                 <span class="admin-badge {{ $bingVerificationConfigured ? 'admin-badge-success' : 'admin-badge-warning' }}">{{ $bingVerificationConfigured ? 'ثبت شده' : 'ثبت نشده' }}</span>
             </div>
             <p class="admin-help leading-7">ثبت کد تأیید فقط مالکیت سایت را برای meta verification آماده می‌کند. این پروژه هنوز به APIهای Google Search Console یا Bing Webmaster متصل نیست؛ بنابراین Clicks، Impressions، CTR و Average Position در این گزارش وجود ندارند.</p>
+            <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs leading-7 text-amber-800">
+                داده میدانی Core Web Vitals و امتیاز PageSpeed/Lighthouse نیز هنوز به این داشبورد متصل نشده‌اند. برای نمایش آن‌ها باید منبع اندازه‌گیری و مجوز API/CrUX به‌صورت واقعی پیکربندی شود.
+            </div>
             <a href="{{ route('admin.seo.edit') }}" class="text-xs font-semibold text-[var(--admin-accent)]">تنظیم کدهای تأیید ←</a>
         </article>
         <article class="admin-card space-y-3 p-5">
