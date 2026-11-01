@@ -418,6 +418,10 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
             'content_sections' => [
                 ['heading' => 'معرفی محصول', 'body' => 'این مبل برای فضای نشیمن طراحی شده است.'],
             ],
+            'key_features' => [
+                ['label' => 'طراحی', 'value' => 'مدرن و مینیمال'],
+                ['label' => 'کاربری', 'value' => 'مناسب نشیمن روزمره'],
+            ],
             'specifications' => [
                 ['label' => 'جنس بدنه', 'value' => 'چوب راش'],
                 ['label' => 'رنگ', 'value' => 'طوسی'],
@@ -433,6 +437,7 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
         $product->refresh();
         $this->assertSame('مبل راحتی مدرن', $product->focus_keyword);
         $this->assertCount(1, $product->content_sections);
+        $this->assertCount(2, $product->key_features);
         $this->assertCount(3, $product->specifications);
         $this->assertSame('با دستمال نرم و خشک تمیز شود.', $product->care_guide);
         $this->assertCount(1, $product->faq_items);
@@ -444,6 +449,10 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
         $this->get(route('product.show', $product->slug))
             ->assertOk()
             ->assertSee('معرفی محصول')
+            ->assertSee('ویژگی‌های کلیدی')
+            ->assertSee('طراحی')
+            ->assertSee('مدرن و مینیمال')
+            ->assertSee('additionalProperty', false)
             ->assertSee('مشخصات فنی')
             ->assertSee('جنس بدنه')
             ->assertSee('چوب راش')
