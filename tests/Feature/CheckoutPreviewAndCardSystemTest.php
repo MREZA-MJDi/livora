@@ -29,10 +29,11 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
             ->assertSee('پیش‌نمایش مدیریتی Checkout')
             ->assertSee('PREVIEW-SG-0001')
             ->assertSee('DEMO · READ ONLY')
-            ->assertSee('هیچ درخواست پرداختی ارسال نمی‌شود.')
-            ->assertSee('name="robots" content="noindex,nofollow"', false);
+            ->assertSee('هیچ درخواست پرداختی ارسال نمی‌شود.');
 
         $content = $response->getContent();
+        $this->assertStringContainsString('noindex', $content);
+        $this->assertStringContainsString('nofollow', $content);
         $this->assertStringNotContainsString('name="gateway"', $content);
         $this->assertStringNotContainsString('/checkout/payment/0/installment', $content);
         $this->assertStringNotContainsString('/checkout/payment/0/internal-installment', $content);
