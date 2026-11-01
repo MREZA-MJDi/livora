@@ -270,4 +270,32 @@ if (document.readyState === 'loading') {
 }
 
 
+// AJAX requests made from the admin area receive a structured 419 response.
+// Surface a persistent re-authentication prompt instead of leaving the user
+// with an unexplained "Page Expired" response inside a dashboard widget.
+if (/^\/admin(?:\/|$)/.test(window.location.pathname) && !window.__sgAdminSessionGuard) {
+    window.__sgAdminSessionGuard = true;
+    const nativeFetch = window.fetch.bind(window);
+
+    window.fetch = async (...args) => {
+        const response = await nativeFetch(...args);
+
+        if (response.status === 419) {
+            let payload = {};
+            try {
+                payload = await response.clone().json();
+            } catch (_) {
+                // Keep the fallback message if a legacy endpoint returns HTML.
+            }
+
+            window.dispatchEvent(new CustomEvent('admin:session-expired', {
+                detail: payload,
+            }));
+        }
+
+        return response;
+    };
+}
+
+
 Alpine.start();
