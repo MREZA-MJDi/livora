@@ -10,13 +10,14 @@ return new class extends Migration
     {
         Schema::table('contact_settings', function (Blueprint $table): void {
             $table->json('faqs')->nullable()->after('online_description');
+            $table->json('page_content')->nullable()->after('faqs');
         });
     }
 
     public function down(): void
     {
         Schema::table('contact_settings', function (Blueprint $table): void {
-            $table->dropColumn('faqs');
+            $table->dropColumn(['faqs', 'page_content']);
         });
     }
 };
