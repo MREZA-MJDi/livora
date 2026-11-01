@@ -1072,14 +1072,14 @@ body {
     height: 100%;
     object-fit: cover;
     object-position: center 48%;
-    transform: scale(1.12);
+    transform: scale(1);
     transform-origin: center;
     transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .group:hover .product-card-image,
 .group:hover .category-card-image {
-    transform: scale(1.17);
+    transform: scale(1.035);
 }
 
 /* Search modal must sit above the mobile bottom navigation and scroll as a sheet. */
@@ -1182,7 +1182,7 @@ body {
 
     .product-card-image,
     .category-card-image {
-        transform: scale(1.09);
+        transform: scale(1);
     }
 
     .search-overlay-panel {
