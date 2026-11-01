@@ -256,6 +256,25 @@
         </section>
 
 
+        @if($product->banner_image_url)
+            <section class="product-page-banner border-b border-[var(--sg-border)] bg-[var(--sg-white)] py-4 sm:py-6">
+                <x-layout.container>
+                    <figure class="relative overflow-hidden rounded-2xl bg-[var(--sg-surface)] sm:rounded-3xl">
+                        <img
+                            src="{{ $product->banner_image_url }}"
+                            alt="{{ $product->banner_image_alt ?: $product->name }}"
+                            width="1920"
+                            height="800"
+                            fetchpriority="high"
+                            decoding="async"
+                            class="product-page-banner-image block aspect-[12/5] w-full object-cover"
+                        >
+                    </figure>
+                </x-layout.container>
+            </section>
+        @endif
+
+
         {{-- =========================================================
              PRODUCT HERO
         ========================================================== --}}
