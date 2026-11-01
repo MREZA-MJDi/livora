@@ -173,7 +173,7 @@ class PaymentService
                         [
                             'gateway' => $gateway,
                             'status_code' => $result['status_code'] ?? null,
-                            'response' => $result['data'] ?? [],
+                            'response' => $this->safeGatewayResponse($result),
                         ]
                     );
                 }
@@ -361,7 +361,7 @@ class PaymentService
             if (!($result['success'] ?? false)) {
                 $this->recordVerificationPending($payment, [
                     'callback' => $this->safeCallbackData($callbackData),
-                    'verify_response' => $result,
+                    'verify_response' => $this->safeGatewayResponse($result),
                 ]);
 
                 return [
@@ -379,8 +379,9 @@ class PaymentService
                     'message' =>
                         'پرداخت تأیید نشد. در صورت کسر وجه، وضعیت تراکنش بررسی خواهد شد.',
 
-                    'data' =>
-                        $result['data'] ?? [],
+                    'data' => [
+                        'verification_pending' => true,
+                    ],
                 ];
             }
 
@@ -404,7 +405,7 @@ class PaymentService
                         $this->safeCallbackData($callbackData),
 
                     'verify_response' =>
-                        $result,
+                        $this->safeGatewayResponse($result),
                 ]
             );
 
@@ -527,7 +528,7 @@ class PaymentService
 
             if (!($result['success'] ?? false)) {
                 $this->recordVerificationPending($payment, [
-                    'verify_response' => $result,
+                    'verify_response' => $this->safeGatewayResponse($result),
                 ]);
 
                 return [
@@ -556,7 +557,7 @@ class PaymentService
                 ?? null,
                 [
                     'verify_response' =>
-                        $result,
+                        $this->safeGatewayResponse($result),
                 ]
             );
 
@@ -896,7 +897,7 @@ class PaymentService
                             $lockedPayment->metadata ?? [],
                             [
                                 'create_response' =>
-                                    $result,
+                                    $this->safeGatewayResponse($result),
 
                                 'initiated_at' =>
                                     now()->toISOString(),
@@ -1020,6 +1021,33 @@ class PaymentService
 
             $this->orderInventoryService->deductForPaidOrder($lockedOrder);
         });
+    }
+
+    /**
+     * Persist only normalized, non-secret gateway fields in local metadata.
+     * The opaque provider payload and redirect URL are deliberately excluded.
+     */
+    protected function safeGatewayResponse(array $result): array
+    {
+        $safe = [];
+
+        foreach (['success', 'amount', 'transaction_id', 'authority', 'status', 'status_code', 'retryable', 'message'] as $key) {
+            if (! array_key_exists($key, $result)) {
+                continue;
+            }
+
+            $value = $result[$key];
+
+            if (is_string($value)) {
+                $value = mb_substr($value, 0, 500);
+            } elseif (! is_scalar($value) && $value !== null) {
+                continue;
+            }
+
+            $safe[$key] = $value;
+        }
+
+        return $safe;
     }
 
     /**
