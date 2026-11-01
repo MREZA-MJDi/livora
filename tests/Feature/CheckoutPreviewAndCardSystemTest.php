@@ -68,7 +68,8 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
             ->assertSee('دیجی‌پی')
             ->assertSee('اسنپ‌پی')
             ->assertSee('ترب‌پی')
-            ->assertSee('در حال حاضر هیچ درگاه آنلاینی فعال نیست.');
+            ->assertSee('اتصال درگاه پرداخت هنوز تکمیل نشده است.')
+            ->assertSee('در انتظار پرداخت');
     }
 
     public function test_customer_cannot_view_another_customers_order_payment_page(): void
