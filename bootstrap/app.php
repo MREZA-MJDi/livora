@@ -75,6 +75,17 @@ return Application::configure(
                 return null;
             }
 
+            // An expired admin form/session must send the administrator back
+            // through authentication instead of displaying a generic 419 page.
+            if (
+                $e->getStatusCode() === 419
+                && $request->is('admin', 'admin/*')
+            ) {
+                return redirect()
+                    ->guest(route('login'))
+                    ->with('warning', 'نشست شما منقضی شده است؛ لطفاً دوباره وارد شوید.');
+            }
+
             $view = match ($e->getStatusCode()) {
                 403 => 'errors.403',
                 404 => 'errors.404',
