@@ -191,6 +191,17 @@
 
 @push('seo')
 <script type="application/ld+json">{!! json_encode($productStructuredData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) !!}</script>
+@if(!empty($product->faq_items))
+<script type="application/ld+json">{!! json_encode([
+    '@context' => 'https://schema.org',
+    '@type' => 'FAQPage',
+    'mainEntity' => collect($product->faq_items)->filter(fn ($item) => filled($item['question'] ?? null) && filled($item['answer'] ?? null))->map(fn ($item) => [
+        '@type' => 'Question',
+        'name' => $item['question'],
+        'acceptedAnswer' => ['@type' => 'Answer', 'text' => $item['answer']],
+    ])->values()->all(),
+], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) !!}</script>
+@endif
 @endpush
 @section('content')
 
@@ -769,6 +780,67 @@
 
         </section>
 
+
+        @if(!empty($product->content_sections) || !empty($product->specifications) || filled($product->care_guide) || !empty($product->faq_items))
+            <section class="border-t border-[var(--sg-border)] bg-[var(--sg-white)]">
+                <x-layout.container>
+                    <div class="space-y-12 py-14 sm:py-18">
+                        @foreach($product->content_sections ?? [] as $section)
+                            @if(filled($section['heading'] ?? null) && filled($section['body'] ?? null))
+                                <article class="max-w-4xl">
+                                    <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">PRODUCT GUIDE</p>
+                                    <h2 class="mt-3 text-2xl font-semibold sm:text-3xl">{{ $section['heading'] }}</h2>
+                                    <p class="mt-4 whitespace-pre-line text-sm leading-9 text-[var(--sg-stone)]">{{ $section['body'] }}</p>
+                                </article>
+                            @endif
+                        @endforeach
+
+                        @if(!empty($product->specifications))
+                            <section class="max-w-4xl">
+                                <h2 class="text-2xl font-semibold">مشخصات فنی {{ $product->name }}</h2>
+                                <div class="mt-5 overflow-hidden rounded-2xl border border-[var(--sg-border)]">
+                                    <table class="w-full text-right text-sm">
+                                        <tbody>
+                                            @foreach($product->specifications as $specification)
+                                                @if(filled($specification['label'] ?? null) && filled($specification['value'] ?? null))
+                                                    <tr class="border-b border-[var(--sg-border)] last:border-0">
+                                                        <th scope="row" class="w-1/3 bg-[var(--sg-surface)] px-4 py-4 font-semibold">{{ $specification['label'] }}</th>
+                                                        <td class="px-4 py-4 leading-7 text-[var(--sg-stone)]">{{ $specification['value'] }}</td>
+                                                    </tr>
+                                                @endif
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        @endif
+
+                        @if(filled($product->care_guide))
+                            <section class="max-w-4xl">
+                                <h2 class="text-2xl font-semibold">راهنمای نگهداری و استفاده</h2>
+                                <p class="mt-4 whitespace-pre-line text-sm leading-9 text-[var(--sg-stone)]">{{ $product->care_guide }}</p>
+                            </section>
+                        @endif
+
+                        @if(!empty($product->faq_items))
+                            <section class="max-w-4xl">
+                                <h2 class="text-2xl font-semibold">سؤالات متداول درباره {{ $product->name }}</h2>
+                                <div class="mt-5 space-y-3">
+                                    @foreach($product->faq_items as $faq)
+                                        @if(filled($faq['question'] ?? null) && filled($faq['answer'] ?? null))
+                                            <details class="rounded-2xl border border-[var(--sg-border)] p-5">
+                                                <summary class="cursor-pointer text-sm font-semibold">{{ $faq['question'] }}</summary>
+                                                <p class="mt-3 whitespace-pre-line text-sm leading-8 text-[var(--sg-stone)]">{{ $faq['answer'] }}</p>
+                                            </details>
+                                        @endif
+                                    @endforeach
+                                </div>
+                            </section>
+                        @endif
+                    </div>
+                </x-layout.container>
+            </section>
+        @endif
 
         {{-- =========================================================
              PRODUCT FACTS
