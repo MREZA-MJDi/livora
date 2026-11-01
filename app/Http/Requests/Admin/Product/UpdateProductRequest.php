@@ -171,6 +171,8 @@ class UpdateProductRequest extends FormRequest
                 'max:10240',
             ],
 
+            'banner_image_alt' => ['nullable', 'string', 'max:255'],
+
             'price' => [
                 'required',
                 'numeric',
