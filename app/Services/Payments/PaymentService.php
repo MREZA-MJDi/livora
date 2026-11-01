@@ -160,15 +160,23 @@ class PaymentService
             );
 
             if (!($result['success'] ?? false)) {
-                $this->markPaymentAsFailed(
-                    $payment,
-                    $result['message']
-                    ?? 'Payment initialization failed.',
-                    [
+                if ($result['retryable'] ?? false) {
+                    $this->recordGatewayInitiationPending($payment, [
                         'gateway' => $gateway,
-                        'response' => $result,
-                    ]
-                );
+                        'status_code' => $result['status_code'] ?? 0,
+                        'message' => $result['message'] ?? 'Gateway response was inconclusive.',
+                    ]);
+                } else {
+                    $this->markPaymentAsFailed(
+                        $payment,
+                        $result['message'] ?? 'Payment initialization failed.',
+                        [
+                            'gateway' => $gateway,
+                            'status_code' => $result['status_code'] ?? null,
+                            'response' => $result['data'] ?? [],
+                        ]
+                    );
+                }
 
                 return [
                     'success' => false,
@@ -186,6 +194,7 @@ class PaymentService
 
                     'data' =>
                         $result['data'] ?? [],
+                    'retryable' => (bool) ($result['retryable'] ?? false),
                 ];
             }
 
@@ -205,14 +214,12 @@ class PaymentService
             if (
                 blank($redirectUrl)
             ) {
-                $this->markPaymentAsFailed(
-                    $payment,
-                    'Gateway did not return a valid payment URL.',
-                    [
-                        'gateway' => $gateway,
-                        'response' => $result,
-                    ]
-                );
+                $this->recordGatewayInitiationPending($payment, [
+                    'gateway' => $gateway,
+                    'message' => 'Gateway acknowledged the attempt but returned no redirect URL.',
+                    'authority' => $result['authority'] ?? null,
+                    'transaction_id' => $result['transaction_id'] ?? null,
+                ]);
 
                 return [
                     'success' => false,
@@ -229,6 +236,7 @@ class PaymentService
 
                     'data' =>
                         $result['data'] ?? [],
+                    'retryable' => true,
                 ];
             }
 
@@ -434,7 +442,7 @@ class PaymentService
                 $e->getMessage(),
                 [
                     'callback' =>
-                        $callbackData,
+                        $this->safeCallbackData($callbackData),
 
                     'verification_error' =>
                         $e::class,
@@ -1011,6 +1019,45 @@ class PaymentService
             }
 
             $this->orderInventoryService->deductForPaidOrder($lockedOrder);
+        });
+    }
+
+    /**
+     * Record an ambiguous gateway create-payment outcome. Keep the attempt active
+     * to prevent an immediate retry from creating a second remote session.
+     */
+    protected function recordGatewayInitiationPending(Payment $payment, array $context = []): void
+    {
+        DB::transaction(function () use ($payment, $context): void {
+            $lockedOrder = Order::query()
+                ->whereKey($payment->order_id)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $lockedOrder) {
+                return;
+            }
+
+            $lockedPayment = Payment::query()
+                ->whereKey($payment->id)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $lockedPayment || in_array($lockedPayment->status, ['paid', 'refunded', 'failed', 'cancelled'], true)) {
+                return;
+            }
+
+            $lockedPayment->update([
+                'metadata' => array_merge($lockedPayment->metadata ?? [], [
+                    'initiation_pending' => true,
+                    'initiation_pending_at' => now()->toISOString(),
+                    'initiation_context' => $context,
+                ]),
+            ]);
+
+            if ($lockedOrder->payment_status !== 'paid') {
+                $lockedOrder->update(['payment_status' => 'pending']);
+            }
         });
     }
 

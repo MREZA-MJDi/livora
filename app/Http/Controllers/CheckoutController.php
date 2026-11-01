@@ -628,12 +628,19 @@ class CheckoutController extends Controller
                 );
 
             if (!($result['success'] ?? false)) {
+                $orderId = $result['order_id'] ?? null;
+
+                if (($result['data']['verification_pending'] ?? false) && $orderId) {
+                    return redirect()
+                        ->route('account.orders.show', $orderId)
+                        ->with('warning', 'وضعیت تراکنش هنوز از درگاه تأیید نشده است؛ تا استعلام نهایی دوباره پرداخت نکنید.');
+                }
+
                 return redirect()
                     ->route('home')
                     ->with(
                         'error',
-                        $result['message']
-                        ?? 'پرداخت انجام نشد.'
+                        $result['message'] ?? 'پرداخت انجام نشد.'
                     );
             }
 
