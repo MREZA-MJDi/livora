@@ -24,7 +24,41 @@ class UpdateCategoryRequest extends FormRequest
             'is_active' => $this->boolean('is_active'),
             'sort_order' => $this->sort_order ?? 0,
         ]);
+
+        $this->merge([
+            'content_sections' => $this->cleanRows('content_sections', ['heading', 'body']),
+            'comparison_rows' => $this->cleanRows('comparison_rows', ['label', 'value']),
+            'faq_items' => $this->cleanRows('faq_items', ['question', 'answer']),
+            'related_category_ids' => is_array($this->input('related_category_ids')) ? array_values(array_unique(array_map('intval', $this->input('related_category_ids')))) : $this->input('related_category_ids'),
+            'related_product_ids' => is_array($this->input('related_product_ids')) ? array_values(array_unique(array_map('intval', $this->input('related_product_ids')))) : $this->input('related_product_ids'),
+        ]);
     }
+
+    private function cleanRows(string $key, array $fields): mixed
+    {
+        $rows = $this->input($key, []);
+        if (! is_array($rows)) {
+            return $rows;
+        }
+
+        return collect($rows)
+            ->filter(function ($row) use ($fields): bool {
+                return ! is_array($row)
+                    || collect($fields)->contains(fn ($field) => filled($row[$field] ?? null));
+            })
+            ->map(function ($row) use ($fields) {
+                if (! is_array($row)) {
+                    return $row;
+                }
+
+                return collect($fields)->mapWithKeys(
+                    fn ($field) => [$field => trim((string) ($row[$field] ?? ''))]
+                )->all();
+            })
+            ->values()->all();
+    }
+
+
 
     public function rules(): array
     {
@@ -35,6 +69,21 @@ class UpdateCategoryRequest extends FormRequest
             'seo_follow' => ['sometimes', 'boolean'],
             'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string', 'max:1000'],
+            'image_alt' => ['nullable', 'string', 'max:255'],
+            'focus_keyword' => ['nullable', 'string', 'max:120'],
+            'content_sections' => ['nullable', 'array', 'max:12'],
+            'content_sections.*.heading' => ['required', 'string', 'max:160'],
+            'content_sections.*.body' => ['required', 'string', 'max:6000'],
+            'comparison_rows' => ['nullable', 'array', 'max:30'],
+            'comparison_rows.*.label' => ['required', 'string', 'max:120'],
+            'comparison_rows.*.value' => ['required', 'string', 'max:500'],
+            'faq_items' => ['nullable', 'array', 'max:20'],
+            'faq_items.*.question' => ['required', 'string', 'max:255'],
+            'faq_items.*.answer' => ['required', 'string', 'max:2000'],
+            'related_category_ids' => ['nullable', 'array', 'max:30'],
+            'related_category_ids.*' => ['integer', 'distinct', 'exists:categories,id'],
+            'related_product_ids' => ['nullable', 'array', 'max:60'],
+            'related_product_ids.*' => ['integer', 'distinct', 'exists:products,id'],
             'canonical_url' => ['nullable', 'url', 'max:2048'],
             'og_image' => ['nullable', 'url', 'max:2048'],
 

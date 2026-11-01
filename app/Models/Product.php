@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 
@@ -29,6 +30,11 @@ class Product extends Model
         'is_new',
         'meta_title',
         'meta_description',
+        'focus_keyword',
+        'content_sections',
+        'specifications',
+        'care_guide',
+        'faq_items',
         'canonical_url',
         'og_image',
         'banner_image',
@@ -66,6 +72,9 @@ class Product extends Model
             'is_new' => 'boolean',
             'seo_index' => 'boolean',
             'seo_follow' => 'boolean',
+            'content_sections' => 'array',
+            'specifications' => 'array',
+            'faq_items' => 'array',
 
             /*
              * Internal installment settings
@@ -87,6 +96,16 @@ class Product extends Model
         return $this->hasMany(ProductImage::class)
             ->orderByDesc('is_primary')
             ->orderBy('sort_order');
+    }
+
+    public function relatedProducts(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            self::class,
+            'product_related_products',
+            'product_id',
+            'related_product_id'
+        )->withPivot('sort_order')->orderByPivot('sort_order');
     }
 
     public function variants(): HasMany
