@@ -194,6 +194,57 @@ class CmsOperationsTest extends TestCase
         $this->assertStringNotContainsString('/blog/post-blocked-by-follow', $xml);
     }
 
+    public function test_blog_create_and_edit_forms_use_jalali_calendar_not_gregorian_datetime_input(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $this->actingAs($admin)
+            ->get(route('admin.blog.create'))
+            ->assertOk()
+            ->assertSee('زمان انتشار (تقویم شمسی)')
+            ->assertSee('jalaliDatePicker', false)
+            ->assertSee('تقویم و تاریخ نمایشی شمسی')
+            ->assertDontSee('datetime-local');
+
+        $post = BlogPost::query()->create([
+            'user_id' => $admin->id,
+            'title' => 'مقاله زمان‌بندی شمسی',
+            'slug' => 'jalali-blog-calendar',
+            'body' => 'متن مقاله',
+            'status' => 'draft',
+            'published_at' => now(),
+            'seo_index' => false,
+            'seo_follow' => false,
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.blog.edit', $post))
+            ->assertOk()
+            ->assertSee('jalaliDatePicker', false)
+            ->assertDontSee('datetime-local');
+    }
+
+    public function test_admin_blog_index_displays_published_at_in_jalali_calendar(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        BlogPost::query()->create([
+            'user_id' => $admin->id,
+            'title' => 'مقاله تاریخ شمسی',
+            'slug' => 'jalali-blog-index-date',
+            'body' => 'متن مقاله',
+            'status' => 'published',
+            'published_at' => \\Carbon\\Carbon::parse('2025-03-21 12:35:00', 'Asia/Tehran'),
+            'seo_index' => false,
+            'seo_follow' => false,
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.blog.index'))
+            ->assertOk()
+            ->assertSee('۱۴۰۴/۰۱/۰۱ ۱۲:۳۵');
+    }
+
     public function test_published_blog_article_emits_blog_posting_structured_data(): void
     {
         BlogPost::query()->create([
