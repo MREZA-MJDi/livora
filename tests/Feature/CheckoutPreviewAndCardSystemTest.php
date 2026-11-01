@@ -26,7 +26,7 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
 
         $response->assertOk()
             ->assertSee('پیش‌نمایش مدیریتی Checkout')
-            ->assertSee('DEMO-SG-0001')
+            ->assertSee('PREVIEW-SG-0001')
             ->assertSee('DEMO · READ ONLY')
             ->assertSee('هیچ درخواست پرداختی ارسال نمی‌شود.')
             ->assertSee('name="robots" content="noindex,nofollow"', false);
