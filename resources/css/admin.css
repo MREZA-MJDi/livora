@@ -1519,3 +1519,12 @@ p {
 .sg-crop-footer{justify-content:flex-end;border-top:1px solid var(--admin-border);border-bottom:0;background:var(--admin-surface)}
 body.sg-crop-open{overflow:hidden}
 @media(max-width:640px){.sg-upload-preview{align-items:flex-start}.sg-upload-preview>img{width:5.5rem;height:auto;aspect-ratio:4/3;flex-basis:5.5rem}.sg-crop-backdrop{padding:.5rem}.sg-crop-dialog{border-radius:1rem}.sg-crop-header,.sg-crop-body,.sg-crop-footer{padding:.85rem}.sg-crop-footer{flex-direction:column-reverse;align-items:stretch}.sg-crop-footer .admin-btn{width:100%}}
+
+
+/* Match the uploaded primary-image preview to the 4:5 storefront product card. */
+.admin-image-preview .product-primary-preview {
+    object-fit: contain;
+    object-position: center;
+    padding: 0.5rem;
+    background: var(--admin-white);
+}
