@@ -12,34 +12,15 @@
 
                 <a
                     href="{{ route('home') }}"
-                    aria-label="SillaGallery"
+                    aria-label="{{ $storeSettings?->brand_name ?: config('app.name') }}"
                     class="inline-flex items-center"
                 >
                     <span class="text-2xl font-semibold tracking-[0.24em] text-white transition hover:text-[var(--sg-cream)]">
-                        SillaGallery
+                        {{ $storeSettings?->brand_name ?: config('app.name') }}
                     </span>
                 </a>
 
-                <p class="mt-6 max-w-sm text-sm leading-8 text-white/50">
-                    مبلمان و عناصر خانه برای فضاهایی که قرار است
-                    شخصیت داشته باشند و سال‌ها ماندگار بمانند.
-                </p>
-
-                <div class="mt-7 flex flex-wrap gap-2">
-
-                    <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[10px] text-white/50">
-                        Furniture
-                    </span>
-
-                    <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[10px] text-white/50">
-                        Living
-                    </span>
-
-                    <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[10px] text-white/50">
-                        Installment
-                    </span>
-
-                </div>
+                @if($storeSettings?->warranty_text)<p class="mt-6 max-w-sm text-sm leading-8 text-white/50">{{ $storeSettings->warranty_text }}</p>@endif
 
             </div>
 
@@ -190,27 +171,27 @@
 
                 <div class="mt-5 space-y-4">
 
-                    @if(filled(config('app.contact.phone')))
+                    @if(filled($storeSettings?->phone))
                         <a
-                            href="tel:{{ preg_replace('/[^0-9+]/', '', (string) config('app.contact.phone')) }}"
+                            href="tel:{{ preg_replace('/[^0-9+]/', '', (string) $storeSettings->phone) }}"
                             class="block break-all text-sm text-white/55 transition hover:text-white"
                         >
-                            {{ config('app.contact.phone') }}
+                            {{ $storeSettings->phone }}
                         </a>
                     @endif
 
-                    @if(filled(config('app.contact.email')))
+                    @if(filled($storeSettings?->email))
                         <a
-                            href="mailto:{{ config('app.contact.email') }}"
+                            href="mailto:{{ $storeSettings->email }}"
                             class="block break-all text-sm text-white/55 transition hover:text-white"
                         >
-                            {{ config('app.contact.email') }}
+                            {{ $storeSettings->email }}
                         </a>
                     @endif
 
-                    @if(filled(config('app.contact.address')))
+                    @if(filled($storeSettings?->address))
                         <p class="text-sm leading-7 text-white/45">
-                            {{ config('app.contact.address') }}
+                            {{ $storeSettings->address }}
                         </p>
                     @endif
 
@@ -222,7 +203,7 @@
                     href="{{ route('contact') }}"
                     class="mt-6 inline-flex items-center rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-xs font-medium text-white transition hover:border-white/20 hover:bg-white/10"
                 >
-                    ارتباط با SillaGallery
+                    ارتباط با {{ $storeSettings?->brand_name ?: config('app.name') }}
                     <span class="mr-2">←</span>
                 </a>
 
@@ -283,7 +264,7 @@
             <div>
 
                 <p class="text-xs text-white/40">
-                    © {{ date('Y') }} SillaGallery.
+                    © {{ \App\Helpers\JalaliHelper::formatDate(now()) }} {{ $storeSettings?->brand_name ?: config('app.name') }}.
                     تمامی حقوق محفوظ است.
                 </p>
 
@@ -321,9 +302,9 @@
 
                 @endauth
 
-                @if(filled(config('app.contact.instagram_url')))
+                @if(filled($storeSettings?->instagram_url))
                     <a
-                        href="{{ config('app.contact.instagram_url') }}"
+                    href="{{ $storeSettings->instagram_url }}"
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label="Instagram"
@@ -333,9 +314,9 @@
                     </a>
                 @endif
 
-                @if(filled(config('app.contact.telegram_url')))
+                @if(filled($storeSettings?->telegram_url))
                     <a
-                        href="{{ config('app.contact.telegram_url') }}"
+                    href="{{ $storeSettings->telegram_url }}"
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label="Telegram"

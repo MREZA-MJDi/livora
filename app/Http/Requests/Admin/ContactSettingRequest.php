@@ -14,6 +14,8 @@ class ContactSettingRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'brand_name' => ['nullable', 'string', 'max:120'],
+            'logo_path' => ['nullable', 'string', 'max:2048'],
             'phone' => [
                 'nullable',
                 'string',
@@ -25,6 +27,18 @@ class ContactSettingRequest extends FormRequest
                 'email',
                 'max:255',
             ],
+            'whatsapp_url' => ['nullable', 'url', 'max:2048'],
+            'telegram_url' => ['nullable', 'url', 'max:2048'],
+            'instagram_url' => ['nullable', 'url', 'max:2048'],
+            'eitaa_url' => ['nullable', 'url', 'max:2048'],
+            'bale_url' => ['nullable', 'url', 'max:2048'],
+            'map_latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'map_longitude' => ['nullable', 'numeric', 'between:-180,180'],
+            'warranty_text' => ['nullable', 'string', 'max:5000'],
+            'shipping_text' => ['nullable', 'string', 'max:5000'],
+            'installation_text' => ['nullable', 'string', 'max:5000'],
+            'returns_text' => ['nullable', 'string', 'max:5000'],
+            'floating_actions_enabled' => ['nullable', 'boolean'],
 
             'address' => [
                 'nullable',

@@ -369,7 +369,7 @@ Route::middleware(['auth', 'customer'])->group(function () {
 */
 
 Route::middleware(['auth', 'admin'])
-    ->prefix('admin')
+    ->prefix(config('admin.path'))
     ->name('admin.')
     ->group(function () {
 

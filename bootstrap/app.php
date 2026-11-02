@@ -75,7 +75,7 @@ return Application::configure(
             // browser navigation and fetch/XHR requests.
             if (
                 $e->getStatusCode() === 419
-                && $request->is('admin', 'admin/*')
+                && $request->is(config('admin.path'), config('admin.path').'/*')
             ) {
                 if ($request->expectsJson()) {
                     $referer = $request->headers->get('referer');
@@ -90,7 +90,7 @@ return Application::configure(
                         $refererHost
                         && hash_equals(strtolower($request->getHost()), strtolower($refererHost))
                         && is_string($refererPath)
-                        && preg_match('#^/admin(?:/|$)#', $refererPath) === 1
+                        && preg_match('#^/'.preg_quote(config('admin.path'), '#').'(?:/|$)#', $refererPath) === 1
                     ) {
                         $request->session()->put('url.intended', $referer);
                     } else {
