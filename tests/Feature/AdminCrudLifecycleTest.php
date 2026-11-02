@@ -6,6 +6,7 @@ use App\Models\BlogPost;
 use App\Models\Category;
 use App\Models\ContentPage;
 use App\Models\Media;
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductVariant;
@@ -521,6 +522,84 @@ class AdminCrudLifecycleTest extends TestCase
 
         $this->assertSame('محصول محافظت‌شده', $product->fresh()->name);
         $this->assertDatabaseHas('blog_posts', ['id' => $blog->id]);
+    }
+
+    public function test_admin_can_update_customer_details_and_order_fulfillment_status(): void
+    {
+        $customer = User::factory()->create([
+            'role' => 'customer',
+            'name' => 'مشتری اولیه',
+            'email' => 'customer-before@example.test',
+        ]);
+
+        $this->actingAs($this->admin)
+            ->get(route('admin.customers.index'))
+            ->assertOk()
+            ->assertSee('مشتری اولیه');
+
+        $this->actingAs($this->admin)
+            ->get(route('admin.customers.show', $customer))
+            ->assertOk()
+            ->assertSee('مشتری اولیه');
+
+        $this->actingAs($this->admin)
+            ->get(route('admin.customers.edit', $customer))
+            ->assertOk();
+
+        $this->actingAs($this->admin)
+            ->put(route('admin.customers.update', $customer), [
+                'name' => 'مشتری به‌روزشده',
+                'email' => 'customer-after@example.test',
+            ])
+            ->assertRedirect(route('admin.customers.show', $customer));
+
+        $this->assertDatabaseHas('users', [
+            'id' => $customer->id,
+            'name' => 'مشتری به‌روزشده',
+            'email' => 'customer-after@example.test',
+            'role' => 'customer',
+        ]);
+
+        $order = Order::query()->create([
+            'user_id' => $customer->id,
+            'order_number' => 'LIV-ADMIN-CRUD-0001',
+            'status' => 'pending',
+            'payment_status' => 'pending',
+            'subtotal' => 1000000,
+            'shipping_cost' => 50000,
+            'discount' => 0,
+            'total' => 1050000,
+            'first_name' => 'مشتری',
+            'last_name' => 'آزمایشی',
+            'phone' => '09120000000',
+            'email' => 'customer-after@example.test',
+            'province' => 'تهران',
+            'city' => 'تهران',
+            'address' => 'خیابان نمونه، پلاک ۱',
+            'postal_code' => '1234567890',
+        ]);
+
+        $this->actingAs($this->admin)
+            ->get(route('admin.orders.index'))
+            ->assertOk()
+            ->assertSee('LIV-ADMIN-CRUD-0001');
+
+        $this->actingAs($this->admin)
+            ->get(route('admin.orders.show', $order))
+            ->assertOk()
+            ->assertSee('LIV-ADMIN-CRUD-0001');
+
+        $this->actingAs($this->admin)
+            ->patch(route('admin.orders.status', $order), [
+                'status' => 'shipped',
+            ])
+            ->assertRedirect(route('admin.orders.show', $order));
+
+        $this->assertDatabaseHas('orders', [
+            'id' => $order->id,
+            'status' => 'shipped',
+            'payment_status' => 'pending',
+        ]);
     }
 
     private function createCategory(string $slug): Category
