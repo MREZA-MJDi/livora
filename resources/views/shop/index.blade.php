@@ -26,7 +26,7 @@
         ========================================================== --}}
 
         @if($shopBanner->is_active)
-        <section class="border-b border-[var(--sg-border)] bg-[var(--sg-white)]">
+        <section data-shop-hero class="border-b border-[var(--sg-border)] bg-[var(--sg-white)]">
             <x-layout.container>
                 <div class="pb-8 pt-8 sm:pb-10 sm:pt-10">
                     <nav aria-label="مسیر صفحه" class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--sg-stone)]">
@@ -36,7 +36,7 @@
                     </nav>
 
                     <div class="shop-hero-banner relative mt-5 flex min-h-[270px] aspect-[12/5] items-end overflow-hidden rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-ink)] text-white shadow-sm sm:min-h-[320px]">
-                        @if($shopBanner->is_active && $shopBanner->banner_image_url)
+                        @if($shopBanner->banner_image_url)
                             <img
                                 src="{{ $shopBanner->banner_image_url }}"
                                 alt="{{ $shopBanner->banner_image_alt ?: $shopBanner->title }}"
