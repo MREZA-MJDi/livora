@@ -31,7 +31,7 @@ class ShopBannerAndHomeCarouselTest extends TestCase
             ->get(route('admin.shop-banner.edit'))
             ->assertOk()
             ->assertSee('data-crop-ratio="2.4"', false)
-            ->assertSee('مدیریت بنر فروشگاه');
+            ->assertSee('بنر صفحه فروشگاه');
 
         $image = UploadedFile::fake()->image('shop-hero.jpg', 2400, 1000);
 
@@ -110,12 +110,12 @@ class ShopBannerAndHomeCarouselTest extends TestCase
 
     public function test_shop_banner_without_an_image_keeps_a_styled_text_fallback(): void
     {
-        ShopBannerSetting::query()->create([
-            'id' => 1,
+        ShopBannerSetting::current()->update([
             'eyebrow' => 'SILLAGALLERY',
             'title' => 'فروشگاه با تصویر پیش‌فرض',
             'description' => 'توضیح بنر بدون تصویر',
             'is_active' => true,
+            'banner_image' => null,
         ]);
 
         $this->get(route('shop.index'))
