@@ -461,16 +461,18 @@
 
                     @if($featuredWithoutHero->isNotEmpty())
 
-                        <div class="mt-10 sg-product-grid sg-product-grid--showcase">
-
-                            @foreach($featuredWithoutHero as $product)
-
-                                <x-product.card
-                                    :product="$product"
-                                />
-
-                            @endforeach
-
+                        <div class="mt-10" data-sg-carousel>
+                            <div class="mb-4 flex justify-end gap-2">
+                                <button type="button" data-carousel-prev aria-label="محصولات قبلی" class="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)] text-[var(--sg-ink)] transition hover:border-[var(--sg-ink)] hover:bg-[var(--sg-ink)] hover:text-white disabled:cursor-not-allowed disabled:opacity-35">→</button>
+                                <button type="button" data-carousel-next aria-label="محصولات بعدی" class="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)] text-[var(--sg-ink)] transition hover:border-[var(--sg-ink)] hover:bg-[var(--sg-ink)] hover:text-white disabled:cursor-not-allowed disabled:opacity-35">←</button>
+                            </div>
+                            <div class="sg-product-carousel" data-carousel-track tabindex="0" role="region" aria-label="محصولات منتخب SillaGallery" dir="rtl">
+                                @foreach($featuredWithoutHero as $product)
+                                    <div class="sg-product-carousel-item">
+                                        <x-product.card :product="$product" />
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
 
                     @else
@@ -656,16 +658,18 @@
                         </div>
 
 
-                        <div class="mt-10 sg-product-grid sg-product-grid--showcase">
-
-                            @foreach($installmentProducts as $product)
-
-                                <x-product.card
-                                    :product="$product"
-                                />
-
-                            @endforeach
-
+                        <div class="mt-10" data-sg-carousel>
+                            <div class="mb-4 flex justify-end gap-2">
+                                <button type="button" data-carousel-prev aria-label="محصولات قبلی" class="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)] text-[var(--sg-ink)] transition hover:border-[var(--sg-ink)] hover:bg-[var(--sg-ink)] hover:text-white disabled:cursor-not-allowed disabled:opacity-35">→</button>
+                                <button type="button" data-carousel-next aria-label="محصولات بعدی" class="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)] text-[var(--sg-ink)] transition hover:border-[var(--sg-ink)] hover:bg-[var(--sg-ink)] hover:text-white disabled:cursor-not-allowed disabled:opacity-35">←</button>
+                            </div>
+                            <div class="sg-product-carousel" data-carousel-track tabindex="0" role="region" aria-label="محصولات دارای خرید اقساطی" dir="rtl">
+                                @foreach($installmentProducts as $product)
+                                    <div class="sg-product-carousel-item">
+                                        <x-product.card :product="$product" />
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
 
                     </div>
@@ -718,16 +722,18 @@
 
                     @if($newProducts->isNotEmpty())
 
-                        <div class="mt-10 sg-product-grid sg-product-grid--showcase">
-
-                            @foreach($newProducts as $product)
-
-                                <x-product.card
-                                    :product="$product"
-                                />
-
-                            @endforeach
-
+                        <div class="mt-10" data-sg-carousel>
+                            <div class="mb-4 flex justify-end gap-2">
+                                <button type="button" data-carousel-prev aria-label="محصولات قبلی" class="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)] text-[var(--sg-ink)] transition hover:border-[var(--sg-ink)] hover:bg-[var(--sg-ink)] hover:text-white disabled:cursor-not-allowed disabled:opacity-35">→</button>
+                                <button type="button" data-carousel-next aria-label="محصولات بعدی" class="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)] text-[var(--sg-ink)] transition hover:border-[var(--sg-ink)] hover:bg-[var(--sg-ink)] hover:text-white disabled:cursor-not-allowed disabled:opacity-35">←</button>
+                            </div>
+                            <div class="sg-product-carousel" data-carousel-track tabindex="0" role="region" aria-label="تازه‌های SillaGallery" dir="rtl">
+                                @foreach($newProducts as $product)
+                                    <div class="sg-product-carousel-item">
+                                        <x-product.card :product="$product" />
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
 
                     @else
