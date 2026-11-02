@@ -31,6 +31,7 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\ProductImageController as AdminProductImageController;
 use App\Http\Controllers\Admin\ProductVariantController as AdminProductVariantController;
+use App\Http\Controllers\Admin\ShopBannerController as AdminShopBannerController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -382,6 +383,9 @@ Route::middleware(['auth', 'admin'])
             '/',
             [AdminDashboardController::class, 'index']
         )->name('dashboard');
+
+        Route::get('/shop-banner', [AdminShopBannerController::class, 'edit'])->name('shop-banner.edit');
+        Route::put('/shop-banner', [AdminShopBannerController::class, 'update'])->name('shop-banner.update');
 
         Route::get(
             '/checkout-preview',
