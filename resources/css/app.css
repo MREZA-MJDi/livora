@@ -1401,3 +1401,55 @@ body {
         transition: none;
     }
 }
+
+
+/* Product card shell keeps photo and its information in one recognizable unit. */
+.product-card {
+    isolation: isolate;
+}
+.product-card-content {
+    display: flex;
+    min-width: 0;
+}
+.product-card-price {
+    display: flex;
+    gap: .35rem;
+}
+.product-card-installment-placeholder {
+    flex: 0 0 74px;
+}
+
+/* Homepage product rails: swipeable on touch, scroll-snapped, and button-driven. */
+.sg-product-carousel {
+    display: flex;
+    gap: clamp(.75rem, 1.5vw, 1.25rem);
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: .25rem .125rem .85rem;
+    direction: rtl;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: .125rem;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+.sg-product-carousel::-webkit-scrollbar { display: none; }
+.sg-product-carousel-item {
+    flex: 0 0 82%;
+    min-width: 0;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+}
+@media (min-width: 640px) {
+    .sg-product-carousel-item { flex-basis: 46%; }
+}
+@media (min-width: 900px) {
+    .sg-product-carousel-item { flex-basis: 32%; }
+}
+@media (min-width: 1280px) {
+    .sg-product-carousel-item { flex-basis: 25%; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .sg-product-carousel { scroll-behavior: auto; }
+}
