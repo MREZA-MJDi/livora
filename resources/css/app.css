@@ -1072,14 +1072,14 @@ body {
     height: 100%;
     object-fit: cover;
     object-position: center 48%;
-    transform: scale(1);
+    transform: scale(1.12);
     transform-origin: center;
     transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .group:hover .product-card-image,
 .group:hover .category-card-image {
-    transform: scale(1.035);
+    transform: scale(1.17);
 }
 
 /* Search modal must sit above the mobile bottom navigation and scroll as a sheet. */
@@ -1182,7 +1182,7 @@ body {
 
     .product-card-image,
     .category-card-image {
-        transform: scale(1);
+        transform: scale(1.09);
     }
 
     .search-overlay-panel {
@@ -1399,21 +1399,5 @@ body {
     }
     [data-card-media] [data-card-image] {
         transition: none;
-    }
-}
-
-
-/* Product catalog photography should never be cropped like editorial imagery. */
-.product-card-image {
-    object-fit: contain !important;
-    object-position: center;
-    padding: 0;
-    background: var(--sg-white);
-    transform: none !important;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .product-card-image {
-        transition: none !important;
     }
 }

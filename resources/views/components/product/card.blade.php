@@ -41,7 +41,7 @@
             : 0;
 @endphp
 
-<article class="product-card group relative flex h-full min-w-0 flex-col">
+<article class="product-card group relative flex h-full min-w-0 flex-col" aria-labelledby="product-card-title-{{ $product->id }}">
 
     {{-- Image --}}
     <div class="relative overflow-hidden rounded-[1.5rem] bg-[var(--sg-surface)]" data-card-media>
@@ -60,7 +60,7 @@
                     loading="lazy"
                     decoding="async"
                     data-card-image
-                    class="product-card-image h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.035]"
+                    class="product-card-image h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.045]"
                 >
                 <span data-card-image-fallback class="hidden h-full w-full items-center justify-center text-xs tracking-[0.2em] text-[var(--sg-stone)]" aria-hidden="true">SillaGallery</span>
 
@@ -160,8 +160,9 @@
         {{-- Category --}}
         @if($product->category)
 
-            <p class="product-card-category min-h-4 line-clamp-1 text-[10px] uppercase tracking-[0.18em] text-[var(--sg-stone)]">
-                {{ $product->category->name }}
+            <p class="product-card-category min-h-4 line-clamp-1 text-[10px] text-[var(--sg-stone)]">
+                <span class="font-medium text-[var(--sg-accent)]">دسته‌بندی:</span>
+                <span class="mr-1 uppercase tracking-[0.12em]">{{ $product->category->name }}</span>
             </p>
 
         @else
@@ -173,13 +174,14 @@
             href="{{ route('product.show', $product->slug) }}"
             class="mt-2 block"
         >
-            <h3 class="min-h-[3rem] line-clamp-2 text-sm font-semibold leading-6 text-[var(--sg-ink)] transition duration-300 group-hover:text-[var(--sg-accent)] sm:text-[15px]">
+            <h3 id="product-card-title-{{ $product->id }}" class="min-h-[3rem] line-clamp-2 text-sm font-semibold leading-6 text-[var(--sg-ink)] transition duration-300 group-hover:text-[var(--sg-accent)] sm:text-[15px]">
                 {{ $product->name }}
             </h3>
         </a>
 
         {{-- Price --}}
         <div class="product-card-price mt-3 min-h-10">
+            <span class="text-[10px] font-medium text-[var(--sg-stone)]">قیمت محصول</span>
 
             @if($hasDiscount)
 
@@ -214,8 +216,9 @@
         {{-- Installment --}}
         @if($installmentEnabled && $cashAmount > 0)
 
-            <div class="mt-3 min-h-[74px] rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-surface)] p-3">
+            <section aria-label="شرایط خرید اقساطی" class="mt-3 min-h-[74px] rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-surface)] p-3">
 
+                <p class="mb-3 text-[10px] font-semibold text-[var(--sg-accent)]">شرایط خرید اقساطی</p>
                 <div class="flex items-center justify-between gap-3">
 
                     <div>
@@ -248,7 +251,7 @@
 
                 </div>
 
-            </div>
+            </section>
 
         @else
             <div class="product-card-installment-placeholder mt-3 min-h-[74px]" aria-hidden="true"></div>
