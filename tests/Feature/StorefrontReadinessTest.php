@@ -285,6 +285,40 @@ class StorefrontReadinessTest extends TestCase
         ]);
     }
 
+    public function test_product_primary_image_and_fallback_order_are_deterministic(): void
+    {
+        $product = $this->product($this->category(), [
+            'name' => 'محصول تصویر اصلی',
+            'slug' => 'primary-image-order-product',
+        ]);
+
+        $later = ProductImage::create([
+            'product_id' => $product->id,
+            'path' => 'products/later.webp',
+            'sort_order' => 2,
+            'is_primary' => false,
+        ]);
+        $firstFallback = ProductImage::create([
+            'product_id' => $product->id,
+            'path' => 'products/fallback-first.webp',
+            'sort_order' => 1,
+            'is_primary' => false,
+        ]);
+        $primary = ProductImage::create([
+            'product_id' => $product->id,
+            'path' => 'products/primary.webp',
+            'sort_order' => 9,
+            'is_primary' => true,
+        ]);
+
+        $this->assertSame($primary->id, $product->fresh()->primaryImage()?->id);
+
+        $primary->update(['is_primary' => false]);
+
+        $this->assertSame($firstFallback->id, $product->fresh()->primaryImage()?->id);
+        $this->assertNotSame($later->id, $product->fresh()->primaryImage()?->id);
+    }
+
     public function test_category_page_links_back_to_the_shop_using_its_slug(): void
     {
         $category = $this->category([
