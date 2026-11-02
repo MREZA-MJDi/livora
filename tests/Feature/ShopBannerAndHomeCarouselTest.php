@@ -108,6 +108,20 @@ class ShopBannerAndHomeCarouselTest extends TestCase
             ->assertSee('مبل راحتی با طراحی مینیمال');
     }
 
+    public function test_inactive_shop_banner_is_not_rendered(): void
+    {
+        ShopBannerSetting::current()->update([
+            'title' => 'بنر خاموش',
+            'description' => 'نباید نمایش داده شود',
+            'is_active' => false,
+        ]);
+
+        $this->get(route('shop.index'))
+            ->assertOk()
+            ->assertDontSee('بنر خاموش')
+            ->assertDontSee('data-shop-hero', false);
+    }
+
     public function test_shop_banner_without_an_image_keeps_a_styled_text_fallback(): void
     {
         ShopBannerSetting::current()->update([
