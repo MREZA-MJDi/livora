@@ -1,14 +1,14 @@
 <?php
 
-namespace App\\Http\\Controllers\\Admin;
+namespace App\Http\Controllers\Admin;
 
-use App\\Http\\Controllers\\Controller;
-use App\\Models\\ShopBannerSetting;
-use Illuminate\\Http\\RedirectResponse;
-use Illuminate\\Http\\Request;
-use Illuminate\\Support\\Facades\\DB;
-use Illuminate\\Support\\Facades\\Storage;
-use Illuminate\\View\\View;
+use App\Http\Controllers\Controller;
+use App\Models\ShopBannerSetting;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
 
 class ShopBannerController extends Controller
 {
@@ -44,7 +44,7 @@ class ShopBannerController extends Controller
             $newImage = $request->file('banner_image')->store('shop/banner', 'public');
 
             if (! $newImage) {
-                throw new \\RuntimeException('Shop banner could not be stored.');
+                throw new \RuntimeException('Shop banner could not be stored.');
             }
         }
 
@@ -65,7 +65,7 @@ class ShopBannerController extends Controller
 
         try {
             DB::transaction(fn () => $settings->update($data));
-        } catch (\\Throwable $exception) {
+        } catch (\Throwable $exception) {
             if ($newImage) {
                 Storage::disk('public')->delete($newImage);
             }
