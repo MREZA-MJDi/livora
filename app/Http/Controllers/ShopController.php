@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Shop\ShopFilterRequest;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ShopBannerSetting;
 use Illuminate\Contracts\View\View;
 
 class ShopController extends Controller
@@ -98,6 +99,7 @@ class ShopController extends Controller
         return view('shop.index', [
             'products' => $products,
             'categories' => $categories,
+            'shopBanner' => ShopBannerSetting::current(),
         ]);
     }
 }

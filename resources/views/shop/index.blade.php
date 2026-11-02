@@ -22,76 +22,57 @@
     >
 
         {{-- =========================================================
-             SHOP HEADER
+             SHOP HERO BANNER
         ========================================================== --}}
 
         <section class="border-b border-[var(--sg-border)] bg-[var(--sg-white)]">
-
             <x-layout.container>
-
-                <div class="py-10 sm:py-14 lg:py-16">
-
-                    {{-- Breadcrumb --}}
-
-                    <nav
-                        aria-label="breadcrumb"
-                        class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--sg-stone)]"
-                    >
-
-                        <a
-                            href="{{ route('home') }}"
-                            class="transition hover:text-[var(--sg-ink)]"
-                        >
-                            خانه
-                        </a>
-
-                        <span>/</span>
-
-                        <span class="text-[var(--sg-ink)]">
-                            فروشگاه
-                        </span>
-
+                <div class="pb-8 pt-8 sm:pb-10 sm:pt-10">
+                    <nav aria-label="مسیر صفحه" class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--sg-stone)]">
+                        <a href="{{ route('home') }}" class="transition hover:text-[var(--sg-ink)]">خانه</a>
+                        <span aria-hidden="true">/</span>
+                        <span class="font-medium text-[var(--sg-ink)]">فروشگاه</span>
                     </nav>
 
+                    <div class="shop-hero-banner relative mt-5 flex min-h-[270px] aspect-[12/5] items-end overflow-hidden rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-ink)] text-white shadow-sm sm:min-h-[320px]">
+                        @if($shopBanner->is_active && $shopBanner->banner_image_url)
+                            <img
+                                src="{{ $shopBanner->banner_image_url }}"
+                                alt="{{ $shopBanner->banner_image_alt ?: $shopBanner->title }}"
+                                class="absolute inset-0 h-full w-full object-cover"
+                                fetchpriority="high"
+                            >
+                        @endif
 
-                    {{-- Header Content --}}
+                        <div class="absolute inset-0 bg-gradient-to-l from-black/80 via-black/45 to-black/5" aria-hidden="true"></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" aria-hidden="true"></div>
 
-                    <div class="mt-7 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-
-                        <div class="max-w-3xl">
-
-                            <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
-                                SillaGallery COLLECTION
+                        <div class="relative z-10 w-full max-w-3xl p-6 sm:p-9 lg:p-12">
+                            <p class="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/75 sm:text-xs">
+                                {{ $shopBanner->eyebrow ?: 'SILLAGALLERY COLLECTION' }}
                             </p>
-
-                            <h1 class="mt-3 text-4xl font-semibold tracking-tight text-[var(--sg-ink)] sm:text-5xl">
-                                فروشگاه
+                            <h1 class="mt-4 max-w-2xl text-3xl font-semibold leading-tight tracking-tight sm:text-4xl lg:text-5xl">
+                                {{ $shopBanner->title ?: 'برای خانه‌ای با امضای شما' }}
                             </h1>
+                            @if($shopBanner->description)
+                                <p class="mt-4 max-w-2xl text-sm leading-8 text-white/80 sm:text-base">
+                                    {{ $shopBanner->description }}
+                                </p>
+                            @endif
 
-                            <p class="mt-4 max-w-2xl text-sm leading-8 text-[var(--sg-stone)]">
-                                مجموعه‌ای منتخب از مبلمان و عناصر خانه برای فضاهایی که قرار است
-                                شخصیت و ماندگاری داشته باشند.
-                            </p>
-
+                            <div class="mt-7 flex flex-wrap items-center gap-3">
+                                <a href="#shop-products" class="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-xs font-semibold text-[var(--sg-ink)] transition hover:bg-[var(--sg-cream)] sm:text-sm">
+                                    مشاهده محصولات
+                                    <span aria-hidden="true">←</span>
+                                </a>
+                                <span class="rounded-xl border border-white/25 bg-black/20 px-4 py-3 text-xs text-white/90 backdrop-blur-sm">
+                                    {{ number_format($products->total()) }} محصول در مجموعه
+                                </span>
+                            </div>
                         </div>
-
-
-                        <div class="text-sm text-[var(--sg-stone)]">
-
-                            <span class="font-semibold text-[var(--sg-ink)]">
-                                {{ number_format($products->total()) }}
-                            </span>
-
-                            محصول
-
-                        </div>
-
                     </div>
-
                 </div>
-
             </x-layout.container>
-
         </section>
 
 
@@ -353,7 +334,7 @@
 
                         @if($products->isNotEmpty())
 
-                            <div class="mt-8 sg-product-grid sg-product-grid--catalog">
+                            <div id="shop-products" class="mt-8 sg-product-grid sg-product-grid--catalog">
 
                                 @foreach($products as $product)
 

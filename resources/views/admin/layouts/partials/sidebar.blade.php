@@ -494,6 +494,11 @@
                     <span class="flex-1">صفحات سایت</span>
                 </a>
 
+                <a href="{{ route('admin.shop-banner.edit') }}" class="group flex items-center gap-3 rounded-2xl px-3 py-3 text-xs font-medium text-[var(--admin-text-soft)] transition hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text)] {{ request()->routeIs('admin.shop-banner.*') ? 'bg-[var(--admin-surface)] text-[var(--admin-text)]' : '' }}">
+                    <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">▧</span>
+                    <span class="flex-1">بنر صفحه فروشگاه</span>
+                </a>
+
                 <a href="{{ route('admin.blog.index') }}" class="group flex items-center gap-3 rounded-2xl px-3 py-3 text-xs font-medium text-[var(--admin-text-soft)] transition hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text)]">
                     <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">✎</span>
                     <span class="flex-1">وبلاگ و مقاله‌ها</span>

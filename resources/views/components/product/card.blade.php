@@ -41,10 +41,10 @@
             : 0;
 @endphp
 
-<article class="product-card group relative flex h-full min-w-0 flex-col" aria-labelledby="product-card-title-{{ $product->id }}">
+<article class="product-card group relative flex h-full min-w-0 flex-col overflow-hidden rounded-[1.5rem] border border-[var(--sg-border)] bg-[var(--sg-white)] shadow-sm transition duration-300 hover:-translate-y-1 hover:border-[var(--sg-accent)]/40 hover:shadow-lg" aria-labelledby="product-card-title-{{ $product->id }}">
 
     {{-- Image --}}
-    <div class="relative overflow-hidden rounded-[1.5rem] bg-[var(--sg-surface)]" data-card-media>
+    <div class="relative overflow-hidden bg-[var(--sg-surface)]" data-card-media>
 
         <a
             href="{{ route('product.show', $product->slug) }}"
@@ -155,7 +155,7 @@
 
 
     {{-- Product Information --}}
-    <div class="product-card-content flex flex-1 flex-col pt-4">
+    <div class="product-card-content flex flex-1 flex-col p-4 sm:p-5">
 
         {{-- Category --}}
         @if($product->category)
@@ -179,8 +179,14 @@
             </h3>
         </a>
 
+        @if(filled($product->short_description))
+            <p class="mt-2 min-h-10 line-clamp-2 text-xs leading-6 text-[var(--sg-stone)]">{{ $product->short_description }}</p>
+        @else
+            <p class="mt-2 min-h-10" aria-hidden="true"></p>
+        @endif
+
         {{-- Price --}}
-        <div class="product-card-price mt-3 min-h-10">
+        <div class="product-card-price mt-3 min-h-10 flex-col">
             <span class="text-[10px] font-medium text-[var(--sg-stone)]">قیمت محصول</span>
 
             @if($hasDiscount)
@@ -261,7 +267,7 @@
         {{-- CTA --}}
         <a
             href="{{ route('product.show', $product->slug) }}"
-            class="mt-auto pt-4 inline-flex items-center text-xs font-medium text-[var(--sg-ink)] transition duration-300 group-hover:text-[var(--sg-accent)]"
+            class="mt-auto inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[var(--sg-border)] bg-[var(--sg-surface)] px-4 py-3 text-xs font-semibold text-[var(--sg-ink)] transition duration-300 hover:border-[var(--sg-ink)] hover:bg-[var(--sg-ink)] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sg-accent)]"
         >
             مشاهده محصول
             <span class="mr-2 transition-transform duration-300 group-hover:-translate-x-1">
