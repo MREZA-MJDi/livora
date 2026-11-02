@@ -169,7 +169,10 @@ class ProductController extends Controller
                 $product->relatedProducts()->sync(array_values(array_diff($relatedProductIds, [$product->id])));
 
                 if ($bannerPath) {
-                    $product->update(['banner_image' => $bannerPath]);
+                    $product->update([
+                        'banner_image' => $bannerPath,
+                        'banner_image_alt' => $data['banner_image_alt'] ?? $product->name,
+                    ]);
                 }
 
                 if ($imagePath) {
