@@ -99,6 +99,38 @@ class CmsOperationsTest extends TestCase
             ->assertSee('Google Search Console');
     }
 
+    public function test_storefront_settings_hide_unconfigured_channels_and_enable_only_configured_floating_actions(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $this->actingAs($admin)
+            ->put(route('admin.contact-settings.update'), [
+                'brand_name' => 'برند آزمایشی',
+                'phone_label' => 'تماس',
+                'email_label' => 'ایمیل',
+                'support_label' => 'پشتیبانی',
+                'online_label' => 'ارتباط آنلاین',
+                'whatsapp_url' => 'https://wa.me/989121234567',
+                'floating_actions_enabled' => '1',
+                'is_active' => '1',
+            ])
+            ->assertRedirect(route('admin.contact-settings.edit'));
+
+        $this->assertDatabaseHas('contact_settings', [
+            'brand_name' => 'برند آزمایشی',
+            'whatsapp_url' => 'https://wa.me/989121234567',
+            'floating_actions_enabled' => true,
+        ]);
+
+        Cache::forget('storefront.settings');
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('برند آزمایشی')
+            ->assertSee('واتساپ')
+            ->assertDontSee('تلگرام');
+    }
+
     public function test_contact_message_is_not_marked_replied_when_production_mailer_is_not_configured(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);

@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'تماس با SillaGallery | ارتباط با ما')
+@section('title', 'تماس با '.($storeSettings?->brand_name ?: config('app.name')).' | ارتباط با ما')
 
-@section('description', $pageContent['hero_description'] ?? 'برای مشاوره خرید، پیگیری سفارش و دریافت اطلاعات بیشتر درباره محصولات و خدمات SillaGallery با ما در ارتباط باشید.')
+@section('description', $pageContent['hero_description'] ?? 'برای مشاوره خرید، پیگیری سفارش و دریافت اطلاعات بیشتر با ما در ارتباط باشید.')
 
 @section('canonical', \App\Models\SeoPageSetting::forRoute('contact')?->canonical_url ?: route('contact'))
 @section('robots', \App\Models\SeoPageSetting::forRoute('contact')?->robots() ?? \App\Models\SeoSetting::current()->robots())
@@ -66,7 +66,7 @@
                         <div class="max-w-4xl">
 
                             <p class="text-[10px] font-medium uppercase tracking-[0.24em] text-[var(--sg-accent)]">
-                                {{ $pageContent['hero_kicker'] ?? 'GET IN TOUCH' }}
+                                {{ $pageContent['hero_kicker'] ?? 'ارتباط با ما' }}
                             </p>
 
                             <h1 class="mt-5 text-5xl font-semibold leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl">
@@ -82,7 +82,7 @@
                         <div>
 
                             <p class="text-sm leading-8 text-[var(--sg-stone)] sm:text-base">
-                                {{ $pageContent['hero_description'] ?? 'برای مشاوره خرید، پیگیری سفارش، پرسش درباره شرایط اقساط یا هر موضوع دیگری می‌توانید با SillaGallery در ارتباط باشید.' }}
+                                {{ $pageContent['hero_description'] ?? 'برای مشاوره خرید، پیگیری سفارش یا هر موضوع دیگری می‌توانید با ما در ارتباط باشید.' }}
                             </p>
 
                             <a
@@ -135,7 +135,7 @@
                                     </div>
 
                                     <p class="mt-7 text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
-                                        PHONE
+                                        تلفن
                                     </p>
 
                                     <h2 class="mt-2 text-base font-semibold">
@@ -143,7 +143,7 @@
                                     </h2>
 
                                     <p class="mt-3 break-all text-xs leading-6 text-[var(--sg-stone)]">
-                                        {{ $contactSetting?->phone ?? 'شماره تماس ثبت نشده است.' }}
+                                        {{ $contactSetting?->phone }}
                                     </p>
 
                                 @if($contactSetting?->phone)
@@ -179,7 +179,7 @@
                                 </div>
 
                                 <p class="mt-7 text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
-                                    EMAIL
+                                    ایمیل
                                 </p>
 
                                 <h2 class="mt-2 text-base font-semibold">
@@ -187,7 +187,7 @@
                                 </h2>
 
                                 <p class="mt-3 break-all text-xs leading-6 text-[var(--sg-stone)]">
-                                    {{ $contactSetting?->email ?? 'ایمیل ثبت نشده است.' }}
+                                {{ $contactSetting?->email }}
                                 </p>
 
                             @if($contactSetting?->email)
@@ -203,14 +203,14 @@
 
     {{-- SUPPORT --}}
 
-    <div class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-6">
+    @if(filled($contactSetting?->support_description))<div class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-6">
 
         <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--sg-surface)] text-xs font-semibold">
             03
         </div>
 
         <p class="mt-7 text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
-            SUPPORT
+            پشتیبانی
         </p>
 
         <h2 class="mt-2 text-base font-semibold">
@@ -218,22 +218,22 @@
         </h2>
 
         <p class="mt-3 text-xs leading-6 text-[var(--sg-stone)]">
-            {{ $contactSetting?->support_description ?? 'پاسخ‌گویی به پرسش‌های خرید و سفارش.' }}
+            {{ $contactSetting->support_description }}
         </p>
 
-    </div>
+    </div>@endif
 
 
     {{-- ONLINE --}}
 
-    <div class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-6">
+    @if(filled($contactSetting?->online_description))<div class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-6">
 
         <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--sg-surface)] text-xs font-semibold">
             04
         </div>
 
         <p class="mt-7 text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
-            ONLINE
+            ارتباط آنلاین
         </p>
 
         <h2 class="mt-2 text-base font-semibold">
@@ -241,10 +241,10 @@
         </h2>
 
         <p class="mt-3 text-xs leading-6 text-[var(--sg-stone)]">
-            {{ $contactSetting?->online_description ?? 'پیام خود را ارسال کنید تا با شما تماس بگیریم.' }}
+            {{ $contactSetting->online_description }}
         </p>
 
-    </div>
+    </div>@endif
 
     </div>
 
@@ -268,7 +268,7 @@
                 <div>
 
                     <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
-                        {{ $pageContent['info_kicker'] ?? "LET'S TALK" }}
+                        {{ $pageContent['info_kicker'] ?? 'پشتیبانی' }}
                     </p>
 
                     <h2 class="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -284,47 +284,47 @@
 
                     <div class="mt-10 space-y-3">
 
-                        <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
+                        @if(filled($contactSetting?->address))<div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
 
                             <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
-                                {{ $pageContent['address_label'] ?? 'ADDRESS' }}
+                                {{ $pageContent['address_label'] ?? 'آدرس' }}
                             </p>
 
                             <p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">
-                                {{ $contactSetting?->address ?? 'آدرس فروشگاه ثبت نشده است.' }}
+                                {{ $contactSetting->address }}
                             </p>
 
-                        </div>
+                        </div>@endif
 
 
                         {{-- HOURS --}}
 
-                        <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
+                        @if(filled($contactSetting?->hours))<div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
 
                             <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
-                                {{ $pageContent['hours_label'] ?? 'HOURS' }}
+                                {{ $pageContent['hours_label'] ?? 'ساعات کاری' }}
                             </p>
 
                             <p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">
-                                {{ $contactSetting?->hours ?? 'ساعات کاری فروشگاه ثبت نشده است.' }}
+                                {{ $contactSetting->hours }}
                             </p>
 
-                        </div>
+                        </div>@endif
 
 
                         {{-- INSTALLMENT --}}
 
-                        <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
+                        @if(filled($pageContent['installment_note'] ?? null))<div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
 
                             <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
-                                {{ $pageContent['installment_label'] ?? 'INSTALLMENT' }}
+                                {{ $pageContent['installment_label'] ?? 'اقساط' }}
                             </p>
 
                             <p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">
-                                {{ $pageContent['installment_note'] ?? 'برای اطلاع از شرایط اقساط هر محصول، صفحه همان محصول را بررسی کنید یا از طریق فرم با ما تماس بگیرید.' }}
+                                {{ $pageContent['installment_note'] }}
                             </p>
 
-                        </div>
+                        </div>@endif
 
                     </div>
 
@@ -338,7 +338,7 @@
                     <div class="mb-8">
 
                         <p class="text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--sg-accent)]">
-                            {{ $pageContent['form_kicker'] ?? 'CONTACT FORM' }}
+                            {{ $pageContent['form_kicker'] ?? 'فرم تماس' }}
                         </p>
 
                         <h2 class="mt-3 text-2xl font-semibold">
@@ -653,7 +653,7 @@
                 <div>
 
                     <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
-                        {{ $pageContent['faq_kicker'] ?? 'FAQ' }}
+                        {{ $pageContent['faq_kicker'] ?? 'پرسش‌های متداول' }}
                     </p>
 
                     <h2 class="mt-4 text-3xl font-semibold tracking-tight">
@@ -661,7 +661,7 @@
                     </h2>
 
                     <p class="mt-4 text-sm leading-8 text-[var(--sg-stone)]">
-                        {{ $pageContent['faq_description'] ?? 'پاسخ چند سؤال رایج درباره ارتباط با SillaGallery و خرید از فروشگاه.' }}
+                        {{ $pageContent['faq_description'] ?? 'پاسخ چند سؤال رایج درباره ارتباط با فروشگاه و خرید.' }}
                     </p>
 
                 </div>
@@ -717,17 +717,7 @@
 
                         </article>
 
-                    @empty
-
-                        <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-cream)] p-6">
-
-                            <p class="text-sm leading-7 text-[var(--sg-stone)]">
-                                در حال حاضر پرسش متداولی ثبت نشده است.
-                            </p>
-
-                        </div>
-
-                    @endforelse
+                    @empty @endforelse
 
                 </div>
 
@@ -751,7 +741,7 @@
                 <div>
 
                     <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--sg-accent)]">
-                        {{ $pageContent['final_kicker'] ?? 'SillaGallery' }}
+                        {{ $pageContent['final_kicker'] ?? ($storeSettings?->brand_name ?: config('app.name')) }}
                     </p>
 
                     <h2 class="mt-2 text-2xl font-semibold">

@@ -43,7 +43,7 @@
                 @click="mobileOpen = false"
                 class="text-xl font-semibold tracking-[0.22em] text-[var(--sg-ink)]"
             >
-                SillaGallery
+                {{ $storeSettings?->brand_name ?: config('app.name') }}
             </a>
 
             <button

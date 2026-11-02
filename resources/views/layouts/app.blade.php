@@ -6,8 +6,9 @@
         $pageSeo = \App\Models\SeoPageSetting::forRoute(\Illuminate\Support\Facades\Route::currentRouteName());
         // Admin-managed SEO values take precedence on fixed pages, while dynamic
         // product/category/article metadata continues to come from each view.
-        $seoTitle = $pageSeo?->meta_title ?: (trim($__env->yieldContent('title')) ?: ($siteSeo->default_title ?: 'SillaGallery'));
-        $seoDescription = $pageSeo?->meta_description ?: (trim($__env->yieldContent('description')) ?: ($siteSeo->default_description ?: 'فروشگاه SillaGallery'));
+        $brandName = $storeSettings?->brand_name ?: config('app.name');
+        $seoTitle = $pageSeo?->meta_title ?: (trim($__env->yieldContent('title')) ?: ($siteSeo->default_title ?: $brandName));
+        $seoDescription = $pageSeo?->meta_description ?: (trim($__env->yieldContent('description')) ?: ($siteSeo->default_description ?: 'فروشگاه اینترنتی '.$brandName));
         $routeName = (string) \Illuminate\Support\Facades\Route::currentRouteName();
         $privateRoute = in_array($routeName, [
             'login', 'register', 'password.request', 'password.reset',
@@ -46,7 +47,7 @@
     <meta name="robots" content="{{ $seoRobots }}">
     <meta name="description" content="{{ $seoDescription }}">
     <meta name="theme-color" content="#f3f1ed">
-    <meta property="og:site_name" content="SillaGallery">
+    <meta property="og:site_name" content="{{ $brandName }}">
     <meta property="og:type" content="{{ $seoOgType }}">
     <meta property="og:title" content="{{ $seoOgTitle }}">
     <meta property="og:description" content="{{ $seoOgDescription }}">
@@ -64,7 +65,7 @@
     <script type="application/ld+json">{!! json_encode([
         '@context' => 'https://schema.org',
         '@type' => 'Organization',
-        'name' => $siteSeo->organization_name ?: 'SillaGallery',
+        'name' => $siteSeo->organization_name ?: $brandName,
         'description' => $siteSeo->organization_description ?: $siteSeo->default_description,
         'url' => $seoBaseUrl,
         'logo' => $siteSeo->organization_logo_url,
@@ -75,7 +76,7 @@
     <script type="application/ld+json">{!! json_encode([
         '@context' => 'https://schema.org',
         '@type' => 'WebSite',
-        'name' => 'SillaGallery',
+        'name' => $brandName,
         'url' => $seoBaseUrl,
         'potentialAction' => [
             '@type' => 'SearchAction',
@@ -117,6 +118,7 @@
     <x-shop.filter-drawer />
     <main class="storefront-content">@yield('content')</main>
     <x-layout.footer />
+    <x-layout.floating-actions />
     <x-layout.mobile-bottom-bar />
 </div>
 @stack('scripts')

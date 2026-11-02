@@ -8,7 +8,7 @@ use App\Models\SeoSetting;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
+use App\Http\Requests\Admin\ContactSettingRequest;
 use Illuminate\View\View;
 
 class ContactSettingController extends Controller
@@ -22,9 +22,9 @@ class ContactSettingController extends Controller
         ]);
     }
 
-    public function update(Request $request): RedirectResponse
+    public function update(ContactSettingRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
+        $validated = array_merge($request->validated(), $request->validate([
             'phone' => ['nullable', 'string', 'max:40'],
             'email' => ['nullable', 'email', 'max:255'],
             'address' => ['nullable', 'string', 'max:2000'],
@@ -63,7 +63,7 @@ class ContactSettingController extends Controller
             'page_content.final_description' => ['nullable', 'string', 'max:1000'],
             'page_content.final_cta' => ['nullable', 'string', 'max:120'],
             'page_content.success_message' => ['nullable', 'string', 'max:1000'],
-        ]);
+        ]));
 
         $validated['faqs'] = collect($validated['faqs'] ?? [])
             ->map(fn (array $faq): array => [
@@ -77,6 +77,7 @@ class ContactSettingController extends Controller
             ->map(fn ($value): string => trim((string) $value))
             ->all();
         $validated['is_active'] = $request->boolean('is_active');
+        $validated['floating_actions_enabled'] = $request->boolean('floating_actions_enabled');
 
         DB::transaction(function () use ($validated): void {
             ContactSetting::query()->updateOrCreate(['id' => 1], $validated);
@@ -88,6 +89,7 @@ class ContactSettingController extends Controller
             ]);
         });
         Cache::forget('seo_settings.current');
+        Cache::forget('storefront.settings');
 
         return redirect()
             ->route('admin.contact-settings.edit')

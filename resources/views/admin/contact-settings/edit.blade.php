@@ -20,6 +20,21 @@
         @method('PUT')
 
         <section class="admin-card space-y-5 p-6">
+            <div>
+                <h2 class="text-base font-bold">هویت و ارتباطات فروشگاه</h2>
+                <p class="admin-help mt-1">فقط مقدارهای ثبت‌شده در سایت نمایش داده می‌شوند؛ وارد نکردن یک مقدار، همان بخش را پنهان می‌کند.</p>
+            </div>
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div><label class="admin-label" for="brand_name">نام برند</label><input id="brand_name" name="brand_name" class="admin-input" maxlength="120" value="{{ old('brand_name', $settings->brand_name ?? config('app.name')) }}">@error('brand_name')<p class="admin-error">{{ $message }}</p>@enderror</div>
+                <div><label class="admin-label" for="logo_path">نشانی لوگو</label><input id="logo_path" name="logo_path" type="url" dir="ltr" class="admin-input" value="{{ old('logo_path', $settings->logo_path ?? '') }}"><p class="admin-help">اختیاری؛ از رسانه‌های تأییدشده سایت استفاده کنید.</p>@error('logo_path')<p class="admin-error">{{ $message }}</p>@enderror</div>
+                @foreach(['whatsapp_url' => 'واتساپ', 'telegram_url' => 'تلگرام', 'instagram_url' => 'اینستاگرام', 'eitaa_url' => 'ایتا', 'bale_url' => 'بله'] as $field => $label)
+                    <div><label class="admin-label" for="{{ $field }}">{{ $label }}</label><input id="{{ $field }}" name="{{ $field }}" type="url" dir="ltr" class="admin-input" value="{{ old($field, $settings->{$field} ?? '') }}">@error($field)<p class="admin-error">{{ $message }}</p>@enderror</div>
+                @endforeach
+            </div>
+            <label class="flex items-center gap-2 rounded-xl border border-[var(--admin-border)] px-4 py-3 text-xs"><input type="hidden" name="floating_actions_enabled" value="0"><input type="checkbox" name="floating_actions_enabled" value="1" class="admin-checkbox" @checked(old('floating_actions_enabled', $settings->floating_actions_enabled ?? false))> نمایش دکمه‌های شناور ارتباط در سایت</label>
+        </section>
+
+        <section class="admin-card space-y-5 p-6">
             <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
                     <h2 class="text-base font-bold">اطلاعات اصلی تماس</h2>
@@ -50,6 +65,17 @@
                     <label class="admin-label" for="hours">ساعات کاری</label>
                     <textarea id="hours" name="hours" rows="3" class="admin-textarea">{{ old('hours', $settings->hours ?? '') }}</textarea>
                 </div>
+            </div>
+        </section>
+
+        <section class="admin-card space-y-5 p-6">
+            <h2 class="text-base font-bold">خدمات و موقعیت</h2>
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div><label class="admin-label" for="map_latitude">عرض جغرافیایی نقشه</label><input id="map_latitude" name="map_latitude" type="number" step="0.0000001" class="admin-input" dir="ltr" value="{{ old('map_latitude', $settings->map_latitude ?? '') }}"></div>
+                <div><label class="admin-label" for="map_longitude">طول جغرافیایی نقشه</label><input id="map_longitude" name="map_longitude" type="number" step="0.0000001" class="admin-input" dir="ltr" value="{{ old('map_longitude', $settings->map_longitude ?? '') }}"></div>
+                @foreach(['warranty_text' => 'متن گارانتی', 'shipping_text' => 'متن ارسال', 'installation_text' => 'متن نصب/خدمات', 'returns_text' => 'متن مرجوعی'] as $field => $label)
+                    <div class="sm:col-span-2"><label class="admin-label" for="{{ $field }}">{{ $label }}</label><textarea id="{{ $field }}" name="{{ $field }}" rows="3" maxlength="5000" class="admin-textarea">{{ old($field, $settings->{$field} ?? '') }}</textarea>@error($field)<p class="admin-error">{{ $message }}</p>@enderror</div>
+                @endforeach
             </div>
         </section>
 

@@ -15,11 +15,13 @@
                 <a
                     href="{{ route('home') }}"
                     class="group inline-flex items-center"
-                    aria-label="SillaGallery"
+                    aria-label="{{ $storeSettings?->brand_name ?: config('app.name') }}"
                 >
-                    <span class="sillagallery-wordmark" aria-hidden="true">
-                        <span class="sillagallery-wordmark__main">Silla</span><span class="sillagallery-wordmark__sub">Gallery</span>
-                    </span>
+                    @if($storeSettings?->logo_path)
+                        <img src="{{ $storeSettings->logo_path }}" alt="{{ $storeSettings->brand_name ?: config('app.name') }}" class="max-h-10 max-w-40 object-contain">
+                    @else
+                        <span class="text-lg font-bold text-[var(--sg-ink)]">{{ $storeSettings?->brand_name ?: config('app.name') }}</span>
+                    @endif
                 </a>
 
             </div>
