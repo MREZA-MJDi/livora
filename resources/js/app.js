@@ -518,3 +518,37 @@ if (/^\/admin(?:\/|$)/.test(window.location.pathname) && !window.__sgAdminSessio
 
 
 Alpine.start();
+
+ 
+// Native scroll-snap product carousels: touch/trackpad work without JS,
+// while these controls add predictable one-card movement and keyboard labels.
+const initSgProductCarousels = () => {
+    document.querySelectorAll('[data-sg-carousel]').forEach((root) => {
+        if (root.dataset.carouselReady === '1') return;
+        const track = root.querySelector('[data-carousel-track]');
+        const previous = root.querySelector('[data-carousel-prev]');
+        const next = root.querySelector('[data-carousel-next]');
+        if (!track || !previous || !next) return;
+        root.dataset.carouselReady = '1';
+
+        const move = (direction) => {
+            const item = track.querySelector('.sg-product-carousel-item');
+            if (!item) return;
+            const styles = window.getComputedStyle(track);
+            const gap = Number.parseFloat(styles.columnGap || styles.gap || '0') || 0;
+            const distance = item.getBoundingClientRect().width + gap;
+            const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            // The track is RTL: next advances visually toward the left.
+            track.scrollBy({ left: direction === 'next' ? -distance : distance, behavior: reducedMotion ? 'auto' : 'smooth' });
+        };
+
+        previous.addEventListener('click', () => move('previous'));
+        next.addEventListener('click', () => move('next'));
+    });
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSgProductCarousels, { once: true });
+} else {
+    initSgProductCarousels();
+}
