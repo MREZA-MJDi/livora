@@ -267,7 +267,7 @@
         {{-- CTA --}}
         <a
             href="{{ route('product.show', $product->slug) }}"
-            class="mt-auto mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[var(--sg-border)] bg-[var(--sg-surface)] px-4 py-3 text-xs font-semibold text-[var(--sg-ink)] transition duration-300 hover:border-[var(--sg-ink)] hover:bg-[var(--sg-ink)] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sg-accent)]"
+            class="mt-auto inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[var(--sg-border)] bg-[var(--sg-surface)] px-4 py-3 text-xs font-semibold text-[var(--sg-ink)] transition duration-300 hover:border-[var(--sg-ink)] hover:bg-[var(--sg-ink)] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sg-accent)]"
         >
             مشاهده محصول
             <span class="mr-2 transition-transform duration-300 group-hover:-translate-x-1">
