@@ -97,7 +97,8 @@ class Product extends Model
     {
         return $this->hasMany(ProductImage::class)
             ->orderByDesc('is_primary')
-            ->orderBy('sort_order');
+            ->orderBy('sort_order')
+            ->orderBy('id');
     }
 
     public function relatedProducts(): BelongsToMany
