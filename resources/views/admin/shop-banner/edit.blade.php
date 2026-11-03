@@ -49,7 +49,7 @@
                     data-crop-ratio="2.4"
                     class="admin-input"
                 >
-                @include('admin.media.partials.picker', ['mediaPickerField' => 'banner_image', 'mediaPickerId' => old('media_id', $settings->media_id), 'mediaPickerUrl' => $settings->banner_image_url, 'mediaPickerName' => 'بنر فروشگاه', 'mediaPickerPreviewId' => 'shop-banner-image-preview'])
+                @include('admin.media.partials.picker', ['mediaPickerField' => 'banner_image', 'mediaPickerId' => old('media_id', $settings->media_id), 'mediaPickerUrl' => $settings->banner_image_url, 'mediaPickerName' => 'بنر فروشگاه', 'mediaPickerPreviewId' => 'shop-banner-image-preview', 'mediaPickerRemoveName' => 'remove_banner'])
                 @error('banner_image')<p class="admin-error">{{ $message }}</p>@enderror
                 <p class="admin-help mt-2">پس از انتخاب تصویر، ابزار برش باز می‌شود. قاب را با کشیدن تصویر و کنترل بزرگ‌نمایی تنظیم کنید.</p>
             </div>
@@ -60,12 +60,7 @@
                 @error('banner_image_alt')<p class="admin-error">{{ $message }}</p>@enderror
             </div>
 
-            @if($settings->banner_image)
-                <label class="flex items-center gap-2 text-sm text-rose-700">
-                    <input type="checkbox" name="remove_banner" value="1" class="admin-checkbox">
-                    حذف تصویر فعلی و نمایش بنر متنی
-                </label>
-            @endif
+
         </section>
 
         <section class="admin-card space-y-5 p-6">
