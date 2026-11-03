@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BlogPost;
 use App\Models\BlogTag;
 use App\Support\HtmlSanitizer;
+use App\Support\MediaLibrary;
 use App\Support\UniqueSlug;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -46,11 +47,11 @@ class BlogPostController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $this->validatedData($request);
-        $imagePath = $request->file('featured_image')?->store('blog', 'public');
-
-        if ($request->hasFile('featured_image') && ! $imagePath) {
-            throw new \RuntimeException('Blog featured image could not be stored.');
-        }
+        $media = $request->hasFile('featured_image')
+            ? MediaLibrary::store($request->file('featured_image'), (int) $request->user()->id, 'blog', $validated['featured_image_alt'] ?? null)
+            : MediaLibrary::image($validated['media_id'] ?? null);
+        $imagePath = $media?->path;
+        $validated['media_id'] = $media?->id;
 
         try {
             DB::transaction(function () use ($request, $validated, $imagePath): void {
@@ -90,17 +91,19 @@ class BlogPostController extends Controller
     {
         $validated = $this->validatedData($request, $blog);
         $oldImage = $blog->featured_image;
-        $newImage = $request->file('featured_image')?->store('blog', 'public');
-
-        if ($request->hasFile('featured_image') && ! $newImage) {
-            throw new \RuntimeException('Blog featured image could not be stored.');
-        }
+        $newMedia = $request->hasFile('featured_image')
+            ? MediaLibrary::store($request->file('featured_image'), (int) $request->user()->id, 'blog', $request->input('featured_image_alt'))
+            : (filled($request->input('media_id')) ? MediaLibrary::image($request->input('media_id')) : null);
+        $newImage = $newMedia?->path;
 
         try {
-            DB::transaction(function () use ($validated, $blog, $newImage): void {
+            DB::transaction(function () use ($validated, $blog, $newImage, $newMedia): void {
                 $validated['body'] = HtmlSanitizer::sanitize($validated['body']);
                 if ($newImage) {
                     $validated['featured_image'] = $newImage;
+                    $validated['media_id'] = $newMedia?->id;
+                } else {
+                    unset($validated['media_id']);
                 }
                 $validated['published_at'] = $validated['status'] === 'published'
                     ? ($validated['published_at'] ?? $blog->published_at ?? now())
@@ -117,23 +120,13 @@ class BlogPostController extends Controller
             throw $exception;
         }
 
-        if ($newImage && $oldImage && $oldImage !== $newImage && ! Str::startsWith($oldImage, ['http://', 'https://', '//'])) {
-            Storage::disk('public')->delete($oldImage);
-        }
 
         return redirect()->route('admin.blog.edit', $blog)->with('success', 'مقاله بروزرسانی شد.');
     }
 
     public function destroy(BlogPost $blog): RedirectResponse
     {
-        $images = [$blog->featured_image, $blog->og_image];
         $blog->delete();
-
-        foreach (array_unique(array_filter($images)) as $image) {
-            if (! Str::startsWith($image, ['http://', 'https://', '//'])) {
-                Storage::disk('public')->delete($image);
-            }
-        }
 
         return redirect()->route('admin.blog.index')->with('success', 'مقاله حذف شد.');
     }
@@ -158,6 +151,7 @@ class BlogPostController extends Controller
             'tags' => ['nullable', 'string', 'max:1000'],
             'excerpt' => ['nullable', 'string', 'max:500'],
             'body' => ['required', 'string', 'max:2000000'],
+            'media_id' => ['nullable', 'integer', 'exists:media,id'],
             'featured_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
             'featured_image_alt' => ['nullable', 'string', 'max:255'],
             'meta_title' => ['nullable', 'string', 'max:255'],
