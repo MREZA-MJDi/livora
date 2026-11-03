@@ -33,6 +33,7 @@ class CategoryController extends Controller
 
         $filters = $request->validated();
         $category->load([
+            'latestActiveProduct.images' => fn ($imageQuery) => $imageQuery->limit(1),
             'relatedCategories' => fn ($query) => $query
                 ->where('is_active', true)
                 ->withCount(['products' => fn ($productQuery) => $productQuery->active()]),
