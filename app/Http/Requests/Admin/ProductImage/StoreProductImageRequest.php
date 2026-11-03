@@ -21,11 +21,14 @@ class StoreProductImageRequest extends FormRequest
             ],
 
             'image' => [
-                'required',
+                'required_without:media_id',
+                'nullable',
                 'image',
                 'mimes:jpg,jpeg,png,webp',
                 'max:10240',
             ],
+
+            'media_id' => ['required_without:image', 'nullable', 'integer', 'exists:media,id'],
 
             'alt' => [
                 'nullable',
