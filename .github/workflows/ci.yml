@@ -20,7 +20,7 @@ jobs:
   dependency-remediation:
     name: Remediate npm advisories on main
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
       contents: write
@@ -64,7 +64,7 @@ jobs:
     if: ${{ !cancelled() && (needs.dependency-remediation.result == 'success' || needs.dependency-remediation.result == 'skipped') }}
     permissions:
       contents: read
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
 
     steps:
@@ -169,7 +169,7 @@ jobs:
 
   mariadb-compatibility:
     name: MariaDB migration and feature compatibility
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     services:
       mariadb:
