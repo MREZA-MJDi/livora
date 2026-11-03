@@ -96,11 +96,14 @@ class BlogPostController extends Controller
         try {
             DB::transaction(function () use ($validated, $blog, $newImage, $newMedia): void {
                 $validated['body'] = HtmlSanitizer::sanitize($validated['body']);
-                if ($newImage) {
+                if ($request->boolean('remove_featured_image')) {
+                    $validated['featured_image'] = null;
+                    $validated['media_id'] = null;
+                } elseif ($newImage) {
                     $validated['featured_image'] = $newImage;
                     $validated['media_id'] = $newMedia?->id;
                 } else {
-                    unset($validated['media_id']);
+                    unset($validated['media_id'], $validated['featured_image']);
                 }
                 $validated['published_at'] = $validated['status'] === 'published'
                     ? ($validated['published_at'] ?? $blog->published_at ?? now())
