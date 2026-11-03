@@ -1259,7 +1259,34 @@
                 <ul class="mt-3 space-y-2">@foreach($seoAnalysis['checks'] as $check)<li class="flex items-start gap-2 text-xs"><span class="{{ $check['passed'] ? 'text-emerald-600' : 'text-amber-600' }}">{{ $check['passed'] ? '✓' : '•' }}</span><span><strong>{{ $check['label'] }}</strong><span class="block text-[var(--admin-muted)]">{{ $check['detail'] }}</span></span></li>@endforeach</ul>
             </div>
         @endif
-        <div><label class="admin-label" for="canonical_url">Canonical URL</label><input id="canonical_url" name="canonical_url" type="url" dir="ltr" class="admin-input" value="{{ old('canonical_url', $product->canonical_url ?? '') }}"></div>
+        <div x-data="seoRoutePicker('{{ route('admin.seo.public-routes') }}')">
+            <label class="admin-label" for="canonical_url">Canonical URL</label>
+            <input id="canonical_url" name="canonical_url" type="url" dir="ltr" class="admin-input" value="{{ old('canonical_url', $product->canonical_url ?? '') }}" placeholder="https://sillashop.com/product/example">
+            <div class="mt-2 flex flex-wrap items-center gap-2">
+                <button type="button" class="admin-btn admin-btn-secondary" @click="show()">انتخاب از صفحات واقعی سایت</button>
+                <p class="admin-help">اگر Canonical متفاوتی لازم نیست، این فیلد را خالی بگذارید تا آدرس اصلی محصول استفاده شود.</p>
+            </div>
+            @error('canonical_url')<p class="admin-error">{{ $message }}</p>@enderror
+            <div x-show="open" x-cloak class="fixed inset-0 z-[310] flex items-center justify-center bg-black/60 p-3 sm:p-6" @keydown.escape.window="open = false">
+                <section class="flex max-h-[85vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-[var(--admin-white)] shadow-2xl" role="dialog" aria-modal="true" aria-label="انتخاب صفحه عمومی">
+                    <header class="flex items-center justify-between border-b border-[var(--admin-border)] p-4"><div><h3 class="font-bold">صفحات قابل‌دسترسی فروشگاه</h3><p class="mt-1 text-xs text-[var(--admin-muted)]">فقط مسیرهای عمومی نمایش داده می‌شوند؛ مسیرهای مدیریت، ورود و پرداخت در این فهرست نیستند.</p></div><button type="button" class="admin-btn admin-btn-secondary" @click="open = false">بستن</button></header>
+                    <div class="p-4"><input type="search" class="admin-input" x-model="search" @input.debounce.300ms="load()" placeholder="جست‌وجوی نام صفحه، محصول یا دسته‌بندی"></div>
+                    <div class="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
+                        <p x-show="loading" class="py-6 text-center text-sm text-[var(--admin-muted)]">در حال بارگذاری…</p>
+                        <div class="space-y-2">
+                            <template x-for="item in routes" :key="item.url">
+                                <button type="button" @click="choose(item.url)" class="block w-full rounded-xl border border-[var(--admin-border)] p-3 text-right hover:border-[var(--admin-accent)] hover:bg-[var(--admin-accent-soft)]">
+                                    <span class="block text-sm font-semibold" x-text="item.label"></span>
+                                    <span class="mt-1 block break-all text-xs text-[var(--admin-muted)]" dir="ltr" x-text="item.url"></span>
+                                    <span class="mt-1 inline-block text-[10px] text-[var(--admin-accent-dark)]" x-text="item.kind"></span>
+                                </button>
+                            </template>
+                        </div>
+                        <p x-show="!loading && routes.length === 0" class="py-6 text-center text-sm text-[var(--admin-muted)]">صفحه‌ای با این عبارت پیدا نشد.</p>
+                    </div>
+                </section>
+            </div>
+        </div>
         <div><label class="admin-label" for="og_image">Open Graph Image URL</label><input id="og_image" name="og_image" type="url" dir="ltr" class="admin-input" value="{{ old('og_image', $product->og_image ?? '') }}"></div>
     </div>
 
