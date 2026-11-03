@@ -261,7 +261,7 @@
                                 value="{{ $category->id }}"
                                 @selected(old('category_id', $product->category_id ?? '') == $category->id)
                             >
-                            {{ $category->name }}
+                            {{ $category->name }}{{ $category->is_active ? '' : ' — غیرفعال و غیرقابل نمایش در فروشگاه' }}
                             </option>
                         @endforeach
                     </select>
@@ -1118,6 +1118,10 @@
 
                 </select>
 
+
+                <p class="admin-help mt-2">
+                    فقط محصول با وضعیت «فعال» و دسته‌بندی «فعال» در فروشگاه عمومی نمایش داده می‌شود. پیش‌نویس و محصول متصل به دسته‌بندی غیرفعال، در سایت قابل مشاهده نیست.
+                </p>
 
                 @error('status')
                 <p class="mt-2 text-xs text-[var(--admin-danger)]">
