@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\CustomerMiddleware;
+use App\Http\Middleware\EnforceAdminSessionTimeout;
 use App\Http\Middleware\ApplyRobotsHeaders;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
@@ -24,6 +25,7 @@ return Application::configure(
         $middleware->alias([
             'admin' => AdminMiddleware::class,
             'customer' => CustomerMiddleware::class,
+            'admin.session.timeout' => EnforceAdminSessionTimeout::class,
         ]);
 
         $middleware->appendToGroup('web', [ApplyRobotsHeaders::class]);
