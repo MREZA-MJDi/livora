@@ -52,7 +52,7 @@
         @endphp
 
         {{-- Product Image --}}
-        <div class="admin-card p-6" x-data="mediaPicker('{{ route('admin.media.picker') }}', @js($primaryImage?->media_id), @js($productImageUrl), @js($primaryImage?->media?->original_name ?? $primaryImage?->alt ?? ''))">
+        <div class="admin-card p-6" x-data="mediaPicker('{{ route('admin.media.picker') }}', @js($primaryImage?->media_id), @js($productImageUrl), @js($primaryImage?->media?->original_name ?? $primaryImage?->alt ?? ''), 'product-image-preview', 'image', 'remove_primary_image')">
 
             <div class="mb-6">
                 <h3 class="text-base font-bold text-[var(--admin-text)]">
@@ -117,11 +117,10 @@
                 accept="image/jpeg,image/png,image/webp"
                 data-crop-ratio="0.8"
                 class="admin-input mt-3 p-2"
-                @change="clearSelection()"
             >
 
             @if($editing && $productImageUrl)
-                <label class="mt-3 flex items-center gap-2 text-sm text-rose-700"><input type="checkbox" name="remove_primary_image" value="1" class="admin-checkbox"> حذف تصویر اصلی از این محصول</label>
+                <label class="mt-3 flex items-center gap-2 text-sm text-rose-700"><input type="checkbox" name="remove_primary_image" value="1" class="admin-checkbox" @change="if ($event.target.checked) { selectedMedia = null; const fileInput = $root.closest('form')?.querySelector('input[type=file][name=image]'); if (fileInput) fileInput.value = ''; }"> حذف تصویر اصلی از این محصول</label>
             @endif
 
             <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">
@@ -209,7 +208,7 @@
                     data-crop-ratio="2.4"
                     class="admin-input p-2"
                 >
-                @include('admin.media.partials.picker', ['mediaPickerField' => 'banner_image', 'mediaPickerId' => old('banner_media_id', $product->banner_media_id ?? null), 'mediaPickerUrl' => $product->banner_image ? \Illuminate\Support\Facades\Storage::disk('public')->url($product->banner_image) : null, 'mediaPickerName' => $product->name, 'mediaPickerPreviewId' => 'product-banner-image-preview', 'mediaPickerInputName' => 'banner_media_id'])
+                @include('admin.media.partials.picker', ['mediaPickerField' => 'banner_image', 'mediaPickerId' => old('banner_media_id', $product->banner_media_id ?? null), 'mediaPickerUrl' => $product->banner_image ? \Illuminate\Support\Facades\Storage::disk('public')->url($product->banner_image) : null, 'mediaPickerName' => $product->name, 'mediaPickerPreviewId' => 'product-banner-image-preview', 'mediaPickerInputName' => 'banner_media_id', 'mediaPickerRemoveName' => 'remove_banner_image'])
                 <p class="admin-help">اندازه پیشنهادی ۱۹۲۰×۸۰۰ پیکسل؛ JPG، PNG یا WEBP تا ۱۰ مگابایت.</p>
                 @if($editing && $product->banner_image)
                     <label class="mt-2 flex items-center gap-2 text-sm text-rose-700"><input type="checkbox" name="remove_banner_image" value="1" class="admin-checkbox"> حذف بنر فعلی از محصول</label>
