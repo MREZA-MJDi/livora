@@ -23,7 +23,7 @@ class ContentPage extends Model
         ];
     }
 
-    public function scopePublished(Builder $query): Builder
+    public function media()\n    {\n        return $this->belongsTo(Media::class);\n    }\n\n    public function scopePublished(Builder $query): Builder
     {
         return $query->where('status', 'published')
             ->whereNotNull('published_at')
