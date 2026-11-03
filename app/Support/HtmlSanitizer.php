@@ -39,7 +39,7 @@ final class HtmlSanitizer
         try {
             $document = new DOMDocument('1.0', 'UTF-8');
             $loaded = $document->loadHTML(
-                '<!doctype html><html><body><div id="rich-root">' . $html . '</div></body></html>',
+                '<!doctype html><html><head><meta charset="UTF-8"></head><body><div id="rich-root">' . $html . '</div></body></html>',
                 LIBXML_NONET | LIBXML_HTML_NODEFDTD
             );
 

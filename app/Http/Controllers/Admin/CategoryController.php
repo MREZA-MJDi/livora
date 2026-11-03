@@ -13,12 +13,11 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use RuntimeException;
+use Throwable;
 
 class CategoryController extends Controller
 {
-    /**
-     * Display a listing of categories.
-     */
     public function index(): View
     {
         $categories = Category::query()
@@ -29,9 +28,6 @@ class CategoryController extends Controller
         return view('admin.categories.index', compact('categories'));
     }
 
-    /**
-     * Show the form for creating a new category.
-     */
     public function create(ContentSeoAnalyzer $seoAnalyzer): View
     {
         $category = new Category();
@@ -46,9 +42,6 @@ class CategoryController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created category.
-     */
     public function store(StoreCategoryRequest $request): RedirectResponse
     {
         $data = $request->validated();
@@ -56,17 +49,27 @@ class CategoryController extends Controller
         $relatedProductIds = $data['related_product_ids'] ?? [];
         unset($data['related_category_ids'], $data['related_product_ids']);
 
-        if ($request->hasFile('image')) {
-            $data['image'] = $request
-                ->file('image')
-                ->store('categories', 'public');
+        $imagePath = null;
+
+        try {
+            if ($request->hasFile('image')) {
+                $imagePath = $request->file('image')->store('categories', 'public');
+                if (! $imagePath) {
+                    throw new RuntimeException('Category image could not be stored.');
+                }
+                $data['image'] = $imagePath;
+            }
+
+            DB::transaction(function () use ($data, $relatedCategoryIds, $relatedProductIds): void {
+                $category = Category::create($data);
+                $category->relatedCategories()->sync(array_values(array_diff($relatedCategoryIds, [$category->id])));
+                $category->recommendedProducts()->sync($relatedProductIds);
+            });
+        } catch (Throwable $exception) {
+            $this->deleteStoredImage($imagePath);
+            throw $exception;
         }
 
-        DB::transaction(function () use ($data, $relatedCategoryIds, $relatedProductIds): void {
-            $category = Category::create($data);
-            $category->relatedCategories()->sync(array_values(array_diff($relatedCategoryIds, [$category->id])));
-            $category->recommendedProducts()->sync($relatedProductIds);
-        });
         Cache::forget('layout.search_categories');
 
         return redirect()
@@ -74,17 +77,11 @@ class CategoryController extends Controller
             ->with('success', 'دسته‌بندی با موفقیت ایجاد شد.');
     }
 
-    /**
-     * Display the specified category.
-     */
     public function show(Category $category): View
     {
         return view('admin.categories.show', compact('category'));
     }
 
-    /**
-     * Show the form for editing the specified category.
-     */
     public function edit(Category $category, ContentSeoAnalyzer $seoAnalyzer): View
     {
         $category->load(['relatedCategories:id,name', 'recommendedProducts:id,name']);
@@ -99,13 +96,8 @@ class CategoryController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified category.
-     */
-    public function update(
-        UpdateCategoryRequest $request,
-        Category $category
-    ): RedirectResponse {
+    public function update(UpdateCategoryRequest $request, Category $category): RedirectResponse
+    {
         $data = $request->validated();
         $relatedCategoryIds = array_values(array_diff($data['related_category_ids'] ?? [], [$category->id]));
         $relatedProductIds = $data['related_product_ids'] ?? [];
@@ -114,29 +106,29 @@ class CategoryController extends Controller
         $oldImage = $category->image;
         $newImage = null;
 
-        if ($request->hasFile('image')) {
-            $newImage = $request
-                ->file('image')
-                ->store('categories', 'public');
+        try {
+            if ($request->hasFile('image')) {
+                $newImage = $request->file('image')->store('categories', 'public');
+                if (! $newImage) {
+                    throw new RuntimeException('Category image could not be stored.');
+                }
+                $data['image'] = $newImage;
+            }
 
-            $data['image'] = $newImage;
+            DB::transaction(function () use ($category, $data, $relatedCategoryIds, $relatedProductIds): void {
+                $category->update($data);
+                $category->relatedCategories()->sync($relatedCategoryIds);
+                $category->recommendedProducts()->sync($relatedProductIds);
+            });
+        } catch (Throwable $exception) {
+            $this->deleteStoredImage($newImage);
+            throw $exception;
         }
 
-        DB::transaction(function () use ($category, $data, $relatedCategoryIds, $relatedProductIds): void {
-            $category->update($data);
-            $category->relatedCategories()->sync($relatedCategoryIds);
-            $category->recommendedProducts()->sync($relatedProductIds);
-        });
         Cache::forget('layout.search_categories');
 
-        if (
-            $newImage
-            && $oldImage
-            && ! str_starts_with($oldImage, 'http://')
-            && ! str_starts_with($oldImage, 'https://')
-            && ! str_starts_with($oldImage, '//')
-        ) {
-            Storage::disk('public')->delete($oldImage);
+        if ($newImage && $oldImage !== $newImage) {
+            $this->deleteStoredImage($oldImage);
         }
 
         return redirect()
@@ -144,36 +136,32 @@ class CategoryController extends Controller
             ->with('success', 'دسته‌بندی با موفقیت بروزرسانی شد.');
     }
 
-    /**
-     * Remove the specified category.
-     */
     public function destroy(Category $category): RedirectResponse
     {
-        if ($category->products()->exists()) {
+        // Product uses SoftDeletes; a trashed product still owns the category FK.
+        // Check trashed rows too, otherwise the database RESTRICT constraint
+        // turns this action into a production 500.
+        if ($category->products()->withTrashed()->exists()) {
             return redirect()
                 ->route('admin.categories.index')
-                ->with(
-                    'error',
-                    'این دسته‌بندی هنوز محصول دارد و تا حذف یا انتقال محصولات قابل حذف نیست.'
-                );
+                ->with('error', 'این دسته‌بندی هنوز محصول دارد و تا حذف یا انتقال محصولات قابل حذف نیست.');
         }
 
         $image = $category->image;
 
         $category->delete();
         Cache::forget('layout.search_categories');
-
-        if (
-            $image
-            && ! str_starts_with($image, 'http://')
-            && ! str_starts_with($image, 'https://')
-            && ! str_starts_with($image, '//')
-        ) {
-            Storage::disk('public')->delete($image);
-        }
+        $this->deleteStoredImage($image);
 
         return redirect()
             ->route('admin.categories.index')
             ->with('success', 'دسته‌بندی با موفقیت حذف شد.');
+    }
+
+    private function deleteStoredImage(?string $path): void
+    {
+        if ($path && ! str_starts_with($path, 'http://') && ! str_starts_with($path, 'https://') && ! str_starts_with($path, '//')) {
+            Storage::disk('public')->delete($path);
+        }
     }
 }
