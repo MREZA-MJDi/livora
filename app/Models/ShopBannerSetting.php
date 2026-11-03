@@ -25,7 +25,7 @@ class ShopBannerSetting extends Model
         ];
     }
 
-    public static function current(): self
+    public function media()\n    {\n        return $this->belongsTo(Media::class);\n    }\n\n    public static function current(): self
     {
         return static::query()->firstOrCreate(
             ['id' => 1],
