@@ -16,6 +16,7 @@
         <span class="text-xs text-[var(--admin-muted)]" x-text="selectedMedia ? 'تصویر کتابخانه انتخاب شده' : 'تصویر جدید آپلود کنید یا از کتابخانه انتخاب کنید'"></span>
         <button type="button" x-show="selectedMedia" @click="clearSelection()" class="text-xs text-rose-600">حذف تصویر فعلی از این بخش</button>
     </div>
+    <p x-show="errorMessage" x-text="errorMessage" class="text-xs text-[var(--admin-danger)]" role="alert"></p>
     <div x-show="pickerOpen" x-cloak class="fixed inset-0 z-[320] flex items-center justify-center bg-black/60 p-3 sm:p-6" @keydown.escape.window="pickerOpen = false">
         <section class="flex max-h-[88vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-[var(--admin-white)] shadow-2xl" role="dialog" aria-modal="true" aria-label="کتابخانه رسانه">
             <header class="flex items-center justify-between border-b border-[var(--admin-border)] p-4">
