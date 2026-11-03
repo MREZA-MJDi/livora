@@ -110,23 +110,7 @@
        CONTAINER
     ====================================================== */
 
-    --sg-container: 1440px;}
-
-/* =========================================================
-SILLAGALLERY CONTAINER SYSTEM
-========================================================= */
-
-.sg-container {
-    width: 100%;
-    max-width: var(--sg-container);
-
-    margin-inline: auto;
-
-    padding-inline: clamp(
-        1rem,
-        3vw,
-        2.5rem
-    );
+    --sg-container: 1440px;
 }
 
 

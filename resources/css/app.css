@@ -1,73 +1,7 @@
 @import './font.css';
 @import './variables.css';
 @import "tailwindcss";
-
-
-/* =========================================================
-   SILLAGALLERY DESIGN TOKENS
-   ========================================================= */
-
-/*:root {*/
-
-/*    !* Brand *!*/
-/*    --sg-ink: #181715;*/
-/*    --sg-charcoal: #24221f;*/
-
-/*    !* Surfaces *!*/
-/*    --sg-cream: #f3efe8;*/
-/*    --sg-white: #faf9f6;*/
-/*    --sg-surface: #eee8df;*/
-
-/*    !* Warm neutrals *!*/
-/*    --sg-sand: #d8d0c4;*/
-/*    --sg-stone: #a79f93;*/
-
-/*    !* Accent *!*/
-/*    --sg-accent: #9a7658;*/
-/*    --sg-accent-dark: #76583f;*/
-/*    --sg-accent-soft: #ede2d7;*/
-
-/*    !* Borders *!*/
-/*    --sg-border: #d6d0c7;*/
-/*    --sg-border-dark: #bbb2a6;*/
-
-/*    !* States *!*/
-/*    --sg-success: #15803d;*/
-/*    --sg-success-soft: #ecfdf3;*/
-
-/*    --sg-warning: #b45309;*/
-/*    --sg-warning-soft: #fff7ed;*/
-
-/*    --sg-danger: #b91c1c;*/
-/*    --sg-danger-soft: #fef2f2;*/
-
-/*    --sg-info: #0369a1;*/
-/*    --sg-info-soft: #f0f9ff;*/
-
-/*    !* Shadows *!*/
-/*    --sg-shadow-sm:*/
-/*        0 4px 14px rgba(24, 23, 21, 0.05);*/
-
-/*    --sg-shadow-md:*/
-/*        0 12px 35px rgba(24, 23, 21, 0.08);*/
-
-/*    --sg-shadow-lg:*/
-/*        0 25px 70px rgba(24, 23, 21, 0.12);*/
-
-/*    !* Radius *!*/
-/*    --sg-radius-sm: 0.75rem;*/
-/*    --sg-radius-md: 1rem;*/
-/*    --sg-radius-lg: 1.5rem;*/
-/*    --sg-radius-xl: 2rem;*/
-
-/*    !* Motion *!*/
-/*    --sg-duration-fast: 180ms;*/
-/*    --sg-duration: 300ms;*/
-/*    --sg-duration-slow: 650ms;*/
-
-/*    !* Container *!*/
-/*    --sg-container: 1440px;*/
-/*}*/
+@import './components.css';
 
 
 /* =========================================================
@@ -253,143 +187,6 @@ h6 {
 
 [x-cloak] {
     display: none !important;
-}
-
-
-/* =========================================================
-   CONTAINER
-   ========================================================= */
-
-.sg-container {
-    width: min(
-        100%,
-        var(--sg-container)
-    );
-
-    margin-inline: auto;
-
-    padding-inline: 1rem;
-}
-
-@media (min-width: 640px) {
-    .sg-container {
-        padding-inline: 1.5rem;
-    }
-}
-
-@media (min-width: 1024px) {
-    .sg-container {
-        padding-inline: 2rem;
-    }
-}
-
-
-/* =========================================================
-   GLOBAL CARD
-   ========================================================= */
-
-.sg-card {
-    background: var(--sg-white);
-    border: 1px solid var(--sg-border);
-    border-radius: var(--sg-radius-xl);
-
-    box-shadow: var(--sg-shadow-sm);
-
-    transition:
-        transform var(--sg-duration),
-        box-shadow var(--sg-duration),
-        border-color var(--sg-duration);
-}
-
-.sg-card:hover {
-    transform: translateY(-2px);
-    border-color: var(--sg-border-dark);
-    box-shadow: var(--sg-shadow-md);
-}
-
-
-/* =========================================================
-   IMAGE SYSTEM
-   ========================================================= */
-
-.sg-image {
-    overflow: hidden;
-    background: var(--sg-surface);
-    border-radius: var(--sg-radius-xl);
-}
-
-.sg-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-
-    transition:
-        transform var(--sg-duration-slow)
-        cubic-bezier(0.22, 1, 0.36, 1),
-        opacity var(--sg-duration);
-}
-
-.sg-image:hover img {
-    transform: scale(1.04);
-}
-
-
-/* =========================================================
-   BUTTON SYSTEM
-   ========================================================= */
-
-.sg-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-
-    min-height: 3rem;
-
-    padding-inline: 1.25rem;
-
-    border: 1px solid transparent;
-    border-radius: 1rem;
-
-    font-size: 0.875rem;
-    font-weight: 600;
-
-    transition:
-        transform var(--sg-duration-fast),
-        background-color var(--sg-duration-fast),
-        border-color var(--sg-duration-fast),
-        color var(--sg-duration-fast),
-        box-shadow var(--sg-duration-fast);
-
-    user-select: none;
-}
-
-.sg-button:hover {
-    transform: translateY(-1px);
-}
-
-.sg-button:active {
-    transform: translateY(0);
-}
-
-.sg-button-primary {
-    background: var(--sg-ink);
-    color: white;
-}
-
-.sg-button-primary:hover {
-    background: var(--sg-accent);
-}
-
-.sg-button-secondary {
-    background: var(--sg-white);
-    color: var(--sg-ink);
-    border-color: var(--sg-border);
-}
-
-.sg-button-secondary:hover {
-    border-color: var(--sg-ink);
-    background: var(--sg-surface);
 }
 
 
@@ -812,14 +609,6 @@ h6 {
 }
 
 
-/* SillaGallery responsive safeguards */
-:root { --site-content-max: 1440px; }
-.sg-container { max-width: var(--site-content-max); }
-.sg-button, .admin-btn { white-space: nowrap; flex: 0 0 auto; }
-@media (max-width: 767px) { .sg-container { padding-inline: 1rem; } .sg-button { min-height: 2.875rem; padding-inline: 1rem; font-size: .8125rem; } }
-@media (min-width: 768px) { .sg-button { min-height: 3rem; } }
-
-
 /* SillaGallery wordmark */
 .sillagallery-wordmark {
     display: inline-flex;
@@ -1020,11 +809,6 @@ body {
     min-width: 0;
 }
 
-.sg-container {
-    width: 100%;
-    max-width: min(100%, var(--site-content-max, 1440px));
-    padding-inline: clamp(1rem, 3vw, 2.5rem);
-}
 
 .product-detail-container {
     width: 100%;
@@ -1139,9 +923,6 @@ body {
 }
 
 @media (max-width: 639px) {
-    .sg-container {
-        padding-inline: 1rem;
-    }
 
     .storefront-content h1 {
         font-size: clamp(1.65rem, 6.8vw, 2.5rem);
