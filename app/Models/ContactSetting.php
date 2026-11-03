@@ -36,6 +36,66 @@ class ContactSetting extends Model
         'floating_actions_enabled',
     ];
 
+
+    public function hasMapLocation(): bool
+    {
+        if (! is_numeric($this->map_latitude) || ! is_numeric($this->map_longitude)) {
+            return false;
+        }
+
+        $latitude = (float) $this->map_latitude;
+        $longitude = (float) $this->map_longitude;
+
+        return is_finite($latitude)
+            && is_finite($longitude)
+            && $latitude >= -90
+            && $latitude <= 90
+            && $longitude >= -180
+            && $longitude <= 180;
+    }
+
+    public function googleMapsEmbedUrl(): ?string
+    {
+        if (! $this->hasMapLocation()) {
+            return null;
+        }
+
+        $coordinates = sprintf('%.7F,%.7F', (float) $this->map_latitude, (float) $this->map_longitude);
+
+        return 'https://maps.google.com/maps?' . http_build_query([
+            'q' => $coordinates,
+            'z' => 15,
+            'output' => 'embed',
+        ]);
+    }
+
+    public function googleMapsDirectionsUrl(): ?string
+    {
+        if (! $this->hasMapLocation()) {
+            return null;
+        }
+
+        $coordinates = sprintf('%.7F,%.7F', (float) $this->map_latitude, (float) $this->map_longitude);
+
+        return 'https://www.google.com/maps/dir/?' . http_build_query([
+            'api' => 1,
+            'destination' => $coordinates,
+        ]);
+    }
+
+    public function googleMapsSearchUrl(): ?string
+    {
+        if ($this->hasMapLocation()) {
+            return $this->googleMapsDirectionsUrl();
+        }
+
+        $address = trim((string) $this->address);
+
+        return $address !== ''
+            ? 'https://www.google.com/maps/search/?' . http_build_query(['api' => 1, 'query' => $address])
+            : null;
+    }
+
     protected function casts(): array
     {
         return [
