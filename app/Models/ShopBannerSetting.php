@@ -14,6 +14,7 @@ class ShopBannerSetting extends Model
         'title',
         'description',
         'banner_image',
+        'media_id',
         'banner_image_alt',
         'is_active',
     ];
