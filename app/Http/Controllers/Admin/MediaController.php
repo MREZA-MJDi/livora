@@ -128,11 +128,18 @@ class MediaController extends Controller
 
     public function destroy(Media $media): RedirectResponse
     {
-        $isUsed = $media->productImages()->exists();
+        $usages = [
+            'محصولات' => $media->productImages()->count(),
+            'دسته‌بندی‌ها' => $media->categories()->count(),
+            'مقاله‌ها' => $media->blogPosts()->count(),
+            'صفحه‌ها' => $media->contentPages()->count(),
+            'بنر فروشگاه' => $media->shopBannerSettings()->count(),
+        ];
+        $usedBy = collect($usages)->filter()->map(fn ($count, $label) => $label.' ('.$count.')')->values();
 
-        if ($isUsed) {
+        if ($usedBy->isNotEmpty()) {
             return redirect()->route('admin.media.index')
-                ->with('error', 'این رسانه هنوز در یک یا چند محصول استفاده می‌شود. ابتدا تصویر آن محصولات را جایگزین کنید.');
+                ->with('error', 'این رسانه هنوز استفاده می‌شود: '.$usedBy->implode('، ').'. ابتدا اتصال‌های آن را حذف یا جایگزین کنید.');
         }
 
         DB::transaction(fn () => $media->delete());
