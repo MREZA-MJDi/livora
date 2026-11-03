@@ -562,7 +562,7 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
             'quantity' => 1,
             'unit_price' => 1000000,
         ]);
-        Address::query()->create([
+        $address = Address::query()->create([
             'user_id' => $customer->id,
             'title' => 'خانه',
             'first_name' => 'مشتری',
@@ -579,12 +579,14 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
         $this->actingAs($customer)
             ->get(route('checkout.index'))
             ->assertOk()
+            ->assertViewHas('defaultAddress', fn ($defaultAddress) => $defaultAddress?->is($address))
             ->assertSee('iranShippingPicker', false)
             ->assertSee('x-text="stepTitle"', false)
+            ->assertSee('x-model="province"', false)
+            ->assertSee('x-model="city"', false)
             ->assertSee('شهر من در فهرست نیست')
             ->assertSee('ایمیل (اختیاری)')
             ->assertSee('مشتری')
-            ->assertSee('تهران')
             ->assertSee('09121112233')
             ->assertSee('خیابان نمونه، پلاک ۱۰')
             ->assertSee('بدون ایمیل هم می‌توانید سفارش را ثبت کنید.');
