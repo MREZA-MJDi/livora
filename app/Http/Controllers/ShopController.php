@@ -85,7 +85,7 @@ class ShopController extends Controller
         };
 
         $products = $query
-            ->paginate(12)
+            ->paginate(8)
             ->withQueryString();
 
         $categories = Category::query()
