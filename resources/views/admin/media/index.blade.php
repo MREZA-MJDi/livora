@@ -193,13 +193,16 @@
                             </div>
 
 
-                            @if($item->productImages->isNotEmpty())
+                            @php
+                                $usageCount = $item->product_images_count + $item->product_banners_count + $item->categories_count + $item->blog_posts_count + $item->content_pages_count + $item->shop_banner_settings_count;
+                            @endphp
+                            @if($usageCount > 0)
                                 <div class="rounded-xl bg-amber-50 px-3 py-2 text-[10px] leading-5 text-amber-800">
-                                    <strong>{{ $item->productImages->count() }} محل استفاده در محصولات</strong>
-                                    <p class="truncate">{{ $item->productImages->map(fn ($image) => $image->product?->name)->filter()->unique()->take(3)->implode('، ') }}</p>
+                                    <strong>{{ $usageCount }} اتصال فعال به محتوا</strong>
+                                    <p>گالری محصول: {{ $item->product_images_count }} · بنر محصول: {{ $item->product_banners_count }} · دسته: {{ $item->categories_count }} · مقاله: {{ $item->blog_posts_count }} · صفحه: {{ $item->content_pages_count }} · بنر فروشگاه: {{ $item->shop_banner_settings_count }}</p>
                                 </div>
                             @else
-                                <p class="text-[10px] text-emerald-700">در محصولی استفاده نشده</p>
+                                <p class="text-[10px] text-emerald-700">این رسانه در هیچ محتوایی استفاده نشده است.</p>
                             @endif
 
                             {{-- Actions --}}
@@ -227,9 +230,9 @@
 
                                     <button
                                         type="submit"
-                                        @disabled($item->productImages->isNotEmpty())
+                                        @disabled($usageCount > 0)
                                         class="flex h-8 w-8 items-center justify-center rounded-xl border border-red-200 text-red-500 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-30"
-                                        title="{{ $item->productImages->isNotEmpty() ? 'ابتدا این تصویر را از محصولات متصل جدا کنید.' : 'حذف' }}"
+                                        title="{{ $usageCount > 0 ? 'ابتدا این رسانه را از محتوای متصل جدا کنید.' : 'حذف' }}"
                                     >
 
                                         <svg
