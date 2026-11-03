@@ -150,8 +150,8 @@
 <script>
 (() => {
     const timeoutMinutes = Number(document.body.dataset.adminSessionTimeout || 30);
-    const heartbeatEveryMs = 5 * 60 * 1000;
-    const recentActivityWindowMs = 5 * 60 * 1000;
+    const heartbeatEveryMs = Math.max(60 * 1000, Math.min(5 * 60 * 1000, Math.floor(timeoutMinutes * 60 * 1000 / 3)));
+    const recentActivityWindowMs = heartbeatEveryMs * 2;
     const heartbeatUrl = @json(route('admin.session.heartbeat'));
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
 
