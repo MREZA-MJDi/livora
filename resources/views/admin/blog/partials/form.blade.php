@@ -42,7 +42,7 @@
             <h2 class="text-base font-bold">SEO مقاله</h2>
             <div><label class="admin-label" for="meta_title">Meta Title</label><input id="meta_title" name="meta_title" class="admin-input" maxlength="255" value="{{ old('meta_title', $post->meta_title ?? '') }}"></div>
             <div><label class="admin-label" for="meta_description">Meta Description</label><textarea id="meta_description" name="meta_description" rows="3" maxlength="1000" class="admin-textarea">{{ old('meta_description', $post->meta_description ?? '') }}</textarea></div>
-            <div><label class="admin-label" for="canonical_url">Canonical URL</label><input id="canonical_url" name="canonical_url" type="url" dir="ltr" class="admin-input" value="{{ old('canonical_url', $post->canonical_url ?? '') }}"></div>
+            @include('admin.seo.partials.canonical-picker', ['seoCanonical' => $post->canonical_url ?? ''])
             <div><label class="admin-label" for="og_image">Open Graph Image URL</label><input id="og_image" name="og_image" type="url" dir="ltr" class="admin-input" value="{{ old('og_image', $post->og_image ?? '') }}"></div>
             <div class="grid gap-3 sm:grid-cols-2">
                 <label class="flex items-center gap-3 rounded-xl border border-[var(--admin-border)] p-4"><input type="checkbox" name="seo_index" value="1" class="admin-checkbox" @checked(old('seo_index', $post->seo_index ?? false))><span class="text-sm">اجازه ایندکس مقاله</span></label>
