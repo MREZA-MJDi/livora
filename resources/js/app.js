@@ -40,7 +40,7 @@ window.seoRoutePicker = (endpoint) => ({
 });
 
 
-window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName = '', previewId = 'product-image-preview', fileField = 'image') => ({
+window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName = '', previewId = 'product-image-preview', fileField = 'image', removeField = 'remove_image') => ({
     endpoint,
     pickerOpen: false,
     loading: false,
@@ -52,9 +52,20 @@ window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName
     errorMessage: '',
     previewId,
     fileField,
+    removeField,
     selectedMedia: initialId && initialUrl
         ? { id: Number(initialId), url: initialUrl, name: initialName || 'تصویر فعلی', alt: initialName || '' }
         : null,
+    init() {
+        const fileInput = this.$root.querySelector(`input[type=\"file\"][name=\"${this.fileField}\"]`);
+        fileInput?.addEventListener('change', () => {
+            if (fileInput.files?.length) {
+                this.selectedMedia = null;
+                const removeInput = this.$root.querySelector(`input[name=\"${this.removeField}\"]`);
+                if (removeInput) removeInput.value = '0';
+            }
+        });
+    },
     async openPicker() {
         this.pickerOpen = true;
         await this.loadMedia(1);
@@ -86,12 +97,20 @@ window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName
         this.selectedMedia = item;
         const fileInput = this.$root.querySelector(`input[type="file"][name="${this.fileField}"]`);
         if (fileInput) fileInput.value = '';
+        const removeInput = this.$root.querySelector(`input[name=\"${this.removeField}\"]`);
+        if (removeInput) removeInput.value = '0';
         const preview = document.getElementById(this.previewId);
         if (preview) { preview.src = item.url; preview.classList.remove('hidden'); }
         this.pickerOpen = false;
     },
     clearSelection() {
         this.selectedMedia = null;
+        const removeInput = this.$root.querySelector(`input[name=\"${this.removeField}\"]`);
+        if (removeInput) removeInput.value = '1';
+        const fileInput = this.$root.querySelector(`input[type=\"file\"][name=\"${this.fileField}\"]`);
+        if (fileInput) fileInput.value = '';
+        const preview = document.getElementById(this.previewId);
+        if (preview) { preview.removeAttribute('src'); preview.classList.add('hidden'); }
     },
 });
 
