@@ -105,12 +105,48 @@ window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName
     },
     clearSelection() {
         this.selectedMedia = null;
-        const removeInput = this.$root.querySelector(`input[name=\"${this.removeField}\"]`);
+        const removeInput = this.$root.querySelector(`input[name="\${this.removeField}"]`);
         if (removeInput) removeInput.value = '1';
-        const fileInput = this.$root.querySelector(`input[type=\"file\"][name=\"${this.fileField}\"]`);
+        const fileInput = this.$root.querySelector(`input[type="file"][name="\${this.fileField}"]`);
         if (fileInput) fileInput.value = '';
         const preview = document.getElementById(this.previewId);
         if (preview) { preview.removeAttribute('src'); preview.classList.add('hidden'); }
+    },
+    async cropSelected() {
+        if (!this.selectedMedia || this.loading) return;
+        const fileInput = this.$root.querySelector(`input[type="file"][name="\${this.fileField}"]`);
+        const ratio = Number(fileInput?.dataset.cropRatio) || 4 / 3;
+        this.loading = true;
+        this.errorMessage = '';
+        try {
+            const source = await fetch(this.selectedMedia.url, { credentials: 'same-origin' });
+            if (!source.ok) throw new Error('دریافت تصویر اصلی برای برش ناموفق بود.');
+            const blob = await source.blob();
+            if (!/^image\/(jpeg|png|webp)$/i.test(blob.type)) throw new Error('فرمت تصویر برای برش پشتیبانی نمی‌شود.');
+            const original = new File([blob], this.selectedMedia.name || 'media-image.jpg', { type: blob.type });
+            const cropped = await window.SillaImageCropper.crop(original, ratio);
+            const data = new FormData();
+            data.append('image', cropped);
+            data.append('alt', this.selectedMedia.alt || '');
+            const response = await fetch(this.endpoint.replace(/\/picker\/?$/, '/crop'), {
+                method: 'POST',
+                body: data,
+                credentials: 'same-origin',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                    'Accept': 'application/json',
+                },
+            });
+            const payload = await response.json();
+            if (!response.ok || !payload.id || !payload.url) throw new Error(payload.message || 'ذخیره نسخه برش‌خورده ناموفق بود.');
+            this.selectedMedia = payload;
+            const preview = document.getElementById(this.previewId);
+            if (preview) { preview.src = payload.url; preview.classList.remove('hidden'); }
+        } catch (error) {
+            if (error?.message !== 'Crop cancelled') this.errorMessage = error.message || 'برش تصویر انجام نشد.';
+        } finally {
+            this.loading = false;
+        }
     },
 });
 
