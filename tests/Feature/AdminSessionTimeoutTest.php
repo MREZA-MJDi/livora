@@ -67,4 +67,22 @@ class AdminSessionTimeoutTest extends TestCase
 
         $this->assertGuest();
     }
+
+    public function test_customer_session_is_not_shortened_by_the_admin_idle_timeout(): void
+    {
+        config(['admin.session_timeout_minutes' => 30]);
+
+        $customer = User::factory()->create(['role' => 'customer']);
+
+        $this->actingAs($customer)
+            ->get(route('account.index'))
+            ->assertOk();
+
+        $this->travel(31)->minutes();
+
+        $this->get(route('account.index'))
+            ->assertOk();
+
+        $this->assertAuthenticatedAs($customer);
+    }
 }
