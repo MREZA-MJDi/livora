@@ -24,7 +24,7 @@
                 : (trim($__env->yieldContent('robots')) ?: $siteSeo->robots()));
         // Canonical and social URLs must be bound to this application's configured origin.
         // Never let an inbound Host header from another virtual host poison SillaGallery metadata.
-        $seoOrigin = rtrim((string) config('app.url', 'https://sillashop.com'), '/');
+        $seoOrigin = rtrim((string) config('app.url', 'https://silashop.com'), '/');
         $seoCanonicalSource = $pageSeo?->canonical_url ?: trim($__env->yieldContent('canonical'));
         $seoCanonicalPath = parse_url($seoCanonicalSource, PHP_URL_PATH);
         $seoCanonicalPath = is_string($seoCanonicalPath) && $seoCanonicalPath !== ''
