@@ -2,8 +2,8 @@
 
 @section('title', 'تماس با '.($storeSettings?->brand_name ?: config('app.name')).' | ارتباط با ما')
 @section('description', $pageContent['hero_description'] ?? 'برای مشاوره خرید، پیگیری سفارش و دریافت اطلاعات بیشتر با ما در ارتباط باشید.')
-@section('canonical', \\App\\Models\\SeoPageSetting::forRoute('contact')?->canonical_url ?: route('contact'))
-@section('robots', \\App\\Models\\SeoPageSetting::forRoute('contact')?->robots() ?? \\App\\Models\\SeoSetting::current()->robots())
+@section('canonical', \App\Models\SeoPageSetting::forRoute('contact')?->canonical_url ?: route('contact'))
+@section('robots', \App\Models\SeoPageSetting::forRoute('contact')?->robots() ?? \App\Models\SeoSetting::current()->robots())
 
 @push('seo')
 @if($faqs->isNotEmpty())
