@@ -350,3 +350,60 @@
         transition: none;
     }
 }
+
+
+/* Category artwork: preserve the uploaded image's native proportions.
+   Never crop, zoom, letterbox or shrink it inside a fixed-height cover. */
+.sg-category-index-tile,
+.sg-category-index-tile__media {
+    height: auto;
+    min-height: 0;
+}
+.sg-category-index-tile__media {
+    aspect-ratio: auto;
+    background: transparent;
+}
+.sg-category-index-tile__media > img {
+    position: relative;
+    inset: auto;
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: auto;
+    object-fit: unset;
+    object-position: center;
+    transform: none !important;
+}
+.sg-category-index-tile:hover .sg-category-index-tile__media > img {
+    transform: none !important;
+}
+.sg-category-detail-visual {
+    height: auto;
+    min-height: 0;
+    aspect-ratio: auto;
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+}
+.sg-category-detail-visual > img {
+    position: relative;
+    inset: auto;
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: none;
+    aspect-ratio: auto;
+    object-fit: unset;
+    object-position: center;
+    border-radius: 1.25rem;
+}
+@media (max-width: 639px) {
+    .sg-category-detail-visual {
+        min-height: 0;
+        aspect-ratio: auto;
+    }
+    .sg-category-detail-visual > img {
+        border-radius: .85rem;
+    }
+}
