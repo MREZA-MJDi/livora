@@ -13,6 +13,8 @@
 </head>
 <body
     class="min-h-full bg-[var(--admin-bg)] text-[var(--admin-text)] antialiased"
+    data-admin-session-timeout="{{ (int) config('admin.session_timeout_minutes', 30) }}"
+    data-admin-path="{{ config('admin.path', 'admin') }}"
 >
 <div
     x-data="{
@@ -145,6 +147,59 @@
 {{-- =========================================================
      SCRIPTS
 ========================================================== --}}
+{{-- Renew the admin session only after recent real interaction with the dashboard. --}}
+<script>
+(() => {
+    const timeoutMinutes = Number(document.body.dataset.adminSessionTimeout || 30);
+    const heartbeatEveryMs = Math.max(60_000, Math.min(300_000, Math.floor(timeoutMinutes * 60_000 / 3)));
+    const recentInteractionWindowMs = heartbeatEveryMs * 2;
+    const heartbeatUrl = @json(route('admin.session.heartbeat'));
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
+    if (!csrfToken || !heartbeatUrl) return;
+
+    let lastInteractionAt = Date.now();
+    let lastHeartbeatAt = Date.now();
+    let heartbeatInFlight = false;
+
+    const registerInteraction = () => {
+        lastInteractionAt = Date.now();
+    };
+
+    ['pointerdown', 'keydown', 'touchstart', 'scroll'].forEach((eventName) => {
+        window.addEventListener(eventName, registerInteraction, { passive: true });
+    });
+
+    window.setInterval(async () => {
+        const now = Date.now();
+        const hasRecentInteraction = now - lastInteractionAt < recentInteractionWindowMs;
+        const heartbeatDue = now - lastHeartbeatAt >= heartbeatEveryMs;
+
+        if (!hasRecentInteraction || !heartbeatDue || heartbeatInFlight) return;
+
+        heartbeatInFlight = true;
+
+        try {
+            const response = await window.fetch(heartbeatUrl, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': csrfToken,
+                },
+            });
+
+            if (response.ok) lastHeartbeatAt = Date.now();
+        } catch (_) {
+            // Failed heartbeats never extend the server-side session.
+        } finally {
+            heartbeatInFlight = false;
+        }
+    }, 30_000);
+})();
+</script>
+
 @stack('scripts')
 
 @includeIf(
