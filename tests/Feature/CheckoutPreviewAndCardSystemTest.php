@@ -562,7 +562,7 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
             'quantity' => 1,
             'unit_price' => 1000000,
         ]);
-        Address::query()->create([
+        $address = Address::query()->create([
             'user_id' => $customer->id,
             'title' => 'خانه',
             'first_name' => 'مشتری',
