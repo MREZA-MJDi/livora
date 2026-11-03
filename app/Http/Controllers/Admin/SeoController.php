@@ -35,7 +35,7 @@ class SeoController extends Controller
 
         $products = Product::query()->active()
             ->whereHas('category', fn ($query) => $query->where('is_active', true))
-            ->when($term !== '', fn ($query) => $query->where('name', 'like', "%{$term}%")->orWhere('slug', 'like', "%{$term}%"))
+            ->when($term !== '', fn ($query) => $query->where(fn ($search) => $search->where('name', 'like', "%{$term}%")->orWhere('slug', 'like', "%{$term}%")))
             ->orderBy('name')->limit(40)->get(['name', 'slug']);
 
         $categories = Category::query()->active()
