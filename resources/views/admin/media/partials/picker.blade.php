@@ -5,18 +5,20 @@
     $mediaPickerName = $mediaPickerName ?? '';
     $mediaPickerPreviewId = $mediaPickerPreviewId ?? 'media-image-preview';
     $mediaPickerInputName = $mediaPickerInputName ?? 'media_id';
+    $mediaPickerRemoveName = $mediaPickerRemoveName ?? 'remove_image';
 @endphp
-<div x-data="mediaPicker(@js(route('admin.media.picker')), @js($mediaPickerId), @js($mediaPickerUrl), @js($mediaPickerName), @js($mediaPickerPreviewId), @js($mediaPickerField))" class="space-y-2">
+<div x-data="mediaPicker(@js(route('admin.media.picker')), @js($mediaPickerId), @js($mediaPickerUrl), @js($mediaPickerName), @js($mediaPickerPreviewId), @js($mediaPickerField), @js($mediaPickerRemoveName))" class="space-y-2">
     <input type="hidden" name="{{ $mediaPickerInputName }}" :value="selectedMedia?.id || ''">
+    <input type="hidden" name="{{ $mediaPickerRemoveName }}" value="0">
     <div class="flex flex-wrap items-center gap-2">
         <button type="button" class="admin-btn admin-btn-secondary" @click="openPicker()">انتخاب از کتابخانه رسانه</button>
         <span class="text-xs text-[var(--admin-muted)]" x-text="selectedMedia ? 'تصویر کتابخانه انتخاب شده' : 'تصویر جدید آپلود کنید یا از کتابخانه انتخاب کنید'"></span>
-        <button type="button" x-show="selectedMedia" @click="clearSelection()" class="text-xs text-rose-600">لغو انتخاب رسانه</button>
+        <button type="button" x-show="selectedMedia" @click="clearSelection()" class="text-xs text-rose-600">حذف تصویر فعلی از این بخش</button>
     </div>
     <div x-show="pickerOpen" x-cloak class="fixed inset-0 z-[320] flex items-center justify-center bg-black/60 p-3 sm:p-6" @keydown.escape.window="pickerOpen = false">
         <section class="flex max-h-[88vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-[var(--admin-white)] shadow-2xl" role="dialog" aria-modal="true" aria-label="کتابخانه رسانه">
             <header class="flex items-center justify-between border-b border-[var(--admin-border)] p-4">
-                <div><h3 class="font-bold">کتابخانه رسانه</h3><p class="admin-help mt-1">یک تصویر را انتخاب کنید؛ فایل اصلی کپی یا ویرایش نمی‌شود.</p></div>
+                <div><h3 class="font-bold">کتابخانه رسانه</h3><p class="admin-help mt-1">یک تصویر را انتخاب کنید. برای جایگزینی، از رایانه آپلود کنید؛ برای حذف تصویر فعلی، گزینه حذف را بزنید.</p></div>
                 <button type="button" class="admin-btn admin-btn-secondary" @click="pickerOpen = false">بستن</button>
             </header>
             <div class="p-4"><input type="search" class="admin-input" x-model="search" @input.debounce.300ms="loadMedia(1)" placeholder="جست‌وجوی نام فایل یا تصویر"></div>
