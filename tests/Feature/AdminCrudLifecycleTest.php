@@ -361,8 +361,9 @@ class AdminCrudLifecycleTest extends TestCase
 
         $image->refresh();
         $this->assertTrue($image->is_primary, 'A product must retain a primary image after an update.');
-        Storage::disk('public')->assertMissing($oldPath);
+        Storage::disk('public')->assertExists($oldPath); // The old upload remains available in the central Media Library.
         Storage::disk('public')->assertExists($image->path);
+        $this->assertNotNull($image->media_id);
 
         $this->actingAs($this->admin)
             ->post(route('admin.product-variants.store'), [
@@ -422,7 +423,7 @@ class AdminCrudLifecycleTest extends TestCase
             ->assertRedirect(route('admin.product-images.index', ['product_id' => $product->id]));
 
         $this->assertDatabaseMissing('product_images', ['id' => $image->id]);
-        Storage::disk('public')->assertMissing($image->path);
+        Storage::disk('public')->assertExists($image->path); // Removing a usage never removes the shared original.
     }
 
     public function test_admin_can_upload_and_delete_media_library_assets(): void
@@ -439,7 +440,7 @@ class AdminCrudLifecycleTest extends TestCase
             ])
             ->assertRedirect(route('admin.media.index'));
 
-        $media = Media::query()->firstOrFail();
+        $media = Media::query()->where('original_name', 'library-image.jpg')->firstOrFail();
         $path = $media->path;
 
         $this->assertSame($this->admin->id, $media->user_id);
