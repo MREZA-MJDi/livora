@@ -643,6 +643,34 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
         $this->assertSame('digipay', $order->fresh()->payment_provider);
     }
 
+    public function test_ambiguous_gateway_start_stays_pending_and_blocks_duplicate_attempts(): void
+    {
+        $customer = $this->user('customer', 'gateway-initiation-timeout@example.test');
+        $order = $this->orderFor($customer);
+
+        $gateway = \\Mockery::mock(InstallmentPaymentGatewayInterface::class);
+        $gateway->shouldReceive('createPayment')
+            ->once()
+            ->andThrow(new \\RuntimeException('Connection timed out after request dispatch.'));
+
+        $manager = \\Mockery::mock(PaymentManager::class);
+        $manager->shouldReceive('driver')->once()->with('digipay')->andReturn($gateway);
+        $this->instance(PaymentManager::class, $manager);
+
+        $this->actingAs($customer)
+            ->from(route('checkout.payment', $order))
+            ->post(route('checkout.payment.installment', $order), ['gateway' => 'digipay'])
+            ->assertRedirect(route('checkout.payment', $order))
+            ->assertSessionHas('error');
+
+        $payment = Payment::query()->where('order_id', $order->id)->firstOrFail();
+
+        $this->assertSame('pending', $payment->status);
+        $this->assertTrue((bool) data_get($payment->metadata, 'initiation_pending'));
+        $this->assertSame('pending', $order->fresh()->payment_status);
+        $this->assertSame(1, Payment::query()->where('order_id', $order->id)->count());
+    }
+
     public function test_verified_gateway_callback_is_idempotent_and_deducts_stock_once(): void
     {
         $customer = $this->user('customer', 'gateway-callback@example.test');
