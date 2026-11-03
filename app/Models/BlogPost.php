@@ -25,7 +25,7 @@ class BlogPost extends Model
         ];
     }
 
-    public function author(): BelongsTo
+    public function media(): BelongsTo\n    {\n        return $this->belongsTo(Media::class);\n    }\n\n    public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
