@@ -1,4 +1,4 @@
-# SilaGallery / Livora production deployment — sillashop.com
+# SillaGallery / Livora production deployment — sillashop.com
 
 This deployment is intentionally isolated from farzindev and farajihome.com.
 It uses its own release tree, environment file, database, writable storage, PHP-FPM pool/socket (where provisioned), and Nginx server block. The only shared resources are the VPS operating system and Nginx service.
@@ -94,7 +94,7 @@ Create the shared environment file once:
 
 Set these values in /var/www/livora/shared/.env before generating the application key or running migrations:
 
-    APP_NAME="SilaGallery"
+    APP_NAME="SillaGallery"
     APP_ENV=production
     APP_DEBUG=false
     APP_URL=https://sillashop.com
