@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
-@section('title', \\App\\Models\\SeoPageSetting::forRoute('categories')?->meta_title ?: 'مجموعه‌ها و دسته‌بندی‌ها | SillaGallery')
+@section('title', \App\Models\\SeoPageSetting::forRoute('categories')?->meta_title ?: 'مجموعه‌ها و دسته‌بندی‌ها | SillaGallery')
 
-@section('description', \\App\\Models\\SeoPageSetting::forRoute('categories')?->meta_description ?: 'مجموعه‌های مبلمان و دکوراسیون SillaGallery را مرور کنید و برای فضای خود انتخاب دقیق‌تری داشته باشید.')
+@section('description', \App\Models\\SeoPageSetting::forRoute('categories')?->meta_description ?: 'مجموعه‌های مبلمان و دکوراسیون SillaGallery را مرور کنید و برای فضای خود انتخاب دقیق‌تری داشته باشید.')
 
-@section('canonical', \\App\\Models\\SeoPageSetting::forRoute('categories')?->canonical_url ?: route('categories.index'))
+@section('canonical', \App\Models\\SeoPageSetting::forRoute('categories')?->canonical_url ?: route('categories.index'))
 
-@section('robots', \\App\\Models\\SeoPageSetting::forRoute('categories')?->robots() ?? \\App\\Models\\SeoSetting::current()->robots())
+@section('robots', \App\Models\\SeoPageSetting::forRoute('categories')?->robots() ?? \App\Models\\SeoSetting::current()->robots())
 
 @section('content')
     <div class="overflow-hidden bg-[var(--sg-cream)]">
@@ -114,7 +114,7 @@
                                                 @endif
                                                 <h3>{{ $category->name }}</h3>
                                                 @if(filled($category->description))
-                                                    <p class="sg-category-index-tile__description">{{ \\Illuminate\\Support\\Str::limit(strip_tags($category->description), 110) }}</p>
+                                                    <p class="sg-category-index-tile__description">{{ \Illuminate\Support\Str::limit(strip_tags($category->description), 110) }}</p>
                                                 @endif
                                             </div>
                                             <span class="sg-category-index-tile__arrow" aria-hidden="true">←</span>
