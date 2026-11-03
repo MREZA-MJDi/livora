@@ -89,6 +89,15 @@
     @stack('seo')
 </head>
 <body class="min-h-screen antialiased">
+@php
+    // Resolve the customer's cart once for the shared storefront shell.
+    // Navbar and mobile navigation consume the same count without duplicate queries.
+    $storefrontCartCount = 0;
+    if (auth()->check() && auth()->user()->isCustomer()) {
+        $storefrontCart = auth()->user()->activeCart;
+        $storefrontCartCount = $storefrontCart?->itemCount() ?? 0;
+    }
+@endphp
 <div id="app" x-data="{
     mobileOpen: false,
     searchOpen: false,
@@ -112,14 +121,14 @@
         });
     }
 }" class="min-h-screen pb-24 lg:pb-0">
-    <x-layout.navbar />
+    <x-layout.navbar :cart-count="$storefrontCartCount" />
     <x-layout.mobile-menu />
     <x-layout.search-overlay />
     <x-shop.filter-drawer />
     <main class="storefront-content">@yield('content')</main>
     <x-layout.footer />
     <x-layout.floating-actions />
-    <x-layout.mobile-bottom-bar />
+    <x-layout.mobile-bottom-bar :cart-count="$storefrontCartCount" />
 </div>
 @stack('scripts')
 </body>
