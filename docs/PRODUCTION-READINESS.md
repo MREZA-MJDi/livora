@@ -9,7 +9,7 @@ This checklist is deliberately conservative. A successful asset build or a green
 ## Before the first release
 
 - Create a dedicated MySQL/MariaDB database and least-privilege application user. Back it up and rehearse a restore.
-- Configure production values outside source control: `APP_ENV=production`, `APP_DEBUG=false`, a real HTTPS `APP_URL`, a unique `APP_KEY`, database credentials, and the actual mail/queue settings.
+- Configure production values outside source control: `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://silashop.com`, a unique `APP_KEY`, database credentials, and the actual mail/queue settings. Keep the app URL, Nginx virtual host, TLS certificate, and DNS records aligned to this exact canonical host.
 - Set `SESSION_SECURE_COOKIE=true` behind HTTPS. Use `SESSION_DRIVER=database` or Redis with working persistence; do not use the local `array` driver in production.
 - Configure writable `storage/` and `bootstrap/cache/` directories; ensure uploaded product/category images live on the intended persistent disk.
 - Set `ADMIN_NAME`, `ADMIN_EMAIL`, and a unique `ADMIN_PASSWORD` (at least 16 characters) only when bootstrapping a new administrator. Production seeding refuses weak defaults and does not reset an existing administrator's password.
