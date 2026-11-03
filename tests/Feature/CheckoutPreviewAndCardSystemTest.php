@@ -182,6 +182,21 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
             ->assertSee('در انتظار پرداخت');
     }
 
+    public function test_customer_order_tracking_is_scoped_to_the_authenticated_owner(): void
+    {
+        $owner = $this->user('customer', 'order-tracking-owner@example.test');
+        $otherCustomer = $this->user('customer', 'order-tracking-other@example.test');
+        $order = $this->orderFor($owner);
+
+        $this->actingAs($otherCustomer)
+            ->get(route('account.orders.show', $order))
+            ->assertForbidden();
+
+        $this->actingAs($owner)
+            ->get(route('account.orders.show', $order))
+            ->assertOk();
+    }
+
     public function test_customer_cannot_view_another_customers_order_payment_page(): void
     {
         $owner = $this->user('customer', 'checkout-order-owner@example.test');
