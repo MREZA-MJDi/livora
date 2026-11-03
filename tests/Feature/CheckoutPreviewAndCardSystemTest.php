@@ -179,8 +179,12 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
             ->assertSee('دیجی‌پی')
             ->assertSee('اسنپ‌پی')
             ->assertSee('ترب‌پی')
-            ->assertSee('اتصال درگاه پرداخت هنوز تکمیل نشده است.')
-            ->assertSee('در انتظار پرداخت');
+            ->assertSee('پرداخت آنلاین در حال آماده‌سازی است')
+            ->assertSee('در انتظار پرداخت')
+            ->assertSee('هیچ مبلغی از حساب شما کسر نمی‌شود.')
+            ->assertSee('پیگیری سفارش')
+            ->assertSee('ارتباط با پشتیبانی')
+            ->assertSee($order->order_number);
     }
 
     public function test_customer_order_tracking_is_scoped_to_the_authenticated_owner(): void
