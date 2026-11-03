@@ -316,6 +316,19 @@ class SeoMetadataTest extends TestCase
             ->assertSessionHas('error');
         $this->assertDatabaseHas('media', ['id' => $media->id]);
         Storage::disk('public')->assertExists($path);
+
+        $this->put(route('admin.seo.update'), [
+            'site_name' => 'SillaGallery',
+            'remove_default_og_image' => '1',
+        ])->assertRedirect(route('admin.seo.edit'));
+
+        $this->assertDatabaseHas('media', ['id' => $media->id]);
+        $this->assertDatabaseHas('seo_settings', ['id' => 1, 'default_og_media_id' => null]);
+        $this->delete(route('admin.media.destroy', $media))
+            ->assertRedirect(route('admin.media.index'))
+            ->assertSessionHas('success');
+        $this->assertDatabaseMissing('media', ['id' => $media->id]);
+        Storage::disk('public')->assertMissing($path);
     }
 
     public function test_media_library_crop_endpoint_creates_a_separate_derivative_without_mutating_source_asset(): void
