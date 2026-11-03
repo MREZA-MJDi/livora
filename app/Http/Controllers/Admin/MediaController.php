@@ -1,25 +1,94 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\\Http\\Controllers\\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\Media\MediaUploadRequest;
-use App\Models\Media;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\View\View;
+use App\\Http\\Controllers\\Controller;
+use App\\Http\\Requests\\Admin\\Media\\MediaUploadRequest;
+use App\\Models\\Media;
+use Illuminate\\Http\\JsonResponse;
+use Illuminate\\Http\\RedirectResponse;
+use Illuminate\\Http\\Request;
+use Illuminate\\Support\\Facades\\DB;
+use Illuminate\\Support\\Facades\\Storage;
+use Illuminate\\View\\View;
 use RuntimeException;
 use Throwable;
 
 class MediaController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $media = Media::with('user')->latest()->paginate(24);
+        $filters = $request->validate([
+            'q' => ['nullable', 'string', 'max:120'],
+            'type' => ['nullable', 'in:all,images,documents'],
+            'sort' => ['nullable', 'in:newest,oldest,name'],
+        ]);
 
-        return view('admin.media.index', compact('media'));
+        $query = Media::query()->with('user');
+
+        if (! empty($filters['q'])) {
+            $term = trim($filters['q']);
+            $query->where(function ($builder) use ($term): void {
+                $builder->where('original_name', 'like', "%{$term}%")
+                    ->orWhere('alt', 'like', "%{$term}%")
+                    ->orWhere('description', 'like', "%{$term}%");
+            });
+        }
+
+        if (($filters['type'] ?? 'all') === 'images') {
+            $query->where('mime_type', 'like', 'image/%');
+        } elseif (($filters['type'] ?? 'all') === 'documents') {
+            $query->where('mime_type', 'not like', 'image/%');
+        }
+
+        match ($filters['sort'] ?? 'newest') {
+            'oldest' => $query->oldest(),
+            'name' => $query->orderBy('original_name'),
+            default => $query->latest(),
+        };
+
+        $media = $query->paginate(24)->withQueryString();
+
+        return view('admin.media.index', compact('media', 'filters'));
+    }
+
+    /**
+     * Searchable image-only endpoint used by the shared media picker.
+     */
+    public function picker(Request $request): JsonResponse
+    {
+        $filters = $request->validate([
+            'q' => ['nullable', 'string', 'max:120'],
+            'page' => ['nullable', 'integer', 'min:1'],
+        ]);
+
+        $media = Media::query()
+            ->where('mime_type', 'like', 'image/%')
+            ->when($filters['q'] ?? null, function ($query, string $term): void {
+                $term = trim($term);
+                $query->where(function ($builder) use ($term): void {
+                    $builder->where('original_name', 'like', "%{$term}%")
+                        ->orWhere('alt', 'like', "%{$term}%");
+                });
+            })
+            ->latest()
+            ->paginate(30);
+
+        return response()->json([
+            'data' => $media->getCollection()->map(fn (Media $item): array => [
+                'id' => $item->id,
+                'name' => $item->original_name,
+                'alt' => $item->alt,
+                'url' => $item->url,
+                'size' => $item->human_size,
+                'created_at' => $item->created_at?->toISOString(),
+            ]),
+            'meta' => [
+                'current_page' => $media->currentPage(),
+                'last_page' => $media->lastPage(),
+                'total' => $media->total(),
+            ],
+        ]);
     }
 
     public function create(): View
@@ -64,6 +133,16 @@ class MediaController extends Controller
 
     public function destroy(Media $media): RedirectResponse
     {
+        if ($media->productImages()->exists()) {
+            return redirect()
+                ->route('admin.media.index')
+                ->with('error', 'این رسانه به تصویر یک یا چند محصول متصل است؛ ابتدا اتصال‌های آن را تغییر دهید.');
+        }
+
+        DB::transaction(function () use ($media): void {
+            $media->delete();
+        });
+
         if (
             $media->disk
             && $media->path
@@ -73,8 +152,6 @@ class MediaController extends Controller
         ) {
             Storage::disk($media->disk)->delete($media->path);
         }
-
-        $media->delete();
 
         return redirect()
             ->route('admin.media.index')
