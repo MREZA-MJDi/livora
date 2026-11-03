@@ -63,7 +63,7 @@
             @if($editing && $page->featured_image_url)<img src="{{ $page->featured_image_url }}" alt="{{ $page->featured_image_alt ?: $page->title }}" class="aspect-video w-full rounded-2xl object-cover">@endif
             <div class="aspect-video overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]"><img id="page-featured-image-preview" src="{{ $page->featured_image_url ?? '' }}" alt="{{ $page->featured_image_alt ?? $page->title ?? '' }}" class="{{ isset($page) && $page->featured_image_url ? '' : 'hidden' }} h-full w-full object-contain"></div>
             <input name="featured_image" type="file" accept="image/jpeg,image/png,image/webp" class="admin-input p-2">
-            @include('admin.media.partials.picker', ['mediaPickerField' => 'featured_image', 'mediaPickerId' => old('media_id', $page->media_id ?? null), 'mediaPickerUrl' => $page->featured_image_url ?? null, 'mediaPickerName' => $page->title ?? '', 'mediaPickerPreviewId' => 'page-featured-image-preview'])
+            @include('admin.media.partials.picker', ['mediaPickerField' => 'featured_image', 'mediaPickerId' => old('media_id', $page->media_id ?? null), 'mediaPickerUrl' => $page->featured_image_url ?? null, 'mediaPickerName' => $page->title ?? '', 'mediaPickerPreviewId' => 'page-featured-image-preview', 'mediaPickerRemoveName' => 'remove_featured_image'])
             <p class="admin-help">JPG، PNG یا WEBP؛ حداکثر ۱۰ مگابایت.</p>
             <label class="admin-label" for="featured_image_alt">متن جایگزین تصویر</label>
             <input id="featured_image_alt" name="featured_image_alt" maxlength="255" class="admin-input" value="{{ old('featured_image_alt', $page->featured_image_alt ?? '') }}">
