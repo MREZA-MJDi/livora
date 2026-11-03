@@ -296,6 +296,44 @@
 
                         </div>@endif
 
+                        {{-- GOOGLE MAP: only show a pinned map when the admin has saved valid coordinates. --}}
+                        @if($contactSetting?->googleMapsEmbedUrl())
+                            <section class="overflow-hidden rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)]" aria-label="موقعیت فروشگاه روی نقشه">
+                                <div class="flex items-center justify-between gap-3 border-b border-[var(--sg-border)] px-5 py-4">
+                                    <div>
+                                        <p class="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--sg-accent)]">FIND US</p>
+                                        <h3 class="mt-1 text-sm font-semibold text-[var(--sg-ink)]">موقعیت فروشگاه روی نقشه</h3>
+                                    </div>
+                                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--sg-surface)] text-sm text-[var(--sg-ink)]" aria-hidden="true">⌖</span>
+                                </div>
+                                <div class="aspect-[4/3] w-full bg-[var(--sg-surface)] sm:aspect-[16/10]">
+                                    <iframe
+                                        src="{{ $contactSetting->googleMapsEmbedUrl() }}"
+                                        title="نقشه موقعیت فروشگاه SillaGallery"
+                                        class="h-full w-full border-0"
+                                        loading="lazy"
+                                        referrerpolicy="strict-origin-when-cross-origin"
+                                        allowfullscreen
+                                    ></iframe>
+                                </div>
+                                @if($contactSetting->googleMapsDirectionsUrl())
+                                    <div class="flex flex-wrap items-center justify-between gap-3 p-4 sm:px-5">
+                                        <p class="text-xs leading-6 text-[var(--sg-stone)]">برای مشاهده مسیر و مسیریابی، نقشه را در Google Maps باز کنید.</p>
+                                        <a href="{{ $contactSetting->googleMapsDirectionsUrl() }}" target="_blank" rel="noopener noreferrer" class="inline-flex min-h-10 shrink-0 items-center justify-center rounded-xl bg-[var(--sg-ink)] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[var(--sg-accent)]">
+                                            مسیریابی در Google Maps <span class="mr-2" aria-hidden="true">↗</span>
+                                        </a>
+                                    </div>
+                                @endif
+                            </section>
+                        @elseif($contactSetting?->googleMapsSearchUrl())
+                            <div class="flex flex-col gap-3 rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
+                                <p class="text-xs leading-7 text-[var(--sg-stone)]">آدرس فروشگاه ثبت شده است، اما هنوز مختصات دقیق نقشه توسط مدیریت تأیید نشده است.</p>
+                                <a href="{{ $contactSetting->googleMapsSearchUrl() }}" target="_blank" rel="noopener noreferrer" class="inline-flex min-h-10 w-fit items-center justify-center rounded-xl border border-[var(--sg-border)] px-4 py-2 text-xs font-semibold text-[var(--sg-ink)] transition hover:border-[var(--sg-accent)] hover:text-[var(--sg-accent)]">
+                                    جستجوی آدرس در Google Maps <span class="mr-2" aria-hidden="true">↗</span>
+                                </a>
+                            </div>
+                        @endif
+
 
                         {{-- HOURS --}}
 
