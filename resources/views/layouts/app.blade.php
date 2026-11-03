@@ -120,7 +120,7 @@
             else document.querySelector('[data-sg-search-trigger]')?.focus({ preventScroll: true });
         });
     }
-}" class="min-h-screen pb-24 lg:pb-0">
+}" class="min-h-screen pb-[calc(7rem+env(safe-area-inset-bottom))] lg:pb-0">
     <x-layout.navbar :cart-count="$storefrontCartCount" />
     <x-layout.mobile-menu />
     <x-layout.search-overlay />
