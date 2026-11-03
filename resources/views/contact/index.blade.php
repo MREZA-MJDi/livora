@@ -1,9 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'تماس با '.($storeSettings?->brand_name ?: config('app.name')).' | ارتباط با ما')
-
 @section('description', $pageContent['hero_description'] ?? 'برای مشاوره خرید، پیگیری سفارش و دریافت اطلاعات بیشتر با ما در ارتباط باشید.')
-
 @section('canonical', \App\Models\SeoPageSetting::forRoute('contact')?->canonical_url ?: route('contact'))
 @section('robots', \App\Models\SeoPageSetting::forRoute('contact')?->robots() ?? \App\Models\SeoSetting::current()->robots())
 
@@ -15,797 +13,185 @@
     'mainEntity' => $faqs->map(fn ($faq) => [
         '@type' => 'Question',
         'name' => $faq['question'],
-        'acceptedAnswer' => [
-            '@type' => 'Answer',
-            'text' => $faq['answer'],
-        ],
+        'acceptedAnswer' => ['@type' => 'Answer', 'text' => $faq['answer']],
     ])->values()->all(),
 ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) !!}</script>
 @endif
 @endpush
 
-
-
 @section('content')
-
-    <div class="overflow-hidden bg-[var(--sg-cream)]">
-
-        {{-- =========================================================
-             HERO
-        ========================================================== --}}
-
-        <section class="border-b border-[var(--sg-border)] bg-[var(--sg-white)]">
-
-            <x-layout.container>
-
-                <div class="py-10 sm:py-16 lg:py-20">
-
-                    <nav
-                        aria-label="breadcrumb"
-                        class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--sg-stone)]"
-                    >
-
-                        <a
-                            href="{{ route('home') }}"
-                            class="transition hover:text-[var(--sg-ink)]"
-                        >
-                            خانه
-                        </a>
-
-                        <span>/</span>
-
-                        <span class="text-[var(--sg-ink)]">
-                            {{ $pageContent['breadcrumb_label'] ?? 'تماس با ما' }}
-                        </span>
-
-                    </nav>
-
-
-                    <div class="mt-10 grid items-end gap-10 lg:grid-cols-[1.1fr_0.9fr]">
-
-                        <div class="max-w-4xl">
-
-                            <p class="text-[10px] font-medium uppercase tracking-[0.24em] text-[var(--sg-accent)]">
-                                {{ $pageContent['hero_kicker'] ?? 'ارتباط با ما' }}
-                            </p>
-
-                            <h1 class="mt-5 text-5xl font-semibold leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl">
-                                {{ $pageContent['hero_title'] ?? 'برای انتخاب بهتر،' }}
-                                <span class="block text-[var(--sg-accent)]">
-                                    {{ $pageContent['hero_highlight'] ?? 'کنار شما هستیم.' }}
-                                </span>
-                            </h1>
-
-                        </div>
-
-
-                        <div>
-
-                            <p class="text-sm leading-8 text-[var(--sg-stone)] sm:text-base">
-                                {{ $pageContent['hero_description'] ?? 'برای مشاوره خرید، پیگیری سفارش یا هر موضوع دیگری می‌توانید با ما در ارتباط باشید.' }}
-                            </p>
-
-                            <a
-                                href="#contact-form"
-                                class="mt-7 inline-flex items-center rounded-2xl bg-[var(--sg-ink)] px-6 py-4 text-sm font-medium text-white transition hover:bg-[var(--sg-accent)]"
-                            >
-                                {{ $pageContent['hero_cta'] ?? 'ارسال پیام' }}
-                            </a>
-
-                        </div>
-
+<div class="bg-[var(--sg-cream)]">
+    <section class="relative overflow-hidden border-b border-[var(--sg-border)] bg-[var(--sg-white)]">
+        <x-layout.container>
+            <div class="py-10 sm:py-16 lg:py-20">
+                <nav aria-label="مسیر صفحه" class="flex flex-wrap items-center gap-2 text-xs text-[var(--sg-stone)]">
+                    <a href="{{ route('home') }}" class="hover:text-[var(--sg-ink)]">خانه</a><span>/</span><span class="text-[var(--sg-ink)]">{{ $pageContent['breadcrumb_label'] ?? 'تماس با ما' }}</span>
+                </nav>
+                <div class="mt-10 grid items-end gap-8 lg:grid-cols-[1.15fr_.85fr] lg:gap-16">
+                    <div>
+                        <p class="sg-eyebrow">{{ $pageContent['hero_kicker'] ?? 'ارتباط با ما' }}</p>
+                        <h1 class="mt-5 max-w-3xl text-4xl font-semibold leading-[1.3] tracking-tight text-[var(--sg-ink)] sm:text-5xl lg:text-6xl">
+                            {{ $pageContent['hero_title'] ?? 'برای انتخاب بهتر،' }}
+                            <span class="block text-[var(--sg-accent)]">{{ $pageContent['hero_highlight'] ?? 'کنار شما هستیم.' }}</span>
+                        </h1>
                     </div>
-
+                    <div class="max-w-xl lg:pb-2">
+                        <p class="text-sm leading-8 text-[var(--sg-stone)] sm:text-base">{{ $pageContent['hero_description'] ?? 'برای مشاوره خرید، پیگیری سفارش یا هر موضوع دیگری می‌توانید با ما در ارتباط باشید.' }}</p>
+                        <a href="#contact-form" class="mt-7 inline-flex min-h-12 items-center justify-center rounded-xl bg-[var(--sg-ink)] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[var(--sg-accent)]">{{ $pageContent['hero_cta'] ?? 'ارسال پیام' }}</a>
+                    </div>
                 </div>
+            </div>
+        </x-layout.container>
+    </section>
 
-            </x-layout.container>
-
-        </section>
-
-
-        {{-- =========================================================
-             CONTACT METHODS
-        ========================================================== --}}
-
+    @php
+        $contactMethods = collect([
+            ['number' => '01', 'label' => $contactSetting?->phone_label ?? 'تماس تلفنی', 'value' => $contactSetting?->phone, 'href' => $contactSetting?->phone ? 'tel:'.$contactSetting->phone : null, 'eyebrow' => 'PHONE'],
+            ['number' => '02', 'label' => $contactSetting?->email_label ?? 'ایمیل', 'value' => $contactSetting?->email, 'href' => $contactSetting?->email ? 'mailto:'.$contactSetting->email : null, 'eyebrow' => 'EMAIL'],
+            ['number' => '03', 'label' => $contactSetting?->support_label ?? 'پشتیبانی', 'value' => $contactSetting?->support_description, 'href' => null, 'eyebrow' => 'SUPPORT'],
+            ['number' => '04', 'label' => $contactSetting?->online_label ?? 'ارتباط آنلاین', 'value' => $contactSetting?->online_description, 'href' => null, 'eyebrow' => 'ONLINE'],
+        ])->filter(fn ($item) => filled($item['value']))->values();
+    @endphp
+    @if($contactMethods->isNotEmpty())
         <section class="border-b border-[var(--sg-border)]">
-
             <x-layout.container>
-
-                <div class="grid gap-4 py-10 sm:grid-cols-2 lg:grid-cols-4">
-
-                    {{-- PHONE --}}
-
-                    @if($contactSetting?->phone)
-
-                        <a
-                            href="tel:{{ $contactSetting->phone }}"
-                            class="group rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-6 transition duration-300 hover:-translate-y-1 hover:border-[var(--sg-ink)]"
-                        >
-
+                <div class="grid gap-3 py-8 sm:grid-cols-2 lg:grid-cols-4 lg:py-10">
+                    @foreach($contactMethods as $method)
+                        <article class="group min-w-0 rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5 transition duration-300 hover:-translate-y-1 hover:shadow-lg sm:p-6">
+                            <div class="flex items-center justify-between">
+                                <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--sg-surface)] text-xs font-semibold text-[var(--sg-ink)]">{{ $method['number'] }}</span>
+                                <span class="text-[9px] tracking-[.18em] text-[var(--sg-accent)]">{{ $method['eyebrow'] }}</span>
+                            </div>
+                            <h2 class="mt-6 text-base font-semibold text-[var(--sg-ink)]">{{ $method['label'] }}</h2>
+                            @if($method['href'])
+                                <a href="{{ $method['href'] }}" class="mt-2 block break-all text-sm text-[var(--sg-stone)] hover:text-[var(--sg-accent)]" dir="auto">{{ $method['value'] }}</a>
                             @else
-
-                                <div
-                                    class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-6"
-                                >
-
-                                    @endif
-
-                                    <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--sg-surface)] text-xs font-semibold">
-                                        01
-                                    </div>
-
-                                    <p class="mt-7 text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
-                                        تلفن
-                                    </p>
-
-                                    <h2 class="mt-2 text-base font-semibold">
-                                        {{ $contactSetting?->phone_label ?? 'تماس تلفنی' }}
-                                    </h2>
-
-                                    <p class="mt-3 break-all text-xs leading-6 text-[var(--sg-stone)]">
-                                        {{ $contactSetting?->phone }}
-                                    </p>
-
-                                @if($contactSetting?->phone)
-
-                        </a>
-
-                    @else
-
+                                <p class="mt-2 text-sm leading-7 text-[var(--sg-stone)]">{{ $method['value'] }}</p>
+                            @endif
+                        </article>
+                    @endforeach
                 </div>
-
-                @endif
-
-
-                {{-- EMAIL --}}
-
-                @if($contactSetting?->email)
-
-                    <a
-                        href="mailto:{{ $contactSetting->email }}"
-                        class="group rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-6 transition duration-300 hover:-translate-y-1 hover:border-[var(--sg-ink)]"
-                    >
-
-                        @else
-
-                            <div
-                                class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-6"
-                            >
-
-                                @endif
-
-                                <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--sg-surface)] text-xs font-semibold">
-                                    02
-                                </div>
-
-                                <p class="mt-7 text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
-                                    ایمیل
-                                </p>
-
-                                <h2 class="mt-2 text-base font-semibold">
-                                    {{ $contactSetting?->email_label ?? 'ایمیل' }}
-                                </h2>
-
-                                <p class="mt-3 break-all text-xs leading-6 text-[var(--sg-stone)]">
-                                {{ $contactSetting?->email }}
-                                </p>
-
-                            @if($contactSetting?->email)
-
-                    </a>
-
-        @else
-
-    </div>
-
+            </x-layout.container>
+        </section>
     @endif
 
-
-    {{-- SUPPORT --}}
-
-    @if(filled($contactSetting?->support_description))<div class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-6">
-
-        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--sg-surface)] text-xs font-semibold">
-            03
-        </div>
-
-        <p class="mt-7 text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
-            پشتیبانی
-        </p>
-
-        <h2 class="mt-2 text-base font-semibold">
-            {{ $contactSetting?->support_label ?? 'پشتیبانی' }}
-        </h2>
-
-        <p class="mt-3 text-xs leading-6 text-[var(--sg-stone)]">
-            {{ $contactSetting->support_description }}
-        </p>
-
-    </div>@endif
-
-
-    {{-- ONLINE --}}
-
-    @if(filled($contactSetting?->online_description))<div class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-6">
-
-        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--sg-surface)] text-xs font-semibold">
-            04
-        </div>
-
-        <p class="mt-7 text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
-            ارتباط آنلاین
-        </p>
-
-        <h2 class="mt-2 text-base font-semibold">
-            {{ $contactSetting?->online_label ?? 'ارتباط آنلاین' }}
-        </h2>
-
-        <p class="mt-3 text-xs leading-6 text-[var(--sg-stone)]">
-            {{ $contactSetting->online_description }}
-        </p>
-
-    </div>@endif
-
-    </div>
-
-    </x-layout.container>
-
-    </section>
-
-
-    {{-- =========================================================
-         FORM + INFO
-    ========================================================== --}}
-
-    <section id="contact-form">
-
+    <section id="contact-form" class="scroll-mt-24 py-12 sm:py-16 lg:py-20">
         <x-layout.container>
-
-            <div class="grid gap-8 py-14 sm:py-16 lg:grid-cols-[0.8fr_1.2fr] lg:py-24">
-
-                {{-- INFO --}}
-
-                <div>
-
-                    <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
-                        {{ $pageContent['info_kicker'] ?? 'پشتیبانی' }}
-                    </p>
-
-                    <h2 class="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
-                        {{ $pageContent['info_title'] ?? 'چه کمکی از دست ما برمی‌آید؟' }}
-                    </h2>
-
-                    <p class="mt-5 max-w-xl text-sm leading-8 text-[var(--sg-stone)]">
-                        {{ $pageContent['info_description'] ?? 'اگر درباره محصول، موجودی، قیمت، شرایط خرید اقساطی، ارسال یا سفارش خود سؤالی دارید، پیام بگذارید.' }}
-                    </p>
-
-
-                    {{-- ADDRESS --}}
-
-                    <div class="mt-10 space-y-3">
-
-                        @if(filled($contactSetting?->address))<div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
-
-                            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
-                                {{ $pageContent['address_label'] ?? 'آدرس' }}
-                            </p>
-
-                            <p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">
-                                {{ $contactSetting->address }}
-                            </p>
-
-                        </div>@endif
-
-                        {{-- GOOGLE MAP: only show a pinned map when the admin has saved valid coordinates. --}}
-                        @if($contactSetting?->googleMapsEmbedUrl())
-                            <section class="overflow-hidden rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)]" aria-label="موقعیت فروشگاه روی نقشه">
-                                <div class="flex items-center justify-between gap-3 border-b border-[var(--sg-border)] px-5 py-4">
-                                    <div>
-                                        <p class="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--sg-accent)]">FIND US</p>
-                                        <h3 class="mt-1 text-sm font-semibold text-[var(--sg-ink)]">موقعیت فروشگاه روی نقشه</h3>
-                                    </div>
-                                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--sg-surface)] text-sm text-[var(--sg-ink)]" aria-hidden="true">⌖</span>
-                                </div>
-                                <div class="aspect-[4/3] w-full bg-[var(--sg-surface)] sm:aspect-[16/10]">
-                                    <iframe
-                                        src="{{ $contactSetting->googleMapsEmbedUrl() }}"
-                                        title="نقشه موقعیت فروشگاه SillaGallery"
-                                        class="h-full w-full border-0"
-                                        loading="lazy"
-                                        referrerpolicy="strict-origin-when-cross-origin"
-                                        allowfullscreen
-                                    ></iframe>
-                                </div>
-                                @if($contactSetting->googleMapsDirectionsUrl())
-                                    <div class="flex flex-wrap items-center justify-between gap-3 p-4 sm:px-5">
-                                        <p class="text-xs leading-6 text-[var(--sg-stone)]">برای مشاهده مسیر و مسیریابی، نقشه را در Google Maps باز کنید.</p>
-                                        <a href="{{ $contactSetting->googleMapsDirectionsUrl() }}" target="_blank" rel="noopener noreferrer" class="inline-flex min-h-10 shrink-0 items-center justify-center rounded-xl bg-[var(--sg-ink)] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[var(--sg-accent)]">
-                                            مسیریابی در Google Maps <span class="mr-2" aria-hidden="true">↗</span>
-                                        </a>
-                                    </div>
-                                @endif
-                            </section>
-                        @elseif($contactSetting?->googleMapsSearchUrl())
-                            <div class="flex flex-col gap-3 rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
-                                <p class="text-xs leading-7 text-[var(--sg-stone)]">آدرس فروشگاه ثبت شده است، اما هنوز مختصات دقیق نقشه توسط مدیریت تأیید نشده است.</p>
-                                <a href="{{ $contactSetting->googleMapsSearchUrl() }}" target="_blank" rel="noopener noreferrer" class="inline-flex min-h-10 w-fit items-center justify-center rounded-xl border border-[var(--sg-border)] px-4 py-2 text-xs font-semibold text-[var(--sg-ink)] transition hover:border-[var(--sg-accent)] hover:text-[var(--sg-accent)]">
-                                    جستجوی آدرس در Google Maps <span class="mr-2" aria-hidden="true">↗</span>
-                                </a>
-                            </div>
-                        @endif
-
-
-                        {{-- HOURS --}}
-
-                        @if(filled($contactSetting?->hours))<div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
-
-                            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
-                                {{ $pageContent['hours_label'] ?? 'ساعات کاری' }}
-                            </p>
-
-                            <p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">
-                                {{ $contactSetting->hours }}
-                            </p>
-
-                        </div>@endif
-
-
-                        {{-- INSTALLMENT --}}
-
-                        @if(filled($pageContent['installment_note'] ?? null))<div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
-
-                            <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
-                                {{ $pageContent['installment_label'] ?? 'اقساط' }}
-                            </p>
-
-                            <p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">
-                                {{ $pageContent['installment_note'] }}
-                            </p>
-
-                        </div>@endif
-
+            <div class="grid items-start gap-8 lg:grid-cols-[.82fr_1.18fr] lg:gap-12">
+                <aside class="space-y-5">
+                    <div class="max-w-xl">
+                        <p class="sg-eyebrow">{{ $pageContent['info_kicker'] ?? 'پشتیبانی SillaGallery' }}</p>
+                        <h2 class="mt-4 text-3xl font-semibold leading-snug text-[var(--sg-ink)] sm:text-4xl">{{ $pageContent['info_title'] ?? 'چه کمکی از دست ما برمی‌آید؟' }}</h2>
+                        <p class="mt-4 text-sm leading-8 text-[var(--sg-stone)]">{{ $pageContent['info_description'] ?? 'اگر درباره محصول، موجودی، قیمت، شرایط خرید اقساطی، ارسال یا سفارش خود سؤالی دارید، پیام بگذارید.' }}</p>
                     </div>
+                    @if(filled($contactSetting?->address))
+                        <div class="rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
+                            <p class="text-xs font-semibold text-[var(--sg-accent)]">{{ $pageContent['address_label'] ?? 'آدرس' }}</p>
+                            <p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">{{ $contactSetting->address }}</p>
+                        </div>
+                    @endif
+                    @if(filled($contactSetting?->hours))
+                        <div class="rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
+                            <p class="text-xs font-semibold text-[var(--sg-accent)]">{{ $pageContent['hours_label'] ?? 'ساعات کاری' }}</p>
+                            <p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">{{ $contactSetting->hours }}</p>
+                        </div>
+                    @endif
+                    @if(filled($pageContent['installment_note'] ?? null))
+                        <div class="rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
+                            <p class="text-xs font-semibold text-[var(--sg-accent)]">{{ $pageContent['installment_label'] ?? 'خرید اقساطی' }}</p>
+                            <p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">{{ $pageContent['installment_note'] }}</p>
+                        </div>
+                    @endif
+                    @if($contactSetting?->googleMapsEmbedUrl())
+                        <div class="overflow-hidden rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)]">
+                            <div class="border-b border-[var(--sg-border)] px-5 py-4"><p class="sg-eyebrow">FIND US</p><h3 class="mt-1 font-semibold">موقعیت فروشگاه</h3></div>
+                            <div class="aspect-[4/3] bg-[var(--sg-surface)]"><iframe src="{{ $contactSetting->googleMapsEmbedUrl() }}" title="نقشه موقعیت فروشگاه SillaGallery" class="h-full w-full border-0" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+                            @if($contactSetting->googleMapsDirectionsUrl())
+                                <div class="p-4"><a href="{{ $contactSetting->googleMapsDirectionsUrl() }}" target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-[var(--sg-accent)]">مسیریابی در Google Maps ↗</a></div>
+                            @endif
+                        </div>
+                    @elseif($contactSetting?->googleMapsSearchUrl())
+                        <a href="{{ $contactSetting->googleMapsSearchUrl() }}" target="_blank" rel="noopener noreferrer" class="block rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5 text-sm font-semibold text-[var(--sg-accent)]">مشاهده آدرس در Google Maps ↗</a>
+                    @endif
+                </aside>
 
-                </div>
-
-
-                {{-- FORM --}}
-
-                <div class="rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-6 sm:p-8 lg:p-10">
-
-                    <div class="mb-8">
-
-                        <p class="text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--sg-accent)]">
-                            {{ $pageContent['form_kicker'] ?? 'فرم تماس' }}
-                        </p>
-
-                        <h2 class="mt-3 text-2xl font-semibold">
-                            {{ $pageContent['form_title'] ?? 'پیام خود را ارسال کنید' }}
-                        </h2>
-
-                        <p class="mt-2 text-xs leading-7 text-[var(--sg-stone)]">
-                            {{ $pageContent['form_description'] ?? 'اطلاعات تماس خود را وارد کنید تا بتوانیم پاسخ دقیق‌تری ارائه دهیم.' }}
-                        </p>
-
+                <div class="rounded-[1.5rem] border border-[var(--sg-border)] bg-[var(--sg-white)] p-5 shadow-[0_18px_60px_rgba(35,29,23,.06)] sm:p-8 lg:p-10">
+                    <div class="mb-7">
+                        <p class="sg-eyebrow">{{ $pageContent['form_kicker'] ?? 'فرم تماس' }}</p>
+                        <h2 class="mt-3 text-2xl font-semibold text-[var(--sg-ink)]">{{ $pageContent['form_title'] ?? 'پیام خود را ارسال کنید' }}</h2>
+                        <p class="mt-2 text-sm leading-7 text-[var(--sg-stone)]">{{ $pageContent['form_description'] ?? 'اطلاعات تماس خود را وارد کنید تا بتوانیم پاسخ دقیق‌تری ارائه دهیم.' }}</p>
                     </div>
-
-
-                    {{-- SUCCESS MESSAGE --}}
-
                     @if(session('success'))
-
-                        <div class="mb-6 rounded-2xl border border-[var(--sg-success)]/20 bg-[var(--sg-success-soft)] p-4">
-
-                            <p class="text-xs leading-7 text-[var(--sg-success)]">
-                                {{ session('success') }}
-                            </p>
-
-                        </div>
-
+                        <div role="status" class="mb-6 rounded-xl border border-[var(--sg-success)]/20 bg-[var(--sg-success-soft)] p-4 text-sm leading-7 text-[var(--sg-success)]">{{ session('success') }}</div>
                     @endif
-
-
-                    {{-- VALIDATION ERRORS --}}
-
                     @if($errors->any())
-
-                        <div class="mb-6 rounded-2xl border border-[var(--sg-danger)]/20 bg-[var(--sg-danger-soft)] p-4">
-
-                            <ul class="space-y-1 text-xs leading-6 text-[var(--sg-danger)]">
-
-                                @foreach($errors->all() as $error)
-
-                                    <li>
-                                        {{ $error }}
-                                    </li>
-
-                                @endforeach
-
-                            </ul>
-
+                        <div role="alert" class="mb-6 rounded-xl border border-[var(--sg-danger)]/20 bg-[var(--sg-danger-soft)] p-4">
+                            <ul class="list-inside list-disc space-y-1 text-sm leading-7 text-[var(--sg-danger)]">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
                         </div>
-
                     @endif
-
-
-                    {{-- CONTACT FORM --}}
-
-                    <form
-                        action="{{ route('contact.store') }}"
-                        method="POST"
-                        class="space-y-5"
-                    >
-
+                    <form action="{{ route('contact.store') }}" method="POST" class="space-y-5">
                         @csrf
-
-
-                        {{-- NAME + PHONE --}}
-
                         <div class="grid gap-5 sm:grid-cols-2">
-
-                            {{-- NAME --}}
-
                             <div>
-
-                                <label
-                                    for="name"
-                                    class="admin-label"
-                                >
-                                    نام و نام خانوادگی
-                                </label>
-
-                                <input
-                                    id="name"
-                                    name="name"
-                                    type="text"
-                                    value="{{ old('name', auth()->user()?->name) }}"
-                                    class="admin-input mt-2 w-full @error('name') border-[var(--sg-danger)] @enderror"
-                                    autocomplete="name"
-                                    placeholder="نام شما"
-                                >
-
-                                @error('name')
-
-                                <p class="mt-1 text-[11px] text-[var(--sg-danger)]">
-                                    {{ $message }}
-                                </p>
-
-                                @enderror
-
+                                <label for="contact-name" class="admin-label">نام و نام خانوادگی <span class="text-[var(--sg-danger)]">*</span></label>
+                                <input id="contact-name" name="name" type="text" required maxlength="120" autocomplete="name" value="{{ old('name', auth()->user()?->name) }}" class="admin-input mt-2 w-full @error('name') border-[var(--sg-danger)] @enderror" placeholder="نام شما">
+                                @error('name')<p class="mt-2 text-xs text-[var(--sg-danger)]">{{ $message }}</p>@enderror
                             </div>
-
-
-                            {{-- PHONE --}}
-
                             <div>
-
-                                <label
-                                    for="phone"
-                                    class="admin-label"
-                                >
-                                    شماره تماس
-                                </label>
-
-                                <input
-                                    id="phone"
-                                    name="phone"
-                                    type="tel"
-                                    value="{{ old('phone', auth()->user()?->phone) }}"
-                                    class="admin-input mt-2 w-full @error('phone') border-[var(--sg-danger)] @enderror"
-                                    autocomplete="tel"
-                                    dir="ltr"
-                                    placeholder="09xxxxxxxxx"
-                                >
-
-                                @error('phone')
-
-                                <p class="mt-1 text-[11px] text-[var(--sg-danger)]">
-                                    {{ $message }}
-                                </p>
-
-                                @enderror
-
+                                <label for="contact-phone" class="admin-label">شماره تماس <span class="text-[var(--sg-danger)]">*</span></label>
+                                <input id="contact-phone" name="phone" type="tel" required maxlength="30" autocomplete="tel" inputmode="tel" dir="ltr" value="{{ old('phone') }}" class="admin-input mt-2 w-full text-left @error('phone') border-[var(--sg-danger)] @enderror" placeholder="09xxxxxxxxx">
+                                @error('phone')<p class="mt-2 text-xs text-[var(--sg-danger)]">{{ $message }}</p>@enderror
                             </div>
-
                         </div>
-
-
-                        {{-- EMAIL --}}
-
                         <div>
-
-                            <label
-                                for="email"
-                                class="admin-label"
-                            >
-                                ایمیل
-                            </label>
-
-                            <input
-                                id="email"
-                                name="email"
-                                type="email"
-                                value="{{ old('email', auth()->user()?->email) }}"
-                                class="admin-input mt-2 w-full @error('email') border-[var(--sg-danger)] @enderror"
-                                autocomplete="email"
-                                dir="ltr"
-                                placeholder="you@example.com"
-                            >
-
-                            @error('email')
-
-                            <p class="mt-1 text-[11px] text-[var(--sg-danger)]">
-                                {{ $message }}
-                            </p>
-
-                            @enderror
-
+                            <label for="contact-email" class="admin-label">ایمیل <span class="text-xs font-normal text-[var(--sg-stone)]">(اختیاری)</span></label>
+                            <input id="contact-email" name="email" type="email" maxlength="255" autocomplete="email" dir="ltr" value="{{ old('email', auth()->user()?->email) }}" class="admin-input mt-2 w-full text-left @error('email') border-[var(--sg-danger)] @enderror" placeholder="you@example.com">
+                            @error('email')<p class="mt-2 text-xs text-[var(--sg-danger)]">{{ $message }}</p>@enderror
                         </div>
-
-
-                        {{-- SUBJECT --}}
-
                         <div>
-
-                            <label
-                                for="subject"
-                                class="admin-label"
-                            >
-                                موضوع
-                            </label>
-
-                            <select
-                                id="subject"
-                                name="subject"
-                                class="admin-select mt-2 w-full @error('subject') border-[var(--sg-danger)] @enderror"
-                            >
-
-                                <option value="">
-                                    انتخاب موضوع
-                                </option>
-
-                                <option
-                                    value="product"
-                                    @selected(old('subject') === 'product')
-                                >
-                                مشاوره درباره محصول
-                                </option>
-
-                                <option
-                                    value="installment"
-                                    @selected(old('subject') === 'installment')
-                                >
-                                شرایط خرید اقساطی
-                                </option>
-
-                                <option
-                                    value="order"
-                                    @selected(old('subject') === 'order')
-                                >
-                                پیگیری سفارش
-                                </option>
-
-                                <option
-                                    value="shipping"
-                                    @selected(old('subject') === 'shipping')
-                                >
-                                ارسال و تحویل
-                                </option>
-
-                                <option
-                                    value="other"
-                                    @selected(old('subject') === 'other')
-                                >
-                                سایر
-                                </option>
-
+                            <label for="contact-subject" class="admin-label">موضوع پیام <span class="text-[var(--sg-danger)]">*</span></label>
+                            <select id="contact-subject" name="subject" required class="admin-select mt-2 w-full @error('subject') border-[var(--sg-danger)] @enderror">
+                                <option value="">انتخاب موضوع</option>
+                                <option value="product" @selected(old('subject') === 'product')>مشاوره درباره محصول</option>
+                                <option value="installment" @selected(old('subject') === 'installment')>شرایط خرید اقساطی</option>
+                                <option value="order" @selected(old('subject') === 'order')>پیگیری سفارش</option>
+                                <option value="shipping" @selected(old('subject') === 'shipping')>ارسال و تحویل</option>
+                                <option value="other" @selected(old('subject') === 'other')>سایر</option>
                             </select>
-
-                            @error('subject')
-
-                            <p class="mt-1 text-[11px] text-[var(--sg-danger)]">
-                                {{ $message }}
-                            </p>
-
-                            @enderror
-
+                            @error('subject')<p class="mt-2 text-xs text-[var(--sg-danger)]">{{ $message }}</p>@enderror
                         </div>
-
-
-                        {{-- MESSAGE --}}
-
                         <div>
-
-                            <label
-                                for="message"
-                                class="admin-label"
-                            >
-                                پیام
-                            </label>
-
-                            <textarea
-                                id="message"
-                                name="message"
-                                rows="7"
-                                class="admin-textarea mt-2 w-full @error('message') border-[var(--sg-danger)] @enderror"
-                                placeholder="پیام خود را بنویسید..."
-                            >{{ old('message') }}</textarea>
-
-                            @error('message')
-
-                            <p class="mt-1 text-[11px] text-[var(--sg-danger)]">
-                                {{ $message }}
-                            </p>
-
-                            @enderror
-
+                            <label for="contact-message" class="admin-label">پیام شما <span class="text-[var(--sg-danger)]">*</span></label>
+                            <textarea id="contact-message" name="message" rows="6" required minlength="10" maxlength="5000" class="admin-textarea mt-2 w-full @error('message') border-[var(--sg-danger)] @enderror" placeholder="چطور می‌توانیم راهنمایی‌تان کنیم؟">{{ old('message') }}</textarea>
+                            <p class="mt-2 text-xs text-[var(--sg-stone)]">حداقل ۱۰ و حداکثر ۵۰۰۰ نویسه.</p>
+                            @error('message')<p class="mt-2 text-xs text-[var(--sg-danger)]">{{ $message }}</p>@enderror
                         </div>
-
-
-                        {{-- FORM NOTE --}}
-
-                        <div class="rounded-2xl bg-[var(--sg-surface)] p-4">
-
-                            <p class="text-[11px] leading-7 text-[var(--sg-stone)]">
-                                پیام شما پس از ارسال بررسی می‌شود و در صورت نیاز
-                                از طریق اطلاعات تماس واردشده با شما ارتباط خواهیم گرفت.
-                            </p>
-
-                        </div>
-
-
-                        {{-- SUBMIT --}}
-
-                        <button
-                            type="submit"
-                            class="w-full rounded-2xl bg-[var(--sg-ink)] px-6 py-4 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:bg-[var(--sg-accent)]"
-                        >
-                            ارسال پیام
-                        </button>
-
+                        <button type="submit" class="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-[var(--sg-ink)] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[var(--sg-accent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sg-accent)]">ارسال پیام</button>
+                        <p class="text-center text-xs leading-6 text-[var(--sg-stone)]">اطلاعات شما فقط برای پیگیری همین درخواست استفاده می‌شود.</p>
                     </form>
-
                 </div>
-
             </div>
-
         </x-layout.container>
-
     </section>
 
-
-    {{-- =========================================================
-         FAQ
-         FAQ is intentionally static for the first version.
-    ========================================================== --}}
-
-    <section class="border-t border-[var(--sg-border)] bg-[var(--sg-white)]">
-
-        <x-layout.container>
-
-            <div
-                x-data="{ active: null }"
-                class="grid gap-10 py-14 sm:py-16 lg:grid-cols-[0.7fr_1.3fr] lg:py-24"
-            >
-
-                <div>
-
-                    <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
-                        {{ $pageContent['faq_kicker'] ?? 'پرسش‌های متداول' }}
-                    </p>
-
-                    <h2 class="mt-4 text-3xl font-semibold tracking-tight">
-                        {{ $pageContent['faq_title'] ?? 'پرسش‌های متداول' }}
-                    </h2>
-
-                    <p class="mt-4 text-sm leading-8 text-[var(--sg-stone)]">
-                        {{ $pageContent['faq_description'] ?? 'پاسخ چند سؤال رایج درباره ارتباط با فروشگاه و خرید.' }}
-                    </p>
-
+    @if($faqs->isNotEmpty())
+        <section class="border-t border-[var(--sg-border)] bg-[var(--sg-white)]">
+            <x-layout.container>
+                <div class="grid gap-8 py-12 sm:py-16 lg:grid-cols-[.7fr_1.3fr] lg:py-20">
+                    <div><p class="sg-eyebrow">{{ $pageContent['faq_kicker'] ?? 'پرسش‌های متداول' }}</p><h2 class="mt-4 text-3xl font-semibold">{{ $pageContent['faq_title'] ?? 'پاسخ پرسش‌های شما' }}</h2><p class="mt-4 text-sm leading-8 text-[var(--sg-stone)]">{{ $pageContent['faq_description'] ?? 'پاسخ چند سؤال رایج درباره ارتباط با فروشگاه و خرید.' }}</p></div>
+                    <div x-data="{ active: null }" class="space-y-3">
+                        @foreach($faqs as $index => $faq)
+                            <article class="overflow-hidden rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-cream)]">
+                                <button type="button" @click="active === {{ $index }} ? active = null : active = {{ $index }}" :aria-expanded="active === {{ $index }} ? 'true' : 'false'" class="flex w-full items-center justify-between gap-4 px-5 py-5 text-right">
+                                    <span class="text-sm font-semibold">{{ $faq['question'] }}</span><span aria-hidden="true" class="text-lg text-[var(--sg-accent)]" x-text="active === {{ $index }} ? '−' : '+'"></span>
+                                </button>
+                                <div x-show="active === {{ $index }}" x-collapse x-cloak class="border-t border-[var(--sg-border)] px-5 py-4 text-sm leading-8 text-[var(--sg-stone)]">{{ $faq['answer'] }}</div>
+                            </article>
+                        @endforeach
+                    </div>
                 </div>
-
-
-                <div class="space-y-3">
-
-                    @forelse($faqs as $index => $faq)
-
-                        <article class="overflow-hidden rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-cream)]">
-
-                            <button
-                                type="button"
-                                @click="active === {{ $index }} ? active = null : active = {{ $index }}"
-                                :aria-expanded="active === {{ $index }} ? 'true' : 'false'"
-                                class="flex w-full items-center justify-between gap-5 px-5 py-5 text-right sm:px-6"
-                            >
-
-                                    <span class="text-sm font-semibold">
-                                        {{ $faq['question'] }}
-                                    </span>
-
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke-width="1.5"
-                                    stroke="currentColor"
-                                    class="h-4 w-4 shrink-0 transition-transform duration-300"
-                                    :class="active === {{ $index }} ? 'rotate-180' : ''"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="m19.5 8.25-7.5 7.5-7.5-7.5"
-                                    />
-                                </svg>
-
-                            </button>
-
-
-                            <div
-                                x-show="active === {{ $index }}"
-                                x-collapse
-                                x-cloak
-                            >
-
-                                <div class="border-t border-[var(--sg-border)] px-5 py-5 text-xs leading-7 text-[var(--sg-stone)] sm:px-6">
-                                    {{ $faq['answer'] }}
-                                </div>
-
-                            </div>
-
-                        </article>
-
-                    @empty @endforelse
-
-                </div>
-
-            </div>
-
-        </x-layout.container>
-
-    </section>
-
-
-    {{-- =========================================================
-         FINAL CTA
-    ========================================================== --}}
-
-    <section class="border-t border-[var(--sg-border)] bg-[var(--sg-surface)]">
-
-        <x-layout.container>
-
-            <div class="flex flex-col gap-6 py-12 sm:flex-row sm:items-center sm:justify-between sm:py-16">
-
-                <div>
-
-                    <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--sg-accent)]">
-                        {{ $pageContent['final_kicker'] ?? ($storeSettings?->brand_name ?: config('app.name')) }}
-                    </p>
-
-                    <h2 class="mt-2 text-2xl font-semibold">
-                        {{ $pageContent['final_title'] ?? 'آماده‌ای انتخابت را پیدا کنی؟' }}
-                    </h2>
-
-                    <p class="mt-2 text-sm leading-7 text-[var(--sg-stone)]">
-                        {{ $pageContent['final_description'] ?? 'مجموعه محصولات را ببین و انتخاب بعدی‌ات را پیدا کن.' }}
-                    </p>
-
-                </div>
-
-
-                <a
-                    href="{{ route('shop.index') }}"
-                    class="inline-flex w-fit rounded-2xl bg-[var(--sg-ink)] px-6 py-4 text-sm font-medium text-white transition hover:bg-[var(--sg-accent)]"
-                >
-                    {{ $pageContent['final_cta'] ?? 'ورود به فروشگاه' }}
-                </a>
-
-            </div>
-
-        </x-layout.container>
-
-    </section>
-
-    </div>
-
+            </x-layout.container>
+        </section>
+    @endif
+</div>
 @endsection
