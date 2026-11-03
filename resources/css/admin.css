@@ -1395,50 +1395,108 @@ p {
    ========================================================= */
 
 @media (max-width: 1023px) {
-
     .admin-page-header {
         align-items: flex-start;
-
         flex-direction: column;
     }
 
     .admin-sidebar {
+        width: min(22rem, 88vw);
+        max-width: 88vw;
+    }
+
+    .admin-shell,
+    .admin-main,
+    .admin-content {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .admin-content > * {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .admin-table-wrapper {
         width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        overscroll-behavior-inline: contain;
     }
 }
 
 
 @media (max-width: 640px) {
-
     .admin-page-title,
     .admin-title {
-        font-size: 1.55rem;
+        font-size: clamp(1.35rem, 5vw, 1.6rem);
+        line-height: 1.45;
+        overflow-wrap: anywhere;
+    }
+
+    .admin-main {
+        padding-inline: .875rem;
+        padding-top: 1rem;
+        padding-bottom: 1.25rem;
     }
 
     .admin-card {
-        border-radius: 1.35rem;
+        border-radius: 1.25rem;
     }
 
     .admin-section {
-        border-radius: 1.35rem;
+        border-radius: 1.25rem;
     }
 
     .admin-table-wrapper {
-        border-radius: 1.25rem;
+        border-radius: 1rem;
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .admin-table {
+        min-width: 680px;
     }
 
     .admin-modal {
         width: calc(100% - 1rem);
-        border-radius: 1.5rem;
+        max-height: min(90dvh, 48rem);
+        border-radius: 1.25rem;
     }
 
     .admin-modal-header,
-    .admin-modal-body {
-        padding-inline: 1rem;
+    .admin-modal-body,
+    .admin-modal-footer {
+        padding-inline: .875rem;
     }
 
-    .admin-modal-footer {
-        padding-inline: 1rem;
+    .admin-content input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+    .admin-content select,
+    .admin-content textarea {
+        min-width: 0;
+        max-width: 100%;
+        min-height: 3rem;
+        font-size: 16px;
+        line-height: 1.5;
+    }
+
+    .admin-content textarea {
+        min-height: 7rem;
+    }
+
+    .admin-page-header,
+    .admin-page-header > div,
+    .admin-page-header .flex {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .admin-page-header .admin-btn {
+        white-space: normal;
+        max-width: 100%;
+        text-align: center;
     }
 }
 

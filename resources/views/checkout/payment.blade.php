@@ -225,7 +225,11 @@
                                 </h2>
 
                                 <p class="mt-2 text-xs leading-7 text-[var(--sg-stone)]">
-                                    یکی از درگاه‌های فعال را انتخاب کنید.
+                                    @if($enabledGateways->isNotEmpty())
+                                        یکی از روش‌های پرداخت فعال را انتخاب کنید.
+                                    @else
+                                        وضعیت پرداخت و راه پیگیری سفارش شما در همین صفحه نمایش داده می‌شود.
+                                    @endif
                                 </p>
 
                             </div>
@@ -377,37 +381,26 @@
                                 class="mt-6 overflow-hidden rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-surface)]"
                             >
                                 <div class="flex items-start gap-4 p-5 sm:p-6">
-                                    <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[var(--sg-white)] text-[var(--sg-accent)] shadow-sm" aria-hidden="true">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="h-5 w-5">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M10.3 3.9 2.8 17a2 2 0 0 0 1.7 3h15a2 2 0 0 0 1.7-3l-7.5-13.1a2 2 0 0 0-3.4 0Z"/>
-                                        </svg>
-                                    </span>
-
-                                    <div class="min-w-0 flex-1">
+                                    <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] text-lg text-[var(--sg-accent)]" aria-hidden="true">⌛</span>
+                                    <div class="min-w-0">
                                         <p class="text-sm font-semibold text-[var(--sg-ink)]">
                                             پرداخت آنلاین در حال آماده‌سازی است
                                         </p>
                                         <p class="mt-2 text-xs leading-7 text-[var(--sg-stone)]">
-                                            اتصال امن و آزمایش نهایی درگاه‌های بانکی هنوز تکمیل نشده است. به محض تأیید و فعال‌سازی، امکان پرداخت آنلاین در همین صفحه در دسترس خواهد بود.
+                                            سفارش شما با موفقیت ثبت شده است. در حال حاضر هیچ درگاه بانکی برای دریافت وجه فعال نیست؛ تا زمان اتصال و تأیید پرداخت، وضعیت سفارش «در انتظار پرداخت» می‌ماند و هیچ مبلغی از حساب شما کسر نمی‌شود.
                                         </p>
                                     </div>
                                 </div>
 
                                 <div class="grid gap-3 border-t border-[var(--sg-border)] p-5 sm:grid-cols-2 sm:p-6">
-                                    <div class="rounded-2xl bg-[var(--sg-white)] p-4">
-                                        <p class="text-[10px] font-medium text-[var(--sg-stone)]">وضعیت سفارش</p>
-                                        <p class="mt-2 text-xs font-semibold text-[var(--sg-ink)]">سفارش شما ثبت شده است</p>
-                                        <p class="mt-1 text-[11px] text-[var(--sg-stone)]">
-                                            کد سفارش: {{ $order->order_number }}
-                                        </p>
+                                    <div class="rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-4">
+                                        <p class="text-[10px] font-medium text-[var(--sg-stone)]">کد سفارش</p>
+                                        <p class="mt-2 break-all text-sm font-semibold text-[var(--sg-ink)]" dir="ltr">{{ $order->order_number }}</p>
                                     </div>
-
-                                    <div class="rounded-2xl bg-[var(--sg-white)] p-4">
+                                    <div class="rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-4">
                                         <p class="text-[10px] font-medium text-[var(--sg-stone)]">وضعیت پرداخت</p>
-                                        <p class="mt-2 text-xs font-semibold text-[var(--sg-ink)]">در انتظار پرداخت</p>
-                                        <p class="mt-1 text-[11px] leading-6 text-[var(--sg-stone)]">
-                                            در این مرحله هیچ مبلغی از حساب شما کسر نشده است.
-                                        </p>
+                                        <p class="mt-2 text-sm font-semibold text-[var(--sg-ink)]">در انتظار پرداخت</p>
+                                        <p class="mt-1 text-[11px] leading-6 text-[var(--sg-stone)]">مبلغی از حساب شما کسر نشده است.</p>
                                     </div>
                                 </div>
 

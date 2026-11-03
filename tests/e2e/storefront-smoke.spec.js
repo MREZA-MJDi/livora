@@ -8,12 +8,20 @@ const routes = [
     '/product/luna-sofa',
     '/about',
     '/contact',
+    '/blog',
     '/cart',
+    '/account',
+    '/account/profile',
+    '/account/addresses',
+    '/account/orders',
+    '/account/wishlist',
+    '/checkout',
     '/login',
     '/register',
 ];
 
 const viewports = [
+    { width: 320, height: 720 },
     { width: 360, height: 740 },
     { width: 390, height: 844 },
     { width: 768, height: 900 },
@@ -84,6 +92,95 @@ for (const viewport of viewports) {
         }
     });
 }
+
+
+test('mobile customer login, cart and checkout remain usable through order creation without email', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+
+    await page.goto('/login', { waitUntil: 'domcontentloaded' });
+    await page.locator('input[name="email"]').fill('demo@livora.test');
+    await page.locator('input[name="password"]').fill('password');
+    await page.getByRole('button', { name: 'ورود به حساب' }).click();
+
+    await expect(page).toHaveURL(/\/account(?:\/)?$/);
+
+    let overflow = await page.evaluate(() => (
+        Math.max(document.documentElement.scrollWidth, document.body.scrollWidth)
+        - document.documentElement.clientWidth
+    ));
+    expect(overflow, 'customer account dashboard mobile overflow').toBeLessThanOrEqual(1);
+
+    await page.goto('/product/stone-vase', { waitUntil: 'domcontentloaded' });
+    await page.locator('#product-purchase button[type="submit"]').click();
+    await page.goto('/cart', { waitUntil: 'domcontentloaded' });
+    await expect(page.getByText('Stone Vase')).toBeVisible();
+    await page.getByRole('link', { name: 'ادامه به تسویه حساب' }).click();
+
+    await expect(page).toHaveURL(/\/checkout(?:\/)?$/);
+    await expect(page.locator('form[action*="/checkout"]')).toBeVisible();
+
+    // The province modal must reveal only cities for the selected province.
+    await page.locator('button[aria-controls="iran-shipping-location-modal"]').first().click();
+    const regionDialog = page.getByRole('dialog', { name: 'استان محل تحویل را انتخاب کنید' });
+    await expect(regionDialog).toBeVisible();
+    await regionDialog.getByRole('button', { name: /^تهران/ }).first().click();
+
+    const cityDialog = page.getByRole('dialog', { name: 'شهر محل تحویل را انتخاب کنید' });
+    await expect(cityDialog).toBeVisible();
+    await cityDialog.getByRole('button', { name: /^تهران$/ }).first().click();
+
+    await page.locator('input[name="first_name"]').fill('مشتری');
+    await page.locator('input[name="last_name"]').fill('آزمایشی');
+    await page.locator('input[name="phone"]').fill('09121234567');
+    await page.locator('input[name="email"]').fill('');
+    await page.locator('[name="address"]').fill('تهران، خیابان نمونه، پلاک ۱۲، واحد ۳');
+    await page.locator('input[name="postal_code"]').fill('1234567890');
+
+    await page.getByRole('button', { name: 'ثبت سفارش و ادامه پرداخت' }).click();
+    await expect(page).toHaveURL(/\/checkout\/payment\/\d+/);
+    await expect(page.getByText(/در انتظار پرداخت/).first()).toBeVisible();
+
+    overflow = await page.evaluate(() => (
+        Math.max(document.documentElement.scrollWidth, document.body.scrollWidth)
+        - document.documentElement.clientWidth
+    ));
+    expect(overflow, 'mobile payment waiting page overflow').toBeLessThanOrEqual(1);
+});
+
+test('admin can log in and use the dashboard drawer on a narrow mobile viewport', async ({ page }) => {
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+
+    test.skip(!adminEmail || !adminPassword, 'Admin credentials are injected only by the isolated browser CI job.');
+
+    await page.setViewportSize({ width: 360, height: 740 });
+    await page.goto('/login', { waitUntil: 'domcontentloaded' });
+    await page.locator('input[name="email"]').fill(adminEmail);
+    await page.locator('input[name="password"]').fill(adminPassword);
+    await page.getByRole('button', { name: 'ورود به حساب' }).click();
+
+    await expect(page).toHaveURL(/\/admin(?:\/)?$/);
+    await expect(page.locator('.admin-shell')).toBeVisible();
+    await expect(page.locator('[data-admin-sidebar]')).toBeAttached();
+
+    const openSidebar = page.getByRole('button', { name: 'باز کردن منوی مدیریت' });
+    await expect(openSidebar).toBeVisible();
+    await openSidebar.click();
+
+    const sidebar = page.locator('[data-admin-sidebar]');
+    await expect(sidebar).toBeInViewport();
+    await expect(page.locator('[data-admin-sidebar-backdrop]')).toBeVisible();
+
+    await sidebar.getByRole('button', { name: 'بستن منوی مدیریت' }).click();
+    await expect(sidebar).not.toBeInViewport();
+    await expect(page.locator('[data-admin-sidebar-backdrop]')).toBeHidden();
+
+    const overflow = await page.evaluate(() => (
+        Math.max(document.documentElement.scrollWidth, document.body.scrollWidth)
+        - document.documentElement.clientWidth
+    ));
+    expect(overflow, 'admin dashboard horizontal overflow at 360px').toBeLessThanOrEqual(1);
+});
 
 test('mobile search opens, focuses its input and restores focus when closed', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });

@@ -384,7 +384,9 @@ Route::middleware(['auth', 'admin', 'admin.session.timeout'])
             [AdminDashboardController::class, 'index']
         )->name('dashboard');
 
-        Route::post('/session/heartbeat', fn () => response()->noContent())->middleware('throttle:30,1')->name('session.heartbeat');
+        Route::post('/session/heartbeat', fn () => response()->noContent())
+            ->middleware('throttle:30,1')
+            ->name('session.heartbeat');
 
         Route::get('/shop-banner', [AdminShopBannerController::class, 'edit'])->name('shop-banner.edit');
         Route::put('/shop-banner', [AdminShopBannerController::class, 'update'])->name('shop-banner.update');

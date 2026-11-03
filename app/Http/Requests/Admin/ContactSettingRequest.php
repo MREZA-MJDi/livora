@@ -32,8 +32,8 @@ class ContactSettingRequest extends FormRequest
             'instagram_url' => ['nullable', 'url', 'max:2048'],
             'eitaa_url' => ['nullable', 'url', 'max:2048'],
             'bale_url' => ['nullable', 'url', 'max:2048'],
-            'map_latitude' => ['nullable', 'numeric', 'between:-90,90'],
-            'map_longitude' => ['nullable', 'numeric', 'between:-180,180'],
+            'map_latitude' => ['nullable', 'required_with:map_longitude', 'numeric', 'between:-90,90'],
+            'map_longitude' => ['nullable', 'required_with:map_latitude', 'numeric', 'between:-180,180'],
             'warranty_text' => ['nullable', 'string', 'max:5000'],
             'shipping_text' => ['nullable', 'string', 'max:5000'],
             'installation_text' => ['nullable', 'string', 'max:5000'],
@@ -97,6 +97,8 @@ class ContactSettingRequest extends FormRequest
             'phone' => 'شماره تماس',
             'email' => 'ایمیل',
             'address' => 'آدرس',
+            'map_latitude' => 'عرض جغرافیایی نقشه',
+            'map_longitude' => 'طول جغرافیایی نقشه',
             'hours' => 'ساعات کاری',
             'phone_label' => 'عنوان تماس تلفنی',
             'email_label' => 'عنوان ایمیل',
@@ -112,6 +114,10 @@ class ContactSettingRequest extends FormRequest
     {
         return [
             'email.email' => 'فرمت ایمیل واردشده صحیح نیست.',
+            'map_latitude.required_with' => 'برای تعیین موقعیت، طول جغرافیایی را هم وارد کنید.',
+            'map_longitude.required_with' => 'برای تعیین موقعیت، عرض جغرافیایی را هم وارد کنید.',
+            'map_latitude.between' => 'عرض جغرافیایی باید بین ۹۰- تا ۹۰ باشد.',
+            'map_longitude.between' => 'طول جغرافیایی باید بین ۱۸۰- تا ۱۸۰ باشد.',
 
             'phone.max' => 'شماره تماس نمی‌تواند بیشتر از :max کاراکتر باشد.',
 

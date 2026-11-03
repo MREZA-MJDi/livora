@@ -58,25 +58,140 @@
                     @error('email')<p class="admin-error">{{ $message }}</p>@enderror
                 </div>
                 <div>
-                    <label class="admin-label" for="address">آدرس</label>
-                    <textarea id="address" name="address" rows="3" class="admin-textarea">{{ old('address', $settings->address ?? '') }}</textarea>
-                </div>
-                <div>
                     <label class="admin-label" for="hours">ساعات کاری</label>
                     <textarea id="hours" name="hours" rows="3" class="admin-textarea">{{ old('hours', $settings->hours ?? '') }}</textarea>
                 </div>
             </div>
         </section>
 
-        <section class="admin-card space-y-5 p-6">
-            <h2 class="text-base font-bold">خدمات و موقعیت</h2>
-            <div class="grid gap-4 sm:grid-cols-2">
-                <div><label class="admin-label" for="map_latitude">عرض جغرافیایی نقشه</label><input id="map_latitude" name="map_latitude" type="number" step="0.0000001" class="admin-input" dir="ltr" value="{{ old('map_latitude', $settings->map_latitude ?? '') }}"></div>
-                <div><label class="admin-label" for="map_longitude">طول جغرافیایی نقشه</label><input id="map_longitude" name="map_longitude" type="number" step="0.0000001" class="admin-input" dir="ltr" value="{{ old('map_longitude', $settings->map_longitude ?? '') }}"></div>
-                @foreach(['warranty_text' => 'متن گارانتی', 'shipping_text' => 'متن ارسال', 'installation_text' => 'متن نصب/خدمات', 'returns_text' => 'متن مرجوعی'] as $field => $label)
-                    <div class="sm:col-span-2"><label class="admin-label" for="{{ $field }}">{{ $label }}</label><textarea id="{{ $field }}" name="{{ $field }}" rows="3" maxlength="5000" class="admin-textarea">{{ old($field, $settings->{$field} ?? '') }}</textarea>@error($field)<p class="admin-error">{{ $message }}</p>@enderror</div>
-                @endforeach
+        <section
+            class="admin-card space-y-5 p-6"
+            x-data="{
+                address: @js(old('address', $settings->address ?? '')),
+                latitude: @js((string) old('map_latitude', $settings->map_latitude ?? '')),
+                longitude: @js((string) old('map_longitude', $settings->map_longitude ?? '')),
+                locationLink: '',
+                mapNotice: '',
+                get hasValidCoordinates() {
+                    if (this.latitude === '' || this.longitude === '') return false;
+                    const lat = Number(this.latitude);
+                    const lng = Number(this.longitude);
+                    return Number.isFinite(lat) && Number.isFinite(lng)
+                        && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
+                },
+                get mapPreviewUrl() {
+                    if (!this.hasValidCoordinates) return '';
+                    return 'https://maps.google.com/maps?q='
+                        + encodeURIComponent(this.latitude + ',' + this.longitude)
+                        + '&z=15&output=embed';
+                },
+                applyLocationLink() {
+                    const source = this.locationLink.trim();
+                    const patterns = [
+                        /!3d(-?\d+(?:\.\d+)?)!4d(-?\d+(?:\.\d+)?)/i,
+                        /@(-?\d+(?:\.\d+)?),\s*(-?\d+(?:\.\d+)?)/,
+                        /[?&](?:q|query|ll)=(-?\d+(?:\.\d+)?)(?:%2C|,)\s*(-?\d+(?:\.\d+)?)/i,
+                        /^(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)$/
+                    ];
+                    for (const pattern of patterns) {
+                        const match = source.match(pattern);
+                        if (!match) continue;
+                        const lat = Number(match[1]);
+                        const lng = Number(match[2]);
+                        if (!Number.isFinite(lat) || !Number.isFinite(lng)
+                            || lat < -90 || lat > 90 || lng < -180 || lng > 180) break;
+                        this.latitude = lat.toFixed(7);
+                        this.longitude = lng.toFixed(7);
+                        this.mapNotice = 'مختصات از لینک نقشه دریافت شد. پس از ذخیره، همین موقعیت در صفحه تماس نمایش داده می‌شود.';
+                        return;
+                    }
+                    this.mapNotice = 'مختصات از این لینک قابل تشخیص نبود. لینک کامل Google Maps یا دو عدد عرض و طول را وارد کنید.';
+                }
+            }"
+        >
+            <div>
+                <h2 class="text-base font-bold">آدرس فروشگاه و انتخاب موقعیت روی Google Maps</h2>
+                <p class="admin-help mt-1">آدرس و مختصات را همین‌جا تنظیم کنید. نقشه پیش‌نمایش زنده دارد و بعد از ذخیره در صفحه تماس عمومی نمایش داده می‌شود.</p>
             </div>
+
+            <div class="grid gap-5 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+                <div class="space-y-4">
+                    <div>
+                        <label class="admin-label" for="address">آدرس کامل فروشگاه</label>
+                        <textarea id="address" name="address" rows="3" maxlength="2000" class="admin-textarea" x-model="address">{{ old('address', $settings->address ?? '') }}</textarea>
+                        @error('address')<p class="admin-error mt-1">{{ $message }}</p>@enderror
+                    </div>
+
+                    <div>
+                        <label class="admin-label" for="google_map_location_link">لینک Google Maps یا مختصات</label>
+                        <div class="flex flex-col gap-2 sm:flex-row">
+                            <input id="google_map_location_link" type="text" inputmode="url" dir="ltr" class="admin-input min-w-0 flex-1" x-model="locationLink" placeholder="https://maps.google.com/... یا 35.6892,51.3890">
+                            <button type="button" class="admin-btn admin-btn-secondary shrink-0" @click="applyLocationLink()">استخراج مختصات</button>
+                        </div>
+                        <p class="admin-help mt-2">لینک مکان را از Google Maps کپی کنید یا مختصات را به شکل latitude,longitude وارد کنید. لینک کوتاه maps.app.goo.gl را ابتدا باز و نشانی کامل را کپی کنید.</p>
+                        <p x-cloak x-show="mapNotice" class="mt-2 text-xs leading-6 text-[var(--admin-accent)]" role="status" x-text="mapNotice"></p>
+                    </div>
+
+                    <div class="grid gap-3 sm:grid-cols-2">
+                        <div>
+                            <label class="admin-label" for="map_latitude">عرض جغرافیایی (Latitude)</label>
+                            <input id="map_latitude" name="map_latitude" type="number" min="-90" max="90" step="0.0000001" inputmode="decimal" class="admin-input" dir="ltr" x-model="latitude" aria-describedby="map-latitude-help">
+                            <p id="map-latitude-help" class="admin-help mt-1">محدوده: ۹۰- تا ۹۰</p>
+                            @error('map_latitude')<p class="admin-error mt-1">{{ $message }}</p>@enderror
+                        </div>
+                        <div>
+                            <label class="admin-label" for="map_longitude">طول جغرافیایی (Longitude)</label>
+                            <input id="map_longitude" name="map_longitude" type="number" min="-180" max="180" step="0.0000001" inputmode="decimal" class="admin-input" dir="ltr" x-model="longitude" aria-describedby="map-longitude-help">
+                            <p id="map-longitude-help" class="admin-help mt-1">محدوده: ۱۸۰- تا ۱۸۰</p>
+                            @error('map_longitude')<p class="admin-error mt-1">{{ $message }}</p>@enderror
+                        </div>
+                    </div>
+
+                    <div class="rounded-2xl bg-[var(--admin-surface)] p-4">
+                        <p class="text-xs font-semibold text-[var(--admin-text)]">راهنمای انتخاب موقعیت</p>
+                        <ol class="mt-2 list-inside list-decimal space-y-1 text-xs leading-6 text-[var(--admin-muted)]">
+                            <li>محل فروشگاه را در Google Maps پیدا کنید.</li>
+                            <li>نشانی کامل را کپی و در کادر لینک قرار دهید.</li>
+                            <li>«استخراج مختصات» را بزنید و پیش‌نمایش را بررسی کنید.</li>
+                            <li>در پایان، فرم تنظیمات را ذخیره کنید.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="min-w-0">
+                    <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+                        <p class="text-xs font-semibold text-[var(--admin-text)]">پیش‌نمایش موقعیت فروشگاه</p>
+                        <span class="rounded-full border border-[var(--admin-border)] px-3 py-1 text-[10px] text-[var(--admin-muted)]" x-text="hasValidCoordinates ? 'مختصات معتبر' : 'منتظر مختصات'"></span>
+                    </div>
+                    <div class="overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)]">
+                        <template x-if="hasValidCoordinates">
+                            <iframe
+                                :src="mapPreviewUrl"
+                                title="پیش‌نمایش موقعیت فروشگاه در Google Maps"
+                                class="aspect-[4/3] min-h-[260px] w-full border-0"
+                                loading="lazy"
+                                referrerpolicy="strict-origin-when-cross-origin"
+                            ></iframe>
+                        </template>
+                        <div x-show="!hasValidCoordinates" class="flex min-h-[260px] aspect-[4/3] flex-col items-center justify-center px-6 py-10 text-center">
+                            <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-lg text-[var(--admin-muted)]" aria-hidden="true">⌖</span>
+                            <p class="mt-4 text-sm font-semibold text-[var(--admin-text)]">هنوز موقعیت دقیقی انتخاب نشده</p>
+                            <p class="mt-2 max-w-sm text-xs leading-6 text-[var(--admin-muted)]">برای جلوگیری از نمایش آدرس اشتباه، تا زمانی که مختصات معتبر وارد نشود نقشه‌ای روی سایت مشتری نمایش داده نمی‌شود.</p>
+                        </div>
+                    </div>
+                    <template x-if="hasValidCoordinates">
+                        <a :href="'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(latitude + ',' + longitude)" target="_blank" rel="noopener noreferrer" class="mt-3 inline-flex items-center gap-2 text-xs font-semibold text-[var(--admin-accent)]">باز کردن مسیر در Google Maps <span aria-hidden="true">↗</span></a>
+                    </template>
+                </div>
+            </div>
+
+            @foreach(['warranty_text' => 'متن گارانتی', 'shipping_text' => 'متن ارسال', 'installation_text' => 'متن نصب/خدمات', 'returns_text' => 'متن مرجوعی'] as $field => $label)
+                <div>
+                    <label class="admin-label" for="{{ $field }}">{{ $label }}</label>
+                    <textarea id="{{ $field }}" name="{{ $field }}" rows="3" maxlength="5000" class="admin-textarea">{{ old($field, $settings->{$field} ?? '') }}</textarea>
+                    @error($field)<p class="admin-error mt-1">{{ $message }}</p>@enderror
+                </div>
+            @endforeach
         </section>
 
         <section class="admin-card space-y-5 p-6">

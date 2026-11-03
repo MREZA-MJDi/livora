@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\Address;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -179,13 +180,11 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
             ->assertSee('اسنپ‌پی')
             ->assertSee('ترب‌پی')
             ->assertSee('پرداخت آنلاین در حال آماده‌سازی است')
-            ->assertSee('کد سفارش: ' . $order->order_number)
             ->assertSee('در انتظار پرداخت')
-            ->assertSee('در این مرحله هیچ مبلغی از حساب شما کسر نشده است.')
-            ->assertSee(route('account.orders.show', $order), false)
+            ->assertSee('هیچ مبلغی از حساب شما کسر نمی‌شود.')
             ->assertSee('پیگیری سفارش')
             ->assertSee('ارتباط با پشتیبانی')
-            ->assertDontSee('name="gateway"', false);
+            ->assertSee($order->order_number);
     }
 
     public function test_customer_order_tracking_is_scoped_to_the_authenticated_owner(): void
@@ -292,8 +291,8 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
 
         $this->get('/categories')
             ->assertOk()
-            ->assertSee('sg-category-grid--index', false)
-            ->assertSee('sg-card-image-skeleton', false)
+            ->assertSee('sg-category-index-grid', false)
+            ->assertSee('sg-category-index-tile', false)
             ->assertSee($category->name);
     }
 
@@ -368,7 +367,8 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
 
         $response = $this->get(route('categories.show', $category->slug));
         $response->assertOk()
-            ->assertSee('aspect-[12/5]', false)
+            ->assertSee('sg-category-detail-hero', false)
+            ->assertSee('sg-category-detail-visual', false)
             ->assertSee('کاربردها و انواع')
             ->assertSee('راهنمای انتخاب')
             ->assertSee('معیارهای انتخاب')
@@ -526,6 +526,70 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
             ->assertSee('name="search"', false);
     }
 
+    public function test_checkout_uses_saved_address_and_renders_two_step_province_city_picker(): void
+    {
+        $customer = $this->user('customer', 'checkout-location-picker@example.test');
+        $category = Category::query()->create([
+            'name' => 'دسته انتخاب نشانی',
+            'slug' => 'checkout-location-picker-category',
+            'description' => null,
+            'is_active' => true,
+            'sort_order' => 1,
+        ]);
+        $product = Product::query()->create([
+            'category_id' => $category->id,
+            'name' => 'محصول انتخاب نشانی',
+            'slug' => 'checkout-location-picker-product',
+            'sku' => 'SG-LOCATION-001',
+            'short_description' => 'محصول تست',
+            'description' => 'محصول تست',
+            'price' => 1000000,
+            'stock' => 2,
+            'status' => 'active',
+            'installment_enabled' => false,
+        ]);
+        $cart = Cart::query()->create([
+            'user_id' => $customer->id,
+            'session_id' => null,
+            'status' => 'active',
+        ]);
+        CartItem::query()->create([
+            'cart_id' => $cart->id,
+            'product_id' => $product->id,
+            'product_variant_id' => null,
+            'variant_key' => 'base',
+            'variant_options' => null,
+            'quantity' => 1,
+            'unit_price' => 1000000,
+        ]);
+        Address::query()->create([
+            'user_id' => $customer->id,
+            'title' => 'خانه',
+            'first_name' => 'مشتری',
+            'last_name' => 'ذخیره‌شده',
+            'phone' => '09121112233',
+            'province' => 'تهران',
+            'city' => 'تهران',
+            'address' => 'خیابان نمونه، پلاک ۱۰',
+            'postal_code' => '1234567890',
+            'unit' => '۲',
+            'is_default' => true,
+        ]);
+
+        $this->actingAs($customer)
+            ->get(route('checkout.index'))
+            ->assertOk()
+            ->assertSee('iranShippingPicker', false)
+            ->assertSee('x-text="stepTitle"', false)
+            ->assertSee('شهر من در فهرست نیست')
+            ->assertSee('ایمیل (اختیاری)')
+            ->assertSee('مشتری')
+            ->assertSee('تهران')
+            ->assertSee('09121112233')
+            ->assertSee('خیابان نمونه، پلاک ۱۰')
+            ->assertSee('بدون ایمیل هم می‌توانید سفارش را ثبت کنید.');
+    }
+
     public function test_checkout_rejects_aggregate_quantity_above_base_stock_without_creating_order(): void
     {
         $customer = $this->user('customer', 'checkout-aggregate-stock@example.test');
@@ -577,6 +641,22 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
         $this->assertSame(2, $cart->items()->count());
     }
 
+    public function test_checkout_rejects_a_city_that_does_not_belong_to_the_selected_province(): void
+    {
+        $customer = $this->user('customer', 'checkout-city-province-mismatch@example.test');
+        $payload = $this->validCheckoutPayload($customer);
+        $payload['province'] = 'تهران';
+        $payload['city'] = 'شیراز';
+
+        $this->actingAs($customer)
+            ->from(route('checkout.index'))
+            ->post(route('checkout.place'), $payload)
+            ->assertRedirect(route('checkout.index'))
+            ->assertSessionHasErrors('city');
+
+        $this->assertDatabaseCount('orders', 0);
+    }
+
     public function test_checkout_creates_one_order_and_consumes_cart_atomically(): void
     {
         $customer = $this->user('customer', 'checkout-idempotency@example.test');
@@ -614,19 +694,30 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
             'unit_price' => 1250000,
         ]);
 
+        $checkoutPayload = $this->validCheckoutPayload($customer);
+        unset($checkoutPayload['email']);
+        $checkoutPayload['phone'] = '۰۹۱۲۱۲۳۴۵۶۷';
+        $checkoutPayload['postal_code'] = '۱۲۳۴۵۶۷۸۹۰';
+        $checkoutPayload['city'] = 'شهر آزمایشی خارج از فهرست';
+        $checkoutPayload['city_is_other'] = '1';
+
         $response = $this->actingAs($customer)
-            ->post(route('checkout.place'), $this->validCheckoutPayload($customer));
+            ->post(route('checkout.place'), $checkoutPayload);
 
         $order = Order::query()->firstOrFail();
         $response->assertRedirect(route('checkout.payment', $order));
         $this->assertSame('2500000.00', $order->fresh()->subtotal);
+        $this->assertNull($order->fresh()->email);
+        $this->assertSame('شهر آزمایشی خارج از فهرست', $order->fresh()->city);
+        $this->assertSame('09121234567', $order->fresh()->phone);
+        $this->assertSame('1234567890', $order->fresh()->postal_code);
         $this->assertDatabaseCount('order_items', 1);
         $this->assertSame('converted', $cart->fresh()->status);
         $this->assertSame(0, $cart->items()->count());
 
         // A repeated browser submission cannot consume the converted cart again.
         $this->actingAs($customer)
-            ->post(route('checkout.place'), $this->validCheckoutPayload($customer));
+            ->post(route('checkout.place'), $checkoutPayload);
 
         $this->assertDatabaseCount('orders', 1);
     }

@@ -48,6 +48,7 @@ class CheckoutController extends Controller
         return view('checkout.index', [
             'cart' => $cart,
             'defaultAddress' => $defaultAddress,
+            'shippingRegions' => config('iran_shipping.provinces', []),
         ]);
     }
 
@@ -347,7 +348,7 @@ class CheckoutController extends Controller
                         $validated['phone'],
 
                     'email' =>
-                        $validated['email'],
+                        $validated['email'] ?? null,
 
                     'province' =>
                         $validated['province'],

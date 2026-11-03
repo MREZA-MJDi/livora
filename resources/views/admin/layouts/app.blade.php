@@ -14,6 +14,7 @@
 <body
     class="min-h-full bg-[var(--admin-bg)] text-[var(--admin-text)] antialiased"
     data-admin-session-timeout="{{ (int) config('admin.session_timeout_minutes', 30) }}"
+    data-admin-path="{{ config('admin.path', 'admin') }}"
 >
 <div
     x-data="{
@@ -34,6 +35,7 @@
         x-show="sidebarOpen"
         x-cloak
         x-transition.opacity
+        data-admin-sidebar-backdrop
         class="fixed inset-0 z-40 bg-black/35 backdrop-blur-sm lg:hidden"
         @click="sidebarOpen = false"
     ></div>
@@ -146,12 +148,12 @@
 {{-- =========================================================
      SCRIPTS
 ========================================================== --}}
-{{-- Keep active admin sessions alive only while the operator is interacting with the panel. --}}
+{{-- Renew the admin session only after recent real interaction with the dashboard. --}}
 <script>
 (() => {
     const timeoutMinutes = Number(document.body.dataset.adminSessionTimeout || 30);
-    const heartbeatEveryMs = Math.max(60 * 1000, Math.min(5 * 60 * 1000, Math.floor(timeoutMinutes * 60 * 1000 / 3)));
-    const recentActivityWindowMs = heartbeatEveryMs * 2;
+    const heartbeatEveryMs = 60_000;
+    const recentInteractionWindowMs = 60_000;
     const heartbeatUrl = @json(route('admin.session.heartbeat'));
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
 
@@ -171,7 +173,7 @@
 
     window.setInterval(async () => {
         const now = Date.now();
-        const hasRecentInteraction = now - lastInteractionAt < recentActivityWindowMs;
+        const hasRecentInteraction = now - lastInteractionAt < recentInteractionWindowMs;
         const heartbeatDue = now - lastHeartbeatAt >= heartbeatEveryMs;
 
         if (!hasRecentInteraction || !heartbeatDue || heartbeatInFlight) return;
@@ -183,21 +185,19 @@
                 method: 'POST',
                 credentials: 'same-origin',
                 headers: {
-                    'Accept': 'application/json',
+                    Accept: 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
                     'X-CSRF-TOKEN': csrfToken,
                 },
             });
 
-            if (response.ok) {
-                lastHeartbeatAt = Date.now();
-            }
+            if (response.ok) lastHeartbeatAt = Date.now();
         } catch (_) {
-            // A failed heartbeat never extends the session; the server enforces the hard timeout.
+            // Failed heartbeats never extend the server-side session.
         } finally {
             heartbeatInFlight = false;
         }
-    }, 60 * 1000);
+    }, 15_000);
 })();
 </script>
 

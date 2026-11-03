@@ -13,19 +13,17 @@ final class EnforceAdminSessionTimeout
 
     public function handle(Request $request, Closure $next): Response
     {
-        $user = $request->user();
-
-        if (! $user?->isAdmin()) {
+        if (! $request->user()?->isAdmin()) {
             return $next($request);
         }
 
-        $timeoutMinutes = max(5, (int) config('admin.session_timeout_minutes', 30));
+        $timeoutMinutes = (int) config('admin.session_timeout_minutes', 30);
         $timeoutSeconds = $timeoutMinutes * 60;
         $now = now()->timestamp;
         $lastActivity = (int) $request->session()->get(self::LAST_ACTIVITY_KEY, 0);
 
         if ($lastActivity > 0 && ($now - $lastActivity) >= $timeoutSeconds) {
-            Auth::logout();
+            Auth::guard()->logout();
 
             $request->session()->invalidate();
             $request->session()->regenerateToken();

@@ -49,6 +49,51 @@ class StorefrontReadinessTest extends TestCase
             ->assertNotFound();
     }
 
+
+    public function test_category_directory_uses_real_active_product_images_and_hides_inactive_categories(): void
+    {
+        $category = $this->category([
+            'name' => 'مجموعه نشیمن واقعی',
+            'slug' => 'real-living-room-collection',
+            'image' => null,
+            'is_active' => true,
+        ]);
+
+        $product = $this->product($category, [
+            'name' => 'مبل واقعی برای تصویر مجموعه',
+            'slug' => 'real-living-room-image-product',
+            'status' => 'active',
+        ]);
+
+        ProductImage::query()->create([
+            'product_id' => $product->id,
+            'path' => 'https://images.example.test/sillagallery/living-room.webp',
+            'alt' => 'مبل واقعی در مجموعه نشیمن',
+            'sort_order' => 0,
+            'is_primary' => true,
+        ]);
+
+        $hiddenCategory = $this->category([
+            'name' => 'مجموعه غیرفعال خصوصی',
+            'slug' => 'hidden-private-collection',
+            'is_active' => false,
+        ]);
+
+        $this->get(route('categories.index'))
+            ->assertOk()
+            ->assertSee('مجموعه نشیمن واقعی')
+            ->assertSee('https://images.example.test/sillagallery/living-room.webp')
+            ->assertDontSee('مجموعه غیرفعال خصوصی');
+
+        $this->get(route('categories.show', $category->slug))
+            ->assertOk()
+            ->assertSee('مجموعه نشیمن واقعی')
+            ->assertSee('https://images.example.test/sillagallery/living-room.webp');
+
+        $this->get(route('categories.show', $hiddenCategory->slug))
+            ->assertNotFound();
+    }
+
     public function test_inactive_category_products_are_hidden_and_cannot_be_added_to_cart(): void
     {
         $activeCategory = $this->category([

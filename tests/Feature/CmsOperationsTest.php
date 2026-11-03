@@ -36,6 +36,8 @@ class CmsOperationsTest extends TestCase
                 'phone' => '+989121234567',
                 'email' => 'support@sillashop.com',
                 'address' => 'تهران، خیابان نمونه',
+                'map_latitude' => '35.6892',
+                'map_longitude' => '51.3890',
                 'hours' => 'شنبه تا پنجشنبه، ۹ تا ۱۸',
                 'phone_label' => 'تماس با فروشگاه',
                 'email_label' => 'ایمیل پشتیبانی',
@@ -75,7 +77,70 @@ class CmsOperationsTest extends TestCase
             ->assertSee('سوالات مشتریان')
             ->assertSee('چطور سفارش ثبت کنم؟')
             ->assertSee('محصول را به سبد خرید اضافه کنید.')
+            ->assertSee('نقشه موقعیت فروشگاه SillaGallery')
+            ->assertSee('maps.google.com/maps?q=35.6892000%2C51.3890000', false)
+            ->assertSee('مسیریابی در Google Maps')
             ->assertSee('"@type":"FAQPage"', false);
+    }
+
+
+    public function test_contact_map_requires_a_complete_valid_coordinate_pair(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $payload = [
+            'phone_label' => 'تماس تلفنی',
+            'email_label' => 'ایمیل',
+            'support_label' => 'پشتیبانی',
+            'online_label' => 'ارتباط آنلاین',
+            'is_active' => '1',
+        ];
+
+        $this->actingAs($admin)
+            ->from(route('admin.contact-settings.edit'))
+            ->put(route('admin.contact-settings.update'), [
+                ...$payload,
+                'map_latitude' => '35.6892',
+                'map_longitude' => '',
+            ])
+            ->assertRedirect(route('admin.contact-settings.edit'))
+            ->assertSessionHasErrors('map_longitude');
+
+        $this->assertDatabaseMissing('contact_settings', [
+            'map_latitude' => '35.6892000',
+        ]);
+
+        $this->from(route('admin.contact-settings.edit'))
+            ->put(route('admin.contact-settings.update'), [
+                ...$payload,
+                'map_latitude' => '91',
+                'map_longitude' => '181',
+            ])
+            ->assertRedirect(route('admin.contact-settings.edit'))
+            ->assertSessionHasErrors(['map_latitude', 'map_longitude']);
+
+        $this->assertDatabaseCount('contact_settings', 0);
+    }
+
+    public function test_contact_page_does_not_render_a_fake_map_when_only_a_text_address_exists(): void
+    {
+        ContactSetting::query()->create([
+            'address' => 'تهران، خیابان نمونه',
+            'is_active' => true,
+            'phone_label' => 'تماس تلفنی',
+            'email_label' => 'ایمیل',
+            'support_label' => 'پشتیبانی',
+            'online_label' => 'ارتباط آنلاین',
+        ]);
+
+        Cache::forget('storefront.settings');
+
+        $this->get('/contact')
+            ->assertOk()
+            ->assertSee('تهران، خیابان نمونه')
+            ->assertDontSee('نقشه موقعیت فروشگاه SillaGallery')
+            ->assertDontSee('<iframe', false)
+            ->assertSee('جستجوی آدرس در Google Maps');
     }
 
     public function test_contact_settings_and_seo_audit_are_admin_only(): void
