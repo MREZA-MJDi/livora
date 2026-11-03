@@ -135,6 +135,7 @@ class MediaController extends Controller
             'مقاله‌ها' => $media->blogPosts()->count(),
             'صفحه‌ها' => $media->contentPages()->count(),
             'بنر فروشگاه' => $media->shopBannerSettings()->count(),
+            'تصویر پیش‌فرض Open Graph' => $media->seoSettings()->count(),
         ];
         $usedBy = collect($usages)->filter()->map(fn ($count, $label) => $label.' ('.$count.')')->values();
 
