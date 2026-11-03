@@ -1,3 +1,5 @@
+@props(["cartCount" => 0])
+
 <nav
     x-data
     aria-label="ناوبری اصلی فروشگاه"
@@ -249,20 +251,6 @@
                 {{-- =====================================================
                     CART
                 ====================================================== --}}
-                @php
-                    $cartCount = 0;
-
-                    if (
-                        auth()->check()
-                        && auth()->user()->isCustomer()
-                    ) {
-                        $cart = auth()->user()->activeCart;
-
-                        if ($cart) {
-                            $cartCount = $cart->itemCount();
-                        }
-                    }
-                @endphp
 
                 <a
                     href="{{ route('cart.index') }}"
