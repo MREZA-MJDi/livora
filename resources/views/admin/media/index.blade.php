@@ -101,7 +101,7 @@
                                 <img
                                     src="{{ $item->url }}"
                                     alt="{{ $item->alt ?: $item->original_name }}"
-                                    class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                    class="h-full w-full object-contain p-2"
                                     loading="lazy"
                                 >
 
@@ -178,6 +178,15 @@
                             </div>
 
 
+                            @if($item->productImages->isNotEmpty())
+                                <div class="rounded-xl bg-amber-50 px-3 py-2 text-[10px] leading-5 text-amber-800">
+                                    <strong>{{ $item->productImages->count() }} محل استفاده در محصولات</strong>
+                                    <p class="truncate">{{ $item->productImages->map(fn ($image) => $image->product?->name)->filter()->unique()->take(3)->implode('، ') }}</p>
+                                </div>
+                            @else
+                                <p class="text-[10px] text-emerald-700">در محصولی استفاده نشده</p>
+                            @endif
+
                             {{-- Actions --}}
                             <div class="flex items-center gap-2">
 
@@ -203,8 +212,9 @@
 
                                     <button
                                         type="submit"
-                                        class="flex h-8 w-8 items-center justify-center rounded-xl border border-red-200 text-red-500 transition hover:bg-red-50"
-                                        title="حذف"
+                                        @disabled($item->productImages->isNotEmpty())
+                                        class="flex h-8 w-8 items-center justify-center rounded-xl border border-red-200 text-red-500 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-30"
+                                        title="{{ $item->productImages->isNotEmpty() ? 'ابتدا این تصویر را از محصولات متصل جدا کنید.' : 'حذف' }}"
                                     >
 
                                         <svg
