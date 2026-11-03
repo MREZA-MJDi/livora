@@ -24,7 +24,7 @@ class MediaController extends Controller
             'sort' => ['nullable', 'in:newest,oldest,name'],
         ]);
 
-        $query = Media::query()->with('user');
+        $query = Media::query()->with(['user', 'productImages.product']);
 
         if (filled($filters['q'] ?? null)) {
             $term = trim($filters['q']);
