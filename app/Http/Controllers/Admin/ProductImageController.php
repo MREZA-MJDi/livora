@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ProductImage\StoreProductImageRequest;
 use App\Http\Requests\Admin\ProductImage\UpdateProductImageRequest;
+use App\Models\Media;
 use App\Models\Product;
 use App\Models\ProductImage;
 use Illuminate\Http\RedirectResponse;
@@ -57,7 +58,19 @@ class ProductImageController extends Controller
         $data['path'] = $path;
 
         try {
-            DB::transaction(function () use (&$data): void {
+            DB::transaction(function () use (&$data, $request, $file, $path): void {
+                $media = Media::create([
+                    'user_id' => $request->user()->id,
+                    'disk' => 'public',
+                    'path' => $path,
+                    'filename' => basename($path),
+                    'original_name' => $file->getClientOriginalName(),
+                    'mime_type' => $file->getMimeType(),
+                    'extension' => strtolower($file->getClientOriginalExtension()),
+                    'size' => $file->getSize(),
+                ]);
+                $data['media_id'] = $media->id;
+
                 $hasExistingImage = ProductImage::query()
                     ->where('product_id', $data['product_id'])
                     ->exists();
@@ -101,6 +114,7 @@ class ProductImageController extends Controller
         $data = $request->validated();
         $oldProductId = (int) $productImage->product_id;
         $oldPath = $productImage->path;
+        $oldMediaId = $productImage->media_id;
         $newPath = null;
 
         if ($request->hasFile('image')) {
@@ -112,7 +126,21 @@ class ProductImageController extends Controller
         }
 
         try {
-            DB::transaction(function () use ($data, $productImage, $oldProductId): void {
+            DB::transaction(function () use ($data, $productImage, $oldProductId, $request, $newPath): void {
+                if ($newPath) {
+                    $file = $request->file('image');
+                    $media = Media::create([
+                        'user_id' => $request->user()->id,
+                        'disk' => 'public',
+                        'path' => $newPath,
+                        'filename' => basename($newPath),
+                        'original_name' => $file->getClientOriginalName(),
+                        'mime_type' => $file->getMimeType(),
+                        'extension' => strtolower($file->getClientOriginalExtension()),
+                        'size' => $file->getSize(),
+                    ]);
+                    $data['media_id'] = $media->id;
+                }
                 $newProductId = (int) $data['product_id'];
                 $isMovingProduct = $oldProductId !== $newProductId;
 
@@ -155,7 +183,7 @@ class ProductImageController extends Controller
             throw $exception;
         }
 
-        if ($newPath && $oldPath && $oldPath !== $newPath && ! Str::startsWith($oldPath, ['http://', 'https://', '//'])) {
+        if ($newPath && ! $oldMediaId && $oldPath && $oldPath !== $newPath && ! Str::startsWith($oldPath, ['http://', 'https://', '//'])) {
             Storage::disk('public')->delete($oldPath);
         }
 
@@ -168,6 +196,7 @@ class ProductImageController extends Controller
     {
         $productId = $productImage->product_id;
         $path = $productImage->path;
+        $mediaId = $productImage->media_id;
         $wasPrimary = (bool) $productImage->is_primary;
 
         DB::transaction(function () use ($productImage, $productId, $wasPrimary): void {
@@ -184,7 +213,7 @@ class ProductImageController extends Controller
             }
         });
 
-        if ($path && ! Str::startsWith($path, ['http://', 'https://', '//'])) {
+        if (! $mediaId && $path && ! Str::startsWith($path, ['http://', 'https://', '//'])) {
             Storage::disk('public')->delete($path);
         }
 
