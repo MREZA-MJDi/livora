@@ -86,14 +86,67 @@ class AdminCrudLifecycleTest extends TestCase
         $this->assertSame('14500000.00', $product->price);
         $this->assertTrue($newImage->is_primary);
         $this->assertNotSame($oldImage->path, $newImage->path);
-        Storage::disk('public')->assertMissing($oldImage->path);
+        Storage::disk('public')->assertExists($oldImage->path); // Replaced assets remain in the Media Library until explicitly removed.
         Storage::disk('public')->assertExists($newImage->path);
+        $this->assertNotNull($oldImage->fresh()->media_id);
+        $this->assertNotNull($newImage->fresh()->media_id);
 
         $this->actingAs($this->admin)
             ->delete(route('admin.products.destroy', $product))
             ->assertRedirect(route('admin.products.index'));
 
         $this->assertSoftDeleted('products', ['id' => $product->id]);
+    }
+
+
+    public function test_admin_can_reuse_a_library_image_and_published_product_appears_on_storefront(): void
+    {
+        $category = $this->createCategory('media-picker-category');
+        $path = 'media/library-sofa.webp';
+        Storage::disk('public')->put($path, 'fake-image-content');
+        $media = Media::query()->create([
+            'user_id' => $this->admin->id,
+            'disk' => 'public',
+            'path' => $path,
+            'filename' => 'library-sofa.webp',
+            'original_name' => 'library-sofa.webp',
+            'mime_type' => 'image/webp',
+            'extension' => 'webp',
+            'size' => 19,
+            'alt' => 'مبل در کتابخانه رسانه',
+        ]);
+
+        $this->actingAs($this->admin)
+            ->get(route('admin.media.picker', ['q' => 'library-sofa']))
+            ->assertOk()
+            ->assertJsonPath('data.0.id', $media->id);
+
+        $this->actingAs($this->admin)
+            ->post(route('admin.products.store'), $this->productPayload($category, [
+                'name' => 'مبل متصل به کتابخانه',
+                'slug' => 'media-library-sofa',
+                'sku' => 'SG-MEDIA-001',
+                'media_id' => $media->id,
+                'status' => 'active',
+            ]))
+            ->assertRedirect(route('admin.products.index'));
+
+        $product = Product::query()->where('slug', 'media-library-sofa')->firstOrFail();
+        $image = $product->images()->firstOrFail();
+
+        $this->assertSame($media->id, $image->media_id);
+        $this->assertSame($path, $image->path);
+        Storage::disk('public')->assertExists($path);
+
+        $this->get('/shop')->assertOk()->assertSee('مبل متصل به کتابخانه');
+        $this->get('/')->assertOk()->assertSee('مبل متصل به کتابخانه');
+
+        $this->actingAs($this->admin)
+            ->delete(route('admin.media.destroy', $media))
+            ->assertRedirect(route('admin.media.index'))
+            ->assertSessionHas('error');
+
+        Storage::disk('public')->assertExists($path);
     }
 
     public function test_admin_can_create_read_update_and_delete_categories_and_replace_category_images(): void
