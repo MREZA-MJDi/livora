@@ -571,6 +571,22 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
         $this->assertSame(2, $cart->items()->count());
     }
 
+    public function test_checkout_rejects_a_city_that_does_not_belong_to_the_selected_province(): void
+    {
+        $customer = $this->user('customer', 'checkout-city-province-mismatch@example.test');
+        $payload = $this->validCheckoutPayload($customer);
+        $payload['province'] = 'تهران';
+        $payload['city'] = 'شیراز';
+
+        $this->actingAs($customer)
+            ->from(route('checkout.index'))
+            ->post(route('checkout.place'), $payload)
+            ->assertRedirect(route('checkout.index'))
+            ->assertSessionHasErrors('city');
+
+        $this->assertDatabaseCount('orders', 0);
+    }
+
     public function test_checkout_creates_one_order_and_consumes_cart_atomically(): void
     {
         $customer = $this->user('customer', 'checkout-idempotency@example.test');
@@ -608,19 +624,27 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
             'unit_price' => 1250000,
         ]);
 
+        $checkoutPayload = $this->validCheckoutPayload($customer);
+        unset($checkoutPayload['email']);
+        $checkoutPayload['phone'] = '۰۹۱۲۱۲۳۴۵۶۷';
+        $checkoutPayload['postal_code'] = '۱۲۳۴۵۶۷۸۹۰';
+
         $response = $this->actingAs($customer)
-            ->post(route('checkout.place'), $this->validCheckoutPayload($customer));
+            ->post(route('checkout.place'), $checkoutPayload);
 
         $order = Order::query()->firstOrFail();
         $response->assertRedirect(route('checkout.payment', $order));
         $this->assertSame('2500000.00', $order->fresh()->subtotal);
+        $this->assertNull($order->fresh()->email);
+        $this->assertSame('09121234567', $order->fresh()->phone);
+        $this->assertSame('1234567890', $order->fresh()->postal_code);
         $this->assertDatabaseCount('order_items', 1);
         $this->assertSame('converted', $cart->fresh()->status);
         $this->assertSame(0, $cart->items()->count());
 
         // A repeated browser submission cannot consume the converted cart again.
         $this->actingAs($customer)
-            ->post(route('checkout.place'), $this->validCheckoutPayload($customer));
+            ->post(route('checkout.place'), $checkoutPayload);
 
         $this->assertDatabaseCount('orders', 1);
     }
