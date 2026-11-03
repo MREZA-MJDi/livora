@@ -129,7 +129,8 @@ class MediaController extends Controller
     public function destroy(Media $media): RedirectResponse
     {
         $usages = [
-            'محصولات' => $media->productImages()->count(),
+            'تصاویر محصولات' => $media->productImages()->count(),
+            'بنر محصولات' => $media->productBanners()->count(),
             'دسته‌بندی‌ها' => $media->categories()->count(),
             'مقاله‌ها' => $media->blogPosts()->count(),
             'صفحه‌ها' => $media->contentPages()->count(),
