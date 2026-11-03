@@ -18,7 +18,7 @@ class SeoController extends Controller
 {
     public function edit(): View
     {
-        return view('admin.seo.edit', ['settings' => SeoSetting::current()]);
+        return view('admin.seo.edit', ['settings' => SeoSetting::current()->load('defaultOgMedia')]);
     }
 
 
@@ -95,17 +95,16 @@ class SeoController extends Controller
             'social_links' => ['nullable', 'array'],
             'social_links.*' => ['nullable', 'url', 'max:2048'],
             'default_og_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
+            'default_og_media_id' => ['nullable', 'integer', 'exists:media,id'],
+            'remove_default_og_image' => ['nullable', 'boolean'],
             'organization_logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
 
         $settings = SeoSetting::current();
-        $oldFiles = [
-            'default_og_image' => $settings->default_og_image,
-            'organization_logo' => $settings->organization_logo,
-        ];
+        $oldFiles = ['organization_logo' => $settings->organization_logo];
         $newFiles = [];
 
-        foreach (['default_og_image' => 'seo', 'organization_logo' => 'brand'] as $field => $folder) {
+        foreach (['organization_logo' => 'brand'] as $field => $folder) {
             if ($request->hasFile($field)) {
                 $path = $request->file($field)->store($folder, 'public');
                 if (! $path) {
@@ -133,6 +132,19 @@ class SeoController extends Controller
             'indexing_enabled' => $request->boolean('indexing_enabled'),
             'following_enabled' => $request->boolean('following_enabled'),
         ];
+
+        if ($request->boolean('remove_default_og_image')) {
+            $data['default_og_image'] = null;
+            $data['default_og_media_id'] = null;
+        } elseif ($request->hasFile('default_og_image')) {
+            $ogMedia = MediaLibrary::store($request->file('default_og_image'), (int) $request->user()->id, 'seo', null);
+            $data['default_og_image'] = $ogMedia->path;
+            $data['default_og_media_id'] = $ogMedia->id;
+        } elseif (filled($request->input('default_og_media_id'))) {
+            $ogMedia = MediaLibrary::image($request->input('default_og_media_id'));
+            $data['default_og_image'] = $ogMedia->path;
+            $data['default_og_media_id'] = $ogMedia->id;
+        }
 
         foreach ($newFiles as $field => $path) {
             $data[$field] = $path;
