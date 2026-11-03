@@ -15,6 +15,9 @@ class CategoryController extends Controller
             ->withCount([
                 'products' => fn ($query) => $query->active(),
             ])
+            ->with([
+                'latestActiveProduct.images' => fn ($imageQuery) => $imageQuery->limit(1),
+            ])
             ->orderBy('sort_order')
             ->paginate(12)
             ->withQueryString();
