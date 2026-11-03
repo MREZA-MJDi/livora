@@ -110,7 +110,7 @@ test('mobile customer login, cart and checkout remain usable through order creat
     expect(overflow, 'customer account dashboard mobile overflow').toBeLessThanOrEqual(1);
 
     await page.goto('/product/stone-vase', { waitUntil: 'domcontentloaded' });
-    await page.getByRole('button', { name: 'افزودن به سبد خرید' }).click();
+    await page.locator('#product-purchase button[type="submit"]').click();
     await page.goto('/cart', { waitUntil: 'domcontentloaded' });
     await expect(page.getByText('Stone Vase')).toBeVisible();
     await page.getByRole('link', { name: 'ادامه به تسویه حساب' }).click();
