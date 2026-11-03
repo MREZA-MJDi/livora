@@ -1,7 +1,7 @@
 @props(["cartCount" => 0])
 
 <nav
-    class="sg-mobile-nav mobile-bottom-nav fixed inset-x-3 bottom-3 z-[90] lg:hidden"
+    class="sg-mobile-nav mobile-bottom-nav fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-[90] lg:hidden"
     aria-label="ناوبری موبایل"
 >
     <div class="mx-auto grid max-w-md grid-cols-5 items-center rounded-[1.6rem] border border-[var(--sg-border)] bg-[color:var(--sg-cream)]/95 p-2 shadow-[0_16px_45px_rgba(24,23,21,.14)] backdrop-blur-2xl">
