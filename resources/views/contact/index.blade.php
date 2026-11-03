@@ -111,7 +111,7 @@
                             @endif
                         </div>
                     @elseif($contactSetting?->googleMapsSearchUrl())
-                        <a href="{{ $contactSetting->googleMapsSearchUrl() }}" target="_blank" rel="noopener noreferrer" class="block rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5 text-sm font-semibold text-[var(--sg-accent)]">مشاهده آدرس در Google Maps ↗</a>
+                        <a href="{{ $contactSetting->googleMapsSearchUrl() }}" target="_blank" rel="noopener noreferrer" class="block rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5 text-sm font-semibold text-[var(--sg-accent)]">جستجوی آدرس در Google Maps ↗</a>
                     @endif
                 </aside>
 
