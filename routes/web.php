@@ -516,6 +516,11 @@ Route::middleware(['auth', 'admin'])
         )->name('media.index');
 
         Route::get(
+            '/media/picker',
+            [MediaController::class, 'picker']
+        )->middleware('throttle:60,1')->name('media.picker');
+
+        Route::get(
             '/media/create',
             [MediaController::class, 'create']
         )->name('media.create');
