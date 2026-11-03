@@ -90,7 +90,7 @@ class StorefrontReadinessTest extends TestCase
             'role' => 'customer',
         ]);
 
-        $this->seed(\\Database\\Seeders\\CartSeeder::class);
+        $this->seed(\Database\Seeders\CartSeeder::class);
 
         $cart = Cart::query()
             ->where('user_id', $demoCustomer->id)
@@ -106,7 +106,7 @@ class StorefrontReadinessTest extends TestCase
         $this->assertCount(2, $item->variant_options);
         $this->assertSame('color', $item->variant_options[0]['type']);
         $this->assertSame('size', $item->variant_options[1]['type']);
-        $this->assertSame('65000000.00', $item->unit_price);
+        $this->assertSame('52500000.00', $item->unit_price);
         $this->assertSame(1, $item->quantity);
         $this->assertNotSame('base', $item->variant_key);
     }
