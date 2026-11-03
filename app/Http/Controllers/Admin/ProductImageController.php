@@ -8,6 +8,7 @@ use App\Http\Requests\Admin\ProductImage\UpdateProductImageRequest;
 use App\Models\Media;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Support\MediaLibrary;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -48,29 +49,13 @@ class ProductImageController extends Controller
     public function store(StoreProductImageRequest $request): RedirectResponse
     {
         $data = $request->validated();
-        $file = $request->file('image');
-        unset($data['image']);
+        $media = $request->hasFile('image')
+            ? MediaLibrary::store($request->file('image'), (int) $request->user()->id, 'products/images', $data['alt'] ?? null)
+            : MediaLibrary::image($data['media_id'] ?? null);
+        $data['path'] = $media->path;
+        $data['media_id'] = $media->id;
 
-        $path = $file->store('products/images', 'public');
-        if (! $path) {
-            throw new RuntimeException('Product image could not be stored.');
-        }
-        $data['path'] = $path;
-
-        try {
-            DB::transaction(function () use (&$data, $request, $file, $path): void {
-                $media = Media::create([
-                    'user_id' => $request->user()->id,
-                    'disk' => 'public',
-                    'path' => $path,
-                    'filename' => basename($path),
-                    'original_name' => $file->getClientOriginalName(),
-                    'mime_type' => $file->getMimeType(),
-                    'extension' => strtolower($file->getClientOriginalExtension()),
-                    'size' => $file->getSize(),
-                ]);
-                $data['media_id'] = $media->id;
-
+        DB::transaction(function () use (&$data): void {
                 $hasExistingImage = ProductImage::query()
                     ->where('product_id', $data['product_id'])
                     ->exists();
@@ -84,11 +69,7 @@ class ProductImageController extends Controller
                 }
 
                 ProductImage::create($data);
-            });
-        } catch (Throwable $exception) {
-            Storage::disk('public')->delete($path);
-            throw $exception;
-        }
+        });
 
         return redirect()
             ->route('admin.product-images.index', ['product_id' => $data['product_id']])
@@ -113,34 +94,17 @@ class ProductImageController extends Controller
     {
         $data = $request->validated();
         $oldProductId = (int) $productImage->product_id;
-        $oldPath = $productImage->path;
-        $oldMediaId = $productImage->media_id;
-        $newPath = null;
-
-        if ($request->hasFile('image')) {
-            $newPath = $request->file('image')->store('products/images', 'public');
-            if (! $newPath) {
-                throw new RuntimeException('Product image could not be stored.');
-            }
-            $data['path'] = $newPath;
+        $newMedia = $request->hasFile('image')
+            ? MediaLibrary::store($request->file('image'), (int) $request->user()->id, 'products/images', $data['alt'] ?? null)
+            : (filled($data['media_id'] ?? null) ? MediaLibrary::image($data['media_id']) : null);
+        if ($newMedia) {
+            $data['path'] = $newMedia->path;
+            $data['media_id'] = $newMedia->id;
+        } else {
+            unset($data['media_id'], $data['path']);
         }
 
-        try {
-            DB::transaction(function () use ($data, $productImage, $oldProductId, $request, $newPath): void {
-                if ($newPath) {
-                    $file = $request->file('image');
-                    $media = Media::create([
-                        'user_id' => $request->user()->id,
-                        'disk' => 'public',
-                        'path' => $newPath,
-                        'filename' => basename($newPath),
-                        'original_name' => $file->getClientOriginalName(),
-                        'mime_type' => $file->getMimeType(),
-                        'extension' => strtolower($file->getClientOriginalExtension()),
-                        'size' => $file->getSize(),
-                    ]);
-                    $data['media_id'] = $media->id;
-                }
+        DB::transaction(function () use ($data, $productImage, $oldProductId): void {
                 $newProductId = (int) $data['product_id'];
                 $isMovingProduct = $oldProductId !== $newProductId;
 
@@ -175,17 +139,7 @@ class ProductImageController extends Controller
                         $replacement?->update(['is_primary' => true]);
                     }
                 }
-            });
-        } catch (Throwable $exception) {
-            if ($newPath) {
-                Storage::disk('public')->delete($newPath);
-            }
-            throw $exception;
-        }
-
-        if ($newPath && ! $oldMediaId && $oldPath && $oldPath !== $newPath && ! Str::startsWith($oldPath, ['http://', 'https://', '//'])) {
-            Storage::disk('public')->delete($oldPath);
-        }
+        });
 
         return redirect()
             ->route('admin.product-images.index', ['product_id' => $productImage->product_id])
