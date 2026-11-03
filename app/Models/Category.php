@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Category extends Model
 {
@@ -50,28 +51,43 @@ class Category extends Model
 
     public function getImageUrlAttribute(): ?string
     {
+        // The Media Library relation is the canonical source for newly
+        // selected/uploaded category artwork.
+        $media = $this->relationLoaded('media')
+            ? $this->getRelation('media')
+            : $this->media()->first();
+
+        if ($media) {
+            $disk = Storage::disk($media->disk ?: 'public');
+            $mediaPath = ltrim($media->path, '/');
+
+            if (Str::startsWith($media->path, ['http://', 'https://', '//'])) {
+                return $media->url;
+            }
+
+            if ($disk->exists($mediaPath)) {
+                return $media->url;
+            }
+        }
+
+        // Keep compatibility with categories saved before Media Library
+        // references were introduced.
         if (! $this->image) {
             return null;
         }
 
-        if (Str::startsWith($this->image, [
-            'http://',
-            'https://',
-            '//',
-        ])) {
+        if (Str::startsWith($this->image, ['http://', 'https://', '//'])) {
             return $this->image;
         }
 
         $path = ltrim($this->image, '/');
 
-        if (! Storage::disk('public')->exists($path)) {
-            return null;
-        }
-
-        return Storage::disk('public')->url($path);
+        return Storage::disk('public')->exists($path)
+            ? Storage::disk('public')->url($path)
+            : null;
     }
 
-    public function media()
+    public function media(): BelongsTo
     {
         return $this->belongsTo(Media::class);
     }
@@ -108,21 +124,13 @@ class Category extends Model
 
     public function getHomepageImageUrlAttribute(): ?string
     {
-        $categoryImageIsUploaded =
-            $this->image
-            && ! Str::startsWith($this->image, [
-                'http://',
-                'https://',
-                '//',
-            ]);
-
-        if ($categoryImageIsUploaded && $this->image_url) {
-            return $this->image_url;
+        // An explicitly selected category image always wins, whether it came
+        // from a direct upload, the Media Library, or an external URL.
+        if ($categoryImage = $this->image_url) {
+            return $categoryImage;
         }
 
-        $productImage = $this->latestActiveProduct?->images?->first()?->url;
-
-        return $productImage ?: $this->image_url;
+        return $this->latestActiveProduct?->images?->first()?->url;
     }
 
     public function scopeActive($query)
