@@ -75,7 +75,7 @@
                     </div>
 
                     @if($categories->isNotEmpty())
-                        <div class="sg-category-index-grid">
+                        <div class="sg-category-grid sg-category-grid--index sg-category-index-grid">
                             @foreach($categories as $category)
                                 <a
                                     href="{{ route('categories.show', $category->slug) }}"
