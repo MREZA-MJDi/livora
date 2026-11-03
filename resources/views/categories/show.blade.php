@@ -79,78 +79,53 @@
 
                     </nav>
 
-                    <div class="mt-8 grid items-end gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
-
-                        <div class="max-w-3xl">
-
-                            <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
-                                COLLECTION
-                            </p>
-
-                            <h1 class="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
+                    <div class="sg-category-detail-hero mt-8 grid items-center gap-8 lg:mt-12 lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] lg:gap-12">
+                        <div class="max-w-3xl py-3">
+                            <p class="sg-eyebrow">THE COLLECTION</p>
+                            <h1 class="mt-4 text-4xl font-semibold leading-[1.35] tracking-tight text-[var(--sg-ink)] sm:text-5xl lg:text-6xl">
                                 {{ $category->name }}
                             </h1>
 
-                            @if($category->description)
-
-                                <div class="mt-5 max-w-2xl text-sm leading-8 text-[var(--sg-stone)]">
+                            <p class="mt-5 max-w-2xl text-sm leading-8 text-[var(--sg-stone)] sm:text-base">
+                                @if(filled($category->description))
                                     {{ $category->description }}
-                                </div>
+                                @else
+                                    مجموعه محصولات {{ $category->name }} را بررسی کنید؛ مشخصات، قیمت و شرایط خرید هر محصول را با هم مقایسه کنید.
+                                @endif
+                            </p>
 
-                            @else
-
-                                <p class="mt-5 max-w-2xl text-sm leading-8 text-[var(--sg-stone)]">
-                                    مجموعه محصولات {{ $category->name }} را بررسی کنید؛
-                                    قیمت، مشخصات، موجودی و شرایط خرید اقساطی محصولات را مشاهده کنید.
-                                </p>
-
-                            @endif
-
-                            <div class="mt-7 flex flex-wrap items-center gap-3">
-
-                            <span class="rounded-full border border-[var(--sg-border)] px-4 py-2 text-[11px] text-[var(--sg-stone)]">
-                                {{ number_format($products->total()) }}
-                                محصول
-                            </span>
-
+                            <div class="mt-8 flex flex-wrap items-center gap-3">
+                                <span class="inline-flex min-h-11 items-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-surface)] px-4 text-xs font-medium text-[var(--sg-ink)]">
+                                    {{ number_format($products->total()) }} محصول
+                                </span>
                                 <a
                                     href="{{ route('shop.index', ['category' => $category->slug]) }}"
-                                    class="rounded-full bg-[var(--sg-ink)] px-4 py-2 text-[11px] font-medium text-white transition hover:bg-[var(--sg-accent)]"
+                                    class="sg-button sg-button-primary"
                                 >
                                     مشاهده همه محصولات
+                                    <span aria-hidden="true">←</span>
                                 </a>
-
                             </div>
-
                         </div>
 
-                        {{-- Category image --}}
-                        <div class="overflow-hidden rounded-[2rem] bg-[var(--sg-surface)]">
-
-                            @if($category->image_url)
-
+                        <div class="sg-category-detail-visual relative overflow-hidden rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-surface)]">
+                            @if($category->homepage_image_url)
                                 <img
-                                    src="{{ $category->image_url }}"
+                                    src="{{ $category->homepage_image_url }}"
                                     alt="{{ $category->image_alt ?: $category->name }}"
                                     width="1440"
-                                    height="600"
+                                    height="1000"
                                     fetchpriority="high"
                                     decoding="async"
-                                    class="aspect-[12/5] h-full w-full object-cover"
+                                    class="h-full w-full object-cover"
                                 >
-
                             @else
-
-                                <div class="flex aspect-[12/5] items-center justify-center">
-                                <span class="text-xs tracking-[0.2em] text-[var(--sg-stone)]">
-                                    SillaGallery
-                                </span>
+                                <div class="sg-category-detail-placeholder flex h-full min-h-[18rem] items-center justify-center">
+                                    <span class="sillagallery-wordmark"><span class="sillagallery-wordmark__main">Silla</span><span class="sillagallery-wordmark__sub">Gallery</span></span>
                                 </div>
-
                             @endif
-
+                            <div class="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/25 to-transparent" aria-hidden="true"></div>
                         </div>
-
                     </div>
 
                 </div>
