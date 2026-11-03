@@ -63,6 +63,8 @@ window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName
                 this.selectedMedia = null;
                 const removeInput = this.$root.querySelector(`input[name=\"${this.removeField}\"]`);
                 if (removeInput) removeInput.value = '0';
+                const removeCheckbox = this.$root.closest('form')?.querySelector(`input[type="checkbox"][name="${this.removeField}"]`);
+                if (removeCheckbox) removeCheckbox.checked = false;
                 const ogRemoval = this.$root.closest('form')?.querySelector('input[type="checkbox"][name="remove_default_og_image"]');
                 if (ogRemoval) ogRemoval.checked = false;
             }
@@ -101,6 +103,8 @@ window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName
         if (fileInput) fileInput.value = '';
         const removeInput = this.$root.querySelector(`input[name=\"${this.removeField}\"]`);
         if (removeInput) removeInput.value = '0';
+                const removeCheckbox = this.$root.closest('form')?.querySelector(`input[type="checkbox"][name="${this.removeField}"]`);
+                if (removeCheckbox) removeCheckbox.checked = false;
         const ogRemoval = this.$root.closest('form')?.querySelector('input[type="checkbox"][name="remove_default_og_image"]');
         if (ogRemoval) ogRemoval.checked = false;
         const preview = document.getElementById(this.previewId);
@@ -111,6 +115,8 @@ window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName
         this.selectedMedia = null;
         const removeInput = this.$root.querySelector(`input[name="${this.removeField}"]`);
         if (removeInput) removeInput.value = '1';
+        const removeCheckbox = this.$root.closest('form')?.querySelector(`input[type="checkbox"][name="${this.removeField}"]`);
+        if (removeCheckbox) removeCheckbox.checked = true;
         const fileInput = this.$root.closest('form')?.querySelector(`input[type="file"][name="${this.fileField}"]`);
         if (fileInput) fileInput.value = '';
         const preview = document.getElementById(this.previewId);
