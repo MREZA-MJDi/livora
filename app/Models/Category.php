@@ -70,7 +70,7 @@ class Category extends Model
         return Storage::disk('public')->url($path);
     }
 
-    public function products(): HasMany
+    public function media()\n    {\n        return $this->belongsTo(Media::class);\n    }\n\n    public function products(): HasMany
     {
         return $this->hasMany(Product::class);
     }
