@@ -206,7 +206,7 @@
                     : null;
             @endphp
 
-            <div class="admin-image-preview aspect-square">
+            <div class="admin-image-preview aspect-[12/5]">
 
                 <img
                     id="category-image-preview"
@@ -250,6 +250,13 @@
                     accept="image/jpeg,image/png,image/webp"
                     class="admin-input p-2"
                 >
+                @include('admin.media.partials.picker', [
+                    'mediaPickerField' => 'image',
+                    'mediaPickerId' => old('media_id', $category->media_id ?? null),
+                    'mediaPickerUrl' => $categoryImageUrl,
+                    'mediaPickerName' => $category->name ?? '',
+                    'mediaPickerPreviewId' => 'category-image-preview',
+                ])
 
                 <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">
                     تصویر Hero دسته‌بندی با نسبت ثابت ۱۲:۵ نمایش داده می‌شود.
