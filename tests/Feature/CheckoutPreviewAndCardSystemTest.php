@@ -697,6 +697,8 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
         unset($checkoutPayload['email']);
         $checkoutPayload['phone'] = '۰۹۱۲۱۲۳۴۵۶۷';
         $checkoutPayload['postal_code'] = '۱۲۳۴۵۶۷۸۹۰';
+        $checkoutPayload['city'] = 'شهر آزمایشی خارج از فهرست';
+        $checkoutPayload['city_is_other'] = '1';
 
         $response = $this->actingAs($customer)
             ->post(route('checkout.place'), $checkoutPayload);
@@ -705,6 +707,7 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
         $response->assertRedirect(route('checkout.payment', $order));
         $this->assertSame('2500000.00', $order->fresh()->subtotal);
         $this->assertNull($order->fresh()->email);
+        $this->assertSame('شهر آزمایشی خارج از فهرست', $order->fresh()->city);
         $this->assertSame('09121234567', $order->fresh()->phone);
         $this->assertSame('1234567890', $order->fresh()->postal_code);
         $this->assertDatabaseCount('order_items', 1);
