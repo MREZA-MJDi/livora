@@ -368,7 +368,7 @@ Route::middleware(['auth', 'customer'])->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'admin'])
+Route::middleware(['auth', 'admin', 'admin.session.timeout'])
     ->prefix(config('admin.path'))
     ->name('admin.')
     ->group(function () {
@@ -383,6 +383,8 @@ Route::middleware(['auth', 'admin'])
             '/',
             [AdminDashboardController::class, 'index']
         )->name('dashboard');
+
+        Route::post('/session/heartbeat', fn () => response()->noContent())->middleware('throttle:30,1')->name('session.heartbeat');
 
         Route::get('/shop-banner', [AdminShopBannerController::class, 'edit'])->name('shop-banner.edit');
         Route::put('/shop-banner', [AdminShopBannerController::class, 'update'])->name('shop-banner.update');

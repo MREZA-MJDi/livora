@@ -371,18 +371,60 @@
 
                         @else
 
-                            <div class="mt-6 rounded-2xl bg-[var(--sg-surface)] p-4">
+                            <div
+                                role="status"
+                                aria-live="polite"
+                                class="mt-6 overflow-hidden rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-surface)]"
+                            >
+                                <div class="flex items-start gap-4 p-5 sm:p-6">
+                                    <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[var(--sg-white)] text-[var(--sg-accent)] shadow-sm" aria-hidden="true">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="h-5 w-5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M10.3 3.9 2.8 17a2 2 0 0 0 1.7 3h15a2 2 0 0 0 1.7-3l-7.5-13.1a2 2 0 0 0-3.4 0Z"/>
+                                        </svg>
+                                    </span>
 
-                                <p class="text-xs font-semibold text-[var(--sg-ink)]">
-                                    اتصال درگاه پرداخت هنوز تکمیل نشده است.
-                                </p>
-                                <p class="mt-2 text-xs leading-7 text-[var(--sg-stone)]">
-                                    سفارش شما ثبت شده و تا زمان اتصال و تأیید تراکنش توسط درگاه، وضعیت پرداخت «در انتظار پرداخت» باقی می‌ماند. در این مرحله هیچ مبلغی کسر نمی‌شود.
-                                </p>
-                                <a href="{{ route('contact') }}" class="mt-3 inline-flex text-xs font-semibold text-[var(--sg-accent)]">
-                                    برای هماهنگی با پشتیبانی تماس بگیرید ←
-                                </a>
+                                    <div class="min-w-0 flex-1">
+                                        <p class="text-sm font-semibold text-[var(--sg-ink)]">
+                                            پرداخت آنلاین در حال آماده‌سازی است
+                                        </p>
+                                        <p class="mt-2 text-xs leading-7 text-[var(--sg-stone)]">
+                                            اتصال امن و آزمایش نهایی درگاه‌های بانکی هنوز تکمیل نشده است. به محض تأیید و فعال‌سازی، امکان پرداخت آنلاین در همین صفحه در دسترس خواهد بود.
+                                        </p>
+                                    </div>
+                                </div>
 
+                                <div class="grid gap-3 border-t border-[var(--sg-border)] p-5 sm:grid-cols-2 sm:p-6">
+                                    <div class="rounded-2xl bg-[var(--sg-white)] p-4">
+                                        <p class="text-[10px] font-medium text-[var(--sg-stone)]">وضعیت سفارش</p>
+                                        <p class="mt-2 text-xs font-semibold text-[var(--sg-ink)]">سفارش شما ثبت شده است</p>
+                                        <p class="mt-1 text-[11px] text-[var(--sg-stone)]">
+                                            کد سفارش: {{ $order->order_number }}
+                                        </p>
+                                    </div>
+
+                                    <div class="rounded-2xl bg-[var(--sg-white)] p-4">
+                                        <p class="text-[10px] font-medium text-[var(--sg-stone)]">وضعیت پرداخت</p>
+                                        <p class="mt-2 text-xs font-semibold text-[var(--sg-ink)]">در انتظار پرداخت</p>
+                                        <p class="mt-1 text-[11px] leading-6 text-[var(--sg-stone)]">
+                                            در این مرحله هیچ مبلغی از حساب شما کسر نشده است.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="flex flex-col gap-3 border-t border-[var(--sg-border)] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+                                    <a
+                                        href="{{ route('account.orders.show', $order) }}"
+                                        class="inline-flex min-h-11 items-center justify-center rounded-xl bg-[var(--sg-ink)] px-5 py-3 text-xs font-semibold text-white transition hover:bg-[var(--sg-accent)]"
+                                    >
+                                        پیگیری سفارش
+                                    </a>
+                                    <a
+                                        href="{{ route('contact') }}"
+                                        class="inline-flex min-h-11 items-center justify-center rounded-xl border border-[var(--sg-border)] bg-[var(--sg-white)] px-5 py-3 text-xs font-semibold text-[var(--sg-ink)] transition hover:border-[var(--sg-accent)] hover:text-[var(--sg-accent)]"
+                                    >
+                                        ارتباط با پشتیبانی
+                                    </a>
+                                </div>
                             </div>
 
                         @endif
