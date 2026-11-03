@@ -10,7 +10,7 @@ class SeoSetting extends Model
 {
     protected $fillable = [
         'indexing_enabled', 'following_enabled', 'site_name', 'default_title',
-        'default_description', 'default_og_image', 'twitter_handle',
+        'default_description', 'default_og_image', 'default_og_media_id', 'twitter_handle',
         'google_site_verification', 'bing_site_verification', 'organization_name',
         'organization_description', 'organization_logo', 'contact_email',
         'contact_phone', 'social_links',
@@ -40,6 +40,11 @@ class SeoSetting extends Model
         ));
     }
 
+    public function defaultOgMedia()
+    {
+        return $this->belongsTo(Media::class, 'default_og_media_id');
+    }
+
     public function robots(): string
     {
         return $this->robotsFor(true, true);
@@ -57,7 +62,7 @@ class SeoSetting extends Model
 
     public function getDefaultOgImageUrlAttribute(): ?string
     {
-        return $this->imageUrl($this->default_og_image);
+        return $this->defaultOgMedia?->url ?: $this->imageUrl($this->default_og_image);
     }
 
     public function getOrganizationLogoUrlAttribute(): ?string
