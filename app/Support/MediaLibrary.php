@@ -5,6 +5,7 @@ namespace App\Support;
 use App\Models\Media;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use RuntimeException;
 
 class MediaLibrary
@@ -40,6 +41,11 @@ class MediaLibrary
             return null;
         }
 
-        return Media::query()->whereKey($id)->where('mime_type', 'like', 'image/%')->firstOrFail();
+        $media = Media::query()->whereKey($id)->where('mime_type', 'like', 'image/%')->first();
+        if (! $media) {
+            throw ValidationException::withMessages(['media_id' => 'رسانه انتخاب‌شده یک تصویر معتبر نیست یا دیگر در دسترس نیست.']);
+        }
+
+        return $media;
     }
 }
