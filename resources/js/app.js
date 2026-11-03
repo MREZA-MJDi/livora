@@ -40,7 +40,7 @@ window.seoRoutePicker = (endpoint) => ({
 });
 
 
-window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName = '') => ({
+window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName = '', previewId = 'product-image-preview', fileField = 'image') => ({
     endpoint,
     pickerOpen: false,
     loading: false,
@@ -50,6 +50,8 @@ window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName
     lastPage: 1,
     total: 0,
     errorMessage: '',
+    previewId,
+    fileField,
     selectedMedia: initialId && initialUrl
         ? { id: Number(initialId), url: initialUrl, name: initialName || 'تصویر فعلی', alt: initialName || '' }
         : null,
@@ -75,19 +77,17 @@ window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName
             this.lastPage = payload.meta?.last_page || 1;
             this.total = payload.meta?.total || 0;
         } catch (error) {
-            window.dispatchEvent(new CustomEvent('admin:toast', { detail: { type: 'error', message: error.message } }));
+            this.errorMessage = error.message || 'بارگذاری رسانه ناموفق بود.';
         } finally {
             this.loading = false;
         }
     },
     selectMedia(item) {
         this.selectedMedia = item;
-        const fileInput = this.$root.querySelector('input[type="file"][name="image"]');
+        const fileInput = this.$root.querySelector(`input[type="file"][name="${this.fileField}"]`);
         if (fileInput) fileInput.value = '';
-        const preview = this.$root.querySelector('#product-image-preview');
-        const placeholder = this.$root.querySelector('#product-image-placeholder');
+        const preview = document.getElementById(this.previewId);
         if (preview) { preview.src = item.url; preview.classList.remove('hidden'); }
-        if (placeholder) placeholder.classList.add('hidden');
         this.pickerOpen = false;
     },
     clearSelection() {
