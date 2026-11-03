@@ -15,7 +15,7 @@ class HomeController extends Controller
             ->withCount([
                 'products' => fn ($query) => $query->active(),
             ])
-            ->with(['latestActiveProduct.images' => fn ($imageQuery) => $imageQuery->limit(1)])
+            ->with(['media', 'latestActiveProduct.images' => fn ($imageQuery) => $imageQuery->limit(1)])
             ->orderBy('sort_order')
             ->limit(8)
             ->get();

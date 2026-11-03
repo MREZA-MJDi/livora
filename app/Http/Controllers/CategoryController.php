@@ -16,6 +16,7 @@ class CategoryController extends Controller
                 'products' => fn ($query) => $query->active(),
             ])
             ->with([
+                'media',
                 'latestActiveProduct.images' => fn ($imageQuery) => $imageQuery
                     ->orderByDesc('is_primary')
                     ->orderBy('sort_order')
@@ -37,6 +38,7 @@ class CategoryController extends Controller
 
         $filters = $request->validated();
         $category->load([
+            'media',
             'latestActiveProduct.images' => fn ($imageQuery) => $imageQuery
                     ->orderByDesc('is_primary')
                     ->orderBy('sort_order')
