@@ -4,7 +4,7 @@
 'mobile' => false,
 ])
 
-<div class="space-y-5">
+<div class="space-y-4">
 
     {{-- =========================================================
          CATEGORY
@@ -25,7 +25,7 @@
         </div>
 
 
-        <div class="mt-5">
+        <div class="mt-3">
 
             @if($categories->isNotEmpty())
 
@@ -34,7 +34,7 @@
                     @foreach($categories as $category)
 
                         <label
-                            class="flex cursor-pointer items-center justify-between gap-3 rounded-2xl bg-[var(--sg-surface)] px-4 py-3 transition hover:border-[var(--sg-border)]"
+                            class="flex cursor-pointer items-center justify-between gap-3 rounded-xl bg-[var(--sg-surface)] px-3 py-2.5 transition hover:border-[var(--sg-border)]"
                         >
 
                             <span class="flex min-w-0 items-center gap-3">
@@ -44,7 +44,7 @@
                                     name="category"
                                     value="{{ $category->slug }}"
                                     @checked((string) $selectedCategory === (string) $category->slug)
-                                    @change="$el.form.submit()"
+                                    
                                     class="h-4 w-4 border-[var(--sg-border)] text-[var(--sg-ink)] focus:ring-[var(--sg-ink)]"
                                 >
 
@@ -101,7 +101,7 @@
         </div>
 
 
-        <div class="mt-5">
+        <div class="mt-3">
 
             <input
                 type="search"
@@ -109,7 +109,7 @@
                 value="{{ request('search') }}"
                 placeholder="نام یا مدل محصول..."
                 @keydown.enter.prevent="$el.form.submit()"
-                class="w-full rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-surface)] px-4 py-3.5 text-sm outline-none transition placeholder:text-[var(--sg-stone)] focus:border-[var(--sg-ink)]"
+                class="w-full rounded-xl border border-[var(--sg-border)] bg-[var(--sg-surface)] px-3 py-2.5 text-sm outline-none transition placeholder:text-[var(--sg-stone)] focus:border-[var(--sg-ink)]"
             >
 
         </div>
@@ -136,10 +136,10 @@
         </div>
 
 
-        <div class="mt-5 space-y-2">
+        <div class="mt-3 space-y-2">
 
             <label
-                class="flex cursor-pointer items-center gap-3 rounded-2xl bg-[var(--sg-surface)] px-4 py-3"
+                class="flex cursor-pointer items-center gap-3 rounded-xl bg-[var(--sg-surface)] px-3 py-2.5"
             >
 
                 <input
@@ -147,7 +147,7 @@
                     name="installment"
                     value="1"
                     @checked(request()->boolean('installment'))
-                @change="$el.form.submit()"
+                
                 class="h-4 w-4 rounded border-[var(--sg-border)] text-[var(--sg-ink)] focus:ring-[var(--sg-ink)]"
                 >
 
@@ -177,14 +177,14 @@
             </h3>
         </div>
 
-        <div class="mt-5">
-            <label class="flex cursor-pointer items-center gap-3 rounded-2xl bg-[var(--sg-surface)] px-4 py-3">
+        <div class="mt-3">
+            <label class="flex cursor-pointer items-center gap-3 rounded-xl bg-[var(--sg-surface)] px-3 py-2.5">
                 <input
                     type="checkbox"
                     name="in_stock"
                     value="1"
                     @checked(request()->boolean('in_stock'))
-                    @change="$el.form.submit()"
+                    
                     class="h-4 w-4 rounded border-[var(--sg-border)] text-[var(--sg-ink)] focus:ring-[var(--sg-ink)]"
                 >
 
@@ -215,7 +215,7 @@
         </div>
 
 
-        <div class="mt-5 grid grid-cols-2 gap-3">
+        <div class="mt-3 grid grid-cols-2 gap-3">
 
             <div>
 
@@ -234,7 +234,7 @@
                     value="{{ request('min_price') }}"
                     placeholder="0"
                     @keydown.enter.prevent="$el.form.submit()"
-                    class="w-full rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-surface)] px-3 py-3 text-xs outline-none focus:border-[var(--sg-ink)]"
+                    class="w-full rounded-xl border border-[var(--sg-border)] bg-[var(--sg-surface)] px-2.5 py-2.5 text-xs outline-none focus:border-[var(--sg-ink)]"
                 >
 
             </div>
@@ -257,7 +257,7 @@
                     value="{{ request('max_price') }}"
                     placeholder="مثلاً 100000000"
                     @keydown.enter.prevent="$el.form.submit()"
-                    class="w-full rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-surface)] px-3 py-3 text-xs outline-none focus:border-[var(--sg-ink)]"
+                    class="w-full rounded-xl border border-[var(--sg-border)] bg-[var(--sg-surface)] px-2.5 py-2.5 text-xs outline-none focus:border-[var(--sg-ink)]"
                 >
 
             </div>
@@ -286,12 +286,12 @@
         </div>
 
 
-        <div class="mt-5 space-y-2">
+        <div class="mt-3 space-y-2">
 
             {{-- FEATURED --}}
 
             <label
-                class="flex cursor-pointer items-center gap-3 rounded-2xl bg-[var(--sg-surface)] px-4 py-3"
+                class="flex cursor-pointer items-center gap-3 rounded-xl bg-[var(--sg-surface)] px-3 py-2.5"
             >
 
                 <input
@@ -299,7 +299,7 @@
                     name="featured"
                     value="1"
                     @checked(request()->boolean('featured'))
-                @change="$el.form.submit()"
+                
                 class="h-4 w-4 rounded border-[var(--sg-border)] text-[var(--sg-ink)] focus:ring-[var(--sg-ink)]"
                 >
 
@@ -313,7 +313,7 @@
             {{-- NEW --}}
 
             <label
-                class="flex cursor-pointer items-center gap-3 rounded-2xl bg-[var(--sg-surface)] px-4 py-3"
+                class="flex cursor-pointer items-center gap-3 rounded-xl bg-[var(--sg-surface)] px-3 py-2.5"
             >
 
                 <input
@@ -321,7 +321,7 @@
                     name="new"
                     value="1"
                     @checked(request()->boolean('new'))
-                @change="$el.form.submit()"
+                
                 class="h-4 w-4 rounded border-[var(--sg-border)] text-[var(--sg-ink)] focus:ring-[var(--sg-ink)]"
                 >
 
