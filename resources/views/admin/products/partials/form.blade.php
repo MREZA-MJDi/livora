@@ -98,9 +98,16 @@
 
             </div>
 
-            <label for="image" class="admin-label">
-                {{ $editing ? 'تغییر تصویر' : 'انتخاب تصویر اصلی' }}
-            </label>
+            <input type="hidden" name="media_id" :value="selectedMedia?.id || ''">
+
+            <div class="flex flex-wrap gap-3">
+                <button type="button" class="admin-btn admin-btn-secondary" @click="openPicker()">
+                    انتخاب از کتابخانه رسانه
+                </button>
+                <label for="image" class="admin-btn admin-btn-primary cursor-pointer">
+                    آپلود تصویر جدید
+                </label>
+            </div>
 
             <input
                 id="image"
@@ -108,14 +115,54 @@
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
                 data-crop-ratio="0.8"
-                class="admin-input p-2"
+                class="admin-input mt-3 p-2"
+                @change="clearSelection()"
             >
 
             <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">
-                {{ $editing
-                    ? 'با انتخاب فایل جدید، همین تصویر اصلی جایگزین می‌شود؛ تصاویر دیگر و اتصال Variantها باقی می‌مانند.'
-                    : 'تصویر اصلی محصول را انتخاب کنید. حداکثر حجم ۱۰ مگابایت.' }}
+                انتخاب از کتابخانه، فایل را دوباره آپلود نمی‌کند. آپلود جدید، فایل اصلی مستقلی به کتابخانه اضافه می‌کند.
             </p>
+
+            <div x-show="selectedMedia" x-cloak class="mt-3 flex items-center gap-3 rounded-xl border border-[var(--admin-border)] p-3">
+                <img :src="selectedMedia?.url" :alt="selectedMedia?.alt || selectedMedia?.name" class="h-16 w-14 rounded-lg object-contain">
+                <div class="min-w-0 flex-1">
+                    <p class="truncate text-sm font-semibold" x-text="selectedMedia?.name"></p>
+                    <p class="text-xs text-[var(--admin-muted)]">از کتابخانه رسانه انتخاب شده</p>
+                </div>
+                <button type="button" class="admin-btn admin-btn-secondary" @click="clearSelection()">لغو انتخاب</button>
+            </div>
+
+            <div x-show="pickerOpen" x-cloak x-transition class="fixed inset-0 z-[300] flex items-center justify-center bg-black/60 p-3 sm:p-6" @keydown.escape.window="pickerOpen = false">
+                <section class="flex max-h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-[var(--admin-white)] shadow-2xl" role="dialog" aria-modal="true" aria-label="کتابخانه رسانه">
+                    <header class="flex items-center justify-between border-b border-[var(--admin-border)] p-4 sm:p-5">
+                        <div><h3 class="font-bold">کتابخانه رسانه</h3><p class="mt-1 text-xs text-[var(--admin-muted)]">تصویر موردنظر را جست‌وجو و انتخاب کنید.</p></div>
+                        <button type="button" class="admin-btn admin-btn-secondary" @click="pickerOpen = false">بستن</button>
+                    </header>
+                    <div class="border-b border-[var(--admin-border)] p-4">
+                        <input type="search" x-model="search" @input.debounce.300ms="loadMedia(1)" class="admin-input" placeholder="جست‌وجوی نام یا متن جایگزین تصویر">
+                    </div>
+                    <div class="min-h-0 flex-1 overflow-y-auto p-4">
+                        <p x-show="loading" class="py-8 text-center text-sm text-[var(--admin-muted)]">در حال دریافت تصاویر…</p>
+                        <p x-show="!loading && items.length === 0" class="py-8 text-center text-sm text-[var(--admin-muted)]">تصویری پیدا نشد. می‌توانید تصویر جدید آپلود کنید.</p>
+                        <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                            <template x-for="item in items" :key="item.id">
+                                <button type="button" @click="selectMedia(item)" class="overflow-hidden rounded-xl border p-2 text-right transition hover:border-[var(--admin-accent)]" :class="selectedMedia?.id === item.id ? 'border-[var(--admin-accent)] bg-[var(--admin-accent-soft)]' : 'border-[var(--admin-border)]'">
+                                    <img :src="item.url" :alt="item.alt || item.name" loading="lazy" class="aspect-[4/5] w-full rounded-lg bg-[var(--admin-surface)] object-contain">
+                                    <span class="mt-2 block truncate text-xs font-medium" x-text="item.name"></span>
+                                    <span class="block text-[10px] text-[var(--admin-muted)]" x-text="item.size"></span>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+                    <footer class="flex items-center justify-between border-t border-[var(--admin-border)] p-4">
+                        <span class="text-xs text-[var(--admin-muted)]" x-text="total + ' تصویر'"></span>
+                        <div class="flex gap-2">
+                            <button type="button" class="admin-btn admin-btn-secondary" :disabled="page <= 1 || loading" @click="loadMedia(page - 1)">قبلی</button>
+                            <button type="button" class="admin-btn admin-btn-secondary" :disabled="page >= lastPage || loading" @click="loadMedia(page + 1)">بعدی</button>
+                        </div>
+                    </footer>
+                </section>
+            </div>
 
             @error('image')
             <p class="mt-2 text-xs text-[var(--admin-danger)]">
