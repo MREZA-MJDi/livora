@@ -135,13 +135,13 @@
                     <div class="grid gap-3 sm:grid-cols-2">
                         <div>
                             <label class="admin-label" for="map_latitude">عرض جغرافیایی (Latitude)</label>
-                            <input id="map_latitude" name="map_latitude" type="number" min="-90" max="90" step="0.0000001" inputmode="decimal" class="admin-input" dir="ltr" x-model="latitude" value="{{ old('map_latitude', $settings->map_latitude ?? '') }}" aria-describedby="map-latitude-help">
+                            <input id="map_latitude" name="map_latitude" type="number" min="-90" max="90" step="0.0000001" inputmode="decimal" class="admin-input" dir="ltr" x-model="latitude" aria-describedby="map-latitude-help">
                             <p id="map-latitude-help" class="admin-help mt-1">محدوده: ۹۰- تا ۹۰</p>
                             @error('map_latitude')<p class="admin-error mt-1">{{ $message }}</p>@enderror
                         </div>
                         <div>
                             <label class="admin-label" for="map_longitude">طول جغرافیایی (Longitude)</label>
-                            <input id="map_longitude" name="map_longitude" type="number" min="-180" max="180" step="0.0000001" inputmode="decimal" class="admin-input" dir="ltr" x-model="longitude" value="{{ old('map_longitude', $settings->map_longitude ?? '') }}" aria-describedby="map-longitude-help">
+                            <input id="map_longitude" name="map_longitude" type="number" min="-180" max="180" step="0.0000001" inputmode="decimal" class="admin-input" dir="ltr" x-model="longitude" aria-describedby="map-longitude-help">
                             <p id="map-longitude-help" class="admin-help mt-1">محدوده: ۱۸۰- تا ۱۸۰</p>
                             @error('map_longitude')<p class="admin-error mt-1">{{ $message }}</p>@enderror
                         </div>
