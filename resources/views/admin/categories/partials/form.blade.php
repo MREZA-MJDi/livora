@@ -256,6 +256,7 @@
                     'mediaPickerUrl' => $categoryImageUrl,
                     'mediaPickerName' => $category->name ?? '',
                     'mediaPickerPreviewId' => 'category-image-preview',
+                    'mediaPickerRemoveName' => 'remove_image',
                 ])
 
                 <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">
