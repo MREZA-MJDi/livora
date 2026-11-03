@@ -100,7 +100,7 @@
             </div>
             <input
                 id="image"
-                name="image"
+                name="image" data-crop-ratio="1.7777778"
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
                 class="admin-input p-2"
