@@ -116,10 +116,6 @@ class CategoryController extends Controller
 
         Cache::forget('layout.search_categories');
 
-        if ($newImage && $oldImage !== $newImage) {
-            $this->deleteStoredImage($oldImage);
-        }
-
         return redirect()
             ->route('admin.categories.index')
             ->with('success', 'دسته‌بندی با موفقیت بروزرسانی شد.');
