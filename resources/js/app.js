@@ -105,16 +105,16 @@ window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName
     },
     clearSelection() {
         this.selectedMedia = null;
-        const removeInput = this.$root.querySelector(`input[name="\${this.removeField}"]`);
+        const removeInput = this.$root.querySelector(`input[name="${this.removeField}"]`);
         if (removeInput) removeInput.value = '1';
-        const fileInput = this.$root.querySelector(`input[type="file"][name="\${this.fileField}"]`);
+        const fileInput = this.$root.querySelector(`input[type="file"][name="${this.fileField}"]`);
         if (fileInput) fileInput.value = '';
         const preview = document.getElementById(this.previewId);
         if (preview) { preview.removeAttribute('src'); preview.classList.add('hidden'); }
     },
     async cropSelected() {
         if (!this.selectedMedia || this.loading) return;
-        const fileInput = this.$root.querySelector(`input[type="file"][name="\${this.fileField}"]`);
+        const fileInput = this.$root.querySelector(`input[type="file"][name="${this.fileField}"]`);
         const ratio = Number(fileInput?.dataset.cropRatio) || 4 / 3;
         this.loading = true;
         this.errorMessage = '';
