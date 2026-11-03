@@ -83,7 +83,10 @@ class PageController extends Controller
 
         DB::transaction(function () use ($data, $page, $newMedia): void {
             $data['body'] = HtmlSanitizer::sanitize($data['body']);
-            if ($newMedia) {
+            if (request()->boolean('remove_featured_image')) {
+                $data['featured_image'] = null;
+                $data['media_id'] = null;
+            } elseif ($newMedia) {
                 $data['featured_image'] = $newMedia->path;
                 $data['media_id'] = $newMedia->id;
             } else {
