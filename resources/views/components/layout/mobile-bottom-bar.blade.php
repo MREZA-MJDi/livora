@@ -1,3 +1,5 @@
+@props(["cartCount" => 0])
+
 <nav
     class="sg-mobile-nav mobile-bottom-nav fixed inset-x-3 bottom-3 z-[90] lg:hidden"
     aria-label="ناوبری موبایل"
@@ -36,15 +38,6 @@
             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h1.5l1.5 10h11l2-7H6M9 19.5a1 1 0 1 1-2 0m10 0a1 1 0 1 1-2 0"/>
             </svg>
-            @php
-                $cartCount = 0;
-                if (auth()->check() && auth()->user()->isCustomer()) {
-                    $cart = auth()->user()->activeCart;
-                    if ($cart) {
-                        $cartCount = $cart->itemCount();
-                    }
-                }
-            @endphp
             @if($cartCount > 0)
                 <span class="absolute right-2 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--sg-accent)] px-1 text-[8px] font-semibold text-white">{{ $cartCount }}</span>
             @endif
