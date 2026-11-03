@@ -23,7 +23,7 @@ window.seoRoutePicker = (endpoint) => ({
             const payload = await response.json();
             this.routes = Array.isArray(payload.data) ? payload.data : [];
         } catch (error) {
-            window.dispatchEvent(new CustomEvent('admin:toast', { detail: { type: 'error', message: error.message } }));
+            this.errorMessage = error.message || 'بارگذاری رسانه ناموفق بود.';
         } finally {
             this.loading = false;
         }
@@ -49,6 +49,7 @@ window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName
     page: 1,
     lastPage: 1,
     total: 0,
+    errorMessage: '',
     selectedMedia: initialId && initialUrl
         ? { id: Number(initialId), url: initialUrl, name: initialName || 'تصویر فعلی', alt: initialName || '' }
         : null,
@@ -68,6 +69,7 @@ window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName
             });
             if (!response.ok) throw new Error('بارگذاری کتابخانه رسانه ناموفق بود.');
             const payload = await response.json();
+            this.errorMessage = '';
             this.items = Array.isArray(payload.data) ? payload.data : [];
             this.page = payload.meta?.current_page || 1;
             this.lastPage = payload.meta?.last_page || 1;
