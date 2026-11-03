@@ -17,7 +17,12 @@
 @section('content')
 
     @php
-        $wishlistItems = $wishlist->items ?? $wishlist;
+        $wishlistItems = $wishlist instanceof \Illuminate\Pagination\AbstractPaginator
+            ? $wishlist->getCollection()
+            : ($wishlist->items ?? $wishlist);
+        $wishlistCount = $wishlist instanceof \Illuminate\Pagination\AbstractPaginator
+            ? $wishlist->total()
+            : $wishlistItems->count();
     @endphp
 
     <div class="min-h-[70vh] bg-[var(--sg-cream)]">
@@ -164,7 +169,7 @@
                                 </p>
 
                                 <p class="mt-2 text-sm text-[var(--sg-stone)]">
-                                    {{ number_format($wishlistItems->count()) }}
+                                    {{ number_format($wishlistCount) }}
                                     محصول ذخیره شده
                                 </p>
 
@@ -237,6 +242,12 @@
                             @endforeach
 
                         </div>
+
+                        @if($wishlist instanceof \Illuminate\Pagination\AbstractPaginator)
+                            <div class="mt-10">
+                                {{ $wishlist->links() }}
+                            </div>
+                        @endif
 
                     </div>
 

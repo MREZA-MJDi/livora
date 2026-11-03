@@ -182,6 +182,21 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
             ->assertSee('در انتظار پرداخت');
     }
 
+    public function test_customer_order_tracking_is_scoped_to_the_authenticated_owner(): void
+    {
+        $owner = $this->user('customer', 'order-tracking-owner@example.test');
+        $otherCustomer = $this->user('customer', 'order-tracking-other@example.test');
+        $order = $this->orderFor($owner);
+
+        $this->actingAs($otherCustomer)
+            ->get(route('account.orders.show', $order))
+            ->assertForbidden();
+
+        $this->actingAs($owner)
+            ->get(route('account.orders.show', $order))
+            ->assertOk();
+    }
+
     public function test_customer_cannot_view_another_customers_order_payment_page(): void
     {
         $owner = $this->user('customer', 'checkout-order-owner@example.test');
@@ -641,6 +656,43 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
             'status' => 'initiated',
         ]);
         $this->assertSame('digipay', $order->fresh()->payment_provider);
+    }
+
+    public function test_ambiguous_gateway_start_stays_pending_and_blocks_duplicate_attempts(): void
+    {
+        $customer = $this->user('customer', 'gateway-initiation-timeout@example.test');
+        $order = $this->orderFor($customer);
+
+        $gateway = \Mockery::mock(InstallmentPaymentGatewayInterface::class);
+        $gateway->shouldReceive('createPayment')
+            ->once()
+            ->andThrow(new \RuntimeException('Connection timed out after request dispatch.'));
+
+        $manager = \Mockery::mock(PaymentManager::class);
+        $manager->shouldReceive('driver')->twice()->with('digipay')->andReturn($gateway);
+        $this->instance(PaymentManager::class, $manager);
+
+        $this->actingAs($customer)
+            ->from(route('checkout.payment', $order))
+            ->post(route('checkout.payment.installment', $order), ['gateway' => 'digipay'])
+            ->assertRedirect(route('checkout.payment', $order))
+            ->assertSessionHas('error');
+
+        // An unresolved attempt must not become retryable merely because the
+        // local 20-minute stale-attempt window elapsed.
+        $this->travel(21)->minutes();
+
+        $this->from(route('checkout.payment', $order))
+            ->post(route('checkout.payment.installment', $order), ['gateway' => 'digipay'])
+            ->assertRedirect(route('checkout.payment', $order))
+            ->assertSessionHas('error');
+
+        $payment = Payment::query()->where('order_id', $order->id)->firstOrFail();
+
+        $this->assertSame('pending', $payment->status);
+        $this->assertTrue((bool) data_get($payment->metadata, 'initiation_pending'));
+        $this->assertSame('pending', $order->fresh()->payment_status);
+        $this->assertSame(1, Payment::query()->where('order_id', $order->id)->count());
     }
 
     public function test_verified_gateway_callback_is_idempotent_and_deducts_stock_once(): void

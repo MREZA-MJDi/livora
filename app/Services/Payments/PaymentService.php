@@ -89,9 +89,21 @@ class PaymentService
                 ->get();
 
             foreach ($staleAttempts as $staleAttempt) {
+                $metadata = $staleAttempt->metadata ?? [];
+
+                // Unknown provider outcomes must never expire automatically:
+                // a remote payment session may exist even when our request
+                // timed out. Only a confirmed/reconciled outcome can release it.
+                if (
+                    ! empty($metadata['initiation_pending'])
+                    || ! empty($metadata['verification_pending'])
+                ) {
+                    continue;
+                }
+
                 $staleAttempt->update([
                     'status' => 'failed',
-                    'metadata' => array_merge($staleAttempt->metadata ?? [], [
+                    'metadata' => array_merge($metadata, [
                         'expired_before_retry' => true,
                         'expired_at' => now()->toISOString(),
                     ]),
@@ -258,14 +270,14 @@ class PaymentService
         } catch (Throwable $e) {
             report($e);
 
-            $this->markPaymentAsFailed(
-                $payment,
-                'Gateway communication failed.',
-                [
-                    'exception' =>
-                        $e::class,
-                ]
-            );
+            // A timeout/connection loss does not prove that the provider did
+            // not create a payment session. Keep the attempt active so a
+            // second click cannot create a duplicate remote charge/session.
+            $this->recordGatewayInitiationPending($payment, [
+                'gateway' => $gateway,
+                'exception' => $e::class,
+                'message' => 'Gateway initiation outcome is unknown; reconciliation is required.',
+            ]);
 
             return [
                 'success' => false,
@@ -278,9 +290,12 @@ class PaymentService
                 'redirect_url' => null,
 
                 'message' =>
-                    'خطایی هنگام اتصال به درگاه پرداخت رخ داد. لطفاً دوباره تلاش کنید.',
+                    'پاسخ درگاه نامشخص است؛ برای جلوگیری از پرداخت تکراری، وضعیت تراکنش باید بررسی شود.',
 
-                'data' => [],
+                'data' => [
+                    'initiation_pending' => true,
+                ],
+                'retryable' => false,
             ];
         }
     }
