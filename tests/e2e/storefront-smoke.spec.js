@@ -120,25 +120,25 @@ test('mobile customer login, cart and checkout remain usable through order creat
     await expect(page.locator('form[action*="/checkout"]')).toBeVisible();
 
     // The province modal must reveal only cities for the selected province.
-    await page.getByRole('button', { name: 'انتخاب استان' }).click();
+    await page.locator('button[aria-controls="iran-shipping-location-modal"]').first().click();
     const regionDialog = page.getByRole('dialog', { name: 'استان محل تحویل را انتخاب کنید' });
     await expect(regionDialog).toBeVisible();
     await regionDialog.getByRole('button', { name: /^تهران/ }).first().click();
 
     const cityDialog = page.getByRole('dialog', { name: 'شهر محل تحویل را انتخاب کنید' });
     await expect(cityDialog).toBeVisible();
-    await cityDialog.getByRole('button', { name: /^تهران$/ }).click();
+    await cityDialog.getByRole('button', { name: /^تهران$/ }).first().click();
 
     await page.locator('input[name="first_name"]').fill('مشتری');
     await page.locator('input[name="last_name"]').fill('آزمایشی');
     await page.locator('input[name="phone"]').fill('09121234567');
     await page.locator('input[name="email"]').fill('');
-    await page.locator('textarea[name="address"], input[name="address"]').fill('تهران، خیابان نمونه، پلاک ۱۲، واحد ۳');
+    await page.locator('[name="address"]').fill('تهران، خیابان نمونه، پلاک ۱۲، واحد ۳');
     await page.locator('input[name="postal_code"]').fill('1234567890');
 
     await page.getByRole('button', { name: 'ثبت سفارش و ادامه پرداخت' }).click();
     await expect(page).toHaveURL(/\/checkout\/payment\/\d+/);
-    await expect(page.getByText(/در انتظار پرداخت/)).toBeVisible();
+    await expect(page.getByText(/در انتظار پرداخت/).first()).toBeVisible();
 
     overflow = await page.evaluate(() => (
         Math.max(document.documentElement.scrollWidth, document.body.scrollWidth)
