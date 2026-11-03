@@ -1,16 +1,16 @@
-# SilaGallery / Livora production deployment — silashop.com
+# SilaGallery / Livora production deployment — sillashop.com
 
 This deployment is intentionally isolated from farzindev and farajihome.com.
 It uses its own release tree, environment file, database, writable storage, PHP-FPM pool/socket (where provisioned), and Nginx server block. The only shared resources are the VPS operating system and Nginx service.
 
 ## 1. DNS at Parspack
 
-The domain is delegated to the Parspack nameservers supplied in the CDN panel. In the DNS/CDN zone for silashop.com, set the origin:
+The domain is delegated to the Parspack nameservers supplied in the CDN panel. In the DNS/CDN zone for sillashop.com, set the origin:
 
 - Apex @: A → 45.149.79.155
-- www: CNAME → silashop.com (or A → 45.149.79.155 if the panel does not support an apex CNAME/alias)
+- www: CNAME → sillashop.com (or A → 45.149.79.155 if the panel does not support an apex CNAME/alias)
 - Do not add an AAAA record unless IPv6 is actually configured on this VPS.
-- If the CDN panel has a separate Origin field, set it to 45.149.79.155 and make sure the origin host header is silashop.com.
+- If the CDN panel has a separate Origin field, set it to 45.149.79.155 and make sure the origin host header is sillashop.com.
 
 Check that DNS has propagated before requesting the origin certificate. Do not alter the existing Farzin DNS zone or its Nginx block.
 
@@ -97,7 +97,7 @@ Set these values in /var/www/livora/shared/.env before generating the applicatio
     APP_NAME="SilaGallery"
     APP_ENV=production
     APP_DEBUG=false
-    APP_URL=https://silashop.com
+    APP_URL=https://sillashop.com
     APP_TIMEZONE=Asia/Tehran
     APP_LOCALE=fa
     APP_FALLBACK_LOCALE=fa
@@ -118,7 +118,7 @@ Set these values in /var/www/livora/shared/.env before generating the applicatio
     DB_QUEUE_RETRY_AFTER=120
     FILESYSTEM_DISK=public
 
-    # Keep empty while CDN serves the same silashop.com host transparently.
+    # Keep empty while CDN serves the same sillashop.com host transparently.
     ASSET_URL=
     PUBLIC_STORAGE_URL=
 
@@ -180,9 +180,9 @@ Enable Laravel's scheduler (safe even when no scheduled task is registered yet):
 
 ## 7. Nginx and origin SSL
 
-Copy deploy/nginx/silashop.com.conf to /etc/nginx/sites-available/silashop.com. It points to the dedicated /run/php/php8.5-fpm-livora.sock pool, not the shared default PHP-FPM pool. Verify that socket exists, then enable only this new server block:
+Copy deploy/nginx/sillashop.com.conf to /etc/nginx/sites-available/sillashop.com. It points to the dedicated /run/php/php8.5-fpm-livora.sock pool, not the shared default PHP-FPM pool. Verify that socket exists, then enable only this new server block:
 
-    sudo ln -s /etc/nginx/sites-available/silashop.com /etc/nginx/sites-enabled/silashop.com
+    sudo ln -s /etc/nginx/sites-available/sillashop.com /etc/nginx/sites-enabled/sillashop.com
     sudo nginx -t
     sudo systemctl reload nginx
 
@@ -190,10 +190,10 @@ Check that the existing farajihome.com server block remains enabled and unchange
 
 After the A records resolve to 45.149.79.155, issue the origin certificate:
 
-    sudo certbot --nginx -d silashop.com -d www.silashop.com
+    sudo certbot --nginx -d sillashop.com -d www.sillashop.com
     sudo certbot renew --dry-run
 
-Certbot will add the HTTPS server block and HTTP-to-HTTPS redirect. Test both hostnames. Use the CDN's HTTPS mode Full/Strict (never Flexible) once the origin certificate is valid. Enable the CDN's edge certificate for both silashop.com and www.silashop.com.
+Certbot will add the HTTPS server block and HTTP-to-HTTPS redirect. Test both hostnames. Use the CDN's HTTPS mode Full/Strict (never Flexible) once the origin certificate is valid. Enable the CDN's edge certificate for both sillashop.com and www.sillashop.com.
 
 ## 8. CDN cache policy
 
@@ -213,8 +213,8 @@ Because the CDN is attached to the same domain via nameservers, leave ASSET_URL 
 
 Check in this order:
 
-1. curl -I http://silashop.com then curl -I https://silashop.com and the www hostname.
-2. https://silashop.com/up returns HTTP 200.
+1. curl -I http://sillashop.com then curl -I https://sillashop.com and the www hostname.
+2. https://sillashop.com/up returns HTTP 200.
 3. Home, shop, categories, product details, search, all shop filters, sorting, and pagination.
 4. Admin login, product/category create-edit, image upload, media library, customer/order lists.
 5. Cart as guest and customer, checkout validation, stock/variant checks, order ownership and payment callback route.
