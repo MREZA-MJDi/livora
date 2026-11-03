@@ -22,6 +22,28 @@ class SeoMetadataTest extends TestCase
         Cache::flush();
     }
 
+
+    public function test_seo_route_picker_lists_real_public_destinations_and_excludes_private_routes(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $category = Category::query()->create([
+            'name' => 'دسته مسیر عمومی',
+            'slug' => 'public-route-category',
+            'description' => 'دسته‌بندی قابل انتخاب',
+            'is_active' => true,
+            'sort_order' => 1,
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->getJson(route('admin.seo.public-routes', ['q' => 'دسته مسیر عمومی']))
+            ->assertOk()
+            ->assertJsonPath('data.0.label', 'دسته‌بندی: دسته مسیر عمومی');
+
+        $this->assertStringContainsString('/categories/public-route-category', $response->json('data.0.url'));
+        $this->assertStringNotContainsString('/admin', json_encode($response->json('data')));
+        $this->assertStringNotContainsString('/checkout', json_encode($response->json('data')));
+    }
+
     public function test_public_pages_are_noindex_nofollow_and_sitemap_is_empty_by_default(): void
     {
         $this->get('/')
