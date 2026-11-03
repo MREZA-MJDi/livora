@@ -92,6 +92,11 @@ class Media extends Model
         return $this->hasMany(ProductImage::class);
     }
 
+    public function productBanners(): HasMany
+    {
+        return $this->hasMany(Product::class, 'banner_media_id');
+    }
+
     public function categories(): HasMany
     {
         return $this->hasMany(Category::class);
