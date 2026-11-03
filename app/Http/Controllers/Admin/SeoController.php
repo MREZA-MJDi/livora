@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\SeoSetting;
+use App\Models\BlogPost;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
@@ -39,8 +40,19 @@ class SeoController extends Controller
             ->orderBy('name')->limit(40)->get(['name', 'slug']);
 
         $categories = Category::query()->active()
-            ->when($term !== '', fn ($query) => $query->where('name', 'like', "%{$term}%")->orWhere('slug', 'like', "%{$term}%"))
+            ->when($term !== '', fn ($query) => $query->where(fn ($search) => $search->where('name', 'like', "%{$term}%")->orWhere('slug', 'like', "%{$term}%")))
             ->orderBy('name')->limit(40)->get(['name', 'slug']);
+
+        $articles = BlogPost::query()
+            ->where('status', 'published')
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->when($term !== '', fn ($query) => $query->where(fn ($search) => $search->where('title', 'like', "%{$term}%")->orWhere('slug', 'like', "%{$term}%")))
+            ->orderByDesc('published_at')->limit(40)->get(['title', 'slug']);
+
+        foreach ($articles as $article) {
+            $routes->push(['label' => 'مقاله: '.$article->title, 'url' => route('blog.show', $article->slug), 'kind' => 'مقاله منتشرشده']);
+        }
 
         foreach ($categories as $category) {
             $routes->push(['label' => 'دسته‌بندی: '.$category->name, 'url' => route('categories.show', $category->slug), 'kind' => 'دسته‌بندی']);
