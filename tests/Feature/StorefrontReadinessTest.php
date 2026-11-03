@@ -50,6 +50,67 @@ class StorefrontReadinessTest extends TestCase
     }
 
 
+    public function test_demo_cart_seeder_persists_a_valid_selection_for_each_required_variant_group(): void
+    {
+        $category = $this->category();
+        $product = $this->product($category, [
+            'name' => 'مبل دارای واریانت',
+            'slug' => 'luna-sofa',
+            'sku' => 'LIV-DEMO-SOFA-001',
+            'price' => 50000000,
+            'stock' => 10,
+        ]);
+
+        $color = ProductVariant::query()->create([
+            'product_id' => $product->id,
+            'type' => 'color',
+            'name' => 'رنگ',
+            'value' => 'cream',
+            'sku' => 'LIV-DEMO-SOFA-CREAM',
+            'price_adjustment' => 0,
+            'stock' => 5,
+            'is_active' => true,
+        ]);
+
+        $size = ProductVariant::query()->create([
+            'product_id' => $product->id,
+            'type' => 'size',
+            'name' => 'سایز',
+            'value' => 'medium',
+            'sku' => 'LIV-DEMO-SOFA-MEDIUM',
+            'price_adjustment' => 2500000,
+            'stock' => 4,
+            'is_active' => true,
+        ]);
+
+        $demoCustomer = User::query()->create([
+            'name' => 'Demo Customer',
+            'email' => 'demo@livora.test',
+            'password' => Hash::make('test-password'),
+            'role' => 'customer',
+        ]);
+
+        $this->seed(\\Database\\Seeders\\CartSeeder::class);
+
+        $cart = Cart::query()
+            ->where('user_id', $demoCustomer->id)
+            ->where('status', 'active')
+            ->firstOrFail();
+
+        $item = $cart->items()->where('product_id', $product->id)->firstOrFail();
+
+        $this->assertEqualsCanonicalizing(
+            [$color->id, $size->id],
+            $item->selectedVariantIds()
+        );
+        $this->assertCount(2, $item->variant_options);
+        $this->assertSame('color', $item->variant_options[0]['type']);
+        $this->assertSame('size', $item->variant_options[1]['type']);
+        $this->assertSame('65000000.00', $item->unit_price);
+        $this->assertSame(1, $item->quantity);
+        $this->assertNotSame('base', $item->variant_key);
+    }
+
     public function test_category_directory_uses_real_active_product_images_and_hides_inactive_categories(): void
     {
         $category = $this->category([
