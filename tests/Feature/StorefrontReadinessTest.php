@@ -93,6 +93,61 @@ class StorefrontReadinessTest extends TestCase
         $this->assertDatabaseCount('cart_items', 0);
     }
 
+    public function test_wishlist_uses_the_view_contract_and_rejects_unavailable_products(): void
+    {
+        $customer = User::query()->create([
+            'name' => 'مشتری علاقه‌مندی',
+            'email' => 'wishlist-customer@example.test',
+            'password' => Hash::make('TestPass123!'),
+            'role' => 'customer',
+        ]);
+
+        $activeCategory = $this->category([
+            'name' => 'دسته فعال علاقه‌مندی',
+            'slug' => 'wishlist-active-category',
+        ]);
+        $inactiveCategory = $this->category([
+            'name' => 'دسته غیرفعال علاقه‌مندی',
+            'slug' => 'wishlist-inactive-category',
+            'is_active' => false,
+        ]);
+
+        $visibleProduct = $this->product($activeCategory, [
+            'name' => 'محصول ذخیره‌شده قابل نمایش',
+            'slug' => 'wishlist-visible-product',
+        ]);
+        $hiddenProduct = $this->product($inactiveCategory, [
+            'name' => 'محصول دسته غیرفعال',
+            'slug' => 'wishlist-hidden-product',
+        ]);
+        $inactiveProduct = $this->product($activeCategory, [
+            'name' => 'محصول غیرفعال',
+            'slug' => 'wishlist-inactive-product',
+            'status' => 'draft',
+        ]);
+
+        $customer->wishlists()->createMany([
+            ['product_id' => $visibleProduct->id],
+            ['product_id' => $hiddenProduct->id],
+            ['product_id' => $inactiveProduct->id],
+        ]);
+
+        $this->actingAs($customer)
+            ->get(route('account.wishlist.index'))
+            ->assertOk()
+            ->assertSee('محصول ذخیره‌شده قابل نمایش')
+            ->assertDontSee('محصول دسته غیرفعال')
+            ->assertDontSee('محصول غیرفعال');
+
+        $this->actingAs($customer)
+            ->from(route('account.wishlist.index'))
+            ->post(route('account.wishlist.store', $hiddenProduct))
+            ->assertRedirect(route('account.wishlist.index'))
+            ->assertSessionHas('error');
+
+        $this->assertSame(3, $customer->wishlists()->count());
+    }
+
     public function test_cart_requires_an_active_selection_for_each_configured_variant_type(): void
     {
         $product = $this->product($this->category(), [
