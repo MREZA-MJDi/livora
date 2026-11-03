@@ -16,7 +16,11 @@ class CategoryController extends Controller
                 'products' => fn ($query) => $query->active(),
             ])
             ->with([
-                'latestActiveProduct.images' => fn ($imageQuery) => $imageQuery->limit(1),
+                'latestActiveProduct.images' => fn ($imageQuery) => $imageQuery
+                    ->orderByDesc('is_primary')
+                    ->orderBy('sort_order')
+                    ->orderBy('id')
+                    ->limit(1),
             ])
             ->orderBy('sort_order')
             ->paginate(12)
@@ -33,7 +37,11 @@ class CategoryController extends Controller
 
         $filters = $request->validated();
         $category->load([
-            'latestActiveProduct.images' => fn ($imageQuery) => $imageQuery->limit(1),
+            'latestActiveProduct.images' => fn ($imageQuery) => $imageQuery
+                    ->orderByDesc('is_primary')
+                    ->orderBy('sort_order')
+                    ->orderBy('id')
+                    ->limit(1),
             'relatedCategories' => fn ($query) => $query
                 ->where('is_active', true)
                 ->withCount(['products' => fn ($productQuery) => $productQuery->active()]),
