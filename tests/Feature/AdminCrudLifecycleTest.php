@@ -522,7 +522,7 @@ class AdminCrudLifecycleTest extends TestCase
             ->assertRedirect(route('admin.pages.index'));
 
         $this->assertDatabaseMissing('content_pages', ['id' => $page->id]);
-        Storage::disk('public')->assertMissing($newImage);
+        Storage::disk('public')->assertExists($newImage); // Deleting a page detaches the usage but keeps the shared library asset.
     }
 
     public function test_customer_cannot_open_or_mutate_admin_catalogue_cms_or_media_crud_routes(): void
