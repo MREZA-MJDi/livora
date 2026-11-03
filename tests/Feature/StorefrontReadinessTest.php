@@ -634,7 +634,7 @@ class StorefrontReadinessTest extends TestCase
             ->assertOk()
             ->assertViewHas('products', function ($paginator) {
                 return $paginator instanceof LengthAwarePaginator
-                    && $paginator->perPage() === 12
+                    && $paginator->perPage() === 8
                     && $paginator->total() === 13
                     && $paginator->currentPage() === 2;
             })
