@@ -20,6 +20,7 @@ class UpdateProductImageRequest extends FormRequest
                 'exists:products,id',
             ],
 
+            'media_id' => ['nullable', 'integer', 'exists:media,id'],
             'image' => [
                 'nullable',
                 'image',
