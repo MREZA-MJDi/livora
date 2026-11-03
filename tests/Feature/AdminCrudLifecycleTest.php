@@ -203,7 +203,7 @@ class AdminCrudLifecycleTest extends TestCase
         $this->assertSame('اتاق نشیمن مدرن', $category->name);
         $this->assertSame(2, $category->sort_order);
         $this->assertNotSame($oldImage, $category->image);
-        Storage::disk('public')->assertMissing($oldImage);
+        Storage::disk('public')->assertExists($oldImage); // Replaced source remains in the Media Library.
         Storage::disk('public')->assertExists($category->image);
 
         $this->actingAs($this->admin)
@@ -211,7 +211,7 @@ class AdminCrudLifecycleTest extends TestCase
             ->assertRedirect(route('admin.categories.index'));
 
         $this->assertDatabaseMissing('categories', ['id' => $category->id]);
-        Storage::disk('public')->assertMissing($category->image);
+        Storage::disk('public')->assertExists($category->image); // Deleting content never deletes the shared source asset.
     }
 
     public function test_category_delete_is_blocked_when_only_soft_deleted_products_still_reference_it(): void
@@ -297,7 +297,7 @@ class AdminCrudLifecycleTest extends TestCase
         $this->assertNotNull($post->published_at);
         $this->assertSame('محتوای جدید', strip_tags($post->body));
         $this->assertSame(['دکوراسیون'], $post->tags()->pluck('name')->all());
-        Storage::disk('public')->assertMissing($oldImage);
+        Storage::disk('public')->assertExists($oldImage); // Replaced source remains in the Media Library.
         Storage::disk('public')->assertExists($post->featured_image);
 
         $this->get(route('blog.show', $post->slug))
@@ -310,7 +310,7 @@ class AdminCrudLifecycleTest extends TestCase
             ->assertRedirect(route('admin.blog.index'));
 
         $this->assertDatabaseMissing('blog_posts', ['id' => $post->id]);
-        Storage::disk('public')->assertMissing($newImage);
+        Storage::disk('public')->assertExists($newImage); // The asset remains available for reuse after post deletion.
     }
 
     public function test_admin_can_manage_product_images_and_variants_without_leaving_orphaned_links(): void
@@ -509,7 +509,7 @@ class AdminCrudLifecycleTest extends TestCase
 
         $page->refresh();
         $this->assertSame('published', $page->status);
-        Storage::disk('public')->assertMissing($oldImage);
+        Storage::disk('public')->assertExists($oldImage); // Replaced source remains in the Media Library.
         Storage::disk('public')->assertExists($page->featured_image);
 
         $this->get('/wood-care-lifecycle')
