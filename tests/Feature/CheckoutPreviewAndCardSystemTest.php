@@ -291,8 +291,8 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
 
         $this->get('/categories')
             ->assertOk()
-            ->assertSee('sg-category-grid--index', false)
-            ->assertSee('sg-card-image-skeleton', false)
+            ->assertSee('sg-category-index-grid', false)
+            ->assertSee('sg-category-index-tile', false)
             ->assertSee($category->name);
     }
 
@@ -367,7 +367,8 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
 
         $response = $this->get(route('categories.show', $category->slug));
         $response->assertOk()
-            ->assertSee('aspect-[12/5]', false)
+            ->assertSee('sg-category-detail-hero', false)
+            ->assertSee('sg-category-detail-visual', false)
             ->assertSee('کاربردها و انواع')
             ->assertSee('راهنمای انتخاب')
             ->assertSee('معیارهای انتخاب')
@@ -579,7 +580,7 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
             ->get(route('checkout.index'))
             ->assertOk()
             ->assertSee('iranShippingPicker', false)
-            ->assertSee('شهر محل تحویل را انتخاب کنید')
+            ->assertSee('x-text="stepTitle"', false)
             ->assertSee('شهر من در فهرست نیست')
             ->assertSee('ایمیل (اختیاری)')
             ->assertSee('مشتری')
