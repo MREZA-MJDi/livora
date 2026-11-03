@@ -1383,3 +1383,37 @@ body {
     .cms-content h2 { margin-top: 2rem; }
     .cms-content img, .cms-content video { border-radius: .85rem; }
 }
+
+
+/* Category-card uploads: show the complete source image at its natural ratio. */
+.category-card-media {
+    height: auto;
+    aspect-ratio: auto;
+    overflow: visible;
+    background: transparent;
+}
+.category-card-media > .category-card-image,
+.category-card-media > [data-card-image] {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: auto;
+    object-fit: unset;
+    object-position: center;
+    transform: none !important;
+    border-radius: 1.25rem;
+}
+.category-card-media .sg-card-image-skeleton {
+    display: none;
+}
+.category-card-media [data-card-image-fallback] {
+    position: relative;
+    min-height: 12rem;
+    border-radius: 1.25rem;
+    background: var(--sg-surface);
+}
+
+.category-card-media [data-card-image] {
+    opacity: 1 !important;
+    transition: none;
+}
