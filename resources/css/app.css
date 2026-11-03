@@ -1597,3 +1597,39 @@ body {
         transition: none;
     }
 }
+
+/* Shop catalogue: compact product cards, clearer spacing and mobile-safe banner. */
+.sg-product-grid--catalog {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: .75rem;
+    row-gap: 1.125rem;
+}
+.sg-product-grid--catalog .product-card { border-radius: 1rem; }
+.sg-product-grid--catalog .product-card-media { aspect-ratio: 1 / 1; }
+.sg-product-grid--catalog .product-card-content { gap: 0; }
+.sg-product-grid--catalog .product-card-installment-placeholder { display: none; }
+.shop-hero-banner {
+    min-height: 210px;
+    height: clamp(210px, 26vw, 290px);
+    aspect-ratio: auto;
+    border-radius: 1rem;
+}
+.shop-hero-banner > img { object-position: center 48%; }
+@media (min-width: 640px) {
+    .sg-product-grid--catalog { column-gap: 1rem; row-gap: 1.5rem; }
+    .shop-hero-banner { min-height: 230px; border-radius: 1.125rem; }
+}
+@media (min-width: 768px) {
+    .sg-product-grid--catalog { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 1024px) {
+    .sg-product-grid--catalog { grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 1rem; }
+    .shop-hero-banner { min-height: 250px; }
+}
+@media (min-width: 1440px) {
+    .sg-product-grid--catalog { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 639px) {
+    .shop-hero-banner { min-height: 205px; height: auto; border-radius: .875rem; }
+    .shop-hero-banner > img { object-position: 58% center; }
+}
