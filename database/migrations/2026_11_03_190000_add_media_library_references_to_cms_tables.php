@@ -20,8 +20,8 @@ return new class extends Migration
     {
         foreach (['categories', 'blog_posts', 'content_pages', 'shop_page_settings'] as $tableName) {
             Schema::table($tableName, function (Blueprint $table): void {
-                $table->dropForeign([$tableName === 'shop_page_settings' ? 'media_id' : 'media_id']);
-                $table->dropIndex([$tableName === 'shop_page_settings' ? 'media_id' : 'media_id']);
+                $table->dropForeign(['media_id']);
+                $table->dropIndex(['media_id']);
                 $table->dropColumn('media_id');
             });
         }
