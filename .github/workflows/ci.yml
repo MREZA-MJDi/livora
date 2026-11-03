@@ -28,8 +28,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          persist-credentials: false
-        with:
           ref: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'main' || github.sha }}
           persist-credentials: false
 
@@ -153,6 +151,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
