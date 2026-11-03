@@ -19,6 +19,7 @@ class Category extends Model
         'slug',
         'description',
         'image',
+        'media_id',
         'image_alt',
         'meta_title',
         'meta_description',
