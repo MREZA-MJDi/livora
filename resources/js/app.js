@@ -3,6 +3,43 @@ import Alpine from 'alpinejs';
 
 window.Alpine = Alpine;
 
+window.seoRoutePicker = (endpoint) => ({
+    endpoint,
+    open: false,
+    loading: false,
+    search: '',
+    routes: [],
+    async show() {
+        this.open = true;
+        await this.load();
+    },
+    async load() {
+        this.loading = true;
+        try {
+            const url = new URL(this.endpoint, window.location.origin);
+            if (this.search.trim()) url.searchParams.set('q', this.search.trim());
+            const response = await fetch(url, { headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' });
+            if (!response.ok) throw new Error('دریافت مسیرهای عمومی ناموفق بود.');
+            const payload = await response.json();
+            this.routes = Array.isArray(payload.data) ? payload.data : [];
+        } catch (error) {
+            window.dispatchEvent(new CustomEvent('admin:toast', { detail: { type: 'error', message: error.message } }));
+        } finally {
+            this.loading = false;
+        }
+    },
+    choose(url) {
+        const input = this.$root.querySelector('#canonical_url');
+        if (input) {
+            input.value = url;
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        this.open = false;
+    },
+});
+
+
 window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName = '') => ({
     endpoint,
     pickerOpen: false,
