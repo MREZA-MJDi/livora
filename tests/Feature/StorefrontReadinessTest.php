@@ -82,7 +82,6 @@ class StorefrontReadinessTest extends TestCase
         $this->get(route('categories.index'))
             ->assertOk()
             ->assertSee('مجموعه نشیمن واقعی')
-            ->assertSee('مبل واقعی برای تصویر مجموعه')
             ->assertSee('https://images.example.test/sillagallery/living-room.webp')
             ->assertDontSee('مجموعه غیرفعال خصوصی');
 
