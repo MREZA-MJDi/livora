@@ -89,9 +89,21 @@ class PaymentService
                 ->get();
 
             foreach ($staleAttempts as $staleAttempt) {
+                $metadata = $staleAttempt->metadata ?? [];
+
+                // Unknown provider outcomes must never expire automatically:
+                // a remote payment session may exist even when our request
+                // timed out. Only a confirmed/reconciled outcome can release it.
+                if (
+                    ! empty($metadata['initiation_pending'])
+                    || ! empty($metadata['verification_pending'])
+                ) {
+                    continue;
+                }
+
                 $staleAttempt->update([
                     'status' => 'failed',
-                    'metadata' => array_merge($staleAttempt->metadata ?? [], [
+                    'metadata' => array_merge($metadata, [
                         'expired_before_retry' => true,
                         'expired_at' => now()->toISOString(),
                     ]),
