@@ -40,7 +40,7 @@ php artisan test
 ```
 
 ## Production readiness
-See [docs/DEPLOY-SILASHOP.md](docs/DEPLOY-SILASHOP.md) for the isolated VPS layout, versioned release and rollback procedure, DNS/SSL/CDN setup, and first-release smoke checks. See [docs/PRODUCTION-READINESS.md](docs/PRODUCTION-READINESS.md) for security settings, historical inventory reconciliation, rollback constraints, and the payment-provider release gate.
+See [docs/DEPLOY-SILLASHOP.md](docs/DEPLOY-SILASHOP.md) for the isolated VPS layout, versioned release and rollback procedure, DNS/SSL/CDN setup, and first-release smoke checks. See [docs/PRODUCTION-READINESS.md](docs/PRODUCTION-READINESS.md) for security settings, historical inventory reconciliation, rollback constraints, and the payment-provider release gate.
 
 ## Payments and data safety
 Use gateway sandbox credentials for development. Never store secret keys in source control, and never claim that a payment succeeded based only on a browser redirect; payment status must be confirmed by the application's verified gateway flow. Review migrations and seeders before using them with non-disposable data.
