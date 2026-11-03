@@ -106,7 +106,7 @@ Route::prefix('cart')
         Route::post(
             '/{product}/add',
             [CartController::class, 'add']
-        )->name('add');
+        )->middleware('throttle:30,1')->name('add');
 
         Route::patch(
             '/item/{item}',
@@ -232,7 +232,7 @@ Route::middleware(['auth', 'customer'])->group(function () {
             Route::post(
                 '/',
                 [CheckoutController::class, 'placeOrder']
-            )->name('place');
+            )->middleware('throttle:5,1')->name('place');
 
             Route::get(
                 '/payment/{order}',
