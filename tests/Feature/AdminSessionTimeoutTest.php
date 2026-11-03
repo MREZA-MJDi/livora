@@ -63,7 +63,7 @@ class AdminSessionTimeoutTest extends TestCase
 
         $this->post(route('admin.session.heartbeat'))
             ->assertRedirect(route('login'))
-            ->assertSessionHas('warning', fn (string $message) => str_contains($message, '۱۵'));
+            ->assertSessionHas('warning', fn (string $message) => str_contains($message, '15'));
 
         $this->assertGuest();
     }
