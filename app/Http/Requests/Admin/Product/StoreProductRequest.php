@@ -189,6 +189,8 @@ class StoreProductRequest extends FormRequest
                 'string',
             ],
 
+            'media_id' => ['nullable', 'integer', 'exists:media,id'],
+
             'image' => [
                 'nullable',
                 'image',
