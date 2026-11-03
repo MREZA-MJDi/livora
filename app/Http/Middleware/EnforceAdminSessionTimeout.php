@@ -1,11 +1,11 @@
 <?php
 
-namespace App\\Http\\Middleware;
+namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\\Http\\Request;
-use Illuminate\\Support\\Facades\\Auth;
-use Symfony\\Component\\HttpFoundation\\Response;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 
 final class EnforceAdminSessionTimeout
 {
@@ -41,7 +41,7 @@ final class EnforceAdminSessionTimeout
 
             return redirect()
                 ->guest(route('login'))
-                ->with('warning', 'برای حفظ امنیت، نشست مدیریت پس از ۳۰ دقیقه عدم فعالیت پایان یافت. دوباره وارد شوید.');
+                ->with('warning', "برای حفظ امنیت، نشست مدیریت پس از {$timeoutMinutes} دقیقه عدم فعالیت پایان یافت. دوباره وارد شوید.");
         }
 
         $request->session()->put(self::LAST_ACTIVITY_KEY, $now);
