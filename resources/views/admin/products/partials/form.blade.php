@@ -52,7 +52,7 @@
         @endphp
 
         {{-- Product Image --}}
-        <div class="admin-card p-6">
+        <div class="admin-card p-6" x-data="mediaPicker('{{ route('admin.media.picker') }}', @js($primaryImage?->media_id), @js($productImageUrl), @js($primaryImage?->media?->original_name ?? $primaryImage?->alt ?? ''))">
 
             <div class="mb-6">
                 <h3 class="text-base font-bold text-[var(--admin-text)]">
