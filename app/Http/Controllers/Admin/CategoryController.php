@@ -101,7 +101,10 @@ class CategoryController extends Controller
         $media = $request->hasFile('image')
             ? MediaLibrary::store($request->file('image'), (int) $request->user()->id, 'categories', $data['image_alt'] ?? null)
             : (array_key_exists('media_id', $data) ? MediaLibrary::image($data['media_id']) : null);
-        if ($request->hasFile('image') || ! empty($data['media_id'])) {
+        if ($request->boolean('remove_image')) {
+            $data['image'] = null;
+            $data['media_id'] = null;
+        } elseif ($request->hasFile('image') || ! empty($data['media_id'])) {
             $data['media_id'] = $media?->id;
             $data['image'] = $media?->path;
         } else {
