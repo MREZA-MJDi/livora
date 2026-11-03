@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\SeoSetting;
+use App\Models\Category;
+use App\Models\Product;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -14,6 +17,44 @@ class SeoController extends Controller
     public function edit(): View
     {
         return view('admin.seo.edit', ['settings' => SeoSetting::current()]);
+    }
+
+
+    public function publicRoutes(Request $request): JsonResponse
+    {
+        $term = trim((string) $request->query('q', ''));
+        $routes = collect([
+            ['label' => 'صفحه اصلی', 'url' => route('home'), 'kind' => 'صفحه ثابت'],
+            ['label' => 'فروشگاه', 'url' => route('shop.index'), 'kind' => 'صفحه ثابت'],
+            ['label' => 'فهرست دسته‌بندی‌ها', 'url' => route('categories.index'), 'kind' => 'صفحه ثابت'],
+            ['label' => 'وبلاگ', 'url' => route('blog.index'), 'kind' => 'صفحه ثابت'],
+            ['label' => 'درباره ما', 'url' => route('about'), 'kind' => 'صفحه ثابت'],
+            ['label' => 'قوانین و شرایط', 'url' => route('terms'), 'kind' => 'صفحه ثابت'],
+            ['label' => 'تماس با ما', 'url' => route('contact'), 'kind' => 'صفحه ثابت'],
+        ]);
+
+        $products = Product::query()->active()
+            ->whereHas('category', fn ($query) => $query->where('is_active', true))
+            ->when($term !== '', fn ($query) => $query->where('name', 'like', "%{$term}%")->orWhere('slug', 'like', "%{$term}%"))
+            ->orderBy('name')->limit(40)->get(['name', 'slug']);
+
+        $categories = Category::query()->active()
+            ->when($term !== '', fn ($query) => $query->where('name', 'like', "%{$term}%")->orWhere('slug', 'like', "%{$term}%"))
+            ->orderBy('name')->limit(40)->get(['name', 'slug']);
+
+        foreach ($categories as $category) {
+            $routes->push(['label' => 'دسته‌بندی: '.$category->name, 'url' => route('categories.show', $category->slug), 'kind' => 'دسته‌بندی']);
+        }
+        foreach ($products as $product) {
+            $routes->push(['label' => 'محصول: '.$product->name, 'url' => route('product.show', $product->slug), 'kind' => 'محصول']);
+        }
+
+        if ($term !== '') {
+            $routes = $routes->filter(fn ($item) => str_contains(mb_strtolower($item['label']), mb_strtolower($term))
+                || str_contains(mb_strtolower($item['url']), mb_strtolower($term)));
+        }
+
+        return response()->json(['data' => $routes->values()->take(100)]);
     }
 
     public function update(Request $request): RedirectResponse
