@@ -1417,3 +1417,183 @@ body {
     opacity: 1 !important;
     transition: none;
 }
+
+
+/* =========================================================
+   CATEGORY INDEX — CONSISTENT RESPONSIVE COLLECTION CARDS
+   ========================================================= */
+.sg-category-grid--index {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+    gap: clamp(1rem, 2vw, 1.5rem);
+}
+
+.sg-category-index-tile {
+    display: block;
+    min-width: 0;
+    height: 100%;
+    overflow: hidden;
+    border: 1px solid var(--sg-border);
+    border-radius: 1.5rem;
+    background: var(--sg-white);
+    isolation: isolate;
+}
+
+.sg-category-index-tile__media {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--sg-surface);
+}
+
+.sg-category-index-tile__media > img {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: transform 650ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.sg-category-index-tile:hover .sg-category-index-tile__media > img {
+    transform: scale(1.045);
+}
+
+.sg-category-index-tile__placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--sg-surface);
+}
+
+.sg-category-index-tile__shade {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgb(0 0 0 / .24) 0%, transparent 34%, rgb(0 0 0 / .72) 100%);
+    pointer-events: none;
+}
+
+.sg-category-index-tile__top {
+    position: absolute;
+    inset: 1rem 1rem auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+}
+
+.sg-category-index-tile__eyebrow,
+.sg-category-index-tile__count {
+    display: inline-flex;
+    min-height: 2rem;
+    align-items: center;
+    border: 1px solid rgb(255 255 255 / .24);
+    border-radius: 999px;
+    background: rgb(20 20 20 / .28);
+    padding: .35rem .7rem;
+    color: #fff;
+    font-size: .625rem;
+    line-height: 1.4;
+    backdrop-filter: blur(12px);
+}
+
+.sg-category-index-tile__eyebrow {
+    letter-spacing: .12em;
+}
+
+.sg-category-index-tile__count {
+    white-space: nowrap;
+}
+
+.sg-category-index-tile__content {
+    position: absolute;
+    inset: auto 0 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.125rem;
+    color: #fff;
+}
+
+.sg-category-index-tile__content h3 {
+    overflow: hidden;
+    color: #fff;
+    font-size: clamp(1.05rem, 1.7vw, 1.35rem);
+    font-weight: 650;
+    line-height: 1.5;
+    text-overflow: ellipsis;
+}
+
+.sg-category-index-tile__description {
+    display: -webkit-box;
+    max-width: 34rem;
+    overflow: hidden;
+    margin-top: .35rem;
+    color: rgb(255 255 255 / .78);
+    font-size: .75rem;
+    line-height: 1.8;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.sg-category-index-tile__arrow {
+    display: inline-flex;
+    width: 2.75rem;
+    height: 2.75rem;
+    flex: 0 0 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgb(255 255 255 / .3);
+    border-radius: 999px;
+    background: rgb(255 255 255 / .12);
+    color: #fff;
+    font-size: 1.15rem;
+    transition: background-color 180ms ease, color 180ms ease, transform 180ms ease;
+    backdrop-filter: blur(12px);
+}
+
+.sg-category-index-tile:hover .sg-category-index-tile__arrow {
+    transform: translateX(-3px);
+    background: #fff;
+    color: var(--sg-ink);
+}
+
+@media (min-width: 640px) {
+    .sg-category-grid--index {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .sg-category-index-tile {
+        border-radius: 1.75rem;
+    }
+
+    .sg-category-index-tile__content {
+        padding: 1.35rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .sg-category-grid--index {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1.5rem;
+    }
+
+    .sg-category-index-tile__media {
+        aspect-ratio: 5 / 4;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sg-category-index-tile__media > img,
+    .sg-category-index-tile__arrow {
+        transition: none;
+    }
+}
