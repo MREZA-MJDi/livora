@@ -133,6 +133,7 @@
                 <div class="min-w-0 flex-1">
                     <p class="truncate text-sm font-semibold" x-text="selectedMedia?.name"></p>
                     <p class="text-xs text-[var(--admin-muted)]">از کتابخانه رسانه انتخاب شده</p>
+                    <button type="button" class="admin-btn admin-btn-secondary mt-2" @click="cropSelected()">برش مستقل برای تصویر اصلی</button>
                 </div>
                 <button type="button" class="admin-btn admin-btn-secondary" @click="clearSelection()">لغو انتخاب</button>
             </div>
