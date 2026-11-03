@@ -347,7 +347,8 @@ class SeoMetadataTest extends TestCase
         $this->assertDatabaseHas('media', ['id' => $sourceMedia->id, 'path' => $sourcePath]);
         $this->assertDatabaseHas('media', ['id' => $response->json('id'), 'alt' => 'برش مستقل تصویر Open Graph']);
         Storage::disk('public')->assertExists($sourcePath);
-        Storage::disk('public')->assertExists('media/crops/'.$response->json('name'));
+        $croppedMedia = Media::query()->findOrFail($response->json('id'));
+        Storage::disk('public')->assertExists($croppedMedia->path);
     }
 
 
