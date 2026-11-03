@@ -12,6 +12,7 @@
     <input type="hidden" name="{{ $mediaPickerRemoveName }}" value="0">
     <div class="flex flex-wrap items-center gap-2">
         <button type="button" class="admin-btn admin-btn-secondary" @click="openPicker()">انتخاب از کتابخانه رسانه</button>
+        <button type="button" x-show="selectedMedia" x-cloak class="admin-btn admin-btn-secondary" @click="cropSelected()">برش مستقل برای این محل استفاده</button>
         <span class="text-xs text-[var(--admin-muted)]" x-text="selectedMedia ? 'تصویر کتابخانه انتخاب شده' : 'تصویر جدید آپلود کنید یا از کتابخانه انتخاب کنید'"></span>
         <button type="button" x-show="selectedMedia" @click="clearSelection()" class="text-xs text-rose-600">حذف تصویر فعلی از این بخش</button>
     </div>
