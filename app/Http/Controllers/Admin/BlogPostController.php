@@ -93,10 +93,11 @@ class BlogPostController extends Controller
             : (filled($request->input('media_id')) ? MediaLibrary::image($request->input('media_id')) : null);
         $newImage = $newMedia?->path;
 
-        try {
-            DB::transaction(function () use ($validated, $blog, $newImage, $newMedia): void {
+        $removeFeaturedImage = $request->boolean('remove_featured_image');
+
+        DB::transaction(function () use ($validated, $blog, $newImage, $newMedia, $removeFeaturedImage): void {
                 $validated['body'] = HtmlSanitizer::sanitize($validated['body']);
-                if ($request->boolean('remove_featured_image')) {
+                if ($removeFeaturedImage) {
                     $validated['featured_image'] = null;
                     $validated['media_id'] = null;
                 } elseif ($newImage) {
