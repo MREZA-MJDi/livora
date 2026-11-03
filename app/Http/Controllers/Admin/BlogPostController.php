@@ -87,7 +87,6 @@ class BlogPostController extends Controller
     public function update(Request $request, BlogPost $blog): RedirectResponse
     {
         $validated = $this->validatedData($request, $blog);
-        $oldImage = $blog->featured_image;
         $newMedia = $request->hasFile('featured_image')
             ? MediaLibrary::store($request->file('featured_image'), (int) $request->user()->id, 'blog', $request->input('featured_image_alt'))
             : (filled($request->input('media_id')) ? MediaLibrary::image($request->input('media_id')) : null);
@@ -114,11 +113,6 @@ class BlogPostController extends Controller
                 $blog->update($validated);
                 $blog->tags()->sync($tags);
             });
-        } catch (\Throwable $exception) {
-            throw $exception;
-        }
-
-
         return redirect()->route('admin.blog.edit', $blog)->with('success', 'مقاله بروزرسانی شد.');
     }
 
