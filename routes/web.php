@@ -521,6 +521,8 @@ Route::middleware(['auth', 'admin'])
             [MediaController::class, 'picker']
         )->middleware('throttle:60,1')->name('media.picker');
 
+        Route::post('/media/crop', [MediaController::class, 'crop'])->middleware('throttle:30,1')->name('media.crop');
+
         Route::get(
             '/media/create',
             [MediaController::class, 'create']
