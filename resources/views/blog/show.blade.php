@@ -15,7 +15,7 @@
         '@context' => 'https://schema.org',
         '@type' => 'BlogPosting',
         'headline' => $post->meta_title ?: $post->title,
-        'description' => $post->meta_description ?: ($post->excerpt ?: \\Illuminate\\Support\\Str::limit(strip_tags($post->body), 300)),
+        'description' => $post->meta_description ?: ($post->excerpt ?: \Illuminate\Support\Str::limit(strip_tags($post->body), 300)),
         'mainEntityOfPage' => route('blog.show', $post->slug),
         'datePublished' => $post->published_at?->toAtomString(),
         'dateModified' => $post->updated_at?->toAtomString(),
