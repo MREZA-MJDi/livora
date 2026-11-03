@@ -207,6 +207,8 @@ class UpdateProductRequest extends FormRequest
             ],
 
             'banner_image_alt' => ['nullable', 'string', 'max:255'],
+            'remove_primary_image' => ['nullable', 'boolean'],
+            'remove_banner_image' => ['nullable', 'boolean'],
 
             'price' => [
                 'required',
