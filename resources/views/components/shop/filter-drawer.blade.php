@@ -39,7 +39,7 @@
         x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="translate-x-0"
         x-transition:leave-end="translate-x-full"
-        class="absolute right-0 top-0 flex h-full w-[88%] max-w-md flex-col bg-[var(--sg-cream)] shadow-2xl"
+        class="absolute right-0 top-0 flex h-full w-[90%] max-w-sm flex-col bg-[var(--sg-cream)] shadow-2xl"
     >
 
         {{-- =====================================================
@@ -47,7 +47,7 @@
         ====================================================== --}}
 
         <div
-            class="flex h-[76px] shrink-0 items-center justify-between border-b border-[var(--sg-border)] bg-[var(--sg-white)] px-5"
+            class="flex h-[64px] shrink-0 items-center justify-between border-b border-[var(--sg-border)] bg-[var(--sg-white)] px-5"
         >
 
             <div>
@@ -99,12 +99,13 @@
             action="{{ route('shop.index') }}"
             class="flex min-h-0 flex-1 flex-col"
         >
+            <input type="hidden" name="sort" value="{{ request('sort', 'latest') }}">
 
             {{-- =================================================
                  SCROLL AREA
             ================================================== --}}
 
-            <div class="min-h-0 flex-1 overflow-y-auto px-5 py-6">
+            <div class="min-h-0 flex-1 overflow-y-auto px-4 py-4">
 
                 <x-shop.filters
                     mobile
@@ -120,7 +121,7 @@
             ================================================== --}}
 
             <div
-                class="shrink-0 border-t border-[var(--sg-border)] bg-[var(--sg-white)] p-5"
+                class="shrink-0 border-t border-[var(--sg-border)] bg-[var(--sg-white)] p-4"
             >
 
                 <div class="grid grid-cols-2 gap-3">
