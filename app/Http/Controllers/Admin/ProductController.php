@@ -66,7 +66,9 @@ class ProductController extends Controller
                 $product = Product::create($data);
                 $product->relatedProducts()->sync(array_values(array_diff($relatedProductIds, [$product->id])));
 
-                if ($bannerMedia) {
+                if ($request->boolean('remove_banner_image')) {
+                    $product->update(['banner_image' => null, 'banner_media_id' => null]);
+                } elseif ($bannerMedia) {
                     $product->update([
                         'banner_image' => $bannerMedia->path,
                         'banner_media_id' => $bannerMedia->id,
@@ -74,7 +76,12 @@ class ProductController extends Controller
                     ]);
                 }
 
-                if ($imageFile || $mediaId) {
+                if ($request->boolean('remove_primary_image') && $primaryImage) {
+                    $primaryImage->variants()->detach();
+                    $primaryImage->delete();
+                    $replacement = $product->images()->orderBy('sort_order')->orderBy('id')->first();
+                    $replacement?->update(['is_primary' => true]);
+                } elseif ($imageFile || $mediaId) {
                     $media = $imageFile
                         ? $this->registerUploadedMedia($request, $imageFile, $imagePath)
                         : Media::query()->whereKey($mediaId)->where('mime_type', 'like', 'image/%')->firstOrFail();
