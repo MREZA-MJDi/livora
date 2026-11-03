@@ -10,7 +10,7 @@ This checklist is deliberately conservative. A successful asset build or a green
 
 - Create a dedicated MySQL/MariaDB database and least-privilege application user. Back it up and rehearse a restore.
 - Configure production values outside source control: `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://sillashop.com`, a unique `APP_KEY`, database credentials, and the actual mail/queue settings. Keep the app URL, Nginx virtual host, TLS certificate, and DNS records aligned to this exact canonical host.
-- Set `SESSION_SECURE_COOKIE=true` behind HTTPS. Use `SESSION_DRIVER=database` or Redis with working persistence; do not use the local `array` driver in production.
+- Set `SESSION_SECURE_COOKIE=true` behind HTTPS. Use `SESSION_DRIVER=database` or Redis with working persistence; do not use the local `array` driver in production. Set `ADMIN_SESSION_TIMEOUT_MINUTES=30` for the server-enforced admin idle timeout; customer session lifetime remains controlled separately by `SESSION_LIFETIME`.
 - Configure writable `storage/` and `bootstrap/cache/` directories; ensure uploaded product/category images live on the intended persistent disk.
 - Set `ADMIN_NAME`, `ADMIN_EMAIL`, and a unique `ADMIN_PASSWORD` (at least 16 characters) only when bootstrapping a new administrator. Production seeding refuses weak defaults and does not reset an existing administrator's password.
 - Confirm shipment, refund, privacy, contact, product, price, stock, and installment terms with the customer. Remove demo/sample catalogue rows and images; production seeders no longer seed demo catalogue, customers, carts, orders, or payments.
