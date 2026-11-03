@@ -1,0 +1,68 @@
+/* SillaGallery shared storefront primitives. */
+.sg-container {
+    width: 100%;
+    max-width: var(--sg-container);
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 3vw, 2.5rem);
+}
+
+.sg-card {
+    background: var(--sg-white);
+    border: 1px solid var(--sg-border);
+    border-radius: var(--sg-radius-xl);
+    box-shadow: var(--sg-shadow-sm);
+    transition: transform var(--sg-duration), box-shadow var(--sg-duration), border-color var(--sg-duration);
+}
+
+.sg-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--sg-border-dark);
+    box-shadow: var(--sg-shadow-md);
+}
+
+.sg-image {
+    overflow: hidden;
+    background: var(--sg-surface);
+    border-radius: var(--sg-radius-xl);
+}
+
+.sg-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--sg-duration-slow) cubic-bezier(0.22, 1, 0.36, 1), opacity var(--sg-duration);
+}
+
+.sg-image:hover img {
+    transform: scale(1.04);
+}
+
+.sg-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 3rem;
+    padding-inline: 1.25rem;
+    border: 1px solid transparent;
+    border-radius: 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: transform var(--sg-duration-fast), background-color var(--sg-duration-fast), border-color var(--sg-duration-fast), color var(--sg-duration-fast), box-shadow var(--sg-duration-fast);
+    user-select: none;
+}
+
+.sg-button:hover { transform: translateY(-1px); }
+.sg-button:active { transform: translateY(0); }
+.sg-button-primary { background: var(--sg-ink); color: #fff; }
+.sg-button-primary:hover { background: var(--sg-accent); }
+.sg-button-secondary { background: var(--sg-white); color: var(--sg-ink); border-color: var(--sg-border); }
+.sg-button-secondary:hover { border-color: var(--sg-ink); background: var(--sg-surface); }
+
+@media (max-width: 639px) {
+    .sg-button { min-height: 2.875rem; padding-inline: 1rem; font-size: 0.8125rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sg-card, .sg-image img, .sg-button { transition-duration: 0.01ms; }
+}
