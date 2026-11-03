@@ -91,4 +91,24 @@ class Media extends Model
     {
         return $this->hasMany(ProductImage::class);
     }
+
+    public function categories(): HasMany
+    {
+        return $this->hasMany(Category::class);
+    }
+
+    public function blogPosts(): HasMany
+    {
+        return $this->hasMany(BlogPost::class);
+    }
+
+    public function contentPages(): HasMany
+    {
+        return $this->hasMany(ContentPage::class);
+    }
+
+    public function shopBannerSettings(): HasMany
+    {
+        return $this->hasMany(ShopBannerSetting::class);
+    }
 }
