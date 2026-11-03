@@ -669,11 +669,20 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
             ->andThrow(new \RuntimeException('Connection timed out after request dispatch.'));
 
         $manager = \Mockery::mock(PaymentManager::class);
-        $manager->shouldReceive('driver')->once()->with('digipay')->andReturn($gateway);
+        $manager->shouldReceive('driver')->twice()->with('digipay')->andReturn($gateway);
         $this->instance(PaymentManager::class, $manager);
 
         $this->actingAs($customer)
             ->from(route('checkout.payment', $order))
+            ->post(route('checkout.payment.installment', $order), ['gateway' => 'digipay'])
+            ->assertRedirect(route('checkout.payment', $order))
+            ->assertSessionHas('error');
+
+        // An unresolved attempt must not become retryable merely because the
+        // local 20-minute stale-attempt window elapsed.
+        $this->travel(21)->minutes();
+
+        $this->from(route('checkout.payment', $order))
             ->post(route('checkout.payment.installment', $order), ['gateway' => 'digipay'])
             ->assertRedirect(route('checkout.payment', $order))
             ->assertSessionHas('error');
