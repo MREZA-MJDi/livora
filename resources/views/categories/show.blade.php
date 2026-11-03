@@ -142,26 +142,55 @@
 
             <x-layout.container>
 
-                <form method="GET" action="{{ route('categories.show', $category->slug) }}" class="mb-8 rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-4 sm:p-5">
-                    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_180px_150px_150px_auto]">
-                        <input type="search" name="search" value="{{ request('search') }}" maxlength="150" placeholder="جستجو در این دسته..." class="w-full rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-surface)] px-4 py-3 text-sm outline-none focus:border-[var(--sg-ink)]">
-                        <select name="sort" class="rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-surface)] px-3 py-3 text-sm">
-                            <option value="latest" @selected(request('sort', 'latest') === 'latest')>جدیدترین</option>
-                            <option value="price_asc" @selected(request('sort') === 'price_asc')>ارزان‌ترین</option>
-                            <option value="price_desc" @selected(request('sort') === 'price_desc')>گران‌ترین</option>
-                            <option value="name_asc" @selected(request('sort') === 'name_asc')>نام محصول</option>
-                            <option value="oldest" @selected(request('sort') === 'oldest')>قدیمی‌ترین</option>
-                        </select>
-                        <input type="number" name="min_price" min="0" value="{{ request('min_price') }}" placeholder="حداقل قیمت" class="rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-surface)] px-3 py-3 text-sm">
-                        <input type="number" name="max_price" min="0" value="{{ request('max_price') }}" placeholder="حداکثر قیمت" class="rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-surface)] px-3 py-3 text-sm">
-                        <button type="submit" class="rounded-2xl bg-[var(--sg-ink)] px-5 py-3 text-sm font-medium text-white">اعمال فیلتر</button>
+                <form method="GET" action="{{ route('categories.show', $category->slug) }}" class="sg-category-filter mb-8">
+                    <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-[minmax(0,1.5fr)_minmax(10rem,1fr)_minmax(8rem,.8fr)_minmax(8rem,.8fr)_auto]">
+                        <label class="min-w-0">
+                            <span class="mb-2 block text-[11px] font-medium text-[var(--sg-stone)]">جستجو در این مجموعه</span>
+                            <input type="search" name="search" value="{{ request('search') }}" maxlength="150" placeholder="نام یا کد محصول..." class="sg-category-filter__input w-full" autocomplete="off">
+                        </label>
+                        <label class="min-w-0">
+                            <span class="mb-2 block text-[11px] font-medium text-[var(--sg-stone)]">ترتیب نمایش</span>
+                            <select name="sort" class="sg-category-filter__input w-full">
+                                <option value="latest" @selected(request('sort', 'latest') === 'latest')>جدیدترین</option>
+                                <option value="price_asc" @selected(request('sort') === 'price_asc')>ارزان‌ترین</option>
+                                <option value="price_desc" @selected(request('sort') === 'price_desc')>گران‌ترین</option>
+                                <option value="name_asc" @selected(request('sort') === 'name_asc')>نام محصول</option>
+                                <option value="oldest" @selected(request('sort') === 'oldest')>قدیمی‌ترین</option>
+                            </select>
+                        </label>
+                        <label class="min-w-0">
+                            <span class="mb-2 block text-[11px] font-medium text-[var(--sg-stone)]">حداقل قیمت</span>
+                            <input type="number" name="min_price" min="0" step="1" value="{{ request('min_price') }}" placeholder="از" class="sg-category-filter__input w-full" inputmode="numeric">
+                        </label>
+                        <label class="min-w-0">
+                            <span class="mb-2 block text-[11px] font-medium text-[var(--sg-stone)]">حداکثر قیمت</span>
+                            <input type="number" name="max_price" min="0" step="1" value="{{ request('max_price') }}" placeholder="تا" class="sg-category-filter__input w-full" inputmode="numeric">
+                        </label>
+                        <div class="flex items-end">
+                            <button type="submit" class="sg-button sg-button-primary w-full sm:col-span-2 xl:col-span-1">
+                                اعمال فیلتر
+                            </button>
+                        </div>
                     </div>
-                    <div class="mt-4 flex flex-wrap gap-4 text-xs text-[var(--sg-stone)]">
-                        <label class="inline-flex items-center gap-2"><input type="checkbox" name="in_stock" value="1" @checked(request()->boolean('in_stock'))> فقط موجودها</label>
-                        <label class="inline-flex items-center gap-2"><input type="checkbox" name="installment" value="1" @checked(request()->boolean('installment'))> خرید اقساطی</label>
-                        <label class="inline-flex items-center gap-2"><input type="checkbox" name="featured" value="1" @checked(request()->boolean('featured'))> محصولات ویژه</label>
-                        <label class="inline-flex items-center gap-2"><input type="checkbox" name="new" value="1" @checked(request()->boolean('new'))> محصولات جدید</label>
-                        <a href="{{ route('categories.show', $category->slug) }}" class="font-medium text-[var(--sg-accent)]">پاک کردن فیلترها</a>
+
+                    <div class="mt-4 flex flex-wrap items-center gap-x-5 gap-y-3 border-t border-[var(--sg-border)] pt-4">
+                        <label class="inline-flex cursor-pointer items-center gap-2 text-xs text-[var(--sg-stone)]">
+                            <input type="checkbox" name="in_stock" value="1" @checked(request()->boolean('in_stock')) class="accent-[var(--sg-accent)]">
+                            فقط موجودها
+                        </label>
+                        <label class="inline-flex cursor-pointer items-center gap-2 text-xs text-[var(--sg-stone)]">
+                            <input type="checkbox" name="installment" value="1" @checked(request()->boolean('installment')) class="accent-[var(--sg-accent)]">
+                            خرید اقساطی
+                        </label>
+                        <label class="inline-flex cursor-pointer items-center gap-2 text-xs text-[var(--sg-stone)]">
+                            <input type="checkbox" name="featured" value="1" @checked(request()->boolean('featured')) class="accent-[var(--sg-accent)]">
+                            محصولات ویژه
+                        </label>
+                        <label class="inline-flex cursor-pointer items-center gap-2 text-xs text-[var(--sg-stone)]">
+                            <input type="checkbox" name="new" value="1" @checked(request()->boolean('new')) class="accent-[var(--sg-accent)]">
+                            محصولات جدید
+                        </label>
+                        <a href="{{ route('categories.show', $category->slug) }}" class="mr-auto text-xs font-semibold text-[var(--sg-accent)] hover:text-[var(--sg-ink)]">حذف همه فیلترها</a>
                     </div>
                 </form>
 
