@@ -3,6 +3,60 @@ import Alpine from 'alpinejs';
 
 window.Alpine = Alpine;
 
+window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName = '') => ({
+    endpoint,
+    pickerOpen: false,
+    loading: false,
+    search: '',
+    items: [],
+    page: 1,
+    lastPage: 1,
+    total: 0,
+    selectedMedia: initialId && initialUrl
+        ? { id: Number(initialId), url: initialUrl, name: initialName || 'تصویر فعلی', alt: initialName || '' }
+        : null,
+    async openPicker() {
+        this.pickerOpen = true;
+        await this.loadMedia(1);
+    },
+    async loadMedia(page = 1) {
+        this.loading = true;
+        try {
+            const url = new URL(this.endpoint, window.location.origin);
+            url.searchParams.set('page', String(page));
+            if (this.search.trim()) url.searchParams.set('q', this.search.trim());
+            const response = await fetch(url, {
+                headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                credentials: 'same-origin',
+            });
+            if (!response.ok) throw new Error('بارگذاری کتابخانه رسانه ناموفق بود.');
+            const payload = await response.json();
+            this.items = Array.isArray(payload.data) ? payload.data : [];
+            this.page = payload.meta?.current_page || 1;
+            this.lastPage = payload.meta?.last_page || 1;
+            this.total = payload.meta?.total || 0;
+        } catch (error) {
+            window.dispatchEvent(new CustomEvent('admin:toast', { detail: { type: 'error', message: error.message } }));
+        } finally {
+            this.loading = false;
+        }
+    },
+    selectMedia(item) {
+        this.selectedMedia = item;
+        const fileInput = this.$root.querySelector('input[type="file"][name="image"]');
+        if (fileInput) fileInput.value = '';
+        const preview = this.$root.querySelector('#product-image-preview');
+        const placeholder = this.$root.querySelector('#product-image-placeholder');
+        if (preview) { preview.src = item.url; preview.classList.remove('hidden'); }
+        if (placeholder) placeholder.classList.add('hidden');
+        this.pickerOpen = false;
+    },
+    clearSelection() {
+        this.selectedMedia = null;
+    },
+});
+
+
 const jalaliMonthNames = [
     'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
     'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند',
