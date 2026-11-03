@@ -35,6 +35,7 @@
         x-show="sidebarOpen"
         x-cloak
         x-transition.opacity
+        data-admin-sidebar-backdrop
         class="fixed inset-0 z-40 bg-black/35 backdrop-blur-sm lg:hidden"
         @click="sidebarOpen = false"
     ></div>
