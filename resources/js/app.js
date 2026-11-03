@@ -681,6 +681,131 @@ if (/^\/admin(?:\/|$)/.test(window.location.pathname) && !window.__sgAdminSessio
 }
 
 
+
+// Accessible two-step province/city picker used by checkout.
+window.iranShippingPicker = (regions, initialProvince = '', initialCity = '', initialCityIsOther = false) => ({
+    regions: Array.isArray(regions) ? regions : [],
+    province: initialProvince || '',
+    city: initialCity || '',
+    cityIsOther: Boolean(initialCityIsOther),
+    otherCity: initialCity || '',
+    modalOpen: false,
+    step: 'province',
+    search: '',
+
+    normalizeSearch(value) {
+        return String(value || '')
+            .replace(/[يى]/g, 'ی')
+            .replace(/ك/g, 'ک')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .toLocaleLowerCase('fa');
+    },
+
+    get filteredProvinces() {
+        const query = this.normalizeSearch(this.search);
+        return this.regions.filter((region) => {
+            return !query || this.normalizeSearch(region.name).includes(query);
+        });
+    },
+
+    get selectedProvince() {
+        return this.regions.find((region) => region.name === this.province) || null;
+    },
+
+    get filteredCities() {
+        const cities = this.selectedProvince?.cities || [];
+        const query = this.normalizeSearch(this.search);
+        return cities.filter((city) => !query || this.normalizeSearch(city).includes(query));
+    },
+
+    get stepTitle() {
+        if (this.step === 'province') return 'استان محل تحویل را انتخاب کنید';
+        if (this.step === 'city') return 'شهر محل تحویل را انتخاب کنید';
+        return 'نام شهر را وارد کنید';
+    },
+
+    init() {
+        if (!this.province || !this.city) return;
+
+        const cities = this.selectedProvince?.cities || [];
+        this.cityIsOther = Boolean(initialCityIsOther) || !cities.includes(this.city);
+        if (this.cityIsOther) this.otherCity = this.city;
+    },
+
+    openProvinceModal() {
+        this.step = 'province';
+        this.search = '';
+        this.modalOpen = true;
+        this.$nextTick?.(() => this.$refs?.locationSearch?.focus());
+    },
+
+    openCityModal() {
+        if (!this.selectedProvince) {
+            this.openProvinceModal();
+            return;
+        }
+
+        this.step = 'city';
+        this.search = '';
+        this.modalOpen = true;
+        this.$nextTick?.(() => this.$refs?.locationSearch?.focus());
+    },
+
+    selectProvince(region) {
+        if (!region || !region.name) return;
+
+        if (this.province !== region.name) {
+            this.city = '';
+            this.cityIsOther = false;
+            this.otherCity = '';
+        }
+
+        this.province = region.name;
+        this.step = 'city';
+        this.search = '';
+        this.$nextTick?.(() => this.$refs?.locationSearch?.focus());
+    },
+
+    selectCity(city) {
+        if (!city) return;
+
+        this.city = city;
+        this.otherCity = '';
+        this.cityIsOther = false;
+        this.modalOpen = false;
+        this.search = '';
+    },
+
+    chooseOtherCity() {
+        this.step = 'other';
+        this.search = '';
+        this.otherCity = '';
+        this.$nextTick?.(() => this.$refs?.otherCityInput?.focus());
+    },
+
+    confirmOtherCity() {
+        const city = String(this.otherCity || '').trim().replace(/\s+/g, ' ');
+        if (city.length < 2 || city.length > 100) return;
+
+        this.city = city;
+        this.cityIsOther = true;
+        this.modalOpen = false;
+        this.search = '';
+    },
+
+    backToProvinces() {
+        this.step = 'province';
+        this.search = '';
+    },
+
+    closeModal() {
+        this.modalOpen = false;
+        this.search = '';
+    },
+});
+
+
 Alpine.start();
 
  
