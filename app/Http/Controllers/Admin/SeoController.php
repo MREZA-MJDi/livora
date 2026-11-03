@@ -8,6 +8,7 @@ use App\Models\BlogPost;
 use App\Models\Category;
 use App\Models\ContentPage;
 use App\Models\Product;
+use App\Support\MediaLibrary;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
