@@ -1,16 +1,16 @@
-# SilaGallery / Livora production deployment — sillashop.com
+# SilaGallery / Livora production deployment — silashop.com
 
 This deployment is intentionally isolated from farzindev and farajihome.com.
 It uses its own release tree, environment file, database, writable storage, PHP-FPM pool/socket (where provisioned), and Nginx server block. The only shared resources are the VPS operating system and Nginx service.
 
 ## 1. DNS at Parspack
 
-The domain is delegated to the Parspack nameservers supplied in the CDN panel. In the DNS/CDN zone for sillashop.com, set the origin:
+The domain is delegated to the Parspack nameservers supplied in the CDN panel. In the DNS/CDN zone for silashop.com, set the origin:
 
 - Apex @: A → 45.149.79.155
-- www: CNAME → sillashop.com (or A → 45.149.79.155 if the panel does not support an apex CNAME/alias)
+- www: CNAME → silashop.com (or A → 45.149.79.155 if the panel does not support an apex CNAME/alias)
 - Do not add an AAAA record unless IPv6 is actually configured on this VPS.
-- If the CDN panel has a separate Origin field, set it to 45.149.79.155 and make sure the origin host header is sillashop.com.
+- If the CDN panel has a separate Origin field, set it to 45.149.79.155 and make sure the origin host header is silashop.com.
 
 Check that DNS has propagated before requesting the origin certificate. Do not alter the existing Farzin DNS zone or its Nginx block.
 
@@ -70,11 +70,17 @@ The normal APP .env uses livora_app (data access only). Use livora_migrator only
 
 The current production baseline is main. Merge the reviewed production-readiness PR before this step; do not deploy the audit branch directly.
 
-    RELEASE_ID=$(date +%Y%m%d%H%M%S)
-    RELEASE=/var/www/livora/releases/$RELEASE_ID
+    BUILD_ID=$(date -u +%Y%m%dT%H%M%SZ)
+    CHECKOUT=/var/www/livora/releases/.build-$BUILD_ID
 
     sudo -u livora git clone --depth 1 --single-branch --branch main \
-      https://github.com/MREZA-MJDi/livora.git "$RELEASE"
+      https://github.com/MREZA-MJDi/livora.git "$CHECKOUT"
+
+    COMMIT_SHA=$(sudo -u livora git -C "$CHECKOUT" rev-parse --short=12 HEAD)
+    RELEASE_ID="$BUILD_ID-$COMMIT_SHA"
+    RELEASE=/var/www/livora/releases/$RELEASE_ID
+    sudo -u livora mv "$CHECKOUT" "$RELEASE"
+    sudo -u livora bash -lc "printf '%s\\n' '$COMMIT_SHA' > '$RELEASE/REVISION'"
 
     sudo -u livora ln -s /var/www/livora/shared/.env "$RELEASE/.env"
     sudo -u livora ln -s /var/www/livora/shared/storage "$RELEASE/storage"
@@ -91,7 +97,7 @@ Set these values in /var/www/livora/shared/.env before generating the applicatio
     APP_NAME="SilaGallery"
     APP_ENV=production
     APP_DEBUG=false
-    APP_URL=https://sillashop.com
+    APP_URL=https://silashop.com
     APP_TIMEZONE=Asia/Tehran
     APP_LOCALE=fa
     APP_FALLBACK_LOCALE=fa
@@ -108,9 +114,11 @@ Set these values in /var/www/livora/shared/.env before generating the applicatio
     SESSION_SAME_SITE=lax
     CACHE_STORE=database
     QUEUE_CONNECTION=database
+    # Must exceed the Supervisor worker --timeout (90 seconds).
+    DB_QUEUE_RETRY_AFTER=120
     FILESYSTEM_DISK=public
 
-    # Keep empty while CDN serves the same sillashop.com host transparently.
+    # Keep empty while CDN serves the same silashop.com host transparently.
     ASSET_URL=
     PUBLIC_STORAGE_URL=
 
@@ -147,8 +155,8 @@ Make sure Laravel's writable storage directories remain group-writable by www-da
     sudo find /var/www/livora/shared/storage -type d -exec chmod 2775 {} \;
     sudo find /var/www/livora/shared/storage -type f -exec chmod 0664 {} \;
     sudo chown -R livora:www-data "$RELEASE/bootstrap/cache"
-    sudo find "$RELEASE/bootstrap/cache" -type d -exec chmod 2775 {} \\
-    sudo find "$RELEASE/bootstrap/cache" -type f -exec chmod 0664 {} \\
+    sudo find "$RELEASE/bootstrap/cache" -type d -exec chmod 2775 {} +
+    sudo find "$RELEASE/bootstrap/cache" -type f -exec chmod 0664 {} +
 
 ## 6. Atomically activate the release
 
@@ -167,14 +175,14 @@ Install and start the dedicated database queue worker after the current symlink 
 
 Enable Laravel's scheduler (safe even when no scheduled task is registered yet):
 
-    echo '* * * * * cd /var/www/livora/current && /usr/bin/php artisan schedule:run >> /dev/null 2>&1' | sudo tee /etc/cron.d/livora-scheduler
+    echo '* * * * * livora cd /var/www/livora/current && /usr/bin/php artisan schedule:run >> /dev/null 2>&1' | sudo tee /etc/cron.d/livora-scheduler
     sudo chmod 644 /etc/cron.d/livora-scheduler
 
 ## 7. Nginx and origin SSL
 
-Copy deploy/nginx/sillashop.com.conf to /etc/nginx/sites-available/sillashop.com. It points to the dedicated /run/php/php8.5-fpm-livora.sock pool, not the shared default PHP-FPM pool. Verify that socket exists, then enable only this new server block:
+Copy deploy/nginx/silashop.com.conf to /etc/nginx/sites-available/silashop.com. It points to the dedicated /run/php/php8.5-fpm-livora.sock pool, not the shared default PHP-FPM pool. Verify that socket exists, then enable only this new server block:
 
-    sudo ln -s /etc/nginx/sites-available/sillashop.com /etc/nginx/sites-enabled/sillashop.com
+    sudo ln -s /etc/nginx/sites-available/silashop.com /etc/nginx/sites-enabled/silashop.com
     sudo nginx -t
     sudo systemctl reload nginx
 
@@ -182,10 +190,10 @@ Check that the existing farajihome.com server block remains enabled and unchange
 
 After the A records resolve to 45.149.79.155, issue the origin certificate:
 
-    sudo certbot --nginx -d sillashop.com -d www.sillashop.com
+    sudo certbot --nginx -d silashop.com -d www.silashop.com
     sudo certbot renew --dry-run
 
-Certbot will add the HTTPS server block and HTTP-to-HTTPS redirect. Test both hostnames. Use the CDN's HTTPS mode Full/Strict (never Flexible) once the origin certificate is valid. Enable the CDN's edge certificate for both sillashop.com and www.sillashop.com.
+Certbot will add the HTTPS server block and HTTP-to-HTTPS redirect. Test both hostnames. Use the CDN's HTTPS mode Full/Strict (never Flexible) once the origin certificate is valid. Enable the CDN's edge certificate for both silashop.com and www.silashop.com.
 
 ## 8. CDN cache policy
 
@@ -205,8 +213,8 @@ Because the CDN is attached to the same domain via nameservers, leave ASSET_URL 
 
 Check in this order:
 
-1. curl -I http://sillashop.com then curl -I https://sillashop.com and the www hostname.
-2. https://sillashop.com/up returns HTTP 200.
+1. curl -I http://silashop.com then curl -I https://silashop.com and the www hostname.
+2. https://silashop.com/up returns HTTP 200.
 3. Home, shop, categories, product details, search, all shop filters, sorting, and pagination.
 4. Admin login, product/category create-edit, image upload, media library, customer/order lists.
 5. Cart as guest and customer, checkout validation, stock/variant checks, order ownership and payment callback route.
@@ -217,9 +225,9 @@ Do not enable online payment gateways until the actual provider sandbox flow is 
 
 ## 10. Routine release / rollback
 
-For each release, clone a new main checkout into a new releases/<timestamp>, link the same shared .env and storage, install/build, run additive migrations, cache, and atomically switch current. Do not overwrite the active release in place.
+For each release, clone the approved main commit into a new releases/<UTC timestamp>-<12-character commit SHA> directory. The release includes a REVISION file containing the short Git SHA. Link the same shared .env and storage, install/build, run additive migrations, cache, and atomically switch current. Never overwrite the active release in place; keep the previous known-good release for immediate code rollback.
 
-After each release, restart the worker on the new code with:
+After each release, gracefully signal the worker to finish its current job and restart on the new code, then reload the dedicated PHP-FPM pool (not restart the shared Nginx/PHP services):
 
     sudo -u livora php /var/www/livora/current/artisan queue:restart
     sudo systemctl reload php8.5-fpm
