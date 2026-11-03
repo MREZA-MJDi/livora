@@ -52,7 +52,7 @@
         @endphp
 
         {{-- Product Image --}}
-        <div class="admin-card p-6">
+        <div class="admin-card p-6" x-data="mediaPicker('{{ route('admin.media.picker') }}', @js($primaryImage?->media_id), @js($productImageUrl), @js($primaryImage?->media?->original_name ?? $primaryImage?->alt ?? ''))">
 
             <div class="mb-6">
                 <h3 class="text-base font-bold text-[var(--admin-text)]">
@@ -98,9 +98,17 @@
 
             </div>
 
-            <label for="image" class="admin-label">
-                {{ $editing ? 'تغییر تصویر' : 'انتخاب تصویر اصلی' }}
-            </label>
+            <input type="hidden" name="media_id" :value="selectedMedia?.id || ''">
+            <input type="hidden" name="remove_primary_image" value="0">
+
+            <div class="flex flex-wrap gap-3">
+                <button type="button" class="admin-btn admin-btn-secondary" @click="openPicker()">
+                    انتخاب از کتابخانه رسانه
+                </button>
+                <label for="image" class="admin-btn admin-btn-primary cursor-pointer">
+                    آپلود تصویر جدید
+                </label>
+            </div>
 
             <input
                 id="image"
@@ -108,14 +116,60 @@
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
                 data-crop-ratio="0.8"
-                class="admin-input p-2"
+                class="admin-input mt-3 p-2"
+                @change="clearSelection()"
             >
 
+            @if($editing && $productImageUrl)
+                <label class="mt-3 flex items-center gap-2 text-sm text-rose-700"><input type="checkbox" name="remove_primary_image" value="1" class="admin-checkbox"> حذف تصویر اصلی از این محصول</label>
+            @endif
+
             <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">
-                {{ $editing
-                    ? 'با انتخاب فایل جدید، همین تصویر اصلی جایگزین می‌شود؛ تصاویر دیگر و اتصال Variantها باقی می‌مانند.'
-                    : 'تصویر اصلی محصول را انتخاب کنید. حداکثر حجم ۱۰ مگابایت.' }}
+                انتخاب از کتابخانه، فایل را دوباره آپلود نمی‌کند. آپلود جدید، فایل اصلی مستقلی به کتابخانه اضافه می‌کند.
             </p>
+
+            <div x-show="selectedMedia" x-cloak class="mt-3 flex items-center gap-3 rounded-xl border border-[var(--admin-border)] p-3">
+                <img :src="selectedMedia?.url" :alt="selectedMedia?.alt || selectedMedia?.name" class="h-16 w-14 rounded-lg object-contain">
+                <div class="min-w-0 flex-1">
+                    <p class="truncate text-sm font-semibold" x-text="selectedMedia?.name"></p>
+                    <p class="text-xs text-[var(--admin-muted)]">از کتابخانه رسانه انتخاب شده</p>
+                    <button type="button" class="admin-btn admin-btn-secondary mt-2" @click="cropSelected()">برش مستقل برای تصویر اصلی</button>
+                </div>
+                <button type="button" class="admin-btn admin-btn-secondary" @click="clearSelection()">لغو انتخاب</button>
+            </div>
+
+            <div x-show="pickerOpen" x-cloak x-transition class="fixed inset-0 z-[300] flex items-center justify-center bg-black/60 p-3 sm:p-6" @keydown.escape.window="pickerOpen = false">
+                <section class="flex max-h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-[var(--admin-white)] shadow-2xl" role="dialog" aria-modal="true" aria-label="کتابخانه رسانه">
+                    <header class="flex items-center justify-between border-b border-[var(--admin-border)] p-4 sm:p-5">
+                        <div><h3 class="font-bold">کتابخانه رسانه</h3><p class="mt-1 text-xs text-[var(--admin-muted)]">تصویر موردنظر را جست‌وجو و انتخاب کنید.</p></div>
+                        <button type="button" class="admin-btn admin-btn-secondary" @click="pickerOpen = false">بستن</button>
+                    </header>
+                    <div class="border-b border-[var(--admin-border)] p-4">
+                        <input type="search" x-model="search" @input.debounce.300ms="loadMedia(1)" class="admin-input" placeholder="جست‌وجوی نام یا متن جایگزین تصویر">
+                    </div>
+                    <div class="min-h-0 flex-1 overflow-y-auto p-4">
+                        <p x-show="loading" class="py-8 text-center text-sm text-[var(--admin-muted)]">در حال دریافت تصاویر…</p>
+                        <p x-show="errorMessage" x-text="errorMessage" class="py-4 text-center text-sm text-[var(--admin-danger)]"></p>
+                        <p x-show="!loading && items.length === 0" class="py-8 text-center text-sm text-[var(--admin-muted)]">تصویری پیدا نشد. می‌توانید تصویر جدید آپلود کنید.</p>
+                        <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                            <template x-for="item in items" :key="item.id">
+                                <button type="button" @click="selectMedia(item)" class="overflow-hidden rounded-xl border p-2 text-right transition hover:border-[var(--admin-accent)]" :class="selectedMedia?.id === item.id ? 'border-[var(--admin-accent)] bg-[var(--admin-accent-soft)]' : 'border-[var(--admin-border)]'">
+                                    <img :src="item.url" :alt="item.alt || item.name" loading="lazy" class="aspect-[4/5] w-full rounded-lg bg-[var(--admin-surface)] object-contain">
+                                    <span class="mt-2 block truncate text-xs font-medium" x-text="item.name"></span>
+                                    <span class="block text-[10px] text-[var(--admin-muted)]" x-text="item.size"></span>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+                    <footer class="flex items-center justify-between border-t border-[var(--admin-border)] p-4">
+                        <span class="text-xs text-[var(--admin-muted)]" x-text="total + ' تصویر'"></span>
+                        <div class="flex gap-2">
+                            <button type="button" class="admin-btn admin-btn-secondary" :disabled="page <= 1 || loading" @click="loadMedia(page - 1)">قبلی</button>
+                            <button type="button" class="admin-btn admin-btn-secondary" :disabled="page >= lastPage || loading" @click="loadMedia(page + 1)">بعدی</button>
+                        </div>
+                    </footer>
+                </section>
+            </div>
 
             @error('image')
             <p class="mt-2 text-xs text-[var(--admin-danger)]">
@@ -146,6 +200,7 @@
 
             <div>
                 <label for="banner_image" class="admin-label">انتخاب یا جایگزینی بنر</label>
+                <div class="aspect-[12/5] overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]"><img id="product-banner-image-preview" src="{{ $product->banner_image ? \Illuminate\Support\Facades\Storage::disk('public')->url($product->banner_image) : '' }}" alt="{{ $product->banner_image_alt ?: $product->name }}" class="{{ $product->banner_image ? '' : 'hidden' }} h-full w-full object-contain"></div>
                 <input
                     id="banner_image"
                     name="banner_image"
@@ -154,7 +209,11 @@
                     data-crop-ratio="2.4"
                     class="admin-input p-2"
                 >
+                @include('admin.media.partials.picker', ['mediaPickerField' => 'banner_image', 'mediaPickerId' => old('banner_media_id', $product->banner_media_id ?? null), 'mediaPickerUrl' => $product->banner_image ? \Illuminate\Support\Facades\Storage::disk('public')->url($product->banner_image) : null, 'mediaPickerName' => $product->name, 'mediaPickerPreviewId' => 'product-banner-image-preview', 'mediaPickerInputName' => 'banner_media_id'])
                 <p class="admin-help">اندازه پیشنهادی ۱۹۲۰×۸۰۰ پیکسل؛ JPG، PNG یا WEBP تا ۱۰ مگابایت.</p>
+                @if($editing && $product->banner_image)
+                    <label class="mt-2 flex items-center gap-2 text-sm text-rose-700"><input type="checkbox" name="remove_banner_image" value="1" class="admin-checkbox"> حذف بنر فعلی از محصول</label>
+                @endif
                 @error('banner_image')<p class="admin-error">{{ $message }}</p>@enderror
             </div>
 
@@ -214,7 +273,7 @@
                                 value="{{ $category->id }}"
                                 @selected(old('category_id', $product->category_id ?? '') == $category->id)
                             >
-                            {{ $category->name }}
+                            {{ $category->name }}{{ $category->is_active ? '' : ' — غیرفعال و غیرقابل نمایش در فروشگاه' }}
                             </option>
                         @endforeach
                     </select>
@@ -1072,6 +1131,10 @@
                 </select>
 
 
+                <p class="admin-help mt-2">
+                    فقط محصول با وضعیت «فعال» و دسته‌بندی «فعال» در فروشگاه عمومی نمایش داده می‌شود. پیش‌نویس و محصول متصل به دسته‌بندی غیرفعال، در سایت قابل مشاهده نیست.
+                </p>
+
                 @error('status')
                 <p class="mt-2 text-xs text-[var(--admin-danger)]">
                     {{ $message }}
@@ -1212,7 +1275,34 @@
                 <ul class="mt-3 space-y-2">@foreach($seoAnalysis['checks'] as $check)<li class="flex items-start gap-2 text-xs"><span class="{{ $check['passed'] ? 'text-emerald-600' : 'text-amber-600' }}">{{ $check['passed'] ? '✓' : '•' }}</span><span><strong>{{ $check['label'] }}</strong><span class="block text-[var(--admin-muted)]">{{ $check['detail'] }}</span></span></li>@endforeach</ul>
             </div>
         @endif
-        <div><label class="admin-label" for="canonical_url">Canonical URL</label><input id="canonical_url" name="canonical_url" type="url" dir="ltr" class="admin-input" value="{{ old('canonical_url', $product->canonical_url ?? '') }}"></div>
+        <div x-data="seoRoutePicker('{{ route('admin.seo.public-routes') }}')">
+            <label class="admin-label" for="canonical_url">Canonical URL</label>
+            <input id="canonical_url" name="canonical_url" type="url" dir="ltr" class="admin-input" value="{{ old('canonical_url', $product->canonical_url ?? '') }}" placeholder="https://sillashop.com/product/example">
+            <div class="mt-2 flex flex-wrap items-center gap-2">
+                <button type="button" class="admin-btn admin-btn-secondary" @click="show()">انتخاب از صفحات واقعی سایت</button>
+                <p class="admin-help">اگر Canonical متفاوتی لازم نیست، این فیلد را خالی بگذارید تا آدرس اصلی محصول استفاده شود.</p>
+            </div>
+            @error('canonical_url')<p class="admin-error">{{ $message }}</p>@enderror
+            <div x-show="open" x-cloak class="fixed inset-0 z-[310] flex items-center justify-center bg-black/60 p-3 sm:p-6" @keydown.escape.window="open = false">
+                <section class="flex max-h-[85vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-[var(--admin-white)] shadow-2xl" role="dialog" aria-modal="true" aria-label="انتخاب صفحه عمومی">
+                    <header class="flex items-center justify-between border-b border-[var(--admin-border)] p-4"><div><h3 class="font-bold">صفحات قابل‌دسترسی فروشگاه</h3><p class="mt-1 text-xs text-[var(--admin-muted)]">فقط مسیرهای عمومی نمایش داده می‌شوند؛ مسیرهای مدیریت، ورود و پرداخت در این فهرست نیستند.</p></div><button type="button" class="admin-btn admin-btn-secondary" @click="open = false">بستن</button></header>
+                    <div class="p-4"><input type="search" class="admin-input" x-model="search" @input.debounce.300ms="load()" placeholder="جست‌وجوی نام صفحه، محصول یا دسته‌بندی"></div>
+                    <div class="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
+                        <p x-show="loading" class="py-6 text-center text-sm text-[var(--admin-muted)]">در حال بارگذاری…</p>
+                        <div class="space-y-2">
+                            <template x-for="item in routes" :key="item.url">
+                                <button type="button" @click="choose(item.url)" class="block w-full rounded-xl border border-[var(--admin-border)] p-3 text-right hover:border-[var(--admin-accent)] hover:bg-[var(--admin-accent-soft)]">
+                                    <span class="block text-sm font-semibold" x-text="item.label"></span>
+                                    <span class="mt-1 block break-all text-xs text-[var(--admin-muted)]" dir="ltr" x-text="item.url"></span>
+                                    <span class="mt-1 inline-block text-[10px] text-[var(--admin-accent-dark)]" x-text="item.kind"></span>
+                                </button>
+                            </template>
+                        </div>
+                        <p x-show="!loading && routes.length === 0" class="py-6 text-center text-sm text-[var(--admin-muted)]">صفحه‌ای با این عبارت پیدا نشد.</p>
+                    </div>
+                </section>
+            </div>
+        </div>
         <div><label class="admin-label" for="og_image">Open Graph Image URL</label><input id="og_image" name="og_image" type="url" dir="ltr" class="admin-input" value="{{ old('og_image', $product->og_image ?? '') }}"></div>
     </div>
 

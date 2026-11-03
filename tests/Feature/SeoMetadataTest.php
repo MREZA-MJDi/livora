@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
+use App\Models\Media;
 use App\Models\SeoPageSetting;
 use App\Models\SeoSetting;
 use App\Models\User;
@@ -20,6 +21,28 @@ class SeoMetadataTest extends TestCase
     {
         parent::setUp();
         Cache::flush();
+    }
+
+
+    public function test_seo_route_picker_lists_real_public_destinations_and_excludes_private_routes(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $category = Category::query()->create([
+            'name' => 'دسته مسیر عمومی',
+            'slug' => 'public-route-category',
+            'description' => 'دسته‌بندی قابل انتخاب',
+            'is_active' => true,
+            'sort_order' => 1,
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->getJson(route('admin.seo.public-routes', ['q' => 'دسته مسیر عمومی']))
+            ->assertOk()
+            ->assertJsonPath('data.0.label', 'دسته‌بندی: دسته مسیر عمومی');
+
+        $this->assertStringContainsString('/categories/public-route-category', $response->json('data.0.url'));
+        $this->assertStringNotContainsString('/admin', json_encode($response->json('data')));
+        $this->assertStringNotContainsString('/checkout', json_encode($response->json('data')));
     }
 
     public function test_public_pages_are_noindex_nofollow_and_sitemap_is_empty_by_default(): void
@@ -256,6 +279,91 @@ class SeoMetadataTest extends TestCase
             ->assertSee('<meta name="twitter:image" content="' . $imageUrl . '">', false)
             ->assertHeader('X-Robots-Tag', 'noindex, nofollow');
     }
+
+
+    public function test_admin_can_select_default_open_graph_image_from_media_library_and_media_cannot_be_deleted_while_in_use(): void
+    {
+        Storage::fake('public');
+        $admin = User::factory()->create(['role' => 'admin']);
+        $file = UploadedFile::fake()->image('library-og.jpg', 1200, 630);
+        $path = $file->store('media', 'public');
+        $media = Media::query()->create([
+            'user_id' => $admin->id,
+            'disk' => 'public',
+            'path' => $path,
+            'filename' => basename($path),
+            'original_name' => 'library-og.jpg',
+            'mime_type' => 'image/jpeg',
+            'extension' => 'jpg',
+            'size' => Storage::disk('public')->size($path),
+            'alt' => 'تصویر اشتراک‌گذاری',
+        ]);
+
+        $this->actingAs($admin)
+            ->put(route('admin.seo.update'), [
+                'site_name' => 'SillaGallery',
+                'default_title' => 'SillaGallery',
+                'default_og_media_id' => $media->id,
+            ])
+            ->assertRedirect(route('admin.seo.edit'));
+
+        $settings = SeoSetting::current()->fresh();
+        $this->assertSame($media->id, (int) $settings->default_og_media_id);
+        $this->assertSame($media->url, $settings->default_og_image_url);
+
+        $this->delete(route('admin.media.destroy', $media))
+            ->assertRedirect(route('admin.media.index'))
+            ->assertSessionHas('error');
+        $this->assertDatabaseHas('media', ['id' => $media->id]);
+        Storage::disk('public')->assertExists($path);
+
+        $this->put(route('admin.seo.update'), [
+            'site_name' => 'SillaGallery',
+            'remove_default_og_image' => '1',
+        ])->assertRedirect(route('admin.seo.edit'));
+
+        $this->assertDatabaseHas('media', ['id' => $media->id]);
+        $this->assertDatabaseHas('seo_settings', ['id' => 1, 'default_og_media_id' => null]);
+        $this->delete(route('admin.media.destroy', $media))
+            ->assertRedirect(route('admin.media.index'))
+            ->assertSessionHas('success');
+        $this->assertDatabaseMissing('media', ['id' => $media->id]);
+        Storage::disk('public')->assertMissing($path);
+    }
+
+    public function test_media_library_crop_endpoint_creates_a_separate_derivative_without_mutating_source_asset(): void
+    {
+        Storage::fake('public');
+        $admin = User::factory()->create(['role' => 'admin']);
+        $source = UploadedFile::fake()->image('original.png', 1600, 900);
+        $sourcePath = $source->store('media', 'public');
+        $sourceMedia = Media::query()->create([
+            'user_id' => $admin->id,
+            'disk' => 'public',
+            'path' => $sourcePath,
+            'filename' => basename($sourcePath),
+            'original_name' => 'original.png',
+            'mime_type' => 'image/png',
+            'extension' => 'png',
+            'size' => Storage::disk('public')->size($sourcePath),
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->postJson(route('admin.media.crop'), [
+                'image' => UploadedFile::fake()->image('original-cropped.png', 1200, 630),
+                'alt' => 'برش مستقل تصویر Open Graph',
+            ])
+            ->assertCreated()
+            ->assertJsonStructure(['id', 'name', 'url', 'size']);
+
+        $this->assertNotSame($sourceMedia->id, $response->json('id'));
+        $this->assertDatabaseHas('media', ['id' => $sourceMedia->id, 'path' => $sourcePath]);
+        $this->assertDatabaseHas('media', ['id' => $response->json('id'), 'alt' => 'برش مستقل تصویر Open Graph']);
+        Storage::disk('public')->assertExists($sourcePath);
+        $croppedMedia = Media::query()->findOrFail($response->json('id'));
+        Storage::disk('public')->assertExists($croppedMedia->path);
+    }
+
 
 
 }

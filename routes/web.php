@@ -496,6 +496,7 @@ Route::middleware(['auth', 'admin'])
         |--------------------------------------------------------------------------
         */
         Route::get('/seo/audit', [\App\Http\Controllers\Admin\SeoAuditController::class, 'index'])->name('seo.audit');
+        Route::get('/seo/public-routes', [AdminSeoController::class, 'publicRoutes'])->middleware('throttle:60,1')->name('seo.public-routes');
         Route::get('/seo', [AdminSeoController::class, 'edit'])->name('seo.edit');
         Route::put('/seo', [AdminSeoController::class, 'update'])->name('seo.update');
         Route::get('/seo/pages', [PageSeoController::class, 'index'])->name('seo.pages');
@@ -514,6 +515,13 @@ Route::middleware(['auth', 'admin'])
             '/media',
             [MediaController::class, 'index']
         )->name('media.index');
+
+        Route::get(
+            '/media/picker',
+            [MediaController::class, 'picker']
+        )->middleware('throttle:60,1')->name('media.picker');
+
+        Route::post('/media/crop', [MediaController::class, 'crop'])->middleware('throttle:30,1')->name('media.crop');
 
         Route::get(
             '/media/create',

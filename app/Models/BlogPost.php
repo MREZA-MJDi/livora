@@ -12,7 +12,7 @@ class BlogPost extends Model
 {
     protected $fillable = [
         'user_id', 'title', 'slug', 'category', 'excerpt', 'body',
-        'featured_image', 'featured_image_alt', 'meta_title', 'meta_description',
+        'featured_image', 'media_id', 'featured_image_alt', 'meta_title', 'meta_description',
         'canonical_url', 'og_image', 'status', 'seo_index', 'seo_follow', 'published_at',
     ];
 
@@ -23,6 +23,11 @@ class BlogPost extends Model
             'seo_follow' => 'boolean',
             'published_at' => 'datetime',
         ];
+    }
+
+    public function media(): BelongsTo
+    {
+        return $this->belongsTo(Media::class);
     }
 
     public function author(): BelongsTo

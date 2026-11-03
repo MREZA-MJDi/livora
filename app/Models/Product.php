@@ -39,6 +39,7 @@ class Product extends Model
         'canonical_url',
         'og_image',
         'banner_image',
+        'banner_media_id',
         'banner_image_alt',
         'seo_index',
         'seo_follow',
@@ -91,6 +92,11 @@ class Product extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function bannerMedia()
+    {
+        return $this->belongsTo(Media::class, 'banner_media_id');
     }
 
     public function images(): HasMany

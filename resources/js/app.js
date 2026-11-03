@@ -3,6 +3,164 @@ import Alpine from 'alpinejs';
 
 window.Alpine = Alpine;
 
+window.seoRoutePicker = (endpoint) => ({
+    endpoint,
+    open: false,
+    loading: false,
+    search: '',
+    routes: [],
+    async show() {
+        this.open = true;
+        await this.load();
+    },
+    async load() {
+        this.loading = true;
+        try {
+            const url = new URL(this.endpoint, window.location.origin);
+            if (this.search.trim()) url.searchParams.set('q', this.search.trim());
+            const response = await fetch(url, { headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' });
+            if (!response.ok) throw new Error('دریافت مسیرهای عمومی ناموفق بود.');
+            const payload = await response.json();
+            this.routes = Array.isArray(payload.data) ? payload.data : [];
+        } catch (error) {
+            this.errorMessage = error.message || 'بارگذاری رسانه ناموفق بود.';
+        } finally {
+            this.loading = false;
+        }
+    },
+    choose(url) {
+        const input = this.$root.querySelector('#canonical_url');
+        if (input) {
+            input.value = url;
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        this.open = false;
+    },
+});
+
+
+window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName = '', previewId = 'product-image-preview', fileField = 'image', removeField = 'remove_image') => ({
+    endpoint,
+    pickerOpen: false,
+    loading: false,
+    search: '',
+    items: [],
+    page: 1,
+    lastPage: 1,
+    total: 0,
+    errorMessage: '',
+    previewId,
+    fileField,
+    removeField,
+    selectedMedia: initialId && initialUrl
+        ? { id: Number(initialId), url: initialUrl, name: initialName || 'تصویر فعلی', alt: initialName || '' }
+        : null,
+    init() {
+        const fileInput = this.$root.closest('form')?.querySelector(`input[type=\"file\"][name=\"${this.fileField}\"]`);
+        fileInput?.addEventListener('change', () => {
+            if (fileInput.files?.length) {
+                this.selectedMedia = null;
+                const removeInput = this.$root.querySelector(`input[name=\"${this.removeField}\"]`);
+                if (removeInput) removeInput.value = '0';
+                const ogRemoval = this.$root.closest('form')?.querySelector('input[type="checkbox"][name="remove_default_og_image"]');
+                if (ogRemoval) ogRemoval.checked = false;
+            }
+        });
+    },
+    async openPicker() {
+        this.pickerOpen = true;
+        await this.loadMedia(1);
+    },
+    async loadMedia(page = 1) {
+        this.loading = true;
+        try {
+            const url = new URL(this.endpoint, window.location.origin);
+            url.searchParams.set('page', String(page));
+            if (this.search.trim()) url.searchParams.set('q', this.search.trim());
+            const response = await fetch(url, {
+                headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                credentials: 'same-origin',
+            });
+            if (!response.ok) throw new Error('بارگذاری کتابخانه رسانه ناموفق بود.');
+            const payload = await response.json();
+            this.errorMessage = '';
+            this.items = Array.isArray(payload.data) ? payload.data : [];
+            this.page = payload.meta?.current_page || 1;
+            this.lastPage = payload.meta?.last_page || 1;
+            this.total = payload.meta?.total || 0;
+        } catch (error) {
+            this.errorMessage = error.message || 'بارگذاری رسانه ناموفق بود.';
+        } finally {
+            this.loading = false;
+        }
+    },
+    selectMedia(item) {
+        this.selectedMedia = item;
+        const fileInput = this.$root.closest('form')?.querySelector(`input[type="file"][name="${this.fileField}"]`);
+        if (fileInput) fileInput.value = '';
+        const removeInput = this.$root.querySelector(`input[name=\"${this.removeField}\"]`);
+        if (removeInput) removeInput.value = '0';
+        const ogRemoval = this.$root.closest('form')?.querySelector('input[type="checkbox"][name="remove_default_og_image"]');
+        if (ogRemoval) ogRemoval.checked = false;
+        const preview = document.getElementById(this.previewId);
+        if (preview) { preview.src = item.url; preview.classList.remove('hidden'); }
+        this.pickerOpen = false;
+    },
+    clearSelection() {
+        this.selectedMedia = null;
+        const removeInput = this.$root.querySelector(`input[name="${this.removeField}"]`);
+        if (removeInput) removeInput.value = '1';
+        const fileInput = this.$root.closest('form')?.querySelector(`input[type="file"][name="${this.fileField}"]`);
+        if (fileInput) fileInput.value = '';
+        const preview = document.getElementById(this.previewId);
+        if (preview) { preview.removeAttribute('src'); preview.classList.add('hidden'); }
+    },
+    async cropSelected() {
+        if (!this.selectedMedia || this.loading) return;
+        const fileInput = this.$root.closest('form')?.querySelector(`input[type="file"][name="${this.fileField}"]`);
+        const explicitRatio = Number(fileInput?.dataset.cropRatio);
+        const cropContext = [this.fileField, fileInput?.id, this.$root.closest('form')?.action].filter(Boolean).join(' ').toLowerCase();
+        const ratio = Number.isFinite(explicitRatio) && explicitRatio > 0
+            ? explicitRatio
+            : (/category|logo|avatar|profile/.test(cropContext) ? 1
+                : (/og_image/.test(cropContext) ? 1200 / 630
+                    : (/featured|blog|banner|hero|editor|pages/.test(cropContext) ? 16 / 9 : 4 / 3)));
+        this.loading = true;
+        this.errorMessage = '';
+        try {
+            const source = await fetch(this.selectedMedia.url, { credentials: 'same-origin' });
+            if (!source.ok) throw new Error('دریافت تصویر اصلی برای برش ناموفق بود.');
+            const blob = await source.blob();
+            if (!/^image\/(jpeg|png|webp)$/i.test(blob.type)) throw new Error('فرمت تصویر برای برش پشتیبانی نمی‌شود.');
+            const original = new File([blob], this.selectedMedia.name || 'media-image.jpg', { type: blob.type });
+            const cropped = await window.SillaImageCropper.crop(original, ratio);
+            const data = new FormData();
+            data.append('image', cropped);
+            data.append('alt', this.selectedMedia.alt || '');
+            const response = await fetch(this.endpoint.replace(/\/picker\/?$/, '/crop'), {
+                method: 'POST',
+                body: data,
+                credentials: 'same-origin',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                    'Accept': 'application/json',
+                },
+            });
+            const payload = await response.json();
+            if (!response.ok || !payload.id || !payload.url) throw new Error(payload.message || 'ذخیره نسخه برش‌خورده ناموفق بود.');
+            this.selectedMedia = payload;
+            const preview = document.getElementById(this.previewId);
+            if (preview) { preview.src = payload.url; preview.classList.remove('hidden'); }
+        } catch (error) {
+            if (error?.message !== 'Crop cancelled') this.errorMessage = error.message || 'برش تصویر انجام نشد.';
+        } finally {
+            this.loading = false;
+        }
+    },
+});
+
+
 const jalaliMonthNames = [
     'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
     'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند',

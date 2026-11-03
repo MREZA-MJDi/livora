@@ -41,7 +41,7 @@
             <h2 class="text-base font-bold">تنظیمات SEO صفحه</h2>
             <div><label class="admin-label" for="meta_title">Meta Title</label><input id="meta_title" name="meta_title" maxlength="255" class="admin-input" value="{{ old('meta_title', $page->meta_title ?? '') }}"><p class="admin-help">عنوان نمایشی در نتایج جستجو؛ در صورت خالی بودن از عنوان صفحه استفاده می‌شود.</p></div>
             <div><label class="admin-label" for="meta_description">Meta Description</label><textarea id="meta_description" name="meta_description" rows="3" maxlength="1000" class="admin-textarea">{{ old('meta_description', $page->meta_description ?? '') }}</textarea></div>
-            <div><label class="admin-label" for="canonical_url">Canonical URL</label><input id="canonical_url" name="canonical_url" type="url" dir="ltr" class="admin-input" value="{{ old('canonical_url', $page->canonical_url ?? '') }}" placeholder="https://sillashop.com/about"></div>
+            @include('admin.seo.partials.canonical-picker', ['seoCanonical' => $page->canonical_url ?? ''])
             <div><label class="admin-label" for="og_image">Open Graph Image URL (اختیاری)</label><input id="og_image" name="og_image" type="url" dir="ltr" class="admin-input" value="{{ old('og_image', $page->og_image ?? '') }}"></div>
             <div class="grid gap-3 sm:grid-cols-2">
                 <label class="flex items-center gap-3 rounded-xl border border-[var(--admin-border)] p-4"><input type="checkbox" name="seo_index" value="1" class="admin-checkbox" @checked(old('seo_index', $page->seo_index ?? false))><span class="text-sm">اجازه ایندکس</span></label>
@@ -61,7 +61,9 @@
         <section class="admin-card space-y-4 p-6">
             <h2 class="text-base font-bold">تصویر شاخص</h2>
             @if($editing && $page->featured_image_url)<img src="{{ $page->featured_image_url }}" alt="{{ $page->featured_image_alt ?: $page->title }}" class="aspect-video w-full rounded-2xl object-cover">@endif
+            <div class="aspect-video overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]"><img id="page-featured-image-preview" src="{{ $page->featured_image_url ?? '' }}" alt="{{ $page->featured_image_alt ?? $page->title ?? '' }}" class="{{ isset($page) && $page->featured_image_url ? '' : 'hidden' }} h-full w-full object-contain"></div>
             <input name="featured_image" type="file" accept="image/jpeg,image/png,image/webp" class="admin-input p-2">
+            @include('admin.media.partials.picker', ['mediaPickerField' => 'featured_image', 'mediaPickerId' => old('media_id', $page->media_id ?? null), 'mediaPickerUrl' => $page->featured_image_url ?? null, 'mediaPickerName' => $page->title ?? '', 'mediaPickerPreviewId' => 'page-featured-image-preview', 'mediaPickerRemoveName' => 'remove_featured_image'])
             <p class="admin-help">JPG، PNG یا WEBP؛ حداکثر ۱۰ مگابایت.</p>
             <label class="admin-label" for="featured_image_alt">متن جایگزین تصویر</label>
             <input id="featured_image_alt" name="featured_image_alt" maxlength="255" class="admin-input" value="{{ old('featured_image_alt', $page->featured_image_alt ?? '') }}">

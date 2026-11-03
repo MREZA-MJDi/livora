@@ -19,6 +19,7 @@ class Category extends Model
         'slug',
         'description',
         'image',
+        'media_id',
         'image_alt',
         'meta_title',
         'meta_description',
@@ -68,6 +69,11 @@ class Category extends Model
         }
 
         return Storage::disk('public')->url($path);
+    }
+
+    public function media()
+    {
+        return $this->belongsTo(Media::class);
     }
 
     public function products(): HasMany

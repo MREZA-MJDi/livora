@@ -95,14 +95,18 @@
                 {{ $editing ? 'تصویر جدید' : 'تصویر محصول' }}
             </label>
 
+            <div class="admin-image-preview mb-5 aspect-video max-w-xl">
+                <img id="product-gallery-image-preview" src="{{ $productImage->url ?? '' }}" alt="{{ $productImage->alt ?? 'تصویر محصول' }}" class="admin-image {{ $editing ? '' : 'hidden' }}">
+            </div>
             <input
                 id="image"
-                name="image"
+                name="image" data-crop-ratio="1.7777778"
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
                 class="admin-input p-2"
-                {{ $editing ? '' : 'required' }}
+                {{ $editing ? '' : '' }}
             >
+            @include('admin.media.partials.picker', ['mediaPickerField' => 'image', 'mediaPickerId' => old('media_id', $productImage->media_id ?? null), 'mediaPickerUrl' => $productImage->url ?? null, 'mediaPickerName' => $productImage->alt ?? '', 'mediaPickerPreviewId' => 'product-gallery-image-preview'])
 
             <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">
                 فرمت‌های مجاز: JPG، JPEG، PNG، WEBP — حداکثر ۱۰ مگابایت.

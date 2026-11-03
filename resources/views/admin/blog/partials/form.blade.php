@@ -42,7 +42,7 @@
             <h2 class="text-base font-bold">SEO مقاله</h2>
             <div><label class="admin-label" for="meta_title">Meta Title</label><input id="meta_title" name="meta_title" class="admin-input" maxlength="255" value="{{ old('meta_title', $post->meta_title ?? '') }}"></div>
             <div><label class="admin-label" for="meta_description">Meta Description</label><textarea id="meta_description" name="meta_description" rows="3" maxlength="1000" class="admin-textarea">{{ old('meta_description', $post->meta_description ?? '') }}</textarea></div>
-            <div><label class="admin-label" for="canonical_url">Canonical URL</label><input id="canonical_url" name="canonical_url" type="url" dir="ltr" class="admin-input" value="{{ old('canonical_url', $post->canonical_url ?? '') }}"></div>
+            @include('admin.seo.partials.canonical-picker', ['seoCanonical' => $post->canonical_url ?? ''])
             <div><label class="admin-label" for="og_image">Open Graph Image URL</label><input id="og_image" name="og_image" type="url" dir="ltr" class="admin-input" value="{{ old('og_image', $post->og_image ?? '') }}"></div>
             <div class="grid gap-3 sm:grid-cols-2">
                 <label class="flex items-center gap-3 rounded-xl border border-[var(--admin-border)] p-4"><input type="checkbox" name="seo_index" value="1" class="admin-checkbox" @checked(old('seo_index', $post->seo_index ?? false))><span class="text-sm">اجازه ایندکس مقاله</span></label>
@@ -105,7 +105,9 @@
         <section class="admin-card space-y-4 p-6">
             <h2 class="text-base font-bold">تصویر شاخص</h2>
             @if($editing && $post->featured_image_url)<img src="{{ $post->featured_image_url }}" alt="{{ $post->featured_image_alt ?: $post->title }}" class="aspect-video w-full rounded-2xl object-cover">@endif
+            <div class="aspect-video overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]"><img id="blog-featured-image-preview" src="{{ $post->featured_image_url ?? '' }}" alt="{{ $post->featured_image_alt ?? $post->title ?? '' }}" class="{{ isset($post) && $post->featured_image_url ? '' : 'hidden' }} h-full w-full object-contain"></div>
             <input id="featured_image" name="featured_image" type="file" accept="image/jpeg,image/png,image/webp" class="admin-input p-2"><p class="admin-help">JPG، PNG یا WEBP — حداکثر ۱۰ مگابایت</p>
+            @include('admin.media.partials.picker', ['mediaPickerField' => 'featured_image', 'mediaPickerId' => old('media_id', $post->media_id ?? null), 'mediaPickerUrl' => $post->featured_image_url ?? null, 'mediaPickerName' => $post->title ?? '', 'mediaPickerPreviewId' => 'blog-featured-image-preview', 'mediaPickerRemoveName' => 'remove_featured_image'])
             <div><label class="admin-label" for="featured_image_alt">Alt تصویر</label><input id="featured_image_alt" name="featured_image_alt" class="admin-input" maxlength="255" value="{{ old('featured_image_alt', $post->featured_image_alt ?? '') }}"></div>
             @error('featured_image')<p class="admin-error">{{ $message }}</p>@enderror
         </section>

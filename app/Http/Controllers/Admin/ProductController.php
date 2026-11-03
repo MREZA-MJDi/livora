@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Product\StoreProductRequest;
 use App\Http\Requests\Admin\Product\UpdateProductRequest;
 use App\Models\Category;
+use App\Models\Media;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Support\MediaLibrary;
 use App\Services\Seo\ContentSeoAnalyzer;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use RuntimeException;
@@ -21,10 +23,7 @@ class ProductController extends Controller
     public function index(): View
     {
         $products = Product::query()
-            ->with([
-                'category',
-                'images' => fn ($imageQuery) => $imageQuery->limit(1),
-            ])
+            ->with(['category', 'images' => fn ($query) => $query->limit(1)])
             ->latest()
             ->paginate(15);
 
@@ -50,46 +49,47 @@ class ProductController extends Controller
     {
         $data = $request->validated();
         $relatedProductIds = $data['related_product_ids'] ?? [];
-        unset($data['related_product_ids']);
+        $mediaId = $data['media_id'] ?? null;
+        unset($data['related_product_ids'], $data['media_id'], $data['banner_media_id'], $data['image'], $data['banner_image']);
 
-        $uploadedImage = $request->file('image');
-        $uploadedBanner = $request->file('banner_image');
-        unset($data['image'], $data['banner_image']);
-
-        $storedPaths = [];
+        $imageFile = $request->file('image');
+        $imagePath = $imageFile?->store('products/images', 'public');
+        if ($imageFile && ! $imagePath) {
+            throw new RuntimeException('Product image could not be stored.');
+        }
+        $bannerMedia = $request->hasFile('banner_image')
+            ? MediaLibrary::store($request->file('banner_image'), (int) $request->user()->id, 'products/banners', $data['banner_image_alt'] ?? null)
+            : MediaLibrary::image($request->input('banner_media_id'));
 
         try {
-            $bannerPath = $uploadedBanner?->store('products/banners', 'public');
-            if ($uploadedBanner && ! $bannerPath) {
-                throw new RuntimeException('Product banner could not be stored.');
-            }
-            if ($bannerPath) {
-                $storedPaths[] = $bannerPath;
-            }
-
-            $imagePath = $uploadedImage?->store('products/images', 'public');
-            if ($uploadedImage && ! $imagePath) {
-                throw new RuntimeException('Product image could not be stored.');
-            }
-            if ($imagePath) {
-                $storedPaths[] = $imagePath;
-            }
-
-            DB::transaction(function () use ($data, $relatedProductIds, $bannerPath, $imagePath): void {
+            DB::transaction(function () use ($request, $data, $relatedProductIds, $mediaId, $imageFile, $imagePath, $bannerMedia): void {
                 $product = Product::create($data);
                 $product->relatedProducts()->sync(array_values(array_diff($relatedProductIds, [$product->id])));
 
-                if ($bannerPath) {
+                if ($request->boolean('remove_banner_image')) {
+                    $product->update(['banner_image' => null, 'banner_media_id' => null]);
+                } elseif ($bannerMedia) {
                     $product->update([
-                        'banner_image' => $bannerPath,
+                        'banner_image' => $bannerMedia->path,
+                        'banner_media_id' => $bannerMedia->id,
                         'banner_image_alt' => $data['banner_image_alt'] ?? $product->name,
                     ]);
                 }
 
-                if ($imagePath) {
+                if ($request->boolean('remove_primary_image') && $primaryImage) {
+                    $primaryImage->variants()->detach();
+                    $primaryImage->delete();
+                    $replacement = $product->images()->orderBy('sort_order')->orderBy('id')->first();
+                    $replacement?->update(['is_primary' => true]);
+                } elseif ($imageFile || $mediaId) {
+                    $media = $imageFile
+                        ? $this->registerUploadedMedia($request, $imageFile, $imagePath)
+                        : Media::query()->whereKey($mediaId)->where('mime_type', 'like', 'image/%')->firstOrFail();
+
                     ProductImage::create([
                         'product_id' => $product->id,
-                        'path' => $imagePath,
+                        'media_id' => $media->id,
+                        'path' => $media->path,
                         'alt' => $product->name,
                         'sort_order' => 0,
                         'is_primary' => true,
@@ -97,29 +97,22 @@ class ProductController extends Controller
                 }
             });
         } catch (Throwable $exception) {
-            $this->deleteStoredPaths($storedPaths);
+            if ($imagePath) Storage::disk('public')->delete($imagePath);
             throw $exception;
         }
 
-        return redirect()
-            ->route('admin.products.index')
-            ->with('success', 'محصول با موفقیت ایجاد شد.');
+        return redirect()->route('admin.products.index')->with('success', 'محصول با موفقیت ایجاد شد.');
     }
 
     public function show(Product $product): View
     {
-        $product->load([
-            'category',
-            'images',
-            'allVariants.images',
-        ]);
-
+        $product->load(['category', 'images.media', 'allVariants.images']);
         return view('admin.products.show', compact('product'));
     }
 
     public function edit(Product $product, ContentSeoAnalyzer $seoAnalyzer): View
     {
-        $product->load(['images', 'relatedProducts:id,name']);
+        $product->load(['images.media', 'relatedProducts:id,name']);
         $categories = Category::query()->orderBy('name')->get();
 
         return view('admin.products.edit', [
@@ -135,61 +128,52 @@ class ProductController extends Controller
     {
         $data = $request->validated();
         $relatedProductIds = $data['related_product_ids'] ?? [];
-        unset($data['related_product_ids']);
+        $mediaId = $data['media_id'] ?? null;
+        unset($data['related_product_ids'], $data['media_id'], $data['banner_media_id'], $data['image'], $data['banner_image']);
 
-        $uploadedImage = $request->file('image');
-        $uploadedBanner = $request->file('banner_image');
-        unset($data['image'], $data['banner_image']);
+        $imageFile = $request->file('image');
+        $imagePath = $imageFile?->store('products/images', 'public');
+        if ($imageFile && ! $imagePath) {
+            throw new RuntimeException('Product image could not be stored.');
+        }
+        $bannerMedia = $request->hasFile('banner_image')
+            ? MediaLibrary::store($request->file('banner_image'), (int) $request->user()->id, 'products/banners', $data['banner_image_alt'] ?? null)
+            : (filled($request->input('banner_media_id')) ? MediaLibrary::image($request->input('banner_media_id')) : null);
 
-        $product->loadMissing('images');
+        $product->loadMissing('images.media');
         $primaryImage = $product->images->firstWhere('is_primary', true) ?? $product->images->first();
-        $oldImagePath = $primaryImage?->path;
-        $oldBannerPath = $product->banner_image;
-        $storedPaths = [];
 
         try {
-            $bannerPath = $uploadedBanner?->store('products/banners', 'public');
-            if ($uploadedBanner && ! $bannerPath) {
-                throw new RuntimeException('Product banner could not be stored.');
-            }
-            if ($bannerPath) {
-                $storedPaths[] = $bannerPath;
-            }
-
-            $imagePath = $uploadedImage?->store('products/images', 'public');
-            if ($uploadedImage && ! $imagePath) {
-                throw new RuntimeException('Product image could not be stored.');
-            }
-            if ($imagePath) {
-                $storedPaths[] = $imagePath;
-            }
-
-            DB::transaction(function () use ($product, $data, $relatedProductIds, $bannerPath, $imagePath, $primaryImage): void {
+            DB::transaction(function () use ($request, $product, $data, $relatedProductIds, $mediaId, $imageFile, $imagePath, $bannerMedia, $primaryImage): void {
                 $product->update($data);
                 $product->relatedProducts()->sync(array_values(array_diff($relatedProductIds, [$product->id])));
 
-                if ($bannerPath) {
+                if ($bannerMedia) {
                     $product->update([
-                        'banner_image' => $bannerPath,
+                        'banner_image' => $bannerMedia->path,
+                        'banner_media_id' => $bannerMedia->id,
                         'banner_image_alt' => $data['banner_image_alt'] ?? $product->name,
                     ]);
                 }
 
-                if ($imagePath) {
+                if ($imageFile || $mediaId) {
+                    $media = $imageFile
+                        ? $this->registerUploadedMedia($request, $imageFile, $imagePath)
+                        : Media::query()->whereKey($mediaId)->where('mime_type', 'like', 'image/%')->firstOrFail();
+
                     if ($primaryImage) {
                         $primaryImage->update([
-                            'path' => $imagePath,
+                            'media_id' => $media->id,
+                            'path' => $media->path,
                             'alt' => $product->name,
                             'is_primary' => true,
                         ]);
-
-                        $product->images()
-                            ->where('id', '!=', $primaryImage->id)
-                            ->update(['is_primary' => false]);
+                        $product->images()->where('id', '!=', $primaryImage->id)->update(['is_primary' => false]);
                     } else {
                         ProductImage::create([
                             'product_id' => $product->id,
-                            'path' => $imagePath,
+                            'media_id' => $media->id,
+                            'path' => $media->path,
                             'alt' => $product->name,
                             'sort_order' => 0,
                             'is_primary' => true,
@@ -198,36 +182,37 @@ class ProductController extends Controller
                 }
             });
         } catch (Throwable $exception) {
-            $this->deleteStoredPaths($storedPaths);
+            if ($imagePath) Storage::disk('public')->delete($imagePath);
             throw $exception;
         }
 
-        if ($bannerPath && $oldBannerPath !== $bannerPath) {
-            $this->deleteStoredPath($oldBannerPath);
-        }
-        if ($imagePath && $oldImagePath !== $imagePath) {
-            $this->deleteStoredPath($oldImagePath);
-        }
-
-        return redirect()
-            ->route('admin.products.edit', $product)
-            ->with('success', 'محصول با موفقیت بروزرسانی شد.');
+        return redirect()->route('admin.products.edit', $product)->with('success', 'محصول با موفقیت بروزرسانی شد.');
     }
 
     public function destroy(Product $product): RedirectResponse
     {
         $product->delete();
+        return redirect()->route('admin.products.index')->with('success', 'محصول با موفقیت حذف شد.');
+    }
 
-        return redirect()
-            ->route('admin.products.index')
-            ->with('success', 'محصول با موفقیت حذف شد.');
+    private function registerUploadedMedia(StoreProductRequest|UpdateProductRequest $request, $file, string $path): Media
+    {
+        return Media::create([
+            'user_id' => $request->user()->id,
+            'disk' => 'public',
+            'path' => $path,
+            'filename' => basename($path),
+            'original_name' => $file->getClientOriginalName(),
+            'mime_type' => $file->getMimeType(),
+            'extension' => strtolower($file->getClientOriginalExtension()),
+            'size' => $file->getSize(),
+            'alt' => $request->input('image_alt'),
+        ]);
     }
 
     private function deleteStoredPaths(array $paths): void
     {
-        foreach (array_unique($paths) as $path) {
-            $this->deleteStoredPath($path);
-        }
+        foreach (array_unique($paths) as $path) $this->deleteStoredPath($path);
     }
 
     private function deleteStoredPath(?string $path): void

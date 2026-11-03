@@ -14,6 +14,7 @@ class ShopBannerSetting extends Model
         'title',
         'description',
         'banner_image',
+        'media_id',
         'banner_image_alt',
         'is_active',
     ];
@@ -23,6 +24,11 @@ class ShopBannerSetting extends Model
         return [
             'is_active' => 'boolean',
         ];
+    }
+
+    public function media()
+    {
+        return $this->belongsTo(Media::class);
     }
 
     public static function current(): self

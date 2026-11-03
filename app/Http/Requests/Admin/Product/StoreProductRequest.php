@@ -189,6 +189,8 @@ class StoreProductRequest extends FormRequest
                 'string',
             ],
 
+            'media_id' => ['nullable', 'integer', 'exists:media,id'],
+
             'image' => [
                 'nullable',
                 'image',
@@ -196,6 +198,7 @@ class StoreProductRequest extends FormRequest
                 'max:10240',
             ],
 
+            'banner_media_id' => ['nullable', 'integer', 'exists:media,id'],
             'banner_image' => [
                 'nullable',
                 'image',

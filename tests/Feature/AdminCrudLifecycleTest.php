@@ -86,14 +86,67 @@ class AdminCrudLifecycleTest extends TestCase
         $this->assertSame('14500000.00', $product->price);
         $this->assertTrue($newImage->is_primary);
         $this->assertNotSame($oldImage->path, $newImage->path);
-        Storage::disk('public')->assertMissing($oldImage->path);
+        Storage::disk('public')->assertExists($oldImage->path); // Replaced assets remain in the Media Library until explicitly removed.
         Storage::disk('public')->assertExists($newImage->path);
+        $this->assertNotNull($oldImage->fresh()->media_id);
+        $this->assertNotNull($newImage->fresh()->media_id);
 
         $this->actingAs($this->admin)
             ->delete(route('admin.products.destroy', $product))
             ->assertRedirect(route('admin.products.index'));
 
         $this->assertSoftDeleted('products', ['id' => $product->id]);
+    }
+
+
+    public function test_admin_can_reuse_a_library_image_and_published_product_appears_on_storefront(): void
+    {
+        $category = $this->createCategory('media-picker-category');
+        $path = 'media/library-sofa.webp';
+        Storage::disk('public')->put($path, 'fake-image-content');
+        $media = Media::query()->create([
+            'user_id' => $this->admin->id,
+            'disk' => 'public',
+            'path' => $path,
+            'filename' => 'library-sofa.webp',
+            'original_name' => 'library-sofa.webp',
+            'mime_type' => 'image/webp',
+            'extension' => 'webp',
+            'size' => 19,
+            'alt' => 'مبل در کتابخانه رسانه',
+        ]);
+
+        $this->actingAs($this->admin)
+            ->get(route('admin.media.picker', ['q' => 'library-sofa']))
+            ->assertOk()
+            ->assertJsonPath('data.0.id', $media->id);
+
+        $this->actingAs($this->admin)
+            ->post(route('admin.products.store'), $this->productPayload($category, [
+                'name' => 'مبل متصل به کتابخانه',
+                'slug' => 'media-library-sofa',
+                'sku' => 'SG-MEDIA-001',
+                'media_id' => $media->id,
+                'status' => 'active',
+            ]))
+            ->assertRedirect(route('admin.products.index'));
+
+        $product = Product::query()->where('slug', 'media-library-sofa')->firstOrFail();
+        $image = $product->images()->firstOrFail();
+
+        $this->assertSame($media->id, $image->media_id);
+        $this->assertSame($path, $image->path);
+        Storage::disk('public')->assertExists($path);
+
+        $this->get('/shop')->assertOk()->assertSee('مبل متصل به کتابخانه');
+        $this->get('/')->assertOk()->assertSee('مبل متصل به کتابخانه');
+
+        $this->actingAs($this->admin)
+            ->delete(route('admin.media.destroy', $media))
+            ->assertRedirect(route('admin.media.index'))
+            ->assertSessionHas('error');
+
+        Storage::disk('public')->assertExists($path);
     }
 
     public function test_admin_can_create_read_update_and_delete_categories_and_replace_category_images(): void
@@ -150,7 +203,7 @@ class AdminCrudLifecycleTest extends TestCase
         $this->assertSame('اتاق نشیمن مدرن', $category->name);
         $this->assertSame(2, $category->sort_order);
         $this->assertNotSame($oldImage, $category->image);
-        Storage::disk('public')->assertMissing($oldImage);
+        Storage::disk('public')->assertExists($oldImage); // Replaced source remains in the Media Library.
         Storage::disk('public')->assertExists($category->image);
 
         $this->actingAs($this->admin)
@@ -158,7 +211,7 @@ class AdminCrudLifecycleTest extends TestCase
             ->assertRedirect(route('admin.categories.index'));
 
         $this->assertDatabaseMissing('categories', ['id' => $category->id]);
-        Storage::disk('public')->assertMissing($category->image);
+        Storage::disk('public')->assertExists($category->image); // Deleting content never deletes the shared source asset.
     }
 
     public function test_category_delete_is_blocked_when_only_soft_deleted_products_still_reference_it(): void
@@ -244,7 +297,7 @@ class AdminCrudLifecycleTest extends TestCase
         $this->assertNotNull($post->published_at);
         $this->assertSame('محتوای جدید', strip_tags($post->body));
         $this->assertSame(['دکوراسیون'], $post->tags()->pluck('name')->all());
-        Storage::disk('public')->assertMissing($oldImage);
+        Storage::disk('public')->assertExists($oldImage); // Replaced source remains in the Media Library.
         Storage::disk('public')->assertExists($post->featured_image);
 
         $this->get(route('blog.show', $post->slug))
@@ -257,7 +310,7 @@ class AdminCrudLifecycleTest extends TestCase
             ->assertRedirect(route('admin.blog.index'));
 
         $this->assertDatabaseMissing('blog_posts', ['id' => $post->id]);
-        Storage::disk('public')->assertMissing($newImage);
+        Storage::disk('public')->assertExists($newImage); // The asset remains available for reuse after post deletion.
     }
 
     public function test_admin_can_manage_product_images_and_variants_without_leaving_orphaned_links(): void
@@ -308,8 +361,9 @@ class AdminCrudLifecycleTest extends TestCase
 
         $image->refresh();
         $this->assertTrue($image->is_primary, 'A product must retain a primary image after an update.');
-        Storage::disk('public')->assertMissing($oldPath);
+        Storage::disk('public')->assertExists($oldPath); // The old upload remains available in the central Media Library.
         Storage::disk('public')->assertExists($image->path);
+        $this->assertNotNull($image->media_id);
 
         $this->actingAs($this->admin)
             ->post(route('admin.product-variants.store'), [
@@ -369,7 +423,7 @@ class AdminCrudLifecycleTest extends TestCase
             ->assertRedirect(route('admin.product-images.index', ['product_id' => $product->id]));
 
         $this->assertDatabaseMissing('product_images', ['id' => $image->id]);
-        Storage::disk('public')->assertMissing($image->path);
+        Storage::disk('public')->assertExists($image->path); // Removing a usage never removes the shared original.
     }
 
     public function test_admin_can_upload_and_delete_media_library_assets(): void
@@ -386,7 +440,7 @@ class AdminCrudLifecycleTest extends TestCase
             ])
             ->assertRedirect(route('admin.media.index'));
 
-        $media = Media::query()->firstOrFail();
+        $media = Media::query()->where('original_name', 'library-image.jpg')->firstOrFail();
         $path = $media->path;
 
         $this->assertSame($this->admin->id, $media->user_id);
@@ -455,7 +509,7 @@ class AdminCrudLifecycleTest extends TestCase
 
         $page->refresh();
         $this->assertSame('published', $page->status);
-        Storage::disk('public')->assertMissing($oldImage);
+        Storage::disk('public')->assertExists($oldImage); // Replaced source remains in the Media Library.
         Storage::disk('public')->assertExists($page->featured_image);
 
         $this->get('/wood-care-lifecycle')
@@ -468,7 +522,7 @@ class AdminCrudLifecycleTest extends TestCase
             ->assertRedirect(route('admin.pages.index'));
 
         $this->assertDatabaseMissing('content_pages', ['id' => $page->id]);
-        Storage::disk('public')->assertMissing($newImage);
+        Storage::disk('public')->assertExists($newImage); // Deleting a page detaches the usage but keeps the shared library asset.
     }
 
     public function test_customer_cannot_open_or_mutate_admin_catalogue_cms_or_media_crud_routes(): void

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ContentPage;
 use App\Support\HtmlSanitizer;
+use App\Support\MediaLibrary;
 use App\Support\UniqueSlug;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -47,27 +48,20 @@ class PageController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $this->validated($request);
-        $image = $request->file('featured_image')?->store('pages', 'public');
-        if ($request->hasFile('featured_image') && ! $image) {
-            throw new \RuntimeException('Page image could not be stored.');
-        }
+        $media = $request->hasFile('featured_image')
+            ? MediaLibrary::store($request->file('featured_image'), (int) $request->user()->id, 'pages', $data['featured_image_alt'] ?? null)
+            : MediaLibrary::image($data['media_id'] ?? null);
+        $data['featured_image'] = $media?->path;
+        $data['media_id'] = $media?->id;
 
-        try {
-            DB::transaction(function () use ($request, $data, $image): void {
-                $data['user_id'] = $request->user()->id;
-                $data['body'] = HtmlSanitizer::sanitize($data['body']);
-                $data['featured_image'] = $image;
-                $data['published_at'] = $data['status'] === 'published'
-                    ? ($data['published_at'] ?? now())
-                    : null;
-                ContentPage::create($data);
-            });
-        } catch (\Throwable $exception) {
-            if ($image) {
-                Storage::disk('public')->delete($image);
-            }
-            throw $exception;
-        }
+        DB::transaction(function () use ($request, $data): void {
+            $data['user_id'] = $request->user()->id;
+            $data['body'] = HtmlSanitizer::sanitize($data['body']);
+            $data['published_at'] = $data['status'] === 'published'
+                ? ($data['published_at'] ?? now())
+                : null;
+            ContentPage::create($data);
+        });
 
         return redirect()->route('admin.pages.index')->with('success', 'صفحه ذخیره شد.');
     }
@@ -83,34 +77,26 @@ class PageController extends Controller
     public function update(Request $request, ContentPage $page): RedirectResponse
     {
         $data = $this->validated($request, $page);
-        $oldImage = $page->featured_image;
-        unset($data['featured_image']);
-        $newImage = $request->file('featured_image')?->store('pages', 'public');
-        if ($request->hasFile('featured_image') && ! $newImage) {
-            throw new \RuntimeException('Page image could not be stored.');
-        }
+        $newMedia = $request->hasFile('featured_image')
+            ? MediaLibrary::store($request->file('featured_image'), (int) $request->user()->id, 'pages', $data['featured_image_alt'] ?? null)
+            : (filled($request->input('media_id')) ? MediaLibrary::image($request->input('media_id')) : null);
 
-        try {
-            DB::transaction(function () use ($request, $data, $page, $newImage): void {
-                $data['body'] = HtmlSanitizer::sanitize($data['body']);
-                if ($newImage) {
-                    $data['featured_image'] = $newImage;
-                }
-                $data['published_at'] = $data['status'] === 'published'
-                    ? ($data['published_at'] ?? $page->published_at ?? now())
-                    : null;
-                $page->update($data);
-            });
-        } catch (\Throwable $exception) {
-            if ($newImage) {
-                Storage::disk('public')->delete($newImage);
+        DB::transaction(function () use ($data, $page, $newMedia): void {
+            $data['body'] = HtmlSanitizer::sanitize($data['body']);
+            if (request()->boolean('remove_featured_image')) {
+                $data['featured_image'] = null;
+                $data['media_id'] = null;
+            } elseif ($newMedia) {
+                $data['featured_image'] = $newMedia->path;
+                $data['media_id'] = $newMedia->id;
+            } else {
+                unset($data['featured_image'], $data['media_id']);
             }
-            throw $exception;
-        }
-
-        if ($newImage && $oldImage && $oldImage !== $newImage && ! str_starts_with($oldImage, 'http') && ! str_starts_with($oldImage, '//')) {
-            Storage::disk('public')->delete($oldImage);
-        }
+            $data['published_at'] = $data['status'] === 'published'
+                ? ($data['published_at'] ?? $page->published_at ?? now())
+                : null;
+            $page->update($data);
+        });
 
         return redirect()->route('admin.pages.edit', $page)->with('success', 'صفحه بروزرسانی شد.');
     }
@@ -121,11 +107,7 @@ class PageController extends Controller
             return back()->with('error', 'صفحات اصلی درباره ما و قوانین را حذف نکنید؛ می‌توانید آن‌ها را ویرایش یا پیش‌نویس کنید.');
         }
 
-        $image = $page->featured_image;
         $page->delete();
-        if ($image && ! str_starts_with($image, 'http') && ! str_starts_with($image, '//')) {
-            Storage::disk('public')->delete($image);
-        }
 
         return redirect()->route('admin.pages.index')->with('success', 'صفحه حذف شد.');
     }
@@ -157,6 +139,7 @@ class PageController extends Controller
             ],
             'excerpt' => ['nullable', 'string', 'max:500'],
             'body' => ['required', 'string', 'max:2000000'],
+            'media_id' => ['nullable', 'integer', 'exists:media,id'],
             'featured_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
             'featured_image_alt' => ['nullable', 'string', 'max:255'],
             'meta_title' => ['nullable', 'string', 'max:255'],

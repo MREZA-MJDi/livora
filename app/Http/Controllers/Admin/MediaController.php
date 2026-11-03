@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Media\MediaUploadRequest;
 use App\Models\Media;
+use App\Support\MediaLibrary;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,11 +17,98 @@ use Throwable;
 
 class MediaController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $media = Media::with('user')->latest()->paginate(24);
+        $filters = $request->validate([
+            'q' => ['nullable', 'string', 'max:120'],
+            'type' => ['nullable', 'in:all,images,documents'],
+            'sort' => ['nullable', 'in:newest,oldest,name'],
+        ]);
 
-        return view('admin.media.index', compact('media'));
+        $query = Media::query()->with(['user', 'productImages.product'])->withCount(['productImages', 'productBanners', 'categories', 'blogPosts', 'contentPages', 'shopBannerSettings']);
+
+        if (filled($filters['q'] ?? null)) {
+            $term = trim($filters['q']);
+            $query->where(function ($builder) use ($term): void {
+                $builder->where('original_name', 'like', "%{$term}%")
+                    ->orWhere('alt', 'like', "%{$term}%")
+                    ->orWhere('description', 'like', "%{$term}%");
+            });
+        }
+
+        if (($filters['type'] ?? 'all') === 'images') {
+            $query->where('mime_type', 'like', 'image/%');
+        } elseif (($filters['type'] ?? 'all') === 'documents') {
+            $query->where('mime_type', 'not like', 'image/%');
+        }
+
+        match ($filters['sort'] ?? 'newest') {
+            'oldest' => $query->oldest(),
+            'name' => $query->orderBy('original_name'),
+            default => $query->latest(),
+        };
+
+        $media = $query->paginate(24)->withQueryString();
+
+        return view('admin.media.index', compact('media', 'filters'));
+    }
+
+    public function picker(Request $request): JsonResponse
+    {
+        $filters = $request->validate([
+            'q' => ['nullable', 'string', 'max:120'],
+            'page' => ['nullable', 'integer', 'min:1'],
+        ]);
+
+        $media = Media::query()
+            ->where('mime_type', 'like', 'image/%')
+            ->when(filled($filters['q'] ?? null), function ($query) use ($filters): void {
+                $term = trim($filters['q']);
+                $query->where(function ($builder) use ($term): void {
+                    $builder->where('original_name', 'like', "%{$term}%")
+                        ->orWhere('alt', 'like', "%{$term}%");
+                });
+            })
+            ->latest()
+            ->paginate(30);
+
+        return response()->json([
+            'data' => $media->getCollection()->map(fn (Media $item): array => [
+                'id' => $item->id,
+                'name' => $item->original_name,
+                'alt' => $item->alt,
+                'url' => $item->url,
+                'size' => $item->human_size,
+            ])->values(),
+            'meta' => [
+                'current_page' => $media->currentPage(),
+                'last_page' => $media->lastPage(),
+                'total' => $media->total(),
+            ],
+        ]);
+    }
+
+    public function crop(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'image' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
+            'alt' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $media = MediaLibrary::store(
+            $request->file('image'),
+            (int) $request->user()->id,
+            'media/crops',
+            $validated['alt'] ?? null
+        );
+
+        return response()->json([
+            'id' => $media->id,
+            'name' => $media->original_name,
+            'alt' => $media->alt,
+            'url' => $media->url,
+            'size' => $media->human_size,
+        ], 201);
     }
 
     public function create(): View
@@ -46,7 +135,7 @@ class MediaController extends Controller
                     'filename' => basename($path),
                     'original_name' => $file->getClientOriginalName(),
                     'mime_type' => $file->getMimeType(),
-                    'extension' => $file->getClientOriginalExtension(),
+                    'extension' => strtolower($file->getClientOriginalExtension()),
                     'size' => $file->getSize(),
                     'alt' => $request->input('alt'),
                     'description' => $request->input('description'),
@@ -57,27 +146,38 @@ class MediaController extends Controller
             throw $exception;
         }
 
-        return redirect()
-            ->route('admin.media.index')
-            ->with('success', 'رسانه با موفقیت آپلود شد.');
+        return redirect()->route('admin.media.index')
+            ->with('success', 'رسانه با موفقیت به کتابخانه اضافه شد.');
     }
 
     public function destroy(Media $media): RedirectResponse
     {
-        if (
-            $media->disk
-            && $media->path
+        $usages = [
+            'تصاویر محصولات' => $media->productImages()->count(),
+            'بنر محصولات' => $media->productBanners()->count(),
+            'دسته‌بندی‌ها' => $media->categories()->count(),
+            'مقاله‌ها' => $media->blogPosts()->count(),
+            'صفحه‌ها' => $media->contentPages()->count(),
+            'بنر فروشگاه' => $media->shopBannerSettings()->count(),
+            'تصویر پیش‌فرض Open Graph' => $media->seoSettings()->count(),
+        ];
+        $usedBy = collect($usages)->filter()->map(fn ($count, $label) => $label.' ('.$count.')')->values();
+
+        if ($usedBy->isNotEmpty()) {
+            return redirect()->route('admin.media.index')
+                ->with('error', 'این رسانه هنوز استفاده می‌شود: '.$usedBy->implode('، ').'. ابتدا اتصال‌های آن را حذف یا جایگزین کنید.');
+        }
+
+        DB::transaction(fn () => $media->delete());
+
+        if ($media->disk && $media->path
             && ! str_starts_with($media->path, 'http://')
             && ! str_starts_with($media->path, 'https://')
-            && ! str_starts_with($media->path, '//')
-        ) {
+            && ! str_starts_with($media->path, '//')) {
             Storage::disk($media->disk)->delete($media->path);
         }
 
-        $media->delete();
-
-        return redirect()
-            ->route('admin.media.index')
-            ->with('success', 'رسانه با موفقیت حذف شد.');
+        return redirect()->route('admin.media.index')
+            ->with('success', 'رسانه حذف شد.');
     }
 }

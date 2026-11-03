@@ -4,6 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\SeoSetting;
+use App\Models\BlogPost;
+use App\Models\Category;
+use App\Models\ContentPage;
+use App\Models\Product;
+use App\Support\MediaLibrary;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -13,7 +19,65 @@ class SeoController extends Controller
 {
     public function edit(): View
     {
-        return view('admin.seo.edit', ['settings' => SeoSetting::current()]);
+        return view('admin.seo.edit', ['settings' => SeoSetting::current()->load('defaultOgMedia')]);
+    }
+
+
+    public function publicRoutes(Request $request): JsonResponse
+    {
+        $term = trim((string) $request->query('q', ''));
+        $routes = collect([
+            ['label' => 'صفحه اصلی', 'url' => route('home'), 'kind' => 'صفحه ثابت'],
+            ['label' => 'فروشگاه', 'url' => route('shop.index'), 'kind' => 'صفحه ثابت'],
+            ['label' => 'فهرست دسته‌بندی‌ها', 'url' => route('categories.index'), 'kind' => 'صفحه ثابت'],
+            ['label' => 'وبلاگ', 'url' => route('blog.index'), 'kind' => 'صفحه ثابت'],
+            ['label' => 'درباره ما', 'url' => route('about'), 'kind' => 'صفحه ثابت'],
+            ['label' => 'قوانین و شرایط', 'url' => route('terms'), 'kind' => 'صفحه ثابت'],
+            ['label' => 'تماس با ما', 'url' => route('contact'), 'kind' => 'صفحه ثابت'],
+        ]);
+
+        $products = Product::query()->active()
+            ->whereHas('category', fn ($query) => $query->where('is_active', true))
+            ->when($term !== '', fn ($query) => $query->where(fn ($search) => $search->where('name', 'like', "%{$term}%")->orWhere('slug', 'like', "%{$term}%")))
+            ->orderBy('name')->limit(40)->get(['name', 'slug']);
+
+        $categories = Category::query()->active()
+            ->when($term !== '', fn ($query) => $query->where(fn ($search) => $search->where('name', 'like', "%{$term}%")->orWhere('slug', 'like', "%{$term}%")))
+            ->orderBy('name')->limit(40)->get(['name', 'slug']);
+
+        $articles = BlogPost::query()
+            ->where('status', 'published')
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->when($term !== '', fn ($query) => $query->where(fn ($search) => $search->where('title', 'like', "%{$term}%")->orWhere('slug', 'like', "%{$term}%")))
+            ->orderByDesc('published_at')->limit(40)->get(['title', 'slug']);
+
+        $pages = ContentPage::query()
+            ->where('status', 'published')
+            ->when($term !== '', fn ($query) => $query->where(fn ($search) => $search->where('title', 'like', "%{$term}%")->orWhere('slug', 'like', "%{$term}%")))
+            ->orderBy('title')->limit(40)->get(['title', 'slug']);
+
+        foreach ($pages as $page) {
+            $routes->push(['label' => 'صفحه: '.$page->title, 'url' => route('pages.show', $page->slug), 'kind' => 'صفحه منتشرشده']);
+        }
+
+        foreach ($articles as $article) {
+            $routes->push(['label' => 'مقاله: '.$article->title, 'url' => route('blog.show', $article->slug), 'kind' => 'مقاله منتشرشده']);
+        }
+
+        foreach ($categories as $category) {
+            $routes->push(['label' => 'دسته‌بندی: '.$category->name, 'url' => route('categories.show', $category->slug), 'kind' => 'دسته‌بندی']);
+        }
+        foreach ($products as $product) {
+            $routes->push(['label' => 'محصول: '.$product->name, 'url' => route('product.show', $product->slug), 'kind' => 'محصول']);
+        }
+
+        if ($term !== '') {
+            $routes = $routes->filter(fn ($item) => str_contains(mb_strtolower($item['label']), mb_strtolower($term))
+                || str_contains(mb_strtolower($item['url']), mb_strtolower($term)));
+        }
+
+        return response()->json(['data' => $routes->values()->take(100)]);
     }
 
     public function update(Request $request): RedirectResponse
@@ -32,17 +96,16 @@ class SeoController extends Controller
             'social_links' => ['nullable', 'array'],
             'social_links.*' => ['nullable', 'url', 'max:2048'],
             'default_og_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
+            'default_og_media_id' => ['nullable', 'integer', 'exists:media,id'],
+            'remove_default_og_image' => ['nullable', 'boolean'],
             'organization_logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
 
         $settings = SeoSetting::current();
-        $oldFiles = [
-            'default_og_image' => $settings->default_og_image,
-            'organization_logo' => $settings->organization_logo,
-        ];
+        $oldFiles = ['organization_logo' => $settings->organization_logo];
         $newFiles = [];
 
-        foreach (['default_og_image' => 'seo', 'organization_logo' => 'brand'] as $field => $folder) {
+        foreach (['organization_logo' => 'brand'] as $field => $folder) {
             if ($request->hasFile($field)) {
                 $path = $request->file($field)->store($folder, 'public');
                 if (! $path) {
@@ -70,6 +133,19 @@ class SeoController extends Controller
             'indexing_enabled' => $request->boolean('indexing_enabled'),
             'following_enabled' => $request->boolean('following_enabled'),
         ];
+
+        if ($request->boolean('remove_default_og_image')) {
+            $data['default_og_image'] = null;
+            $data['default_og_media_id'] = null;
+        } elseif ($request->hasFile('default_og_image')) {
+            $ogMedia = MediaLibrary::store($request->file('default_og_image'), (int) $request->user()->id, 'seo', null);
+            $data['default_og_image'] = $ogMedia->path;
+            $data['default_og_media_id'] = $ogMedia->id;
+        } elseif (filled($request->input('default_og_media_id'))) {
+            $ogMedia = MediaLibrary::image($request->input('default_og_media_id'));
+            $data['default_og_image'] = $ogMedia->path;
+            $data['default_og_media_id'] = $ogMedia->id;
+        }
 
         foreach ($newFiles as $field => $path) {
             $data[$field] = $path;

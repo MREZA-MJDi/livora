@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ShopBannerSetting;
+use App\Support\MediaLibrary;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -25,6 +26,7 @@ class ShopBannerController extends Controller
             'eyebrow' => ['required', 'string', 'max:120'],
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:1200'],
+            'media_id' => ['nullable', 'integer', 'exists:media,id'],
             'banner_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
             'banner_image_alt' => ['nullable', 'string', 'max:255'],
             'is_active' => ['nullable', 'boolean'],
@@ -37,16 +39,9 @@ class ShopBannerController extends Controller
         ]);
 
         $settings = ShopBannerSetting::current();
-        $oldImage = $settings->banner_image;
-        $newImage = null;
-
-        if ($request->hasFile('banner_image')) {
-            $newImage = $request->file('banner_image')->store('shop/banner', 'public');
-
-            if (! $newImage) {
-                throw new \RuntimeException('Shop banner could not be stored.');
-            }
-        }
+        $media = $request->hasFile('banner_image')
+            ? MediaLibrary::store($request->file('banner_image'), (int) $request->user()->id, 'shop/banner', $validated['banner_image_alt'] ?? null)
+            : (filled($validated['media_id'] ?? null) ? MediaLibrary::image($validated['media_id']) : null);
 
         $removeBanner = $request->boolean('remove_banner');
         $data = [
@@ -57,25 +52,16 @@ class ShopBannerController extends Controller
             'is_active' => $request->boolean('is_active'),
         ];
 
-        if ($newImage) {
-            $data['banner_image'] = $newImage;
+        if ($media) {
+            $data['banner_image'] = $media->path;
+            $data['media_id'] = $media->id;
         } elseif ($removeBanner) {
             $data['banner_image'] = null;
+            $data['media_id'] = null;
         }
 
-        try {
-            DB::transaction(fn () => $settings->update($data));
-        } catch (\Throwable $exception) {
-            if ($newImage) {
-                Storage::disk('public')->delete($newImage);
-            }
-            throw $exception;
-        }
+        DB::transaction(fn () => $settings->update($data));
 
-        $imageChanged = $newImage !== null || $removeBanner;
-        if ($imageChanged && $oldImage && ! str_starts_with($oldImage, 'http://') && ! str_starts_with($oldImage, 'https://') && ! str_starts_with($oldImage, '//')) {
-            Storage::disk('public')->delete($oldImage);
-        }
 
         return redirect()
             ->route('admin.shop-banner.edit')

@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Storage;
 class ContentPage extends Model
 {
     protected $fillable = [
-        'user_id', 'title', 'slug', 'excerpt', 'body', 'featured_image',
+        'user_id', 'title', 'slug', 'excerpt', 'body', 'featured_image', 'media_id',
         'featured_image_alt', 'meta_title', 'meta_description', 'canonical_url',
         'og_image', 'status', 'seo_index', 'seo_follow', 'published_at',
     ];
@@ -21,6 +21,11 @@ class ContentPage extends Model
             'seo_follow' => 'boolean',
             'published_at' => 'datetime',
         ];
+    }
+
+    public function media()
+    {
+        return $this->belongsTo(Media::class);
     }
 
     public function scopePublished(Builder $query): Builder

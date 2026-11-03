@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Category\StoreCategoryRequest;
 use App\Http\Requests\Admin\Category\UpdateCategoryRequest;
 use App\Models\Category;
+use App\Support\MediaLibrary;
 use App\Models\Product;
 use App\Services\Seo\ContentSeoAnalyzer;
 use Illuminate\Support\Facades\DB;
@@ -49,26 +50,20 @@ class CategoryController extends Controller
         $relatedProductIds = $data['related_product_ids'] ?? [];
         unset($data['related_category_ids'], $data['related_product_ids']);
 
-        $imagePath = null;
-
-        try {
-            if ($request->hasFile('image')) {
-                $imagePath = $request->file('image')->store('categories', 'public');
-                if (! $imagePath) {
-                    throw new RuntimeException('Category image could not be stored.');
-                }
-                $data['image'] = $imagePath;
-            }
-
-            DB::transaction(function () use ($data, $relatedCategoryIds, $relatedProductIds): void {
-                $category = Category::create($data);
-                $category->relatedCategories()->sync(array_values(array_diff($relatedCategoryIds, [$category->id])));
-                $category->recommendedProducts()->sync($relatedProductIds);
-            });
-        } catch (Throwable $exception) {
-            $this->deleteStoredImage($imagePath);
-            throw $exception;
+        $media = $request->hasFile('image')
+            ? MediaLibrary::store($request->file('image'), (int) $request->user()->id, 'categories', $data['image_alt'] ?? null)
+            : MediaLibrary::image($data['media_id'] ?? null);
+        if ($media) {
+            $data['media_id'] = $media->id;
+            $data['image'] = $media->path;
         }
+        unset($data['media_id']);
+
+        DB::transaction(function () use ($data, $relatedCategoryIds, $relatedProductIds, $media): void {
+            $category = Category::create($data + ['media_id' => $media?->id]);
+            $category->relatedCategories()->sync(array_values(array_diff($relatedCategoryIds, [$category->id])));
+            $category->recommendedProducts()->sync($relatedProductIds);
+        });
 
         Cache::forget('layout.search_categories');
 
@@ -103,33 +98,26 @@ class CategoryController extends Controller
         $relatedProductIds = $data['related_product_ids'] ?? [];
         unset($data['related_category_ids'], $data['related_product_ids']);
 
-        $oldImage = $category->image;
-        $newImage = null;
-
-        try {
-            if ($request->hasFile('image')) {
-                $newImage = $request->file('image')->store('categories', 'public');
-                if (! $newImage) {
-                    throw new RuntimeException('Category image could not be stored.');
-                }
-                $data['image'] = $newImage;
-            }
-
-            DB::transaction(function () use ($category, $data, $relatedCategoryIds, $relatedProductIds): void {
-                $category->update($data);
-                $category->relatedCategories()->sync($relatedCategoryIds);
-                $category->recommendedProducts()->sync($relatedProductIds);
-            });
-        } catch (Throwable $exception) {
-            $this->deleteStoredImage($newImage);
-            throw $exception;
+        $media = $request->hasFile('image')
+            ? MediaLibrary::store($request->file('image'), (int) $request->user()->id, 'categories', $data['image_alt'] ?? null)
+            : (array_key_exists('media_id', $data) ? MediaLibrary::image($data['media_id']) : null);
+        if ($request->boolean('remove_image')) {
+            $data['image'] = null;
+            $data['media_id'] = null;
+        } elseif ($request->hasFile('image') || ! empty($data['media_id'])) {
+            $data['media_id'] = $media?->id;
+            $data['image'] = $media?->path;
+        } else {
+            unset($data['media_id']);
         }
+
+        DB::transaction(function () use ($category, $data, $relatedCategoryIds, $relatedProductIds): void {
+            $category->update($data);
+            $category->relatedCategories()->sync($relatedCategoryIds);
+            $category->recommendedProducts()->sync($relatedProductIds);
+        });
 
         Cache::forget('layout.search_categories');
-
-        if ($newImage && $oldImage !== $newImage) {
-            $this->deleteStoredImage($oldImage);
-        }
 
         return redirect()
             ->route('admin.categories.index')
@@ -147,11 +135,8 @@ class CategoryController extends Controller
                 ->with('error', 'این دسته‌بندی هنوز محصول دارد و تا حذف یا انتقال محصولات قابل حذف نیست.');
         }
 
-        $image = $category->image;
-
         $category->delete();
         Cache::forget('layout.search_categories');
-        $this->deleteStoredImage($image);
 
         return redirect()
             ->route('admin.categories.index')

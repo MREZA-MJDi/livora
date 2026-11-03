@@ -91,4 +91,34 @@ class Media extends Model
     {
         return $this->hasMany(ProductImage::class);
     }
+
+    public function productBanners(): HasMany
+    {
+        return $this->hasMany(Product::class, 'banner_media_id');
+    }
+
+    public function categories(): HasMany
+    {
+        return $this->hasMany(Category::class);
+    }
+
+    public function blogPosts(): HasMany
+    {
+        return $this->hasMany(BlogPost::class);
+    }
+
+    public function contentPages(): HasMany
+    {
+        return $this->hasMany(ContentPage::class);
+    }
+
+    public function shopBannerSettings(): HasMany
+    {
+        return $this->hasMany(ShopBannerSetting::class);
+    }
+
+    public function seoSettings(): HasMany
+    {
+        return $this->hasMany(SeoSetting::class, 'default_og_media_id');
+    }
 }
