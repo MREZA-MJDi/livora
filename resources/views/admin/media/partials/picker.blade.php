@@ -4,9 +4,10 @@
     $mediaPickerUrl = $mediaPickerUrl ?? null;
     $mediaPickerName = $mediaPickerName ?? '';
     $mediaPickerPreviewId = $mediaPickerPreviewId ?? 'media-image-preview';
+    $mediaPickerInputName = $mediaPickerInputName ?? 'media_id';
 @endphp
 <div x-data="mediaPicker(@js(route('admin.media.picker')), @js($mediaPickerId), @js($mediaPickerUrl), @js($mediaPickerName), @js($mediaPickerPreviewId), @js($mediaPickerField))" class="space-y-2">
-    <input type="hidden" name="media_id" :value="selectedMedia?.id || ''">
+    <input type="hidden" name="{{ $mediaPickerInputName }}" :value="selectedMedia?.id || ''">
     <div class="flex flex-wrap items-center gap-2">
         <button type="button" class="admin-btn admin-btn-secondary" @click="openPicker()">انتخاب از کتابخانه رسانه</button>
         <span class="text-xs text-[var(--admin-muted)]" x-text="selectedMedia ? 'تصویر کتابخانه انتخاب شده' : 'تصویر جدید آپلود کنید یا از کتابخانه انتخاب کنید'"></span>
