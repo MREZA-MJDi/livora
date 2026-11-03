@@ -569,6 +569,45 @@ class StorefrontReadinessTest extends TestCase
         }
     }
 
+    public function test_shop_combines_category_search_and_price_filters(): void
+    {
+        $category = $this->category([
+            'name' => 'دسته جستجو',
+            'slug' => 'search-category',
+        ]);
+        $otherCategory = $this->category([
+            'name' => 'دسته دیگر',
+            'slug' => 'other-search-category',
+        ]);
+
+        $matching = $this->product($category, [
+            'name' => 'مبل راحتی کرم',
+            'slug' => 'search-price-matching',
+            'price' => 50000000,
+        ]);
+        $this->product($category, [
+            'name' => 'مبل راحتی گران',
+            'slug' => 'search-price-too-high',
+            'price' => 150000000,
+        ]);
+        $this->product($otherCategory, [
+            'name' => 'مبل راحتی دسته دیگر',
+            'slug' => 'search-other-category',
+            'price' => 50000000,
+        ]);
+
+        $this->get(route('shop.index', [
+            'category' => $category->slug,
+            'search' => 'راحتی',
+            'min_price' => 40000000,
+            'max_price' => 80000000,
+        ]))
+            ->assertOk()
+            ->assertSee($matching->name)
+            ->assertDontSee('مبل راحتی گران')
+            ->assertDontSee('مبل راحتی دسته دیگر');
+    }
+
     public function test_shop_sort_options_match_the_visible_sorting_menu(): void
     {
         $category = $this->category();
