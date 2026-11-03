@@ -40,6 +40,7 @@
 
             <div>
                 <label for="banner_image" class="admin-label">آپلود تصویر و تنظیم کادر</label>
+                <div class="overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)]"><img id="shop-banner-image-preview" src="{{ $settings->banner_image_url ?: '' }}" alt="{{ $settings->banner_image_alt ?: 'پیش‌نمایش بنر فروشگاه' }}" class="{{ $settings->banner_image_url ? '' : 'hidden' }} aspect-[12/5] w-full object-contain"></div>
                 <input
                     id="banner_image"
                     name="banner_image"
@@ -48,6 +49,7 @@
                     data-crop-ratio="2.4"
                     class="admin-input"
                 >
+                @include('admin.media.partials.picker', ['mediaPickerField' => 'banner_image', 'mediaPickerId' => old('media_id', $settings->media_id), 'mediaPickerUrl' => $settings->banner_image_url, 'mediaPickerName' => 'بنر فروشگاه', 'mediaPickerPreviewId' => 'shop-banner-image-preview'])
                 @error('banner_image')<p class="admin-error">{{ $message }}</p>@enderror
                 <p class="admin-help mt-2">پس از انتخاب تصویر، ابزار برش باز می‌شود. قاب را با کشیدن تصویر و کنترل بزرگ‌نمایی تنظیم کنید.</p>
             </div>
