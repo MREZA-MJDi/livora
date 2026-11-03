@@ -10,8 +10,8 @@
 @section('content')
 @php
     $body = (string) $page->body;
-    $body = preg_replace_callback('/<(h1|h2)\\b[^>]*>(.*?)<\\/\\1>/is', function ($match) use ($page) {
-        return trim(preg_replace('/\\s+/u', ' ', strip_tags($match[2]))) === trim($page->title)
+    $body = preg_replace_callback('/<(h1|h2)\b[^>]*>(.*?)<\/\1>/is', function ($match) use ($page) {
+        return trim(preg_replace('/\s+/u', ' ', strip_tags($match[2]))) === trim($page->title)
             ? ''
             : $match[0];
     }, $body, 1);
