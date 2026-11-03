@@ -1,32 +1,46 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\\Http\\Controllers;
 
-use App\Models\Product;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
+use App\\Models\\Product;
+use Illuminate\\Http\\RedirectResponse;
+use Illuminate\\Support\\Facades\\Auth;
+use Illuminate\\View\\View;
 
 class WishlistController extends Controller
 {
     public function index(): View
     {
-        $products = Auth::user()
-            ->wishlistProducts()
+        $wishlist = Auth::user()
+            ->wishlists()
+            ->whereHas('product', function ($query) {
+                $query->active()
+                    ->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('is_active', true));
+            })
             ->with([
-                'category',
-                'images',
+                'product.category',
+                'product.images',
             ])
-            ->latest('wishlists.created_at')
+            ->latest()
             ->paginate(12);
 
         return view('wishlist.index', [
-            'products' => $products,
+            'wishlist' => $wishlist,
         ]);
     }
 
     public function store(Product $product): RedirectResponse
     {
+        if (
+            $product->status !== 'active'
+            || ! $product->category()->where('is_active', true)->exists()
+        ) {
+            return back()->with(
+                'error',
+                'این محصول در حال حاضر در فروشگاه قابل دسترسی نیست.'
+            );
+        }
+
         Auth::user()
             ->wishlists()
             ->firstOrCreate([
