@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\Address;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -518,6 +519,70 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
             ->assertSee('میز عسلی چوبی')
             ->assertDontSee('میز تلویزیون')
             ->assertSee('name="search"', false);
+    }
+
+    public function test_checkout_uses_saved_address_and_renders_two_step_province_city_picker(): void
+    {
+        $customer = $this->user('customer', 'checkout-location-picker@example.test');
+        $category = Category::query()->create([
+            'name' => 'دسته انتخاب نشانی',
+            'slug' => 'checkout-location-picker-category',
+            'description' => null,
+            'is_active' => true,
+            'sort_order' => 1,
+        ]);
+        $product = Product::query()->create([
+            'category_id' => $category->id,
+            'name' => 'محصول انتخاب نشانی',
+            'slug' => 'checkout-location-picker-product',
+            'sku' => 'SG-LOCATION-001',
+            'short_description' => 'محصول تست',
+            'description' => 'محصول تست',
+            'price' => 1000000,
+            'stock' => 2,
+            'status' => 'active',
+            'installment_enabled' => false,
+        ]);
+        $cart = Cart::query()->create([
+            'user_id' => $customer->id,
+            'session_id' => null,
+            'status' => 'active',
+        ]);
+        CartItem::query()->create([
+            'cart_id' => $cart->id,
+            'product_id' => $product->id,
+            'product_variant_id' => null,
+            'variant_key' => 'base',
+            'variant_options' => null,
+            'quantity' => 1,
+            'unit_price' => 1000000,
+        ]);
+        Address::query()->create([
+            'user_id' => $customer->id,
+            'title' => 'خانه',
+            'first_name' => 'مشتری',
+            'last_name' => 'ذخیره‌شده',
+            'phone' => '09121112233',
+            'province' => 'تهران',
+            'city' => 'تهران',
+            'address' => 'خیابان نمونه، پلاک ۱۰',
+            'postal_code' => '1234567890',
+            'unit' => '۲',
+            'is_default' => true,
+        ]);
+
+        $this->actingAs($customer)
+            ->get(route('checkout.index'))
+            ->assertOk()
+            ->assertSee('iranShippingPicker', false)
+            ->assertSee('شهر محل تحویل را انتخاب کنید')
+            ->assertSee('شهر من در فهرست نیست')
+            ->assertSee('ایمیل (اختیاری)')
+            ->assertSee('مشتری')
+            ->assertSee('تهران')
+            ->assertSee('09121112233')
+            ->assertSee('خیابان نمونه، پلاک ۱۰')
+            ->assertSee('بدون ایمیل هم می‌توانید سفارش را ثبت کنید.');
     }
 
     public function test_checkout_rejects_aggregate_quantity_above_base_stock_without_creating_order(): void
