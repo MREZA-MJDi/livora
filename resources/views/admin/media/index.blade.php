@@ -66,6 +66,21 @@
         @endif
 
 
+        <form method="GET" action="{{ route('admin.media.index') }}" class="admin-card grid gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_auto_auto_auto]">
+            <input type="search" name="q" value="{{ $filters['q'] ?? '' }}" class="admin-input" placeholder="جست‌وجوی نام فایل، Alt یا توضیحات">
+            <select name="type" class="admin-select">
+                <option value="all" @selected(($filters['type'] ?? 'all') === 'all')>همه فایل‌ها</option>
+                <option value="images" @selected(($filters['type'] ?? '') === 'images')>تصاویر</option>
+                <option value="documents" @selected(($filters['type'] ?? '') === 'documents')>اسناد</option>
+            </select>
+            <select name="sort" class="admin-select">
+                <option value="newest" @selected(($filters['sort'] ?? 'newest') === 'newest')>جدیدترین</option>
+                <option value="oldest" @selected(($filters['sort'] ?? '') === 'oldest')>قدیمی‌ترین</option>
+                <option value="name" @selected(($filters['sort'] ?? '') === 'name')>نام فایل</option>
+            </select>
+            <button type="submit" class="admin-btn admin-btn-primary">اعمال فیلتر</button>
+        </form>
+
         {{-- Media Library Header --}}
         <div class="flex items-end justify-between">
 
