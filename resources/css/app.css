@@ -982,6 +982,61 @@ body {
     .mobile-bottom-search {
         min-height: 3.25rem;
     }
+
+    /* Comfortable touch and readable form controls on iOS/Android. */
+    .storefront-content input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+    .storefront-content select,
+    .storefront-content textarea {
+        min-width: 0;
+        max-width: 100%;
+        min-height: 3rem;
+        font-size: 16px !important;
+        line-height: 1.5;
+    }
+
+    .storefront-content textarea {
+        min-height: 7rem;
+    }
+
+    .storefront-content input[type="checkbox"],
+    .storefront-content input[type="radio"] {
+        width: 1.125rem;
+        height: 1.125rem;
+        flex: 0 0 auto;
+    }
+
+    .sg-mobile-nav a,
+    .sg-mobile-nav button {
+        min-height: 3rem;
+        touch-action: manipulation;
+    }
+
+    .sg-mobile-nav span {
+        font-size: 10px !important;
+    }
+
+    .storefront-content .product-card,
+    .storefront-content .product-card-content {
+        min-width: 0;
+    }
+
+    .storefront-content .product-card-content {
+        padding: .8rem;
+    }
+
+    .storefront-content .product-card-content h3 {
+        overflow-wrap: anywhere;
+    }
+
+    .storefront-content .sg-category-filter__input {
+        font-size: 16px;
+    }
+
+    .storefront-content .cms-content iframe,
+    .storefront-content .cms-content video {
+        width: 100%;
+        max-width: 100%;
+    }
 }
 
 /* Responsive hero media scale */
