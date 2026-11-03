@@ -318,7 +318,7 @@
         @endif
         <div><label class="admin-label" for="meta_title">Meta Title</label><input id="meta_title" name="meta_title" maxlength="255" class="admin-input" value="{{ old('meta_title', $category->meta_title ?? '') }}">@error('meta_title')<p class="admin-error">{{ $message }}</p>@enderror</div>
         <div><label class="admin-label" for="meta_description">Meta Description</label><textarea id="meta_description" name="meta_description" rows="3" maxlength="1000" class="admin-textarea">{{ old('meta_description', $category->meta_description ?? '') }}</textarea>@error('meta_description')<p class="admin-error">{{ $message }}</p>@enderror</div>
-        <div><label class="admin-label" for="canonical_url">Canonical URL</label><input id="canonical_url" name="canonical_url" type="url" dir="ltr" class="admin-input" value="{{ old('canonical_url', $category->canonical_url ?? '') }}">@error('canonical_url')<p class="admin-error">{{ $message }}</p>@enderror</div>
+        @include('admin.seo.partials.canonical-picker', ['seoCanonical' => $category->canonical_url ?? ''])
         <div><label class="admin-label" for="og_image">Open Graph Image URL</label><input id="og_image" name="og_image" type="url" dir="ltr" class="admin-input" value="{{ old('og_image', $category->og_image ?? '') }}">@error('og_image')<p class="admin-error">{{ $message }}</p>@enderror</div>
     </div>
 
