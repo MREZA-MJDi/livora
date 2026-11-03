@@ -270,6 +270,7 @@
                                     <button
                                         type="button"
                                         @click="openProvinceModal()"
+                                        x-ref="provinceTrigger"
                                         aria-haspopup="dialog"
                                         aria-controls="iran-shipping-location-modal"
                                         class="flex min-h-[3.25rem] w-full items-center justify-between gap-3 rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] px-4 py-3 text-right text-sm transition hover:border-[var(--sg-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--sg-accent)]"
@@ -287,6 +288,7 @@
                                     <button
                                         type="button"
                                         @click="openCityModal()"
+                                        x-ref="cityTrigger"
                                         :disabled="!province"
                                         aria-haspopup="dialog"
                                         aria-controls="iran-shipping-location-modal"
