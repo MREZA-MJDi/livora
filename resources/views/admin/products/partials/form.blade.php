@@ -99,6 +99,7 @@
             </div>
 
             <input type="hidden" name="media_id" :value="selectedMedia?.id || ''">
+            <input type="hidden" name="remove_primary_image" value="0">
 
             <div class="flex flex-wrap gap-3">
                 <button type="button" class="admin-btn admin-btn-secondary" @click="openPicker()">
@@ -118,6 +119,10 @@
                 class="admin-input mt-3 p-2"
                 @change="clearSelection()"
             >
+
+            @if($editing && $productImageUrl)
+                <label class="mt-3 flex items-center gap-2 text-sm text-rose-700"><input type="checkbox" name="remove_primary_image" value="1" class="admin-checkbox"> حذف تصویر اصلی از این محصول</label>
+            @endif
 
             <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">
                 انتخاب از کتابخانه، فایل را دوباره آپلود نمی‌کند. آپلود جدید، فایل اصلی مستقلی به کتابخانه اضافه می‌کند.
@@ -205,6 +210,9 @@
                 >
                 @include('admin.media.partials.picker', ['mediaPickerField' => 'banner_image', 'mediaPickerId' => old('banner_media_id', $product->banner_media_id ?? null), 'mediaPickerUrl' => $product->banner_image ? \Illuminate\Support\Facades\Storage::disk('public')->url($product->banner_image) : null, 'mediaPickerName' => $product->name, 'mediaPickerPreviewId' => 'product-banner-image-preview', 'mediaPickerInputName' => 'banner_media_id'])
                 <p class="admin-help">اندازه پیشنهادی ۱۹۲۰×۸۰۰ پیکسل؛ JPG، PNG یا WEBP تا ۱۰ مگابایت.</p>
+                @if($editing && $product->banner_image)
+                    <label class="mt-2 flex items-center gap-2 text-sm text-rose-700"><input type="checkbox" name="remove_banner_image" value="1" class="admin-checkbox"> حذف بنر فعلی از محصول</label>
+                @endif
                 @error('banner_image')<p class="admin-error">{{ $message }}</p>@enderror
             </div>
 
