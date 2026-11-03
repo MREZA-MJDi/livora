@@ -514,6 +514,8 @@ class StorefrontReadinessTest extends TestCase
 
         $this->get('/categories')
             ->assertOk()
+            ->assertSee('sg-category-grid--index', false)
+            ->assertSee('sg-category-index-tile__media', false)
             ->assertViewHas('categories', function ($categories) {
                 return $categories instanceof LengthAwarePaginator
                     && $categories->perPage() === 12
