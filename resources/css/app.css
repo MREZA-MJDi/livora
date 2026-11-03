@@ -1412,3 +1412,8 @@ body {
     border-radius: 1.25rem;
     background: var(--sg-surface);
 }
+
+.category-card-media [data-card-image] {
+    opacity: 1 !important;
+    transition: none;
+}
