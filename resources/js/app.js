@@ -695,6 +695,7 @@ window.iranShippingPicker = (regions, initialProvince = '', initialCity = '', in
     modalOpen: false,
     step: 'province',
     search: '',
+    returnFocus: 'province',
 
     normalizeSearch(value) {
         return String(value || '')
@@ -732,11 +733,16 @@ window.iranShippingPicker = (regions, initialProvince = '', initialCity = '', in
         if (!this.province || !this.city) return;
 
         const cities = this.selectedProvince?.cities || [];
-        this.cityIsOther = Boolean(initialCityIsOther) || !cities.includes(this.city);
+        const explicitlyManual = initialCityIsOther === true
+            || initialCityIsOther === 1
+            || initialCityIsOther === '1'
+            || initialCityIsOther === 'true';
+        this.cityIsOther = explicitlyManual || !cities.includes(this.city);
         if (this.cityIsOther) this.otherCity = this.city;
     },
 
     openProvinceModal() {
+        this.returnFocus = 'province';
         this.step = 'province';
         this.search = '';
         this.modalOpen = true;
@@ -749,6 +755,7 @@ window.iranShippingPicker = (regions, initialProvince = '', initialCity = '', in
             return;
         }
 
+        this.returnFocus = 'city';
         this.step = 'city';
         this.search = '';
         this.modalOpen = true;
@@ -776,8 +783,7 @@ window.iranShippingPicker = (regions, initialProvince = '', initialCity = '', in
         this.city = city;
         this.otherCity = '';
         this.cityIsOther = false;
-        this.modalOpen = false;
-        this.search = '';
+        this.closeModal();
     },
 
     chooseOtherCity() {
@@ -793,8 +799,7 @@ window.iranShippingPicker = (regions, initialProvince = '', initialCity = '', in
 
         this.city = city;
         this.cityIsOther = true;
-        this.modalOpen = false;
-        this.search = '';
+        this.closeModal();
     },
 
     backToProvinces() {
@@ -805,6 +810,13 @@ window.iranShippingPicker = (regions, initialProvince = '', initialCity = '', in
     closeModal() {
         this.modalOpen = false;
         this.search = '';
+
+        this.$nextTick(() => {
+            const target = this.returnFocus === 'city'
+                ? this.$refs?.cityTrigger
+                : this.$refs?.provinceTrigger;
+            target?.focus?.({ preventScroll: true });
+        });
     },
 });
 
