@@ -1,16 +1,16 @@
 <?php
 
-namespace App\\Http\\Controllers\\Admin;
+namespace App\Http\Controllers\Admin;
 
-use App\\Http\\Controllers\\Controller;
-use App\\Http\\Requests\\Admin\\Media\\MediaUploadRequest;
-use App\\Models\\Media;
-use Illuminate\\Http\\JsonResponse;
-use Illuminate\\Http\\RedirectResponse;
-use Illuminate\\Http\\Request;
-use Illuminate\\Support\\Facades\\DB;
-use Illuminate\\Support\\Facades\\Storage;
-use Illuminate\\View\\View;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\Media\MediaUploadRequest;
+use App\Models\Media;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
 use RuntimeException;
 use Throwable;
 
@@ -26,7 +26,7 @@ class MediaController extends Controller
 
         $query = Media::query()->with('user');
 
-        if (! empty($filters['q'])) {
+        if (filled($filters['q'] ?? null)) {
             $term = trim($filters['q']);
             $query->where(function ($builder) use ($term): void {
                 $builder->where('original_name', 'like', "%{$term}%")
@@ -52,9 +52,6 @@ class MediaController extends Controller
         return view('admin.media.index', compact('media', 'filters'));
     }
 
-    /**
-     * Searchable image-only endpoint used by the shared media picker.
-     */
     public function picker(Request $request): JsonResponse
     {
         $filters = $request->validate([
@@ -64,8 +61,8 @@ class MediaController extends Controller
 
         $media = Media::query()
             ->where('mime_type', 'like', 'image/%')
-            ->when($filters['q'] ?? null, function ($query, string $term): void {
-                $term = trim($term);
+            ->when(filled($filters['q'] ?? null), function ($query) use ($filters): void {
+                $term = trim($filters['q']);
                 $query->where(function ($builder) use ($term): void {
                     $builder->where('original_name', 'like', "%{$term}%")
                         ->orWhere('alt', 'like', "%{$term}%");
@@ -81,8 +78,7 @@ class MediaController extends Controller
                 'alt' => $item->alt,
                 'url' => $item->url,
                 'size' => $item->human_size,
-                'created_at' => $item->created_at?->toISOString(),
-            ]),
+            ])->values(),
             'meta' => [
                 'current_page' => $media->currentPage(),
                 'last_page' => $media->lastPage(),
@@ -115,7 +111,7 @@ class MediaController extends Controller
                     'filename' => basename($path),
                     'original_name' => $file->getClientOriginalName(),
                     'mime_type' => $file->getMimeType(),
-                    'extension' => $file->getClientOriginalExtension(),
+                    'extension' => strtolower($file->getClientOriginalExtension()),
                     'size' => $file->getSize(),
                     'alt' => $request->input('alt'),
                     'description' => $request->input('description'),
@@ -126,35 +122,29 @@ class MediaController extends Controller
             throw $exception;
         }
 
-        return redirect()
-            ->route('admin.media.index')
-            ->with('success', 'رسانه با موفقیت آپلود شد.');
+        return redirect()->route('admin.media.index')
+            ->with('success', 'رسانه با موفقیت به کتابخانه اضافه شد.');
     }
 
     public function destroy(Media $media): RedirectResponse
     {
-        if ($media->productImages()->exists()) {
-            return redirect()
-                ->route('admin.media.index')
-                ->with('error', 'این رسانه به تصویر یک یا چند محصول متصل است؛ ابتدا اتصال‌های آن را تغییر دهید.');
+        $isUsed = $media->productImages()->exists();
+
+        if ($isUsed) {
+            return redirect()->route('admin.media.index')
+                ->with('error', 'این رسانه هنوز در یک یا چند محصول استفاده می‌شود. ابتدا تصویر آن محصولات را جایگزین کنید.');
         }
 
-        DB::transaction(function () use ($media): void {
-            $media->delete();
-        });
+        DB::transaction(fn () => $media->delete());
 
-        if (
-            $media->disk
-            && $media->path
+        if ($media->disk && $media->path
             && ! str_starts_with($media->path, 'http://')
             && ! str_starts_with($media->path, 'https://')
-            && ! str_starts_with($media->path, '//')
-        ) {
+            && ! str_starts_with($media->path, '//')) {
             Storage::disk($media->disk)->delete($media->path);
         }
 
-        return redirect()
-            ->route('admin.media.index')
-            ->with('success', 'رسانه با موفقیت حذف شد.');
+        return redirect()->route('admin.media.index')
+            ->with('success', 'رسانه حذف شد.');
     }
 }
