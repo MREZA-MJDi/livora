@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Media\MediaUploadRequest;
 use App\Models\Media;
+use App\Support\MediaLibrary;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -85,6 +86,29 @@ class MediaController extends Controller
                 'total' => $media->total(),
             ],
         ]);
+    }
+
+    public function crop(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'image' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
+            'alt' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $media = MediaLibrary::store(
+            $request->file('image'),
+            (int) $request->user()->id,
+            'media/crops',
+            $validated['alt'] ?? null
+        );
+
+        return response()->json([
+            'id' => $media->id,
+            'name' => $media->original_name,
+            'alt' => $media->alt,
+            'url' => $media->url,
+            'size' => $media->human_size,
+        ], 201);
     }
 
     public function create(): View
