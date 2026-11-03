@@ -772,6 +772,7 @@ window.iranShippingPicker = (regions, initialProvince = '', initialCity = '', in
         }
 
         this.province = region.name;
+        this.returnFocus = 'city';
         this.step = 'city';
         this.search = '';
         this.$nextTick?.(() => this.$refs?.locationSearch?.focus());
