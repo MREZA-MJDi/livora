@@ -648,12 +648,12 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
         $customer = $this->user('customer', 'gateway-initiation-timeout@example.test');
         $order = $this->orderFor($customer);
 
-        $gateway = \\Mockery::mock(InstallmentPaymentGatewayInterface::class);
+        $gateway = \Mockery::mock(InstallmentPaymentGatewayInterface::class);
         $gateway->shouldReceive('createPayment')
             ->once()
-            ->andThrow(new \\RuntimeException('Connection timed out after request dispatch.'));
+            ->andThrow(new \RuntimeException('Connection timed out after request dispatch.'));
 
-        $manager = \\Mockery::mock(PaymentManager::class);
+        $manager = \Mockery::mock(PaymentManager::class);
         $manager->shouldReceive('driver')->once()->with('digipay')->andReturn($gateway);
         $this->instance(PaymentManager::class, $manager);
 
