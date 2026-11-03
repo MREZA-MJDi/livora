@@ -57,7 +57,7 @@ window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName
         ? { id: Number(initialId), url: initialUrl, name: initialName || 'تصویر فعلی', alt: initialName || '' }
         : null,
     init() {
-        const fileInput = this.$root.querySelector(`input[type=\"file\"][name=\"${this.fileField}\"]`);
+        const fileInput = this.$root.closest('form')?.querySelector(`input[type=\"file\"][name=\"${this.fileField}\"]`);
         fileInput?.addEventListener('change', () => {
             if (fileInput.files?.length) {
                 this.selectedMedia = null;
@@ -95,7 +95,7 @@ window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName
     },
     selectMedia(item) {
         this.selectedMedia = item;
-        const fileInput = this.$root.querySelector(`input[type="file"][name="${this.fileField}"]`);
+        const fileInput = this.$root.closest('form')?.querySelector(`input[type="file"][name="${this.fileField}"]`);
         if (fileInput) fileInput.value = '';
         const removeInput = this.$root.querySelector(`input[name=\"${this.removeField}\"]`);
         if (removeInput) removeInput.value = '0';
@@ -107,14 +107,14 @@ window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName
         this.selectedMedia = null;
         const removeInput = this.$root.querySelector(`input[name="${this.removeField}"]`);
         if (removeInput) removeInput.value = '1';
-        const fileInput = this.$root.querySelector(`input[type="file"][name="${this.fileField}"]`);
+        const fileInput = this.$root.closest('form')?.querySelector(`input[type="file"][name="${this.fileField}"]`);
         if (fileInput) fileInput.value = '';
         const preview = document.getElementById(this.previewId);
         if (preview) { preview.removeAttribute('src'); preview.classList.add('hidden'); }
     },
     async cropSelected() {
         if (!this.selectedMedia || this.loading) return;
-        const fileInput = this.$root.querySelector(`input[type="file"][name="${this.fileField}"]`);
+        const fileInput = this.$root.closest('form')?.querySelector(`input[type="file"][name="${this.fileField}"]`);
         const ratio = Number(fileInput?.dataset.cropRatio) || 4 / 3;
         this.loading = true;
         this.errorMessage = '';
