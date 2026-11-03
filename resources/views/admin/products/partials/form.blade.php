@@ -143,6 +143,7 @@
                     </div>
                     <div class="min-h-0 flex-1 overflow-y-auto p-4">
                         <p x-show="loading" class="py-8 text-center text-sm text-[var(--admin-muted)]">در حال دریافت تصاویر…</p>
+                        <p x-show="errorMessage" x-text="errorMessage" class="py-4 text-center text-sm text-[var(--admin-danger)]"></p>
                         <p x-show="!loading && items.length === 0" class="py-8 text-center text-sm text-[var(--admin-muted)]">تصویری پیدا نشد. می‌توانید تصویر جدید آپلود کنید.</p>
                         <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                             <template x-for="item in items" :key="item.id">
