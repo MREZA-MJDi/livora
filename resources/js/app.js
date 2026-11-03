@@ -63,6 +63,8 @@ window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName
                 this.selectedMedia = null;
                 const removeInput = this.$root.querySelector(`input[name=\"${this.removeField}\"]`);
                 if (removeInput) removeInput.value = '0';
+                const ogRemoval = this.$root.closest('form')?.querySelector('input[type="checkbox"][name="remove_default_og_image"]');
+                if (ogRemoval) ogRemoval.checked = false;
             }
         });
     },
@@ -99,6 +101,8 @@ window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName
         if (fileInput) fileInput.value = '';
         const removeInput = this.$root.querySelector(`input[name=\"${this.removeField}\"]`);
         if (removeInput) removeInput.value = '0';
+        const ogRemoval = this.$root.closest('form')?.querySelector('input[type="checkbox"][name="remove_default_og_image"]');
+        if (ogRemoval) ogRemoval.checked = false;
         const preview = document.getElementById(this.previewId);
         if (preview) { preview.src = item.url; preview.classList.remove('hidden'); }
         this.pickerOpen = false;
