@@ -115,7 +115,13 @@ window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName
     async cropSelected() {
         if (!this.selectedMedia || this.loading) return;
         const fileInput = this.$root.closest('form')?.querySelector(`input[type="file"][name="${this.fileField}"]`);
-        const ratio = Number(fileInput?.dataset.cropRatio) || 4 / 3;
+        const explicitRatio = Number(fileInput?.dataset.cropRatio);
+        const cropContext = [this.fileField, fileInput?.id, this.$root.closest('form')?.action].filter(Boolean).join(' ').toLowerCase();
+        const ratio = Number.isFinite(explicitRatio) && explicitRatio > 0
+            ? explicitRatio
+            : (/category|logo|avatar|profile/.test(cropContext) ? 1
+                : (/og_image/.test(cropContext) ? 1200 / 630
+                    : (/featured|blog|banner|hero|editor|pages/.test(cropContext) ? 16 / 9 : 4 / 3)));
         this.loading = true;
         this.errorMessage = '';
         try {
