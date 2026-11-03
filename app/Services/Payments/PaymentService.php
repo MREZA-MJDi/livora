@@ -258,14 +258,14 @@ class PaymentService
         } catch (Throwable $e) {
             report($e);
 
-            $this->markPaymentAsFailed(
-                $payment,
-                'Gateway communication failed.',
-                [
-                    'exception' =>
-                        $e::class,
-                ]
-            );
+            // A timeout/connection loss does not prove that the provider did
+            // not create a payment session. Keep the attempt active so a
+            // second click cannot create a duplicate remote charge/session.
+            $this->recordGatewayInitiationPending($payment, [
+                'gateway' => $gateway,
+                'exception' => $e::class,
+                'message' => 'Gateway initiation outcome is unknown; reconciliation is required.',
+            ]);
 
             return [
                 'success' => false,
@@ -278,9 +278,12 @@ class PaymentService
                 'redirect_url' => null,
 
                 'message' =>
-                    'خطایی هنگام اتصال به درگاه پرداخت رخ داد. لطفاً دوباره تلاش کنید.',
+                    'پاسخ درگاه نامشخص است؛ برای جلوگیری از پرداخت تکراری، وضعیت تراکنش باید بررسی شود.',
 
-                'data' => [],
+                'data' => [
+                    'initiation_pending' => true,
+                ],
+                'retryable' => false,
             ];
         }
     }
