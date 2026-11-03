@@ -13,6 +13,7 @@
 </head>
 <body
     class="min-h-full bg-[var(--admin-bg)] text-[var(--admin-text)] antialiased"
+    data-admin-session-timeout="{{ (int) config('admin.session_timeout_minutes', 30) }}"
 >
 <div
     x-data="{
@@ -145,6 +146,61 @@
 {{-- =========================================================
      SCRIPTS
 ========================================================== --}}
+{{-- Keep active admin sessions alive only while the operator is interacting with the panel. --}}
+<script>
+(() => {
+    const timeoutMinutes = Number(document.body.dataset.adminSessionTimeout || 30);
+    const heartbeatEveryMs = 5 * 60 * 1000;
+    const recentActivityWindowMs = 5 * 60 * 1000;
+    const heartbeatUrl = @json(route('admin.session.heartbeat'));
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
+    if (!csrfToken || !heartbeatUrl) return;
+
+    let lastInteractionAt = Date.now();
+    let lastHeartbeatAt = Date.now();
+    let heartbeatInFlight = false;
+
+    const registerInteraction = () => {
+        lastInteractionAt = Date.now();
+    };
+
+    ['pointerdown', 'keydown', 'touchstart', 'scroll'].forEach((eventName) => {
+        window.addEventListener(eventName, registerInteraction, { passive: true });
+    });
+
+    window.setInterval(async () => {
+        const now = Date.now();
+        const hasRecentInteraction = now - lastInteractionAt < recentActivityWindowMs;
+        const heartbeatDue = now - lastHeartbeatAt >= heartbeatEveryMs;
+
+        if (!hasRecentInteraction || !heartbeatDue || heartbeatInFlight) return;
+
+        heartbeatInFlight = true;
+
+        try {
+            const response = await window.fetch(heartbeatUrl, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': csrfToken,
+                },
+            });
+
+            if (response.ok) {
+                lastHeartbeatAt = Date.now();
+            }
+        } catch (_) {
+            // A failed heartbeat never extends the session; the server enforces the hard timeout.
+        } finally {
+            heartbeatInFlight = false;
+        }
+    }, 60 * 1000);
+})();
+</script>
+
 @stack('scripts')
 
 @includeIf(
