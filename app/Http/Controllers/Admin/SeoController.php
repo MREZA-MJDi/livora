@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\SeoSetting;
 use App\Models\BlogPost;
 use App\Models\Category;
+use App\Models\ContentPage;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -49,6 +50,15 @@ class SeoController extends Controller
             ->where('published_at', '<=', now())
             ->when($term !== '', fn ($query) => $query->where(fn ($search) => $search->where('title', 'like', "%{$term}%")->orWhere('slug', 'like', "%{$term}%")))
             ->orderByDesc('published_at')->limit(40)->get(['title', 'slug']);
+
+        $pages = ContentPage::query()
+            ->where('status', 'published')
+            ->when($term !== '', fn ($query) => $query->where(fn ($search) => $search->where('title', 'like', "%{$term}%")->orWhere('slug', 'like', "%{$term}%")))
+            ->orderBy('title')->limit(40)->get(['title', 'slug']);
+
+        foreach ($pages as $page) {
+            $routes->push(['label' => 'صفحه: '.$page->title, 'url' => route('pages.show', $page->slug), 'kind' => 'صفحه منتشرشده']);
+        }
 
         foreach ($articles as $article) {
             $routes->push(['label' => 'مقاله: '.$article->title, 'url' => route('blog.show', $article->slug), 'kind' => 'مقاله منتشرشده']);
