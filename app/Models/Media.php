@@ -116,4 +116,9 @@ class Media extends Model
     {
         return $this->hasMany(ShopBannerSetting::class);
     }
+
+    public function seoSettings(): HasMany
+    {
+        return $this->hasMany(SeoSetting::class, 'default_og_media_id');
+    }
 }
