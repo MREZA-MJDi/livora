@@ -24,13 +24,13 @@ class SeoMetadataTest extends TestCase
     }
 
 
-    public function test_robots_txt_points_to_the_official_silashop_domain(): void
+    public function test_robots_txt_points_to_the_official_sillashop_domain(): void
     {
         $robots = file_get_contents(public_path('robots.txt'));
 
         $this->assertIsString($robots);
-        $this->assertStringContainsString('Sitemap: https://silashop.com/sitemap.xml', $robots);
-        $this->assertStringNotContainsString('sillashop.com', $robots);
+        $this->assertStringContainsString('Sitemap: https://sillashop.com/sitemap.xml', $robots);
+        $this->assertStringNotContainsString('silashop.com', $robots);
     }
 
     public function test_seo_route_picker_lists_real_public_destinations_and_excludes_private_routes(): void
@@ -210,7 +210,7 @@ class SeoMetadataTest extends TestCase
 
     public function test_canonical_and_open_graph_urls_are_pinned_to_sillagallery_origin_not_inbound_host(): void
     {
-        config(['app.url' => 'https://silashop.com']);
+        config(['app.url' => 'https://sillashop.com']);
 
         SeoPageSetting::query()
             ->where('route_key', 'home')
@@ -223,10 +223,10 @@ class SeoMetadataTest extends TestCase
             'HTTPS' => 'on',
         ])->get('/')
             ->assertOk()
-            ->assertSee('<link rel="canonical" href="https://silashop.com/catalog/sale">', false)
-            ->assertSee('<meta property="og:url" content="https://silashop.com/catalog/sale">', false)
-            ->assertSee('"url":"https://silashop.com/"', false)
-            ->assertSee('"target":"https://silashop.com/shop?search={search_term_string}"', false)
+            ->assertSee('<link rel="canonical" href="https://sillashop.com/catalog/sale">', false)
+            ->assertSee('<meta property="og:url" content="https://sillashop.com/catalog/sale">', false)
+            ->assertSee('"url":"https://sillashop.com/"', false)
+            ->assertSee('"target":"https://sillashop.com/shop?search={search_term_string}"', false)
             ->assertDontSee('<meta property="og:url" content="https://farajihome.com/catalog/sale">');
     }
 

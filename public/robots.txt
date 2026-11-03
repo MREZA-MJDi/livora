@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://silashop.com/sitemap.xml
+Sitemap: https://sillashop.com/sitemap.xml
