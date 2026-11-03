@@ -67,9 +67,6 @@ class BlogPostController extends Controller
                 $post->tags()->sync($tags);
             });
         } catch (\Throwable $exception) {
-            if ($imagePath) {
-                Storage::disk('public')->delete($imagePath);
-            }
             throw $exception;
         }
 
@@ -114,9 +111,6 @@ class BlogPostController extends Controller
                 $blog->tags()->sync($tags);
             });
         } catch (\Throwable $exception) {
-            if ($newImage) {
-                Storage::disk('public')->delete($newImage);
-            }
             throw $exception;
         }
 
