@@ -348,7 +348,7 @@ class CheckoutController extends Controller
                         $validated['phone'],
 
                     'email' =>
-                        $validated['email'],
+                        $validated['email'] ?? null,
 
                     'province' =>
                         $validated['province'],
