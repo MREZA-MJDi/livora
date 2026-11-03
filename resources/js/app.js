@@ -653,10 +653,14 @@ if (document.readyState === 'loading') {
 }
 
 
-// AJAX requests made from the admin area receive a structured 419 response.
-// Surface a persistent re-authentication prompt instead of leaving the user
-// with an unexplained "Page Expired" response inside a dashboard widget.
-if (/^\/admin(?:\/|$)/.test(window.location.pathname) && !window.__sgAdminSessionGuard) {
+// AJAX requests in the admin area receive a structured 419 and show the
+// existing re-authentication dialog. The admin path is configurable per VPS.
+const configuredAdminPath = String(document.body?.dataset?.adminPath || 'admin').replace(/^\/+|\/+$/g, '');
+const adminBasePath = '/' + configuredAdminPath;
+const isAdminPage = window.location.pathname === adminBasePath
+    || window.location.pathname.startsWith(adminBasePath + '/');
+
+if (isAdminPage && !window.__sgAdminSessionGuard) {
     window.__sgAdminSessionGuard = true;
     const nativeFetch = window.fetch.bind(window);
 
@@ -679,7 +683,6 @@ if (/^\/admin(?:\/|$)/.test(window.location.pathname) && !window.__sgAdminSessio
         return response;
     };
 }
-
 
 
 // Accessible two-step province/city picker used by checkout.
