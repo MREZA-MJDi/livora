@@ -67,5 +67,3 @@
     .sg-card, .sg-image img, .sg-button { transition-duration: 0.01ms; }
 }
 
-/* Keep the floating mobile navigation clear of device safe areas. */
-.sg-mobile-nav { padding-bottom: env(safe-area-inset-bottom); }
