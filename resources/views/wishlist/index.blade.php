@@ -17,10 +17,10 @@
 @section('content')
 
     @php
-        $wishlistItems = $wishlist instanceof \\Illuminate\\Pagination\\AbstractPaginator
+        $wishlistItems = $wishlist instanceof \Illuminate\Pagination\AbstractPaginator
             ? $wishlist->getCollection()
             : ($wishlist->items ?? $wishlist);
-        $wishlistCount = $wishlist instanceof \\Illuminate\\Pagination\\AbstractPaginator
+        $wishlistCount = $wishlist instanceof \Illuminate\Pagination\AbstractPaginator
             ? $wishlist->total()
             : $wishlistItems->count();
     @endphp
@@ -243,7 +243,7 @@
 
                         </div>
 
-                        @if($wishlist instanceof \\Illuminate\\Pagination\\AbstractPaginator)
+                        @if($wishlist instanceof \Illuminate\Pagination\AbstractPaginator)
                             <div class="mt-10">
                                 {{ $wishlist->links() }}
                             </div>
