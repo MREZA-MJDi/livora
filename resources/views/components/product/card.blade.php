@@ -41,7 +41,7 @@
             : 0;
 @endphp
 
-<article class="product-card group relative flex h-full min-w-0 flex-col overflow-hidden rounded-[1.5rem] border border-[var(--sg-border)] bg-[var(--sg-white)] shadow-sm transition duration-300 hover:-translate-y-1 hover:border-[var(--sg-accent)]/40 hover:shadow-lg" aria-labelledby="product-card-title-{{ $product->id }}">
+<article class="product-card group relative flex h-full min-w-0 flex-col overflow-hidden rounded-[1rem] border border-[var(--sg-border)] bg-[var(--sg-white)] shadow-sm transition duration-300 hover:-translate-y-1 hover:border-[var(--sg-accent)]/40 hover:shadow-lg" aria-labelledby="product-card-title-{{ $product->id }}">
 
     {{-- Image --}}
     <div class="relative overflow-hidden bg-[var(--sg-surface)]" data-card-media>
@@ -155,7 +155,7 @@
 
 
     {{-- Product Information --}}
-    <div class="product-card-content flex flex-1 flex-col p-4 sm:p-5">
+    <div class="product-card-content flex flex-1 flex-col p-3 sm:p-4">
 
         {{-- Category --}}
         @if($product->category)
@@ -174,19 +174,19 @@
             href="{{ route('product.show', $product->slug) }}"
             class="mt-2 block"
         >
-            <h3 id="product-card-title-{{ $product->id }}" class="min-h-[3rem] line-clamp-2 text-sm font-semibold leading-6 text-[var(--sg-ink)] transition duration-300 group-hover:text-[var(--sg-accent)] sm:text-[15px]">
+            <h3 id="product-card-title-{{ $product->id }}" class="min-h-[2.5rem] line-clamp-2 text-[13px] font-semibold leading-5 text-[var(--sg-ink)] transition duration-300 group-hover:text-[var(--sg-accent)] sm:text-[15px]">
                 {{ $product->name }}
             </h3>
         </a>
 
         @if(filled($product->short_description))
-            <p class="mt-2 min-h-10 line-clamp-2 text-xs leading-6 text-[var(--sg-stone)]">{{ $product->short_description }}</p>
+            <p class="mt-1.5 min-h-0 line-clamp-2 text-[11px] leading-5 text-[var(--sg-stone)]">{{ $product->short_description }}</p>
         @else
             <p class="mt-2 min-h-10" aria-hidden="true"></p>
         @endif
 
         {{-- Price --}}
-        <div class="product-card-price mt-3 min-h-10 flex-col">
+        <div class="product-card-price mt-2 min-h-8 flex-col">
             <span class="text-[10px] font-medium text-[var(--sg-stone)]">قیمت محصول</span>
 
             @if($hasDiscount)
@@ -222,7 +222,7 @@
         {{-- Installment --}}
         @if($installmentEnabled && $cashAmount > 0)
 
-            <section aria-label="شرایط خرید اقساطی" class="mt-3 min-h-[74px] rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-surface)] p-3">
+            <section aria-label="شرایط خرید اقساطی" class="mt-2 rounded-xl border border-[var(--sg-border)] bg-[var(--sg-surface)] p-2.5">
 
                 <p class="mb-3 text-[10px] font-semibold text-[var(--sg-accent)]">شرایط خرید اقساطی</p>
                 <div class="flex items-center justify-between gap-3">
@@ -260,14 +260,14 @@
             </section>
 
         @else
-            <div class="product-card-installment-placeholder mt-3 min-h-[74px]" aria-hidden="true"></div>
+
 
         @endif
 
         {{-- CTA --}}
         <a
             href="{{ route('product.show', $product->slug) }}"
-            class="mt-auto inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[var(--sg-border)] bg-[var(--sg-surface)] px-4 py-3 text-xs font-semibold text-[var(--sg-ink)] transition duration-300 hover:border-[var(--sg-ink)] hover:bg-[var(--sg-ink)] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sg-accent)]"
+            class="mt-auto inline-flex w-full items-center justify-center gap-2 rounded-lg border border-[var(--sg-border)] bg-[var(--sg-surface)] px-3 py-2.5 text-xs font-semibold text-[var(--sg-ink)] transition duration-300 hover:border-[var(--sg-ink)] hover:bg-[var(--sg-ink)] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sg-accent)]"
         >
             مشاهده محصول
             <span class="mr-2 transition-transform duration-300 group-hover:-translate-x-1">

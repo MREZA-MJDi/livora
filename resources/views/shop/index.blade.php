@@ -35,7 +35,7 @@
                         <span class="font-medium text-[var(--sg-ink)]">فروشگاه</span>
                     </nav>
 
-                    <div class="shop-hero-banner relative mt-5 flex min-h-[270px] aspect-[12/5] items-end overflow-hidden rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-ink)] text-white shadow-sm sm:min-h-[320px]">
+                    <div class="shop-hero-banner relative mt-5 flex  items-end overflow-hidden rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-ink)] text-white shadow-sm sm:min-h-[320px]">
                         @if($shopBanner->banner_image_url)
                             <img
                                 src="{{ $shopBanner->banner_image_url }}"
@@ -48,20 +48,20 @@
                         <div class="absolute inset-0 bg-gradient-to-l from-black/80 via-black/45 to-black/5" aria-hidden="true"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" aria-hidden="true"></div>
 
-                        <div class="relative z-10 w-full max-w-3xl p-6 sm:p-9 lg:p-12">
+                        <div class="relative z-10 w-full max-w-3xl p-5 sm:p-7 lg:p-9">
                             <p class="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/75 sm:text-xs">
                                 {{ $shopBanner->eyebrow ?: 'SILLAGALLERY COLLECTION' }}
                             </p>
-                            <h1 class="mt-4 max-w-2xl text-3xl font-semibold leading-tight tracking-tight sm:text-4xl lg:text-5xl">
+                            <h1 class="mt-4 max-w-2xl text-2xl font-semibold leading-snug tracking-tight sm:text-3xl lg:text-4xl">
                                 {{ $shopBanner->title ?: 'برای خانه‌ای با امضای شما' }}
                             </h1>
                             @if($shopBanner->description)
-                                <p class="mt-4 max-w-2xl text-sm leading-8 text-white/80 sm:text-base">
+                                <p class="mt-3 max-w-2xl text-xs leading-7 text-white/80 sm:text-sm sm:leading-7">
                                     {{ $shopBanner->description }}
                                 </p>
                             @endif
 
-                            <div class="mt-7 flex flex-wrap items-center gap-3">
+                            <div class="mt-5 flex flex-wrap items-center gap-2.5">
                                 <a href="#shop-products" class="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-xs font-semibold text-[var(--sg-ink)] transition hover:bg-[var(--sg-cream)] sm:text-sm">
                                     مشاهده محصولات
                                     <span aria-hidden="true">←</span>
@@ -104,7 +104,7 @@
                                  FILTER CARD
                             ================================================== --}}
 
-                            <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
+                            <div class="rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-4">
 
                                 <div class="flex items-center justify-between gap-3">
 
@@ -139,10 +139,16 @@
                                     class="mt-6"
                                 >
 
+                                    <input type="hidden" name="sort" value="{{ request('sort', 'latest') }}">
+
                                     <x-shop.filters
                                         :categories="$categories"
                                         :selected-category="request('category')"
                                     />
+
+                                    <button type="submit" class="mt-4 w-full rounded-xl bg-[var(--sg-ink)] px-4 py-3 text-xs font-semibold text-white transition hover:bg-[var(--sg-accent)]">
+                                        اعمال فیلترها
+                                    </button>
 
                                 </form>
 

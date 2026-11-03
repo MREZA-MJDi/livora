@@ -23,7 +23,7 @@
      |--------------------------------------------------------------------------
      */
 
-    $baseQuery = request()->except('sort');
+    $baseQuery = request()->except(['sort', 'page']);
 @endphp
 
 <div
