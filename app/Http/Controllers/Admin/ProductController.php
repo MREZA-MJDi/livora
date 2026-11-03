@@ -57,31 +57,38 @@ class ProductController extends Controller
         if ($imageFile && ! $imagePath) {
             throw new RuntimeException('Product image could not be stored.');
         }
-        $bannerMedia = $request->hasFile('banner_image')
-            ? MediaLibrary::store($request->file('banner_image'), (int) $request->user()->id, 'products/banners', $data['banner_image_alt'] ?? null)
-            : MediaLibrary::image($request->input('banner_media_id'));
+        $bannerImageUploaded = $request->hasFile('banner_image');
+        try {
+            $bannerMedia = $bannerImageUploaded
+                ? MediaLibrary::store($request->file('banner_image'), (int) $request->user()->id, 'products/banners', $data['banner_image_alt'] ?? null)
+                : ($request->boolean('remove_banner_image') ? null : MediaLibrary::image($request->input('banner_media_id')));
+        } catch (Throwable $exception) {
+            if ($imagePath) {
+                Storage::disk('public')->delete($imagePath);
+            }
+            throw $exception;
+        }
 
         try {
             DB::transaction(function () use ($request, $data, $relatedProductIds, $mediaId, $imageFile, $imagePath, $bannerMedia): void {
                 $product = Product::create($data);
                 $product->relatedProducts()->sync(array_values(array_diff($relatedProductIds, [$product->id])));
 
-                if ($request->boolean('remove_banner_image')) {
-                    $product->update(['banner_image' => null, 'banner_media_id' => null]);
-                } elseif ($bannerMedia) {
+                if ($bannerMedia) {
                     $product->update([
                         'banner_image' => $bannerMedia->path,
                         'banner_media_id' => $bannerMedia->id,
                         'banner_image_alt' => $data['banner_image_alt'] ?? $product->name,
                     ]);
+                } elseif ($request->boolean('remove_banner_image')) {
+                    $product->update([
+                        'banner_image' => null,
+                        'banner_media_id' => null,
+                        'banner_image_alt' => null,
+                    ]);
                 }
 
-                if ($request->boolean('remove_primary_image') && $primaryImage) {
-                    $primaryImage->variants()->detach();
-                    $primaryImage->delete();
-                    $replacement = $product->images()->orderBy('sort_order')->orderBy('id')->first();
-                    $replacement?->update(['is_primary' => true]);
-                } elseif ($imageFile || $mediaId) {
+                if ($imageFile || $mediaId) {
                     $media = $imageFile
                         ? $this->registerUploadedMedia($request, $imageFile, $imagePath)
                         : Media::query()->whereKey($mediaId)->where('mime_type', 'like', 'image/%')->firstOrFail();
@@ -97,7 +104,10 @@ class ProductController extends Controller
                 }
             });
         } catch (Throwable $exception) {
-            if ($imagePath) Storage::disk('public')->delete($imagePath);
+            if ($imagePath) {
+                Storage::disk('public')->delete($imagePath);
+            }
+            $this->cleanupUploadedMedia($bannerMedia, $bannerImageUploaded);
             throw $exception;
         }
 
@@ -129,16 +139,24 @@ class ProductController extends Controller
         $data = $request->validated();
         $relatedProductIds = $data['related_product_ids'] ?? [];
         $mediaId = $data['media_id'] ?? null;
-        unset($data['related_product_ids'], $data['media_id'], $data['banner_media_id'], $data['image'], $data['banner_image']);
+        unset($data['related_product_ids'], $data['media_id'], $data['banner_media_id'], $data['image'], $data['banner_image'], $data['remove_primary_image'], $data['remove_banner_image']);
 
         $imageFile = $request->file('image');
         $imagePath = $imageFile?->store('products/images', 'public');
         if ($imageFile && ! $imagePath) {
             throw new RuntimeException('Product image could not be stored.');
         }
-        $bannerMedia = $request->hasFile('banner_image')
-            ? MediaLibrary::store($request->file('banner_image'), (int) $request->user()->id, 'products/banners', $data['banner_image_alt'] ?? null)
-            : (filled($request->input('banner_media_id')) ? MediaLibrary::image($request->input('banner_media_id')) : null);
+        $bannerImageUploaded = $request->hasFile('banner_image');
+        try {
+            $bannerMedia = $bannerImageUploaded
+                ? MediaLibrary::store($request->file('banner_image'), (int) $request->user()->id, 'products/banners', $data['banner_image_alt'] ?? null)
+                : ($request->boolean('remove_banner_image') ? null : (filled($request->input('banner_media_id')) ? MediaLibrary::image($request->input('banner_media_id')) : null));
+        } catch (Throwable $exception) {
+            if ($imagePath) {
+                Storage::disk('public')->delete($imagePath);
+            }
+            throw $exception;
+        }
 
         $product->loadMissing('images.media');
         $primaryImage = $product->images->firstWhere('is_primary', true) ?? $product->images->first();
@@ -154,9 +172,15 @@ class ProductController extends Controller
                         'banner_media_id' => $bannerMedia->id,
                         'banner_image_alt' => $data['banner_image_alt'] ?? $product->name,
                     ]);
+                } elseif ($request->boolean('remove_banner_image')) {
+                    $product->update([
+                        'banner_image' => null,
+                        'banner_media_id' => null,
+                        'banner_image_alt' => null,
+                    ]);
                 }
 
-                if ($imageFile || $mediaId) {
+                if ($imageFile || ($mediaId && ! $request->boolean('remove_primary_image'))) {
                     $media = $imageFile
                         ? $this->registerUploadedMedia($request, $imageFile, $imagePath)
                         : Media::query()->whereKey($mediaId)->where('mime_type', 'like', 'image/%')->firstOrFail();
@@ -179,10 +203,23 @@ class ProductController extends Controller
                             'is_primary' => true,
                         ]);
                     }
+                } elseif ($request->boolean('remove_primary_image') && $primaryImage) {
+                    // Detach the product usage, but preserve the shared Media Library asset.
+                    $primaryImage->variants()->detach();
+                    $primaryImage->delete();
+
+                    $replacement = $product->images()
+                        ->orderBy('sort_order')
+                        ->orderBy('id')
+                        ->first();
+                    $replacement?->update(['is_primary' => true]);
                 }
             });
         } catch (Throwable $exception) {
-            if ($imagePath) Storage::disk('public')->delete($imagePath);
+            if ($imagePath) {
+                Storage::disk('public')->delete($imagePath);
+            }
+            $this->cleanupUploadedMedia($bannerMedia, $bannerImageUploaded);
             throw $exception;
         }
 
@@ -193,6 +230,16 @@ class ProductController extends Controller
     {
         $product->delete();
         return redirect()->route('admin.products.index')->with('success', 'محصول با موفقیت حذف شد.');
+    }
+
+    private function cleanupUploadedMedia(?Media $media, bool $wasUploaded): void
+    {
+        if (! $wasUploaded || ! $media) {
+            return;
+        }
+
+        Storage::disk($media->disk ?: 'public')->delete($media->path);
+        $media->delete();
     }
 
     private function registerUploadedMedia(StoreProductRequest|UpdateProductRequest $request, $file, string $path): Media

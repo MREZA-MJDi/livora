@@ -99,6 +99,81 @@ class AdminCrudLifecycleTest extends TestCase
     }
 
 
+    public function test_admin_can_remove_primary_image_and_banner_without_deleting_shared_media(): void
+    {
+        $category = $this->createCategory('product-media-removal-category');
+
+        $this->actingAs($this->admin)
+            ->post(route('admin.products.store'), $this->productPayload($category, [
+                'name' => 'مبل دارای بنر',
+                'slug' => 'sofa-media-removal',
+                'sku' => 'SG-MEDIA-REMOVE-001',
+                'image' => UploadedFile::fake()->image('primary-before-remove.jpg', 800, 1000),
+                'banner_image' => UploadedFile::fake()->image('banner-before-remove.jpg', 1200, 500),
+                'banner_image_alt' => 'بنر محصول برای تست حذف',
+            ]))
+            ->assertRedirect(route('admin.products.index'));
+
+        $product = Product::query()->where('slug', 'sofa-media-removal')->firstOrFail();
+        $primary = $product->images()->firstOrFail();
+        $primaryMedia = Media::query()->findOrFail($primary->media_id);
+        $bannerMedia = $product->bannerMedia()->firstOrFail();
+
+        $secondaryPath = 'products/images/secondary-sofa.webp';
+        Storage::disk('public')->put($secondaryPath, 'secondary-image-content');
+        $secondaryMedia = Media::query()->create([
+            'user_id' => $this->admin->id,
+            'disk' => 'public',
+            'path' => $secondaryPath,
+            'filename' => 'secondary-sofa.webp',
+            'original_name' => 'secondary-sofa.webp',
+            'mime_type' => 'image/webp',
+            'extension' => 'webp',
+            'size' => Storage::disk('public')->size($secondaryPath),
+            'alt' => 'تصویر دوم مبل',
+        ]);
+        $secondary = ProductImage::query()->create([
+            'product_id' => $product->id,
+            'media_id' => $secondaryMedia->id,
+            'path' => $secondaryPath,
+            'alt' => 'تصویر دوم مبل',
+            'sort_order' => 1,
+            'is_primary' => false,
+        ]);
+
+        $this->actingAs($this->admin)
+            ->put(route('admin.products.update', $product), $this->productPayload($category, [
+                'name' => 'مبل دارای بنر',
+                'slug' => 'sofa-media-removal',
+                'sku' => 'SG-MEDIA-REMOVE-001',
+                // The form can still post its preselected IDs when a removal checkbox is used.
+                'media_id' => $primaryMedia->id,
+                'banner_media_id' => $bannerMedia->id,
+                'remove_primary_image' => '1',
+                'remove_banner_image' => '1',
+            ]))
+            ->assertRedirect(route('admin.products.edit', $product));
+
+        $product->refresh();
+        $this->assertNull($product->banner_image);
+        $this->assertNull($product->banner_media_id);
+        $this->assertNull($product->banner_image_alt);
+
+        $this->assertDatabaseMissing('product_images', ['id' => $primary->id]);
+        $this->assertDatabaseHas('product_images', [
+            'id' => $secondary->id,
+            'is_primary' => true,
+        ]);
+        $this->assertDatabaseHas('media', ['id' => $primaryMedia->id]);
+        $this->assertDatabaseHas('media', ['id' => $bannerMedia->id]);
+        Storage::disk('public')->assertExists($primaryMedia->path);
+        Storage::disk('public')->assertExists($bannerMedia->path);
+
+        $this->get(route('product.show', $product->slug))
+            ->assertOk()
+            ->assertSee($secondaryMedia->url, false);
+    }
+
     public function test_admin_can_reuse_a_library_image_and_published_product_appears_on_storefront(): void
     {
         $category = $this->createCategory('media-picker-category');
