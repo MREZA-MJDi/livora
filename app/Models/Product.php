@@ -94,6 +94,11 @@ class Product extends Model
         return $this->belongsTo(Category::class);
     }
 
+    public function bannerMedia()
+    {
+        return $this->belongsTo(Media::class, 'banner_media_id');
+    }
+
     public function images(): HasMany
     {
         return $this->hasMany(ProductImage::class)
