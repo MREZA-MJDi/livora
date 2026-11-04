@@ -1406,12 +1406,14 @@ body {
 .category-card-media [data-card-image-fallback] {
     position: absolute;
     inset: 0;
-    display: flex;
     min-height: 0;
-    align-items: center;
-    justify-content: center;
     border-radius: inherit;
     background: var(--sg-surface);
+}
+.category-card-media [data-card-image-fallback]:not(.hidden) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 
