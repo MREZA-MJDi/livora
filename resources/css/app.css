@@ -1893,3 +1893,26 @@ body {
     .product-card-content h3 { min-height: 2.4rem; font-size: .82rem; }
     .product-card-installment { padding: .5rem .6rem; }
 }
+
+
+/* Explicitly override legacy catalogue frame rules with the shared furniture crop. */
+.sg-product-grid--catalog .product-card-media,
+.sg-product-grid--category .product-card-media,
+.sg-product-grid--showcase .product-card-media {
+    aspect-ratio: 4 / 3;
+}
+@media (min-width: 640px) {
+    .sg-product-carousel-item {
+        flex-basis: calc((100% - clamp(.75rem, 1.5vw, 1.25rem)) / 2);
+    }
+}
+@media (min-width: 900px) {
+    .sg-product-carousel-item {
+        flex-basis: calc((100% - 2 * clamp(.75rem, 1.5vw, 1.25rem)) / 3);
+    }
+}
+@media (min-width: 1280px) {
+    .sg-product-carousel-item {
+        flex-basis: calc((100% - 3 * clamp(.75rem, 1.5vw, 1.25rem)) / 4);
+    }
+}
