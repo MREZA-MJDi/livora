@@ -48,7 +48,7 @@
                         <div class="absolute inset-0 bg-gradient-to-l from-black/80 via-black/45 to-black/5" aria-hidden="true"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" aria-hidden="true"></div>
 
-                        <div class="relative z-10 w-full max-w-3xl p-5 sm:p-7 lg:p-9">
+                        <div class="shop-hero-banner__content relative z-10 w-full max-w-3xl p-5 sm:p-7 lg:p-9">
                             <p class="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/75 sm:text-xs">
                                 {{ $shopBanner->eyebrow ?: 'SILLAGALLERY COLLECTION' }}
                             </p>
