@@ -134,7 +134,7 @@
                         <div class="grid gap-4 sm:grid-cols-2">
                             <div>
                                 <label for="contact-name" class="admin-label">نام و نام خانوادگی <span class="text-[var(--sg-danger)]">*</span></label>
-                                <input id="contact-name" name="name" type="text" required maxlength="120" autocomplete="name" value="{{ old('name', auth()->user()?->name) }}" class="admin-input mt-2 w-full @error('name') border-[var(--sg-danger)] @enderror" placeholder="نام شما">
+                                <input id="contact-name" name="name" type="text" required maxlength="120" autocomplete="name" value="{{ old('name', auth()->user()?->name) }}" class="mt-2 w-full rounded-xl border border-[var(--sg-border)] bg-[var(--sg-white)] px-4 py-3 text-sm text-[var(--sg-ink)] outline-none transition placeholder:text-[var(--sg-stone)] focus:border-[var(--sg-accent)] focus:ring-1 focus:ring-[var(--sg-accent)] @error('name') border-[var(--sg-danger)] @enderror" placeholder="نام شما">
                                 @error('name')<p class="mt-2 text-xs text-[var(--sg-danger)]">{{ $message }}</p>@enderror
                             </div>
                             <div>
@@ -162,7 +162,7 @@
                         </div>
                         <div>
                             <label for="contact-message" class="admin-label">پیام شما <span class="text-[var(--sg-danger)]">*</span></label>
-                            <textarea id="contact-message" name="message" rows="5" required minlength="10" maxlength="5000" class="admin-textarea mt-2 w-full @error('message') border-[var(--sg-danger)] @enderror" placeholder="چطور می‌توانیم راهنمایی‌تان کنیم؟">{{ old('message') }}</textarea>
+                            <textarea id="contact-message" name="message" rows="5" required minlength="10" maxlength="5000" class="mt-2 w-full rounded-xl border border-[var(--sg-border)] bg-[var(--sg-white)] px-4 py-3 text-sm text-[var(--sg-ink)] outline-none transition placeholder:text-[var(--sg-stone)] focus:border-[var(--sg-accent)] focus:ring-1 focus:ring-[var(--sg-accent)] min-h-36 resize-y @error('message') border-[var(--sg-danger)] @enderror" placeholder="چطور می‌توانیم راهنمایی‌تان کنیم؟">{{ old('message') }}</textarea>
                             <p class="mt-2 text-xs text-[var(--sg-stone)]">حداقل ۱۰ و حداکثر ۵۰۰۰ نویسه.</p>
                             @error('message')<p class="mt-2 text-xs text-[var(--sg-danger)]">{{ $message }}</p>@enderror
                         </div>
