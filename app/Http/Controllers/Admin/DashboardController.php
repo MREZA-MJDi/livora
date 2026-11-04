@@ -215,7 +215,7 @@ class DashboardController extends Controller
     {
         return OrderItem::query()
             ->with([
-                'product.images' => fn ($imageQuery) => $imageQuery->limit(1),
+                'product.images' => fn ($imageQuery) => $imageQuery->with('media')->orderByDesc('is_primary')->orderBy('sort_order')->orderBy('id')->limit(1),
             ])
             ->whereHas(
                 'order',
