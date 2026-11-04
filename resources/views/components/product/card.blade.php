@@ -21,6 +21,12 @@
     $installmentEnabled =
         (bool) $product->installment_enabled;
 
+    $hasVariants = isset($product->all_variants_count)
+        ? (int) $product->all_variants_count > 0
+        : ($product->relationLoaded('allVariants')
+            ? $product->allVariants->isNotEmpty()
+            : $product->allVariants()->exists());
+
 @endphp
 
 <article class="product-card group relative flex h-full min-w-0 flex-col overflow-hidden rounded-[1rem] border border-[var(--sg-border)] bg-[var(--sg-white)] shadow-sm transition duration-300 hover:-translate-y-1 hover:border-[var(--sg-accent)]/40 hover:shadow-lg" aria-labelledby="product-card-title-{{ $product->id }}">
@@ -192,16 +198,45 @@
 
         </div>
 
-        {{-- CTA --}}
-        <a
-            href="{{ route('product.show', $product->slug) }}"
-            class="mt-auto inline-flex w-full items-center justify-center gap-2 rounded-lg border border-[var(--sg-border)] bg-[var(--sg-surface)] px-3 py-2.5 text-xs font-semibold text-[var(--sg-ink)] transition duration-300 hover:border-[var(--sg-ink)] hover:bg-[var(--sg-ink)] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sg-accent)]"
-        >
-            مشاهده محصول
-            <span class="mr-2 transition-transform duration-300 group-hover:-translate-x-1">
-                ←
-            </span>
-        </a>
+        {{-- Compact product actions: direct quick-add for simple products, option selection otherwise. --}}
+        <div class="product-card-actions mt-auto">
+            <a
+                href="{{ route('product.show', $product->slug) }}"
+                class="product-card-details"
+            >
+                جزئیات
+            </a>
+
+            @if($hasVariants)
+                <a
+                    href="{{ route('product.show', $product->slug) }}"
+                    class="product-card-choose-options"
+                >
+                    انتخاب گزینه‌ها
+                </a>
+            @elseif((int) $product->stock > 0)
+                <form
+                    action="{{ route('cart.add', $product) }}"
+                    method="POST"
+                    class="product-card-quick-add-form"
+                    data-cart-add-form
+                >
+                    @csrf
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" class="product-card-quick-add" data-cart-add-button>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m-7-7h14"/>
+                        </svg>
+                        <span>افزودن به سبد</span>
+                    </button>
+                    <span class="product-card-quick-add-feedback" data-cart-feedback role="status" aria-live="polite"></span>
+                </form>
+            @else
+                <button type="button" class="product-card-quick-add is-unavailable" disabled>
+                    ناموجود
+                </button>
+            @endif
+        </div>
 
     </div>
 
