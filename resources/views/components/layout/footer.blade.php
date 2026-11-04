@@ -302,29 +302,7 @@
 
                 @endauth
 
-                @if(filled($storeSettings?->instagram_url))
-                    <a
-                    href="{{ $storeSettings->instagram_url }}"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label="Instagram"
-                        class="text-xs text-white/40 transition hover:text-white"
-                    >
-                        Instagram
-                    </a>
-                @endif
-
-                @if(filled($storeSettings?->telegram_url))
-                    <a
-                    href="{{ $storeSettings->telegram_url }}"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label="Telegram"
-                        class="text-xs text-white/40 transition hover:text-white"
-                    >
-                        Telegram
-                    </a>
-                @endif
+                <x-layout.social-links :settings="$storeSettings" variant="footer" />
 
             </div>
 
