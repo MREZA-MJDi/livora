@@ -108,7 +108,7 @@
                             </div>
                         </div>
 
-                        <div class="sg-category-detail-visual relative overflow-hidden rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-surface)]">
+                        <div class="sg-category-detail-visual relative aspect-[4/3] overflow-hidden rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-surface)]">
                             @if($category->homepage_image_url)
                                 <img
                                     src="{{ $category->homepage_image_url }}"

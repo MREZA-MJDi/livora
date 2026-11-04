@@ -40,13 +40,13 @@
 
             <div>
                 <label for="banner_image" class="admin-label">آپلود تصویر و تنظیم کادر</label>
-                <div class="overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)]"><img id="shop-banner-image-preview" src="{{ $settings->banner_image_url ?: '' }}" alt="{{ $settings->banner_image_alt ?: 'پیش‌نمایش بنر فروشگاه' }}" class="{{ $settings->banner_image_url ? '' : 'hidden' }} aspect-[12/5] w-full object-contain"></div>
+                <div class="overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)]"><img id="shop-banner-image-preview" src="{{ $settings->banner_image_url ?: '' }}" alt="{{ $settings->banner_image_alt ?: 'پیش‌نمایش بنر فروشگاه' }}" class="{{ $settings->banner_image_url ? '' : 'hidden' }} aspect-[12/5] w-full object-cover"></div>
                 <input
                     id="banner_image"
                     name="banner_image"
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
-                    data-crop-ratio="2.4"
+                    data-crop-ratio="2.4" data-preview-target="shop-banner-image-preview"
                     class="admin-input"
                 >
                 @include('admin.media.partials.picker', ['mediaPickerField' => 'banner_image', 'mediaPickerId' => old('media_id', $settings->media_id), 'mediaPickerUrl' => $settings->banner_image_url, 'mediaPickerName' => 'بنر فروشگاه', 'mediaPickerPreviewId' => 'shop-banner-image-preview', 'mediaPickerRemoveName' => 'remove_banner'])

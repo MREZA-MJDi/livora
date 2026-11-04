@@ -211,3 +211,42 @@ test('mobile menu is reachable from the visible header and can be closed', async
     await menu.locator('button[aria-label="بستن منو"]').last().click();
     await expect(menu).toBeHidden();
 });
+
+
+test('public category, product and banner image frames preserve their editor crop ratios', async ({ page }) => {
+    const expectRatio = async (selector, expected, label) => {
+        const element = page.locator(selector).first();
+        if (await element.count() === 0) return;
+        const ratio = await element.evaluate(node => {
+            const rect = node.getBoundingClientRect();
+            return rect.width / rect.height;
+        });
+        expect(ratio, label).toBeCloseTo(expected, 1);
+    };
+
+    for (const viewport of [
+        { width: 390, height: 844 },
+        { width: 1440, height: 960 },
+    ]) {
+        await page.setViewportSize(viewport);
+
+        await page.goto('/categories', { waitUntil: 'domcontentloaded' });
+        await expectRatio('.sg-category-index-tile__media', 4 / 3, 'category directory card ratio');
+
+        await page.goto('/', { waitUntil: 'domcontentloaded' });
+        await expectRatio('.category-card-media', 4 / 3, 'homepage category card ratio');
+        await expectRatio('.sg-product-grid .product-card-media', 4 / 5, 'homepage product card ratio');
+
+        await page.goto('/categories/furniture', { waitUntil: 'domcontentloaded' });
+        await expectRatio('.sg-category-detail-visual', 4 / 3, 'category detail hero ratio');
+
+        await page.goto('/shop', { waitUntil: 'domcontentloaded' });
+        await expectRatio('.shop-hero-banner', 12 / 5, 'shop banner ratio');
+        await expectRatio('.sg-product-grid--catalog .product-card-media', 4 / 5, 'shop product card ratio');
+
+        if (viewport.width < 640) {
+            await page.goto('/product/luna-sofa', { waitUntil: 'domcontentloaded' });
+            await expectRatio('.product-gallery-stage', 4 / 5, 'public product gallery ratio');
+        }
+    }
+});

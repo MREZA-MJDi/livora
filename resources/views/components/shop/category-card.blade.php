@@ -20,7 +20,7 @@
         <div class="relative overflow-hidden rounded-[2rem] bg-[var(--sg-surface)]">
 
             {{-- Image --}}
-            <div class="category-card-media relative aspect-[4/5] overflow-hidden" data-card-media>
+            <div class="category-card-media relative aspect-[4/3] overflow-hidden" data-card-media>
 
                 @if($image)
 
