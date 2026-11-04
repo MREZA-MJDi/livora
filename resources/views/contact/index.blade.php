@@ -139,13 +139,13 @@
                             </div>
                             <div>
                                 <label for="contact-phone" class="admin-label">شماره تماس <span class="text-[var(--sg-danger)]">*</span></label>
-                                <input id="contact-phone" name="phone" type="tel" required maxlength="30" autocomplete="tel" inputmode="tel" dir="ltr" value="{{ old('phone') }}" class="admin-input mt-2 w-full text-left @error('phone') border-[var(--sg-danger)] @enderror" placeholder="09xxxxxxxxx">
+                                <input id="contact-phone" name="phone" type="tel" required maxlength="30" autocomplete="tel" inputmode="tel" dir="ltr" value="{{ old('phone') }}" class="mt-2 w-full rounded-xl border border-[var(--sg-border)] bg-[var(--sg-white)] px-4 py-3 text-sm text-[var(--sg-ink)] outline-none transition placeholder:text-[var(--sg-stone)] focus:border-[var(--sg-accent)] focus:ring-1 focus:ring-[var(--sg-accent)] text-left @error('phone') border-[var(--sg-danger)] @enderror" placeholder="09xxxxxxxxx">
                                 @error('phone')<p class="mt-2 text-xs text-[var(--sg-danger)]">{{ $message }}</p>@enderror
                             </div>
                         </div>
                         <div>
                             <label for="contact-email" class="admin-label">ایمیل <span class="text-xs font-normal text-[var(--sg-stone)]">(اختیاری)</span></label>
-                            <input id="contact-email" name="email" type="email" maxlength="255" autocomplete="email" dir="ltr" value="{{ old('email', auth()->user()?->email) }}" class="admin-input mt-2 w-full text-left @error('email') border-[var(--sg-danger)] @enderror" placeholder="you@example.com">
+                            <input id="contact-email" name="email" type="email" maxlength="255" autocomplete="email" dir="ltr" value="{{ old('email', auth()->user()?->email) }}" class="mt-2 w-full rounded-xl border border-[var(--sg-border)] bg-[var(--sg-white)] px-4 py-3 text-sm text-[var(--sg-ink)] outline-none transition placeholder:text-[var(--sg-stone)] focus:border-[var(--sg-accent)] focus:ring-1 focus:ring-[var(--sg-accent)] text-left @error('email') border-[var(--sg-danger)] @enderror" placeholder="you@example.com">
                             @error('email')<p class="mt-2 text-xs text-[var(--sg-danger)]">{{ $message }}</p>@enderror
                         </div>
                         <div>
