@@ -95,7 +95,7 @@
                 {{ $editing ? 'تصویر جدید' : 'تصویر محصول' }}
             </label>
 
-            <div class="admin-image-preview mb-5 aspect-video max-w-xl">
+            <div class="admin-image-preview mb-5 aspect-[4/3] max-w-xl">
                 <img id="product-gallery-image-preview" src="{{ $productImage->url ?? '' }}" alt="{{ $productImage->alt ?? 'تصویر محصول' }}" class="admin-image {{ $editing ? '' : 'hidden' }}">
             </div>
             <input
