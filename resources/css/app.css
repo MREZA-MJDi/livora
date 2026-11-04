@@ -1916,3 +1916,82 @@ body {
         flex-basis: calc((100% - clamp(.75rem, 1.5vw, 1.25rem) - clamp(.75rem, 1.5vw, 1.25rem) - clamp(.75rem, 1.5vw, 1.25rem)) / 4);
     }
 }
+
+
+/* Installment stamp: visible on the photo, not as a tall extra card section. */
+.product-installment-seal {
+    position: absolute;
+    z-index: 5;
+    inset-block-start: .75rem;
+    inset-inline-end: .75rem;
+    display: flex;
+    width: 3.65rem;
+    height: 3.65rem;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .05rem;
+    border: 1px solid rgba(255,255,255,.88);
+    border-radius: 50%;
+    outline: 1px dashed rgba(255,255,255,.75);
+    outline-offset: -4px;
+    background: rgba(35,33,30,.88);
+    color: #fff;
+    box-shadow: 0 3px 14px rgba(0,0,0,.2);
+    text-align: center;
+    backdrop-filter: blur(8px);
+    pointer-events: none;
+}
+.product-installment-seal span {
+    font-size: .53rem;
+    font-weight: 500;
+    line-height: 1.2;
+    opacity: .88;
+}
+.product-installment-seal strong {
+    font-size: .72rem;
+    font-weight: 800;
+    line-height: 1.35;
+}
+.product-installment-summary {
+    min-width: 0;
+}
+.product-installment-summary__icon {
+    display: inline-flex;
+    width: 1.9rem;
+    height: 1.9rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--sg-ink);
+    color: #fff;
+    font-size: .8rem;
+    font-weight: 700;
+}
+.product-installment-details summary {
+    list-style: none;
+}
+.product-installment-details summary::-webkit-details-marker {
+    display: none;
+}
+.product-installment-details summary::after {
+    content: '+';
+    float: left;
+    font-size: .95rem;
+    line-height: 1;
+}
+.product-installment-details[open] summary::after {
+    content: '−';
+}
+@media (max-width: 639px) {
+    .product-installment-seal {
+        inset-block-start: .55rem;
+        inset-inline-end: .55rem;
+        width: 3.15rem;
+        height: 3.15rem;
+    }
+    .product-installment-seal strong { font-size: .65rem; }
+    .product-installment-summary { padding: .7rem; }
+    .product-installment-summary .grid > div { padding: .55rem .45rem; }
+    .product-installment-summary .grid > div p { overflow-wrap: anywhere; }
+}
