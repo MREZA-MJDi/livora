@@ -90,13 +90,23 @@
 </head>
 <body class="min-h-screen antialiased">
 @php
-    // Resolve the customer's cart once for the shared storefront shell.
-    // Navbar and mobile navigation consume the same count without duplicate queries.
-    $storefrontCartCount = 0;
+    // Resolve the active cart for both customers and guests.
+    // Guest carts are session-bound, so the navbar badge works before login too.
+    $storefrontCartQuery = \\App\\Models\\Cart::query()->where('status', 'active');
+
     if (auth()->check() && auth()->user()->isCustomer()) {
-        $storefrontCart = auth()->user()->activeCart;
-        $storefrontCartCount = $storefrontCart?->itemCount() ?? 0;
+        $storefrontCartQuery->where('user_id', auth()->id());
+    } else {
+        $storefrontCartQuery
+            ->whereNull('user_id')
+            ->where('session_id', request()->session()->getId());
     }
+
+    $storefrontCart = $storefrontCartQuery
+        ->withSum('items', 'quantity')
+        ->first();
+
+    $storefrontCartCount = (int) ($storefrontCart?->items_sum_quantity ?? 0);
 @endphp
 <div id="app" x-data="{
     mobileOpen: false,
