@@ -19,6 +19,7 @@ class ShopController extends Controller
                 'category',
                 'images' => fn ($imageQuery) => $imageQuery->with('media')->orderByDesc('is_primary')->orderBy('sort_order')->orderBy('id')->limit(1),
             ])
+            ->withCount('allVariants')
             ->active()
             ->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('is_active', true));
 
