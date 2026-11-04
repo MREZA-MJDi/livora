@@ -1580,10 +1580,9 @@ body.sg-crop-open{overflow:hidden}
 
 
 /* Match the uploaded primary-image preview to the 4:5 storefront product card. */
-.admin-image-preview .product-primary-preview,
-.admin-image-preview .product-gallery-preview {
+.admin-image-preview .product-primary-preview {
     object-fit: contain;
     object-position: center;
-    padding: 0;
+    padding: 0.5rem;
     background: var(--admin-white);
 }

@@ -827,9 +827,9 @@ body {
 }
 
 .product-gallery-stage {
-    height: min(125vw, 72svh);
-    max-height: 680px;
-    aspect-ratio: auto;
+    height: auto;
+    max-height: none;
+    aspect-ratio: 4 / 5;
 }
 
 .product-gallery-image {
@@ -908,6 +908,7 @@ body {
     .product-gallery-stage {
         height: clamp(460px, calc(100svh - 210px), 720px);
         max-height: 720px;
+        aspect-ratio: auto;
     }
 
     .search-overlay-panel {
@@ -918,7 +919,9 @@ body {
 
 @media (min-width: 640px) and (max-width: 1023px) {
     .product-gallery-stage {
-        height: min(92vw, 76svh);
+        height: auto;
+        max-height: none;
+        aspect-ratio: 4 / 5;
     }
 }
 
@@ -953,8 +956,9 @@ body {
     }
 
     .product-gallery-stage {
-        height: min(125vw, 72svh);
-        max-height: 560px;
+        height: auto;
+        max-height: none;
+        aspect-ratio: 4 / 5;
     }
 
     .product-gallery-image {

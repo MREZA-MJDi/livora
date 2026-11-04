@@ -96,7 +96,7 @@
             </label>
 
             <div class="admin-image-preview mb-5 aspect-[4/5] max-w-xl">
-                <img id="product-gallery-image-preview" src="{{ $productImage->url ?? '' }}" alt="{{ $productImage->alt ?? 'تصویر محصول' }}" class="admin-image product-gallery-preview {{ $editing ? '' : 'hidden' }}">
+                <img id="product-gallery-image-preview" src="{{ $productImage->url ?? '' }}" alt="{{ $productImage->alt ?? 'تصویر محصول' }}" class="admin-image {{ $editing ? '' : 'hidden' }}">
             </div>
             <input
                 id="image"
