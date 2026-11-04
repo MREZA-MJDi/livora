@@ -1633,3 +1633,25 @@ body {
     .shop-hero-banner { min-height: 205px; height: auto; border-radius: .875rem; }
     .shop-hero-banner > img { object-position: 58% center; }
 }
+
+
+/* Storefront card finishing pass */
+.sg-product-grid .product-card{display:flex;min-width:0;height:100%;flex-direction:column}
+.sg-product-grid .product-card-media{aspect-ratio:4/5;overflow:hidden;background:#f4f2ee}
+.sg-product-grid .product-card-image{width:100%;height:100%;object-fit:contain;object-position:center}
+.sg-product-grid .product-card-content{display:flex;flex:1 1 auto;flex-direction:column;min-width:0;gap:.15rem;padding:clamp(.75rem,1.2vw,1rem)}
+.sg-product-grid .product-card-content h3{min-height:2.8rem;line-height:1.65}
+.sg-product-grid .product-card-category{min-height:1rem}
+.sg-product-grid .product-card-price{min-height:0;margin-top:.75rem}
+.sg-product-grid .product-card-content>a:last-child{margin-top:auto}
+.sg-product-grid .product-card-content section[aria-label="شرایط خرید اقساطی"]{min-height:5.25rem}
+.sg-category-grid--index .sg-category-index-tile{height:auto;align-self:start}
+@media(max-width:639px){
+.sg-product-grid{column-gap:.625rem;row-gap:1rem}
+.sg-product-grid .product-card{border-radius:.85rem}
+.sg-product-grid .product-card-content{padding:.7rem}
+.sg-product-grid .product-card-content h3{min-height:2.6rem;font-size:.8rem}
+.sg-product-grid .product-card-price>span{font-size:.62rem}
+.sg-product-grid .product-card-price p,.sg-product-grid .product-card-price>div>span:first-child{font-size:.82rem}
+.sg-product-grid .product-card-content>a:last-child{min-height:2.65rem;padding-inline:.5rem;font-size:.68rem}
+}
