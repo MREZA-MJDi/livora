@@ -1867,8 +1867,8 @@ body {
 .shop-hero-banner {
     width: 100%;
     min-height: 0;
-    max-height: 390px;
-    aspect-ratio: 16 / 5;
+    max-height: none;
+    aspect-ratio: 12 / 5;
 }
 .shop-hero-banner > img {
     width: 100%;
