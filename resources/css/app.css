@@ -1769,7 +1769,7 @@ body {
 .product-card-media {
     display: block;
     width: 100%;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 4 / 5;
     overflow: hidden;
     background: #e9e5dd;
 }
@@ -1899,7 +1899,7 @@ body {
 .sg-product-grid--catalog .product-card-media,
 .sg-product-grid--category .product-card-media,
 .sg-product-grid--showcase .product-card-media {
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 4 / 5;
 }
 @media (min-width: 640px) {
     .sg-product-carousel-item {
