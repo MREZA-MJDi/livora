@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\ContactSetting;
 use App\Models\Address;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -1240,7 +1241,7 @@ class StorefrontReadinessTest extends TestCase
             'is_active' => true,
         ]);
 
-        \\Illuminate\\Support\\Facades\\Cache::forget('storefront.settings');
+        \Illuminate\Support\Facades\Cache::forget('storefront.settings');
 
         foreach (['/', '/contact'] as $uri) {
             $this->get($uri)
