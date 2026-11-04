@@ -52,10 +52,12 @@ class CategoryController extends Controller
             'recommendedProducts' => fn ($query) => $query
                 ->where('status', 'active')
                 ->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('is_active', true))
+                ->withCount('allVariants')
                 ->with(['category', 'images' => fn ($imageQuery) => $imageQuery->with('media')->orderByDesc('is_primary')->orderBy('sort_order')->orderBy('id')->limit(1)]),
         ]);
 
         $query = $category->products()
+            ->withCount('allVariants')
             ->active()
             ->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('is_active', true))
             ->with([
