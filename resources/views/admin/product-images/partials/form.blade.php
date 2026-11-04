@@ -78,7 +78,7 @@
 
             @if($editing && $productImage->url)
 
-                <div class="admin-image-preview mb-5 aspect-[4/3] max-w-xl">
+                <div class="admin-image-preview mb-5 aspect-[4/5] max-w-xl">
 
                     <img
                         src="{{ $productImage->url }}"
@@ -95,12 +95,12 @@
                 {{ $editing ? 'تصویر جدید' : 'تصویر محصول' }}
             </label>
 
-            <div class="admin-image-preview mb-5 aspect-[4/3] max-w-xl">
+            <div class="admin-image-preview mb-5 aspect-[4/5] max-w-xl">
                 <img id="product-gallery-image-preview" src="{{ $productImage->url ?? '' }}" alt="{{ $productImage->alt ?? 'تصویر محصول' }}" class="admin-image {{ $editing ? '' : 'hidden' }}">
             </div>
             <input
                 id="image"
-                name="image" data-crop-ratio="1.3333333" data-preview-target="product-gallery-image-preview"
+                name="image" data-crop-ratio="0.8" data-preview-target="product-gallery-image-preview"
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
                 class="admin-input p-2"

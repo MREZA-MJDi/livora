@@ -243,5 +243,10 @@ test('public category, product and banner image frames preserve their editor cro
         await page.goto('/shop', { waitUntil: 'domcontentloaded' });
         await expectRatio('.shop-hero-banner', 12 / 5, 'shop banner ratio');
         await expectRatio('.sg-product-grid--catalog .product-card-media', 4 / 5, 'shop product card ratio');
+
+        if (viewport.width < 640) {
+            await page.goto('/product/luna-sofa', { waitUntil: 'domcontentloaded' });
+            await expectRatio('.product-gallery-stage', 4 / 5, 'public product gallery ratio');
+        }
     }
 });
