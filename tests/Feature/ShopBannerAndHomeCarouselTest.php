@@ -105,7 +105,9 @@ class ShopBannerAndHomeCarouselTest extends TestCase
             ->assertSee('مبل راحتی تست')
             ->assertSee('دسته‌بندی:')
             ->assertSee('قیمت محصول')
-            ->assertSee('مبل راحتی با طراحی مینیمال');
+            ->assertSee('مبل راحتی با طراحی مینیمال')
+            ->assertSee('product-card-media', false)
+            ->assertSee('product-card-description', false);
     }
 
     public function test_inactive_shop_banner_is_not_rendered(): void
