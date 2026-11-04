@@ -1224,7 +1224,18 @@ class StorefrontReadinessTest extends TestCase
             ->assertJsonPath('cart_count', 1)
             ->assertJsonPath('message', 'محصول به سبد اضافه شد.');
 
-        $this->get('/')
+        $cart = Cart::query()
+            ->whereNull('user_id')
+            ->where('status', 'active')
+            ->latest('id')
+            ->firstOrFail();
+
+        // Explicitly preserve the same session identifier when rendering the
+        // next page, matching the guest-cookie contract used by cart tests.
+        $this->withCookie(
+            config('session.cookie'),
+            (string) $cart->session_id
+        )->get('/')
             ->assertOk()
             ->assertSee('data-cart-count="1"', false);
     }
