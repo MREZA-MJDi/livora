@@ -32,6 +32,7 @@ class HomeController extends Controller
                 'category',
                 'images' => fn ($imageQuery) => $imageQuery->limit(1),
             ])
+            ->withCount('allVariants')
             ->orderByDesc('updated_at')
             ->limit(8)
             ->get();
@@ -44,6 +45,7 @@ class HomeController extends Controller
                 'category',
                 'images' => fn ($imageQuery) => $imageQuery->limit(1),
             ])
+            ->withCount('allVariants')
             ->latest()
             ->limit(8)
             ->get();

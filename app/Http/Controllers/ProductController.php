@@ -17,8 +17,10 @@ class ProductController extends Controller
                 'relatedProducts' => fn ($relatedQuery) => $relatedQuery
                     ->where('status', 'active')
                     ->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('is_active', true))
+                    ->withCount('allVariants')
                     ->with(['category', 'images' => fn ($imageQuery) => $imageQuery->limit(1)]),
             ])
+            ->withCount('allVariants')
             ->active()
             ->whereHas('category', fn ($query) => $query->where('is_active', true))
             ->where('slug', $slug)
@@ -37,6 +39,7 @@ class ProductController extends Controller
                     'category',
                     'images' => fn ($imageQuery) => $imageQuery->limit(1),
                 ])
+                ->withCount('allVariants')
                 ->where('id', '!=', $product->id)
                 ->where('category_id', $product->category_id)
                 ->latest()

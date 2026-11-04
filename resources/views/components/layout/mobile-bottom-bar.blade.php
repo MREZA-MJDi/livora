@@ -38,9 +38,7 @@
             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h1.5l1.5 10h11l2-7H6M9 19.5a1 1 0 1 1-2 0m10 0a1 1 0 1 1-2 0"/>
             </svg>
-            @if($cartCount > 0)
-                <span class="absolute right-2 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--sg-accent)] px-1 text-[8px] font-semibold text-white">{{ $cartCount }}</span>
-            @endif
+            <span data-cart-count="{{ $cartCount }}" @if($cartCount < 1) hidden @endif aria-live="polite" aria-atomic="true" class="absolute right-2 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--sg-accent)] px-1 text-[8px] font-semibold text-white">{{ $cartCount }}</span>
             <span class="text-[9px] font-medium">سبد</span>
         </a>
 

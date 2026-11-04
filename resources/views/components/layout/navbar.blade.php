@@ -272,15 +272,13 @@
                         />
                     </svg>
 
-                    @if($cartCount > 0)
-
-                        <span
-                            class="absolute -right-0.5 -top-0.5 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-[var(--sg-accent)] px-1 text-[9px] font-semibold leading-none text-white"
-                        >
-                            {{ $cartCount }}
-                        </span>
-
-                    @endif
+                    <span
+                        data-cart-count="{{ $cartCount }}"
+                        @if($cartCount < 1) hidden @endif
+                        aria-live="polite"
+                        aria-atomic="true"
+                        class="absolute -right-0.5 -top-0.5 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-[var(--sg-accent)] px-1 text-[9px] font-semibold leading-none text-white"
+                    >{{ $cartCount }}</span>
 
                 </a>
 

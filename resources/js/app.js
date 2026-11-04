@@ -872,3 +872,80 @@ if (document.readyState === 'loading') {
 } else {
     initSgProductCarousels();
 }
+
+
+/* Quick add from product cards: update both desktop and mobile cart badges in place. */
+document.addEventListener('submit', async (event) => {
+    const form = event.target instanceof HTMLFormElement
+        ? event.target.closest('[data-cart-add-form]')
+        : null;
+
+    if (!form) return;
+
+    event.preventDefault();
+
+    const button = form.querySelector('[data-cart-add-button]');
+    const feedback = form.querySelector('[data-cart-feedback]');
+    if (!button || button.disabled) return;
+
+    const originalButtonContent = button.innerHTML;
+    button.disabled = true;
+    button.setAttribute('aria-busy', 'true');
+    button.classList.add('is-loading');
+    if (feedback) {
+        feedback.textContent = 'در حال افزودن…';
+        feedback.dataset.state = 'loading';
+    }
+
+    try {
+        const response = await fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            credentials: 'same-origin',
+            headers: {
+                Accept: 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        });
+
+        const contentType = response.headers.get('content-type') || '';
+        const payload = contentType.includes('application/json')
+            ? await response.json()
+            : null;
+
+        if (!response.ok || !payload || !Number.isFinite(Number(payload.cart_count))) {
+            const validationMessage = Object.values(payload?.errors || {}).flat()[0]
+                || payload?.message
+                || 'افزودن محصول به سبد خرید انجام نشد.';
+            throw new Error(validationMessage);
+        }
+
+        const count = Math.max(0, Number(payload.cart_count));
+        document.querySelectorAll('[data-cart-count]').forEach((badge) => {
+            badge.textContent = String(count);
+            badge.dataset.cartCount = String(count);
+            badge.hidden = count < 1;
+        });
+
+        window.dispatchEvent(new CustomEvent('cart:updated', {
+            detail: { count, subtotal: payload.subtotal ?? null },
+        }));
+
+        if (feedback) {
+            feedback.textContent = payload.message || 'به سبد خرید اضافه شد.';
+            feedback.dataset.state = 'success';
+        }
+    } catch (error) {
+        if (feedback) {
+            feedback.textContent = error instanceof Error
+                ? error.message
+                : 'ارتباط با سرور برقرار نشد؛ دوباره تلاش کنید.';
+            feedback.dataset.state = 'error';
+        }
+    } finally {
+        button.disabled = false;
+        button.removeAttribute('aria-busy');
+        button.classList.remove('is-loading');
+        button.innerHTML = originalButtonContent;
+    }
+});

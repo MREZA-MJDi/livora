@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\ContactSetting;
 use App\Models\Address;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -1202,6 +1203,70 @@ class StorefrontReadinessTest extends TestCase
             'user_id' => $owner->id,
             'title' => 'خصوصی',
         ]);
+    }
+
+    public function test_guest_quick_add_updates_the_shared_cart_badge_and_product_cards_offer_quick_add(): void
+    {
+        $product = $this->product($this->category(), [
+            'name' => 'میز عسلی افزودن سریع',
+            'slug' => 'quick-add-side-table',
+            'stock' => 6,
+        ]);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('data-cart-add-form', false)
+            ->assertSee('data-cart-count="0"', false);
+
+        $this->withCredentials()
+            ->postJson(route('cart.add', $product), ['quantity' => 1])
+            ->assertOk()
+            ->assertJsonPath('cart_count', 1)
+            ->assertJsonPath('message', 'محصول به سبد اضافه شد.');
+
+        $cart = Cart::query()
+            ->whereNull('user_id')
+            ->where('status', 'active')
+            ->latest('id')
+            ->firstOrFail();
+
+        // Explicitly preserve the same session identifier when rendering the
+        // next page, matching the guest-cookie contract used by cart tests.
+        $this->withCookie(
+            config('session.cookie'),
+            (string) $cart->session_id
+        )->get('/')
+            ->assertOk()
+            ->assertSee('data-cart-count="1"', false);
+    }
+
+    public function test_contact_page_and_footer_render_dashboard_social_links_as_icons_only(): void
+    {
+        ContactSetting::query()->create([
+            'brand_name' => 'SillaGallery',
+            'phone' => '09120000000',
+            'email' => 'hello@sillashop.com',
+            'whatsapp_url' => 'https://wa.me/989120000000',
+            'telegram_url' => 'https://t.me/sillagallery',
+            'instagram_url' => 'https://instagram.com/sillagallery',
+            'is_active' => true,
+        ]);
+
+        \Illuminate\Support\Facades\Cache::forget('storefront.settings');
+
+        foreach (['/', '/contact'] as $uri) {
+            $this->get($uri)
+                ->assertOk()
+                ->assertSee('aria-label="WhatsApp"', false)
+                ->assertSee('aria-label="Telegram"', false)
+                ->assertSee('aria-label="Instagram"', false)
+                ->assertSee('https://wa.me/989120000000', false)
+                ->assertSee('https://t.me/sillagallery', false)
+                ->assertSee('https://instagram.com/sillagallery', false)
+                ->assertDontSee('>WhatsApp</a>', false)
+                ->assertDontSee('>Telegram</a>', false)
+                ->assertDontSee('>Instagram</a>', false);
+        }
     }
 
     private function inventoryOrder(): Order

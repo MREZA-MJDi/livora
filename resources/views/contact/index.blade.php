@@ -75,6 +75,14 @@
         </section>
     @endif
 
+    @if($contactSetting && collect(['instagram_url', 'whatsapp_url', 'telegram_url'])->contains(fn ($field) => filled($contactSetting->{$field})))
+        <section class="border-b border-[var(--sg-border)] py-5">
+            <x-layout.container>
+                <x-layout.social-links :settings="$contactSetting" variant="contact" />
+            </x-layout.container>
+        </section>
+    @endif
+
     <section id="contact-form" class="scroll-mt-24 py-9 sm:py-12 lg:py-16">
         <x-layout.container>
             <div class="grid items-start gap-6 lg:grid-cols-[.85fr_1.15fr] lg:gap-9">

@@ -223,8 +223,7 @@
     <div
         class="bg-[var(--sg-cream)] pb-28 lg:pb-0"
         x-data="{
-        quantity: {{ max(1, min((int) $product->stock, 1)) }},
-        showInstallmentDetails: false
+        quantity: {{ max(1, min((int) $product->stock, 1)) }}
     }"
     >
 
@@ -413,182 +412,58 @@
                         @endif
 
 
-                        {{-- Installment Box --}}
+                        {{-- Compact installment summary. Full cheque schedule stays optional. --}}
                         @if($installmentEnabled)
-
-                            <div class="mt-7 overflow-hidden rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-white)]">
-
-                                <div class="border-b border-[var(--sg-border)] bg-[var(--sg-surface)] p-5 sm:p-6">
-
-                                    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-
-                                        <div>
-
-                                            <p class="text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--sg-accent)]">
-                                                FLEXIBLE PAYMENT
-                                            </p>
-
-                                            <h2 class="mt-2 text-lg font-semibold">
-                                                امکان خرید اقساطی
-                                            </h2>
-
-                                            <p class="mt-2 text-xs leading-7 text-[var(--sg-stone)]">
-                                                بخشی از مبلغ امروز پرداخت می‌شود و باقی‌مانده
-                                                طبق شرایط ثبت‌شده برای این محصول تسویه خواهد شد.
-                                            </p>
-
-                                        </div>
-
-                                        <span class="rounded-full bg-[var(--sg-ink)] px-3 py-1.5 text-[10px] font-medium text-white">
+                            <section class="product-installment-summary mt-5 rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-3 sm:p-4" aria-label="خلاصه خرید اقساطی">
+                                <div class="flex flex-wrap items-center justify-between gap-2">
+                                    <div class="flex items-center gap-2">
+                                        <span class="product-installment-summary__icon" aria-hidden="true">٪</span>
+                                        <h2 class="text-sm font-semibold text-[var(--sg-ink)]">خرید اقساطی</h2>
+                                    </div>
+                                    <span class="rounded-full bg-[var(--sg-surface)] px-3 py-1.5 text-[10px] font-semibold text-[var(--sg-accent)]">
                                         {{ number_format($cashPercent) }}٪ پیش‌پرداخت
                                     </span>
-
-                                    </div>
-
                                 </div>
 
-                                <div class="p-5 sm:p-6">
-
-                                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
-
-                                        <div class="rounded-2xl border border-[var(--sg-border)] p-4">
-
-                                            <p class="text-[10px] text-[var(--sg-stone)]">
-                                                پرداخت امروز
-                                            </p>
-
-                                            <p class="mt-2 text-base font-semibold">
-                                                {{ number_format($cashAmount) }}
-                                            </p>
-
-                                            <p class="mt-1 text-[10px] text-[var(--sg-stone)]">
-                                                تومان
-                                            </p>
-
-                                        </div>
-
-                                        <div class="rounded-2xl border border-[var(--sg-border)] p-4">
-
-                                            <p class="text-[10px] text-[var(--sg-stone)]">
-                                                باقی‌مانده
-                                            </p>
-
-                                            <p class="mt-2 text-base font-semibold">
-                                                {{ number_format($deferredAmount) }}
-                                            </p>
-
-                                            <p class="mt-1 text-[10px] text-[var(--sg-stone)]">
-                                                تومان
-                                            </p>
-
-                                        </div>
-
-                                        <div class="rounded-2xl border border-[var(--sg-border)] p-4">
-
-                                            <p class="text-[10px] text-[var(--sg-stone)]">
-                                                برنامه تسویه
-                                            </p>
-
-                                            <p class="mt-2 text-base font-semibold">
-                                                {{ number_format($chequeCount) }}
-                                                چک
-                                            </p>
-
-                                            <p class="mt-1 text-[10px] text-[var(--sg-stone)]">
-                                                هر {{ number_format($intervalMonths) }} ماه
-                                            </p>
-
-                                        </div>
-
+                                <div class="mt-3 grid grid-cols-3 gap-2">
+                                    <div class="rounded-xl bg-[var(--sg-surface)] px-2.5 py-3">
+                                        <p class="text-[10px] text-[var(--sg-stone)]">پرداخت امروز</p>
+                                        <p class="mt-1 text-xs font-bold leading-5 text-[var(--sg-ink)]">{{ number_format($cashAmount) }}</p>
+                                        <p class="text-[9px] text-[var(--sg-stone)]">تومان</p>
                                     </div>
+                                    <div class="rounded-xl bg-[var(--sg-surface)] px-2.5 py-3">
+                                        <p class="text-[10px] text-[var(--sg-stone)]">باقی‌مانده</p>
+                                        <p class="mt-1 text-xs font-bold leading-5 text-[var(--sg-ink)]">{{ number_format($deferredAmount) }}</p>
+                                        <p class="text-[9px] text-[var(--sg-stone)]">تومان</p>
+                                    </div>
+                                    <div class="rounded-xl bg-[var(--sg-surface)] px-2.5 py-3">
+                                        <p class="text-[10px] text-[var(--sg-stone)]">تسویه</p>
+                                        <p class="mt-1 text-xs font-bold leading-5 text-[var(--sg-ink)]">{{ number_format($chequeCount) }} چک</p>
+                                        <p class="text-[9px] text-[var(--sg-stone)]">هر {{ number_format($intervalMonths) }} ماه</p>
+                                    </div>
+                                </div>
 
-
-                                    @if(count($chequeAmounts))
-
-                                        <button
-                                            type="button"
-                                            @click="showInstallmentDetails = !showInstallmentDetails"
-                                            class="mt-5 flex w-full items-center justify-between rounded-2xl bg-[var(--sg-surface)] px-4 py-4 text-right"
-                                        >
-
-                                        <span class="text-xs font-medium">
-                                            مشاهده جزئیات سررسیدها
-                                        </span>
-
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke-width="1.5"
-                                                stroke="currentColor"
-                                                class="h-4 w-4 transition-transform"
-                                                :class="showInstallmentDetails ? 'rotate-180' : ''"
-                                            >
-                                                <path
-                                                    stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                    d="m19.5 8.25-7.5 7.5-7.5-7.5"
-                                                />
-                                            </svg>
-
-                                        </button>
-
-
-                                        <div
-                                            x-show="showInstallmentDetails"
-                                            x-cloak
-                                            x-collapse
-                                            class="mt-3 space-y-2"
-                                        >
-
+                                @if(count($chequeAmounts))
+                                    <details class="product-installment-details mt-3">
+                                        <summary class="cursor-pointer rounded-xl border border-[var(--sg-border)] px-3 py-2.5 text-xs font-medium text-[var(--sg-ink)]">
+                                            مشاهده مبلغ و سررسید چک‌ها
+                                        </summary>
+                                        <div class="mt-2 space-y-1.5">
                                             @foreach($chequeAmounts as $index => $amount)
-
-                                                <div class="flex items-center justify-between gap-4 rounded-xl border border-[var(--sg-border)] px-4 py-3">
-
-                                                    <div>
-
-                                                        <p class="text-xs font-medium">
-                                                            چک {{ number_format($index + 1) }}
-                                                        </p>
-
-                                                        <p class="mt-1 text-[10px] text-[var(--sg-stone)]">
-                                                            {{ number_format(($index + 1) * $intervalMonths) }}
-                                                            ماه بعد
-                                                        </p>
-
-                                                    </div>
-
-                                                    <p class="text-sm font-semibold">
-                                                        {{ number_format($amount) }}
-                                                        تومان
-                                                    </p>
-
+                                                <div class="flex items-center justify-between gap-3 rounded-lg bg-[var(--sg-surface)] px-3 py-2.5">
+                                                    <span class="text-[11px] text-[var(--sg-stone)]">
+                                                        چک {{ number_format($index + 1) }} · {{ number_format(($index + 1) * $intervalMonths) }} ماه بعد
+                                                    </span>
+                                                    <strong class="text-xs text-[var(--sg-ink)]">{{ number_format($amount) }} تومان</strong>
                                                 </div>
-
                                             @endforeach
-
                                         </div>
-
-                                    @endif
-
-
-                                    <div class="mt-5 flex items-start gap-3 rounded-2xl border border-[var(--sg-border)] p-4">
-
-                                    <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[var(--sg-surface)] text-xs font-semibold">
-                                        i
-                                    </span>
-
-                                        <p class="text-[11px] leading-6 text-[var(--sg-stone)]">
-                                            شرایط نهایی پرداخت اقساطی هنگام Checkout و بر اساس
-                                            تنظیمات ثبت‌شده برای سفارش به شما نمایش داده می‌شود.
-                                        </p>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
+                                    </details>
+                                @endif
+                                <p class="mt-2 text-[10px] leading-5 text-[var(--sg-stone)]">
+                                    جزئیات نهایی پرداخت پیش از ثبت سفارش نمایش داده می‌شود.
+                                </p>
+                            </section>
                         @endif
 
 
@@ -958,65 +833,6 @@
             </x-layout.container>
 
         </section>
-
-
-        {{-- =========================================================
-             INSTALLMENT SEO / EXPLANATION
-        ========================================================== --}}
-        @if($installmentEnabled)
-
-            <section class="border-t border-[var(--sg-border)] bg-[var(--sg-surface)]">
-
-                <x-layout.container>
-
-                    <div class="grid gap-8 py-14 lg:grid-cols-[0.8fr_1.2fr] lg:py-18">
-
-                        <div>
-
-                            <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
-                                INSTALLMENT GUIDE
-                            </p>
-
-                            <h2 class="mt-3 text-2xl font-semibold">
-                                شرایط خرید اقساطی {{ $product->name }}
-                            </h2>
-
-                        </div>
-
-                        <div class="text-sm leading-8 text-[var(--sg-stone)]">
-
-                            <p>
-                                این محصول با
-                                {{ number_format($cashPercent) }}٪
-                                پیش‌پرداخت قابلیت خرید اقساطی دارد.
-                                مبلغ پیش‌پرداخت
-                                {{ number_format($cashAmount) }}
-                                تومان است و باقی‌مانده
-                                {{ number_format($deferredAmount) }}
-                                تومان در
-                                {{ number_format($chequeCount) }}
-                                فقره چک برنامه‌ریزی می‌شود.
-                            </p>
-
-                            @if($intervalMonths)
-
-                                <p class="mt-4">
-                                    فاصله سررسید چک‌ها
-                                    {{ number_format($intervalMonths) }}
-                                    ماه است و برنامه دقیق پرداخت هنگام Checkout نمایش داده می‌شود.
-                                </p>
-
-                            @endif
-
-                        </div>
-
-                    </div>
-
-                </x-layout.container>
-
-            </section>
-
-        @endif
 
 
         {{-- =========================================================

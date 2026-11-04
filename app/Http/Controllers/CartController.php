@@ -65,9 +65,7 @@ class CartController extends Controller
                 $product->status !== 'active'
                 || ! $product->category()->where('is_active', true)->exists()
             ) {
-                return back()->withErrors([
-                    'product' => 'این محصول دیگر برای خرید فعال نیست.',
-                ]);
+                return $this->addFailure($request, 'product', 'این محصول دیگر برای خرید فعال نیست.');
             }
 
             $variants = $this->resolveSelectedVariants(
@@ -94,9 +92,7 @@ class CartController extends Controller
                 ->all();
 
             if ($requiredTypes !== $selectedTypes) {
-                return back()->withErrors([
-                    'variants' => 'گزینه‌های محصول تغییر کرده‌اند؛ لطفاً محصول را دوباره انتخاب کنید.',
-                ]);
+                return $this->addFailure($request, 'variants', 'گزینه‌های محصول تغییر کرده‌اند؛ لطفاً محصول را دوباره انتخاب کنید.');
             }
 
             $availableStock = $variants->isNotEmpty()
@@ -106,9 +102,7 @@ class CartController extends Controller
             $quantity = (int) $validated['quantity'];
 
             if ($quantity > $availableStock) {
-                return back()->withErrors([
-                    'quantity' => 'موجودی کافی نیست.',
-                ]);
+                return $this->addFailure($request, 'quantity', 'موجودی کافی نیست.');
             }
 
             $unitPrice = max(
@@ -168,9 +162,7 @@ class CartController extends Controller
             }
 
             if ($quantity > 99) {
-                return back()->withErrors([
-                    'quantity' => 'تعداد یک محصول در سبد نمی‌تواند بیشتر از ۹۹ باشد.',
-                ]);
+                return $this->addFailure($request, 'quantity', 'تعداد یک محصول در سبد نمی‌تواند بیشتر از ۹۹ باشد.');
             }
 
             if ($quantity > $availableStock) {
@@ -378,7 +370,22 @@ class CartController extends Controller
         });
     }
 
-        protected function resolveSelectedVariants(
+        protected function addFailure(
+        Request $request,
+        string $field,
+        string $message
+    ): RedirectResponse|JsonResponse {
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => $message,
+                'errors' => [$field => [$message]],
+            ], 422);
+        }
+
+        return back()->withErrors([$field => $message]);
+    }
+
+    protected function resolveSelectedVariants(
         Product $product,
         ?array $submittedVariants,
         ?int $legacyVariantId
