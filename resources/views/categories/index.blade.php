@@ -79,7 +79,7 @@
                             @foreach($categories as $category)
                                 <a
                                     href="{{ route('categories.show', $category->slug) }}"
-                                    class="sg-category-index-tile group {{ $loop->first && $categories->count() > 1 ? 'sg-category-index-tile--featured' : '' }}"
+                                    class="sg-category-index-tile group"
                                     aria-label="مشاهده مجموعه {{ $category->name }}، {{ number_format($category->products_count) }} محصول"
                                 >
                                     <div class="sg-category-index-tile__media">
