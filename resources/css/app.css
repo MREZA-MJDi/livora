@@ -1908,11 +1908,11 @@ body {
 }
 @media (min-width: 900px) {
     .sg-product-carousel-item {
-        flex-basis: calc((100% - 2 * clamp(.75rem, 1.5vw, 1.25rem)) / 3);
+        flex-basis: calc((100% - clamp(.75rem, 1.5vw, 1.25rem) - clamp(.75rem, 1.5vw, 1.25rem)) / 3);
     }
 }
 @media (min-width: 1280px) {
     .sg-product-carousel-item {
-        flex-basis: calc((100% - 3 * clamp(.75rem, 1.5vw, 1.25rem)) / 4);
+        flex-basis: calc((100% - clamp(.75rem, 1.5vw, 1.25rem) - clamp(.75rem, 1.5vw, 1.25rem) - clamp(.75rem, 1.5vw, 1.25rem)) / 4);
     }
 }
