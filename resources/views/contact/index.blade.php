@@ -75,7 +75,7 @@
         </section>
     @endif
 
-    @if($contactSetting)
+    @if($contactSetting && collect(['instagram_url', 'whatsapp_url', 'telegram_url'])->contains(fn ($field) => filled($contactSetting->{$field})))
         <section class="border-b border-[var(--sg-border)] py-5">
             <x-layout.container>
                 <x-layout.social-links :settings="$contactSetting" variant="contact" />
