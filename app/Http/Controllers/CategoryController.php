@@ -18,6 +18,7 @@ class CategoryController extends Controller
             ->with([
                 'media',
                 'latestActiveProduct.images' => fn ($imageQuery) => $imageQuery
+                    ->with('media')
                     ->orderByDesc('is_primary')
                     ->orderBy('sort_order')
                     ->orderBy('id')
@@ -40,6 +41,7 @@ class CategoryController extends Controller
         $category->load([
             'media',
             'latestActiveProduct.images' => fn ($imageQuery) => $imageQuery
+                    ->with('media')
                     ->orderByDesc('is_primary')
                     ->orderBy('sort_order')
                     ->orderBy('id')
@@ -50,7 +52,7 @@ class CategoryController extends Controller
             'recommendedProducts' => fn ($query) => $query
                 ->where('status', 'active')
                 ->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('is_active', true))
-                ->with(['category', 'images' => fn ($imageQuery) => $imageQuery->limit(1)]),
+                ->with(['category', 'images' => fn ($imageQuery) => $imageQuery->with('media')->orderByDesc('is_primary')->orderBy('sort_order')->orderBy('id')->limit(1)]),
         ]);
 
         $query = $category->products()
@@ -58,7 +60,7 @@ class CategoryController extends Controller
             ->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('is_active', true))
             ->with([
                 'category',
-                'images' => fn ($imageQuery) => $imageQuery->limit(1),
+                'images' => fn ($imageQuery) => $imageQuery->with('media')->orderByDesc('is_primary')->orderBy('sort_order')->orderBy('id')->limit(1),
             ]);
 
         if (! empty($filters['search'])) {
