@@ -92,7 +92,7 @@
 @php
     // Resolve the active cart for both customers and guests.
     // Guest carts are session-bound, so the navbar badge works before login too.
-    $storefrontCartQuery = \\App\\Models\\Cart::query()->where('status', 'active');
+    $storefrontCartQuery = \App\Models\Cart::query()->where('status', 'active');
 
     if (auth()->check() && auth()->user()->isCustomer()) {
         $storefrontCartQuery->where('user_id', auth()->id());
