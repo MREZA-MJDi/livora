@@ -178,7 +178,7 @@
         </a>
 
         @if(filled($product->short_description))
-            <p class="mt-1.5 line-clamp-2 min-h-[2.5rem] text-[11px] leading-5 text-[var(--sg-stone)]">{{ $product->short_description }}</p>
+            <p class="product-card-description mt-1.5 line-clamp-1 text-[11px] leading-5 text-[var(--sg-stone)]">{{ $product->short_description }}</p>
         @endif
 
         {{-- Price --}}
@@ -218,9 +218,9 @@
         {{-- Installment --}}
         @if($installmentEnabled && $cashAmount > 0)
 
-            <section aria-label="شرایط خرید اقساطی" class="mt-2 rounded-xl border border-[var(--sg-border)] bg-[var(--sg-surface)] p-2.5">
+            <section aria-label="شرایط خرید اقساطی" class="product-card-installment mt-2 rounded-xl border border-[var(--sg-border)] bg-[var(--sg-surface)] px-3 py-2">
 
-                <p class="mb-3 text-[10px] font-semibold text-[var(--sg-accent)]">شرایط خرید اقساطی</p>
+                <p class="mb-1 text-[10px] font-semibold text-[var(--sg-accent)]">شرایط خرید اقساطی</p>
                 <div class="flex items-center justify-between gap-3">
 
                     <div>
