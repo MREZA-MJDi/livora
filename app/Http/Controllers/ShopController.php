@@ -17,7 +17,7 @@ class ShopController extends Controller
         $query = Product::query()
             ->with([
                 'category',
-                'images' => fn ($imageQuery) => $imageQuery->limit(1),
+                'images' => fn ($imageQuery) => $imageQuery->with('media')->orderByDesc('is_primary')->orderBy('sort_order')->orderBy('id')->limit(1),
             ])
             ->active()
             ->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('is_active', true));
