@@ -165,8 +165,6 @@
                 <span class="mr-1 uppercase tracking-[0.12em]">{{ $product->category->name }}</span>
             </p>
 
-        @else
-            <p class="product-card-category min-h-4" aria-hidden="true"></p>
         @endif
 
         {{-- Name --}}
@@ -180,13 +178,11 @@
         </a>
 
         @if(filled($product->short_description))
-            <p class="mt-1.5 min-h-0 line-clamp-2 text-[11px] leading-5 text-[var(--sg-stone)]">{{ $product->short_description }}</p>
-        @else
-            <p class="mt-2 min-h-10" aria-hidden="true"></p>
+            <p class="mt-1.5 line-clamp-2 min-h-[2.5rem] text-[11px] leading-5 text-[var(--sg-stone)]">{{ $product->short_description }}</p>
         @endif
 
         {{-- Price --}}
-        <div class="product-card-price mt-2 min-h-8 flex-col">
+        <div class="product-card-price mt-3 flex-col">
             <span class="text-[10px] font-medium text-[var(--sg-stone)]">قیمت محصول</span>
 
             @if($hasDiscount)
@@ -258,9 +254,6 @@
                 </div>
 
             </section>
-
-        @else
-
 
         @endif
 
