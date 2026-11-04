@@ -35,7 +35,7 @@
                         <span class="font-medium text-[var(--sg-ink)]">فروشگاه</span>
                     </nav>
 
-                    <div class="shop-hero-banner relative mt-5 flex  items-end overflow-hidden rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-ink)] text-white shadow-sm sm:min-h-[320px]">
+                    <div class="shop-hero-banner relative mt-5 flex items-end overflow-hidden rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-ink)] text-white shadow-sm">
                         @if($shopBanner->banner_image_url)
                             <img
                                 src="{{ $shopBanner->banner_image_url }}"

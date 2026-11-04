@@ -575,6 +575,21 @@ window.richTextEditor = (uploadUrl) => ({
         preview.innerHTML = '<img alt="پیش‌نمایش تصویر نهایی"><div><strong>پیش‌نمایش تصویر</strong><span>تصویر پس از برش آماده ذخیره است.</span><button type="button" class="admin-btn admin-btn-secondary sg-recrop">تنظیم مجدد برش</button></div>';
         input.insertAdjacentElement('afterend', preview);
         const previewImage = preview.querySelector('img'); previewImage.style.aspectRatio = String(ratioFor(input)); let previewUrl = null;
+        let boundPreviewUrl = null;
+        const syncBoundPreview = file => {
+            const targetId = input.dataset.previewTarget;
+            const target = targetId ? document.getElementById(targetId) : null;
+            if (!target || !file) return;
+            if (boundPreviewUrl) URL.revokeObjectURL(boundPreviewUrl);
+            boundPreviewUrl = URL.createObjectURL(file);
+            target.dataset.cropPreviewUrl = boundPreviewUrl;
+            target.src = boundPreviewUrl;
+            target.classList.remove('hidden');
+            const placeholderId = input.dataset.previewPlaceholder;
+            const placeholder = placeholderId ? document.getElementById(placeholderId) : null;
+            placeholder?.classList.add('hidden');
+            placeholder?.classList.remove('flex');
+        };
         form.addEventListener('submit', event => {
             if (input.dataset.cropping === '1') {
                 event.preventDefault();
@@ -596,7 +611,7 @@ window.richTextEditor = (uploadUrl) => ({
                 for (const file of selected) result.push(file.type.startsWith('image/') && file.type !== 'image/gif' ? await cropFile(file, ratioFor(input)) : file);
                 const transfer = new DataTransfer(); result.forEach(file => transfer.items.add(file)); input.files = transfer.files;
                 const firstImage = result.find(file => file.type.startsWith('image/'));
-                if (firstImage) { if (previewUrl) URL.revokeObjectURL(previewUrl); previewUrl = URL.createObjectURL(firstImage); previewImage.src = previewUrl; preview.hidden = false; preview.querySelector('.sg-recrop').hidden = firstImage.type === 'image/gif'; }
+                if (firstImage) { if (previewUrl) URL.revokeObjectURL(previewUrl); previewUrl = URL.createObjectURL(firstImage); previewImage.src = previewUrl; preview.hidden = false; preview.querySelector('.sg-recrop').hidden = firstImage.type === 'image/gif'; syncBoundPreview(firstImage); }
                 input.disabled = false; input.dataset.cropping = '0'; processedInputs.delete(input);
                 input.dispatchEvent(new Event('input', {bubbles:true}));
                 processedInputs.add(input); input.dispatchEvent(new Event('change', {bubbles:true})); processedInputs.delete(input);
@@ -611,7 +626,7 @@ window.richTextEditor = (uploadUrl) => ({
                 const cropped = await cropFile(file, ratioFor(input)); const transfer = new DataTransfer();
                 Array.from(input.files).forEach((item,index) => transfer.items.add(index === 0 ? cropped : item));
                 input.files = transfer.files;
-                if (previewUrl) URL.revokeObjectURL(previewUrl); previewUrl = URL.createObjectURL(cropped); previewImage.src = previewUrl;
+                if (previewUrl) URL.revokeObjectURL(previewUrl); previewUrl = URL.createObjectURL(cropped); previewImage.src = previewUrl; syncBoundPreview(cropped);
             } catch (_) { /* User cancelled recropping. */ }
         });
     };

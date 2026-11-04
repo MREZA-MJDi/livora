@@ -731,6 +731,58 @@ class AdminCrudLifecycleTest extends TestCase
         ]);
     }
 
+    public function test_admin_image_upload_previews_match_the_public_card_aspect_ratios(): void
+    {
+        $category = $this->createCategory('image-preview-ratio-category');
+        $product = Product::query()->create($this->productPayload($category, [
+            'name' => 'محصول نسبت تصویر',
+            'slug' => 'image-preview-ratio-product',
+            'sku' => 'SG-IMAGE-RATIO-001',
+        ]));
+
+        ProductImage::query()->create([
+            'product_id' => $product->id,
+            'path' => 'https://images.example.test/products/variant-preview.webp',
+            'alt' => 'تصویر آزمایشی وریانت',
+            'sort_order' => 0,
+            'is_primary' => true,
+        ]);
+
+        $this->actingAs($this->admin)
+            ->get(route('admin.categories.create'))
+            ->assertOk()
+            ->assertSee('aspect-[4/3]', false)
+            ->assertSee('data-crop-ratio="1.3333333"', false)
+            ->assertSee('data-preview-target="category-image-preview"', false);
+
+        $this->actingAs($this->admin)
+            ->get(route('admin.products.create'))
+            ->assertOk()
+            ->assertSee('aspect-[4/5]', false)
+            ->assertSee('data-crop-ratio="0.8"', false)
+            ->assertSee('data-preview-target="product-image-preview"', false);
+
+        $this->actingAs($this->admin)
+            ->get(route('admin.product-images.create', ['product_id' => $product->id]))
+            ->assertOk()
+            ->assertSee('aspect-[4/3]', false)
+            ->assertSee('data-crop-ratio="1.3333333"', false)
+            ->assertSee('data-preview-target="product-gallery-image-preview"', false);
+
+        $this->actingAs($this->admin)
+            ->get(route('admin.product-variants.create', ['product_id' => $product->id]))
+            ->assertOk()
+            ->assertSee('aspect-[4/3]', false)
+            ->assertSee($product->images()->firstOrFail()->url);
+
+        $this->actingAs($this->admin)
+            ->get(route('admin.shop-banner.edit'))
+            ->assertOk()
+            ->assertSee('aspect-[12/5]', false)
+            ->assertSee('data-crop-ratio="2.4"', false)
+            ->assertSee('data-preview-target="shop-banner-image-preview"', false);
+    }
+
     private function createCategory(string $slug): Category
     {
         return Category::query()->create([

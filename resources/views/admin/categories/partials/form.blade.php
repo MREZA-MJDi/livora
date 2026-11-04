@@ -206,7 +206,7 @@
                     : null;
             @endphp
 
-            <div class="admin-image-preview aspect-[12/5]">
+            <div class="admin-image-preview aspect-[4/3]">
 
                 <img
                     id="category-image-preview"
@@ -245,7 +245,7 @@
 
                 <input
                     id="image"
-                    name="image" data-crop-ratio="1"
+                    name="image" data-crop-ratio="1.3333333" data-preview-target="category-image-preview" data-preview-placeholder="category-image-placeholder"
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
                     class="admin-input p-2"
@@ -260,7 +260,7 @@
                 ])
 
                 <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">
-                    تصویر Hero دسته‌بندی با نسبت ثابت ۱۲:۵ نمایش داده می‌شود.
+                    تصویر دسته‌بندی در کارت‌های عمومی با نسبت ثابت ۴:۳ نمایش داده می‌شود؛ قاب برش و پیش‌نمایش نیز همین نسبت را حفظ می‌کند.
                 </p>
                 <label for="image_alt" class="admin-label mt-3">متن جایگزین تصویر (Alt)</label>
                 <input id="image_alt" name="image_alt" maxlength="255" class="admin-input" value="{{ old('image_alt', $category->image_alt ?? '') }}" placeholder="شرح دقیق تصویر دسته‌بندی">

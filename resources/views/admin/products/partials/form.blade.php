@@ -113,6 +113,7 @@
             <input
                 id="image"
                 name="image"
+                data-preview-target="product-image-preview" data-preview-placeholder="product-image-placeholder"
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
                 data-crop-ratio="0.8"
@@ -199,13 +200,13 @@
 
             <div>
                 <label for="banner_image" class="admin-label">انتخاب یا جایگزینی بنر</label>
-                <div class="aspect-[12/5] overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]"><img id="product-banner-image-preview" src="{{ $product->banner_image ? \Illuminate\Support\Facades\Storage::disk('public')->url($product->banner_image) : '' }}" alt="{{ $product->banner_image_alt ?: $product->name }}" class="{{ $product->banner_image ? '' : 'hidden' }} h-full w-full object-contain"></div>
+                <div class="aspect-[12/5] overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]"><img id="product-banner-image-preview" src="{{ $product->banner_image ? \Illuminate\Support\Facades\Storage::disk('public')->url($product->banner_image) : '' }}" alt="{{ $product->banner_image_alt ?: $product->name }}" class="{{ $product->banner_image ? '' : 'hidden' }} h-full w-full object-cover"></div>
                 <input
                     id="banner_image"
                     name="banner_image"
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
-                    data-crop-ratio="2.4"
+                    data-crop-ratio="2.4" data-preview-target="product-banner-image-preview"
                     class="admin-input p-2"
                 >
                 @include('admin.media.partials.picker', ['mediaPickerField' => 'banner_image', 'mediaPickerId' => old('banner_media_id', $product->banner_media_id ?? null), 'mediaPickerUrl' => $product->banner_image ? \Illuminate\Support\Facades\Storage::disk('public')->url($product->banner_image) : null, 'mediaPickerName' => $product->name, 'mediaPickerPreviewId' => 'product-banner-image-preview', 'mediaPickerInputName' => 'banner_media_id', 'mediaPickerRemoveName' => 'remove_banner_image'])

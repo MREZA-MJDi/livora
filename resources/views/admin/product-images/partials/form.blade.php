@@ -78,7 +78,7 @@
 
             @if($editing && $productImage->url)
 
-                <div class="admin-image-preview mb-5 aspect-video max-w-xl">
+                <div class="admin-image-preview mb-5 aspect-[4/3] max-w-xl">
 
                     <img
                         src="{{ $productImage->url }}"
@@ -100,7 +100,7 @@
             </div>
             <input
                 id="image"
-                name="image" data-crop-ratio="1.7777778"
+                name="image" data-crop-ratio="1.3333333" data-preview-target="product-gallery-image-preview"
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
                 class="admin-input p-2"
