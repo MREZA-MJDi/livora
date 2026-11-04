@@ -21,24 +21,6 @@
     $installmentEnabled =
         (bool) $product->installment_enabled;
 
-    $cashPercent =
-        $installmentEnabled
-            ? (int) ($product->installment_cash_percent ?? 0)
-            : 0;
-
-    $chequeCount =
-        $installmentEnabled
-            ? (int) ($product->installment_cheque_count ?? 0)
-            : 0;
-
-    $cashAmount =
-        $installmentEnabled && $cashPercent > 0
-            ? round(
-                (float) $product->price
-                * ($cashPercent / 100),
-                2
-            )
-            : 0;
 @endphp
 
 <article class="product-card group relative flex h-full min-w-0 flex-col overflow-hidden rounded-[1rem] border border-[var(--sg-border)] bg-[var(--sg-white)] shadow-sm transition duration-300 hover:-translate-y-1 hover:border-[var(--sg-accent)]/40 hover:shadow-lg" aria-labelledby="product-card-title-{{ $product->id }}">
@@ -100,17 +82,12 @@
 
         </div>
 
-        {{-- Installment Badge --}}
+        {{-- Installment seal: a clear visual benefit, without enlarging the card body. --}}
         @if($installmentEnabled)
-
-            <div class="absolute right-3 top-3">
-
-                <span class="rounded-full border border-white/30 bg-[var(--sg-ink)]/90 px-3 py-1.5 text-[10px] font-medium text-white backdrop-blur">
-                    اقساطی
-                </span>
-
+            <div class="product-installment-seal" aria-label="قابل خرید اقساطی">
+                <span>خرید</span>
+                <strong>اقساطی</strong>
             </div>
-
         @endif
 
         {{-- Wishlist --}}
@@ -214,48 +191,6 @@
             @endif
 
         </div>
-
-        {{-- Installment --}}
-        @if($installmentEnabled && $cashAmount > 0)
-
-            <section aria-label="شرایط خرید اقساطی" class="product-card-installment mt-2 rounded-xl border border-[var(--sg-border)] bg-[var(--sg-surface)] px-3 py-2">
-
-                <p class="mb-1 text-[10px] font-semibold text-[var(--sg-accent)]">شرایط خرید اقساطی</p>
-                <div class="flex items-center justify-between gap-3">
-
-                    <div>
-
-                        <p class="text-[10px] text-[var(--sg-stone)]">
-                            پیش‌پرداخت
-                        </p>
-
-                        <p class="mt-1 text-xs font-semibold text-[var(--sg-ink)]">
-                            {{ number_format($cashAmount) }}
-                            تومان
-                        </p>
-
-                    </div>
-
-                    <div class="text-left">
-
-                        <p class="text-[10px] text-[var(--sg-stone)]">
-                            شرایط
-                        </p>
-
-                        <p class="mt-1 text-xs font-medium text-[var(--sg-accent)]">
-                            {{ number_format($cashPercent) }}٪
-                            @if($chequeCount)
-                                + {{ number_format($chequeCount) }} چک
-                            @endif
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-        @endif
 
         {{-- CTA --}}
         <a
