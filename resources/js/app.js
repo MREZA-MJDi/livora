@@ -914,8 +914,8 @@ document.addEventListener('submit', async (event) => {
             : null;
 
         if (!response.ok || !payload || !Number.isFinite(Number(payload.cart_count))) {
-            const validationMessage = payload?.message
-                || Object.values(payload?.errors || {}).flat()[0]
+            const validationMessage = Object.values(payload?.errors || {}).flat()[0]
+                || payload?.message
                 || 'افزودن محصول به سبد خرید انجام نشد.';
             throw new Error(validationMessage);
         }
