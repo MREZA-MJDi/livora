@@ -125,12 +125,17 @@ Set these values in /var/www/livora/shared/.env before generating the applicatio
     LOG_CHANNEL=stack
     LOG_LEVEL=warning
 
+    # Cloudflare Turnstile — keep the secret only in this shared server-side .env.
+    TURNSTILE_SITE_KEY=0x4AAAAAAF0qjF7cUoy072cx
+    TURNSTILE_SECRET=SET_THE_ROTATED_CLOUDFLARE_SECRET_HERE
+    TURNSTILE_HOSTNAMES=sillashop.com,www.sillashop.com
+
     PAYMENT_GATEWAYS_PRODUCTION_READY=false
     DIGIPAY_ENABLED=false
     SNAPPAY_ENABLED=false
     TOROBPAY_ENABLED=false
 
-Also configure real SMTP settings, sender identity, and the public business contact values. Keep all payment gateways disabled until each merchant account has passed its own current sandbox contract and callback/signature tests. Do not put secrets in GitHub.
+Also configure real SMTP settings, sender identity, and the public business contact values. Never put the Turnstile secret in Git, deployment logs, or frontend variables. Use a rotated secret in this server-side file, and list every exact production hostname in the Cloudflare widget allowlist. Keep all payment gateways disabled until each merchant account has passed its own current sandbox contract and callback/signature tests. Do not put secrets in GitHub.
 
 ## 5. Install dependencies, build, migrate and cache
 
