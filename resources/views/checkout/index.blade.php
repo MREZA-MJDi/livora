@@ -544,6 +544,10 @@
                             </div>
 
 
+                            <div class="mt-6">
+                                <x-security.recaptcha />
+                            </div>
+
                             {{-- Submit --}}
                             <button
                                 type="submit"

@@ -148,6 +148,8 @@
                             @endif
 
 
+                            <x-security.recaptcha />
+
                             <x-ui.button
                                 type="submit"
                                 size="lg"

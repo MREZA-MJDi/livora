@@ -24,6 +24,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\WishlistController;
+use App\Http\Middleware\VerifyRecaptcha;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
@@ -85,7 +86,7 @@ Route::get(
 Route::post(
     '/contact',
     [ContactController::class, 'store']
-)->middleware('throttle:5,1')->name('contact.store');
+)->middleware(['throttle:5,1', VerifyRecaptcha::class])->name('contact.store');
 
 
 /*
@@ -151,7 +152,7 @@ Route::middleware('guest')->group(function () {
     Route::post(
         '/register',
         [AuthController::class, 'register']
-    )->middleware('throttle:10,1')->name('register.store');
+    )->middleware(['throttle:10,1', VerifyRecaptcha::class])->name('register.store');
 
     Route::get(
         '/forgot-password',
@@ -232,7 +233,7 @@ Route::middleware(['auth', 'customer'])->group(function () {
             Route::post(
                 '/',
                 [CheckoutController::class, 'placeOrder']
-            )->middleware('throttle:5,1')->name('place');
+            )->middleware(['throttle:5,1', VerifyRecaptcha::class])->name('place');
 
             Route::get(
                 '/payment/{order}',
