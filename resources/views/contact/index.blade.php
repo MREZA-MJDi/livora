@@ -174,7 +174,7 @@
                             <p class="mt-2 text-xs text-[var(--sg-stone)]">حداقل ۱۰ و حداکثر ۵۰۰۰ نویسه.</p>
                             @error('message')<p class="mt-2 text-xs text-[var(--sg-danger)]">{{ $message }}</p>@enderror
                         </div>
-                        <x-security.recaptcha />
+                        <x-security.turnstile />
                         <button type="submit" class="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-[var(--sg-ink)] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[var(--sg-accent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sg-accent)]">ارسال پیام</button>
                         <p class="text-center text-xs leading-6 text-[var(--sg-stone)]">اطلاعات شما فقط برای پیگیری همین درخواست استفاده می‌شود.</p>
                     </form>
