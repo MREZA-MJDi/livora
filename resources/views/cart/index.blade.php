@@ -985,37 +985,15 @@
                                     @endif
 
 
-                                    @if($canCheckout)
-
-                                        <a
-                                            href="{{ route('checkout.index') }}"
-                                            class="mt-6 flex w-full items-center justify-center rounded-2xl bg-[var(--sg-ink)] px-6 py-4 text-sm font-medium text-white transition hover:bg-[var(--sg-accent)]"
-                                        >
-                                            ادامه به تسویه حساب
-                                        </a>
-
-                                    @else
-
-                                        <div class="mt-6 rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-surface)] p-4">
-
-                                            <p class="text-xs leading-7 text-[var(--sg-stone)]">
-                                                برای ادامه به تسویه حساب، ابتدا وارد حساب مشتری شوید.
-                                            </p>
-
-                                            <a
-                                                href="{{ route('login') }}"
-                                                class="mt-3 inline-flex text-xs font-medium text-[var(--sg-ink)] underline underline-offset-4"
-                                            >
-                                                ورود به حساب
-                                            </a>
-
-                                        </div>
-
-                                    @endif
-
-
                                     <a
                                         href="{{ route('checkout.index') }}"
+                                        class="mt-6 flex w-full items-center justify-center rounded-2xl bg-[var(--sg-ink)] px-6 py-4 text-sm font-medium text-white transition hover:bg-[var(--sg-accent)]"
+                                    >
+                                        ادامه به تسویه حساب
+                                    </a>
+
+                                    <a
+                                        href="{{ route('shop.index') }}"
                                         class="mt-3 flex w-full items-center justify-center rounded-2xl border border-[var(--sg-border)] px-6 py-3.5 text-sm font-medium text-[var(--sg-ink)] transition hover:border-[var(--sg-ink)]"
                                     >
                                         ادامه خرید
