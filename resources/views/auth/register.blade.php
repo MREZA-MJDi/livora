@@ -148,7 +148,7 @@
                             @endif
 
 
-                            <x-security.recaptcha />
+                            <x-security.turnstile />
 
                             <x-ui.button
                                 type="submit"
