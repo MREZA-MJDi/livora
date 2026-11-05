@@ -14,12 +14,12 @@ return [
     |
     */
 
-    'recaptcha' => [
-        'site_key' => env('RECAPTCHA_SITE_KEY'),
-        'secret_key' => env('RECAPTCHA_SECRET_KEY'),
-        'allowed_hosts' => array_values(array_filter(array_map(
-            'trim',
-            explode(',', (string) env('RECAPTCHA_ALLOWED_HOSTS', ''))
+    'turnstile' => [
+        'site_key' => env('TURNSTILE_SITE_KEY', '0x4AAAAAAF0qjF7cUoy072cx'),
+        'secret' => env('TURNSTILE_SECRET'),
+        'hostnames' => array_values(array_filter(array_map(
+            static fn (string $host): string => strtolower(trim($host)),
+            explode(',', (string) env('TURNSTILE_HOSTNAMES', ''))
         ))),
     ],
 
