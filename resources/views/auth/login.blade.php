@@ -127,6 +127,8 @@
                             </label>
 
 
+                            <x-security.turnstile />
+
                             <x-ui.button
                                 type="submit"
                                 size="lg"
