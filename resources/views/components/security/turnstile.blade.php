@@ -10,7 +10,8 @@
     };
 @endphp
 
-@if(filled($siteKey) && filled($secret))
+{{-- The browser widget only needs the public site key; the secret is server-side only. --}}
+@if(filled($siteKey))
     <div class="space-y-2">
         <div
             class="cf-turnstile"
