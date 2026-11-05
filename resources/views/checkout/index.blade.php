@@ -545,7 +545,7 @@
 
 
                             <div class="mt-6">
-                                <x-security.recaptcha />
+                                <x-security.turnstile />
                             </div>
 
                             {{-- Submit --}}
