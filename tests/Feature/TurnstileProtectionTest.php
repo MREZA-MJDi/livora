@@ -29,6 +29,16 @@ class TurnstileProtectionTest extends TestCase
         ]);
     }
 
+    public function test_turnstile_widget_renders_with_public_site_key_when_secret_is_missing(): void
+    {
+        config(['services.turnstile.secret' => null]);
+
+        $this->get(route('login'))
+            ->assertOk()
+            ->assertSee('class="cf-turnstile"', false)
+            ->assertSee('data-sitekey="test-site-key"', false);
+    }
+
     public function test_login_is_blocked_when_turnstile_verification_fails(): void
     {
         User::query()->create([
