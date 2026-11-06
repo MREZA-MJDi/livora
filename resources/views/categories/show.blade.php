@@ -255,15 +255,14 @@
                             </h2>
 
                             <p class="mx-auto mt-3 max-w-md text-sm leading-7 text-[var(--sg-stone)]">
-                                در حال حاضر محصولی در این مجموعه قرار نگرفته است.
-                                می‌توانید سایر دسته‌بندی‌ها را بررسی کنید.
+                                با این عبارت جستجو یا فیلتر، محصولی پیدا نشد. فیلترها را تغییر دهید یا پاک کنید.
                             </p>
 
                             <a
-                                href="{{ route('categories.index') }}"
+                                href="{{ route('categories.show', $category->slug) }}"
                                 class="mt-7 inline-flex rounded-2xl bg-[var(--sg-ink)] px-6 py-3.5 text-sm font-medium text-white transition hover:bg-[var(--sg-accent)]"
                             >
-                                مشاهده دسته‌بندی‌ها
+                                پاک کردن فیلترها
                             </a>
 
                         </div>
