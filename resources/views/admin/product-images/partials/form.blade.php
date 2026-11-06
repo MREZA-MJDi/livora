@@ -100,7 +100,7 @@
             </div>
             <input
                 id="image"
-                name="image" data-crop-ratio="0.8" data-preview-target="product-gallery-image-preview"
+                name="image" data-crop-ratio="0.8" data-original-field="original_image" data-preview-target="product-gallery-image-preview"
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
                 class="admin-input p-2"
