@@ -274,7 +274,7 @@
                              ACTIVE FILTER
                         ================================================== --}}
 
-                                                <div id="shop-live-results" aria-live="polite" aria-busy="false">
+                        <div id="shop-live-results" aria-live="polite" aria-busy="false">
 
                         @if(request()->filled('category'))
 
