@@ -342,6 +342,9 @@
         </div>
     </details>
 
+    <details class="overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-white)]">
+        <summary class="cursor-pointer list-none px-5 py-4 text-sm font-semibold text-[var(--admin-text)]">تنظیمات تکمیلی دسته‌بندی (اختیاری)<span class="mt-1 block text-xs font-normal text-[var(--admin-muted)]">زیر‌دسته، بنر اختصاصی، متن‌های تکمیلی و محتوای ویژه صفحه.</span></summary>
+        <div class="space-y-5 border-t border-[var(--admin-border)] p-4 sm:p-6">
     <div class="admin-card space-y-5 p-6">
         <div><h3 class="text-base font-bold text-[var(--admin-text)]">ساختار دسته‌بندی و تصاویر صفحه</h3><p class="admin-help mt-1">تصویر کارت و بنر صفحه دسته‌بندی مستقل هستند. تصویر قدیمی فقط به‌عنوان fallback حفظ می‌شود.</p></div>
         <div>
@@ -391,6 +394,8 @@
         'includeRelatedProducts' => true,
     ])
 
+        </div>
+    </details>
 </div>
 
 
