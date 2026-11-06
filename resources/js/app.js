@@ -946,6 +946,18 @@ Alpine.start();
         const target = targetSelector ? document.querySelector(targetSelector) : null;
         if (!target) return window.location.assign(url.toString());
 
+        const minimum = Number(url.searchParams.get('min_price'));
+        const maximum = Number(url.searchParams.get('max_price'));
+        const minValue = url.searchParams.get('min_price');
+        const maxValue = url.searchParams.get('max_price');
+        const maxInput = sourceForm?.querySelector('[name="max_price"]');
+        if (minValue && maxValue && Number.isFinite(minimum) && Number.isFinite(maximum) && maximum < minimum) {
+            maxInput?.setCustomValidity('حداکثر قیمت باید برابر یا بیشتر از حداقل قیمت باشد.');
+            maxInput?.reportValidity();
+            return;
+        }
+        document.querySelectorAll('form[data-live-catalog-filters] [name="max_price"]').forEach((input) => input.setCustomValidity(''));
+
         activeRequest?.abort();
         const controller = new AbortController();
         activeRequest = controller;
@@ -995,6 +1007,7 @@ Alpine.start();
     };
 
     const schedule = (form, delay) => {
+        activeRequest?.abort();
         const old = timers.get(form);
         if (old) clearTimeout(old);
         timers.set(form, setTimeout(() => {
