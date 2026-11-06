@@ -16,7 +16,7 @@ class InitialDataSeederTest extends TestCase
             ->assertExitCode(0);
 
         $this->assertDatabaseCount('categories', 8);
-        $this->assertDatabaseCount('products', 16);
+        $this->assertDatabaseCount('products', 17);
         $this->assertDatabaseCount('blog_posts', 6);
         $this->assertDatabaseCount('contact_settings', 1);
         $this->assertDatabaseHas('content_pages', ['slug' => 'buying-guide']);
@@ -36,7 +36,7 @@ class InitialDataSeederTest extends TestCase
             ->assertExitCode(0);
 
         $this->assertDatabaseCount('categories', 8);
-        $this->assertDatabaseCount('products', 16);
+        $this->assertDatabaseCount('products', 17);
         $this->assertDatabaseCount('blog_posts', 6);
 
         $this->assertDatabaseHas('products', [
