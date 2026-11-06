@@ -9,6 +9,7 @@ use App\Models\Media;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Support\MediaLibrary;
+use App\Services\Media\ProductImageVariantGenerator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -52,7 +53,7 @@ class ProductImageController extends Controller
         $media = $request->hasFile('image')
             ? MediaLibrary::store($request->file('image'), (int) $request->user()->id, 'products/images', $data['alt'] ?? null)
             : MediaLibrary::image($data['media_id'] ?? null);
-        $data['path'] = $media->path;
+        if ($media && (! $media->thumbnail_path || ! $media->card_path || ! $media->detail_path)) {\n            $media = app(ProductImageVariantGenerator::class)->generate($media);\n        }\n        $data['path'] = $media->path;
         $data['media_id'] = $media->id;
 
         DB::transaction(function () use (&$data): void {
@@ -98,7 +99,7 @@ class ProductImageController extends Controller
             ? MediaLibrary::store($request->file('image'), (int) $request->user()->id, 'products/images', $data['alt'] ?? null)
             : (filled($data['media_id'] ?? null) ? MediaLibrary::image($data['media_id']) : null);
         if ($newMedia) {
-            $data['path'] = $newMedia->path;
+            if (! $newMedia->thumbnail_path || ! $newMedia->card_path || ! $newMedia->detail_path) {\n                $newMedia = app(ProductImageVariantGenerator::class)->generate($newMedia);\n            }\n            $data['path'] = $newMedia->path;
             $data['media_id'] = $newMedia->id;
         } else {
             unset($data['media_id'], $data['path']);
