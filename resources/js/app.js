@@ -99,8 +99,12 @@ window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName
     },
     selectMedia(item) {
         this.selectedMedia = item;
-        const fileInput = this.$root.closest('form')?.querySelector(`input[type="file"][name="${this.fileField}"]`);
+        const form = this.$root.closest('form');
+        const fileInput = form?.querySelector(`input[type="file"][name="${this.fileField}"]`);
         if (fileInput) fileInput.value = '';
+        const originalName = fileInput?.dataset.originalField;
+        const originalInput = originalName ? form?.querySelector(`input[type="file"][name="${originalName}"]`) : null;
+        if (originalInput) originalInput.value = '';
         const removeInput = this.$root.querySelector(`input[name=\"${this.removeField}\"]`);
         if (removeInput) removeInput.value = '0';
                 const removeCheckbox = this.$root.closest('form')?.querySelector(`input[type="checkbox"][name="${this.removeField}"]`);
@@ -117,8 +121,12 @@ window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName
         if (removeInput) removeInput.value = '1';
         const removeCheckbox = this.$root.closest('form')?.querySelector(`input[type="checkbox"][name="${this.removeField}"]`);
         if (removeCheckbox) removeCheckbox.checked = true;
-        const fileInput = this.$root.closest('form')?.querySelector(`input[type="file"][name="${this.fileField}"]`);
+        const form = this.$root.closest('form');
+        const fileInput = form?.querySelector(`input[type="file"][name="${this.fileField}"]`);
         if (fileInput) fileInput.value = '';
+        const originalName = fileInput?.dataset.originalField;
+        const originalInput = originalName ? form?.querySelector(`input[type="file"][name="${originalName}"]`) : null;
+        if (originalInput) originalInput.value = '';
         const preview = document.getElementById(this.previewId);
         if (preview) { preview.removeAttribute('src'); preview.classList.add('hidden'); }
     },
