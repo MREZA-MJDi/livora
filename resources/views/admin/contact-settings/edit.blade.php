@@ -26,7 +26,13 @@
             </div>
             <div class="grid gap-4 sm:grid-cols-2">
                 <div><label class="admin-label" for="brand_name">نام برند</label><input id="brand_name" name="brand_name" class="admin-input" maxlength="120" value="{{ old('brand_name', $settings->brand_name ?? config('app.name')) }}">@error('brand_name')<p class="admin-error">{{ $message }}</p>@enderror</div>
-                <div><label class="admin-label" for="logo_path">نشانی لوگو</label><input id="logo_path" name="logo_path" type="url" dir="ltr" class="admin-input" value="{{ old('logo_path', $settings->logo_path ?? '') }}"><p class="admin-help">اختیاری؛ از رسانه‌های تأییدشده سایت استفاده کنید.</p>@error('logo_path')<p class="admin-error">{{ $message }}</p>@enderror</div>
+                <div class="sm:col-span-2">
+                    <label class="admin-label" for="logo_image">لوگوی اصلی برند</label>
+                    <input id="logo_image" name="logo_image" type="file" accept="image/jpeg,image/png,image/webp" data-crop-ratio="1" class="admin-input p-2">
+                    <div class="mt-3"><img id="brand-logo-preview" src="{{ $settings->logoMedia?->url ?: ($settings->logo_path ? (str_starts_with($settings->logo_path, 'http') ? $settings->logo_path : \\Illuminate\\Support\\Facades\\Storage::disk('public')->url($settings->logo_path)) : '') }}" alt="{{ $settings->brand_name }}" class="{{ $settings->logo_path ? '' : 'hidden' }} h-20 max-w-48 rounded-xl object-contain"></div>
+                    @include('admin.media.partials.picker', ['mediaPickerField' => 'logo_image', 'mediaPickerId' => old('logo_media_id', $settings->logo_media_id), 'mediaPickerUrl' => $settings->logoMedia?->url, 'mediaPickerName' => $settings->logoMedia?->original_name ?? 'Brand logo', 'mediaPickerPreviewId' => 'brand-logo-preview', 'mediaPickerInputName' => 'logo_media_id', 'mediaPickerRemoveName' => 'remove_logo'])
+                    @error('logo_image')<p class="admin-error">{{ $message }}</p>@enderror
+                </div>
                 @foreach(['whatsapp_url' => 'واتساپ', 'telegram_url' => 'تلگرام', 'instagram_url' => 'اینستاگرام', 'eitaa_url' => 'ایتا', 'bale_url' => 'بله'] as $field => $label)
                     <div><label class="admin-label" for="{{ $field }}">{{ $label }}</label><input id="{{ $field }}" name="{{ $field }}" type="url" dir="ltr" class="admin-input" value="{{ old($field, $settings->{$field} ?? '') }}">@error($field)<p class="admin-error">{{ $message }}</p>@enderror</div>
                 @endforeach
