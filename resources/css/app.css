@@ -2363,3 +2363,59 @@ body {
         bottom: .7rem;
     }
 }
+
+
+/* Silla homepage hero: balanced copy/image composition, no orphan product strip. */
+.sila-home-hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
+    align-items: center;
+    gap: clamp(1.5rem, 4vw, 4.5rem);
+    min-height: clamp(420px, calc(100svh - 210px), 620px);
+    padding-block: clamp(2.25rem, 5vw, 4.5rem);
+}
+.sila-home-hero-copy {
+    width: 100%;
+    max-width: 38rem;
+    justify-self: end;
+}
+.sila-home-hero-copy h1 {
+    max-width: 12ch;
+    margin-top: 1rem;
+    font-size: clamp(2.4rem, 4.2vw, 4.6rem);
+    line-height: 1.22;
+    letter-spacing: -.04em;
+    text-wrap: balance;
+}
+.sila-home-hero-copy p:not(:first-child) {
+    max-width: 34rem;
+    font-size: clamp(.9rem, 1.15vw, 1.05rem);
+    line-height: 2.1;
+}
+.sila-home-hero-media { width: 100%; min-width: 0; }
+.sila-home-hero-image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 5 / 4;
+    max-height: 590px;
+    object-fit: cover;
+    object-position: center;
+}
+@media (max-width: 1023px) {
+    .sila-home-hero-grid {
+        min-height: 0;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1.75rem;
+        padding-block: 2rem 2.5rem;
+    }
+    .sila-home-hero-copy { max-width: 48rem; justify-self: stretch; }
+    .sila-home-hero-copy h1 { max-width: 16ch; font-size: clamp(2.2rem, 6vw, 3.5rem); }
+    .sila-home-hero-image { aspect-ratio: 16 / 10; max-height: 520px; }
+}
+@media (max-width: 639px) {
+    .sila-home-hero-grid { gap: 1.35rem; padding-block: 1.5rem 2rem; }
+    .sila-home-hero-copy h1 { max-width: 14ch; margin-top: .75rem; font-size: clamp(2rem, 8.5vw, 2.8rem); }
+    .sila-home-hero-copy p:not(:first-child) { margin-top: .85rem; font-size: .86rem; line-height: 1.9; }
+    .sila-home-hero-copy a { margin-top: 1.25rem; width: 100%; }
+    .sila-home-hero-image { aspect-ratio: 4 / 3; border-radius: 1.1rem; }
+}
