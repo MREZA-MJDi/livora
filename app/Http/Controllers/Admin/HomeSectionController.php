@@ -106,7 +106,11 @@ class HomeSectionController extends Controller
 
     private function validated(Request $request, ?HomeSection $section = null): array
     {
-        $request->merge(['key' => Str::slug((string) $request->input('key'))]);
+        $rawKey = trim((string) $request->input('key'));
+        $fallbackKey = $section?->key ?: (($request->input('type') ?: 'section') . '-' . Str::lower(Str::random(6)));
+        $request->merge([
+            'key' => Str::slug($rawKey !== '' ? $rawKey : $fallbackKey),
+        ]);
 
         return $request->validate([
             'key' => ['required', 'string', 'max:100', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/', Rule::unique('home_sections', 'key')->ignore($section?->id)],
