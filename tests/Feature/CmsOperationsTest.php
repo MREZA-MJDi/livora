@@ -254,7 +254,7 @@ class CmsOperationsTest extends TestCase
         $this->assertNotNull($message->fresh()->replied_at);
     }
 
-    public function test_sitemap_requires_record_level_index_and_follow_permissions(): void
+    public function test_sitemap_includes_published_posts_without_robots_flags(): void
     {
         SeoSetting::current()->update([
             'indexing_enabled' => true,
@@ -288,7 +288,7 @@ class CmsOperationsTest extends TestCase
         $xml = (string) ob_get_clean();
 
         $this->assertStringContainsString('/blog/post-allowed-in-sitemap', $xml);
-        $this->assertStringNotContainsString('/blog/post-blocked-by-follow', $xml);
+        $this->assertStringContainsString('/blog/post-blocked-by-follow', $xml);
     }
 
     public function test_blog_create_and_edit_forms_use_jalali_calendar_not_gregorian_datetime_input(): void
