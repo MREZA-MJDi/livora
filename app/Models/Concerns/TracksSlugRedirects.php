@@ -9,6 +9,13 @@ trait TracksSlugRedirects
 {
     protected static function bootTracksSlugRedirects(): void
     {
+        static::saving(function ($model): void {
+            $normalized = \\Illuminate\\Support\\Str::slug((string) $model->slug);
+            if ($normalized !== '') {
+                $model->slug = $normalized;
+            }
+        });
+
         static::updated(function ($model): void {
             if (! $model->wasChanged('slug')) {
                 return;
