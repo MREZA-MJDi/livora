@@ -25,7 +25,7 @@
                             @if($section->subtitle)<p class="mt-5 max-w-xl text-sm leading-8 {{ $section->type === 'cta' ? 'text-white/65' : 'text-[var(--sg-stone)]' }}">{{ $section->subtitle }}</p>@endif
                             @if($section->cta_label)<a href="{{ $ctaUrl }}" class="mt-8 inline-flex items-center justify-center rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] px-6 py-4 text-sm font-semibold text-[var(--sg-ink)] transition hover:border-[var(--sg-accent)]">{{ $section->cta_label }} <span class="mr-3" aria-hidden="true">←</span></a>@endif
                         </div>
-                        @php($heroProduct = $section->products?->first())
+                        @php($heroProduct = $section->type === 'hero' ? $section->products->first() : null)
                         @php($heroImage = $section->image_url ?: $heroProduct?->images?->first()?->detail_url)
                         <div class="min-w-0 space-y-4 {{ $section->type === 'cta' ? 'lg:order-1' : '' }}">
                             @if($heroImage)
