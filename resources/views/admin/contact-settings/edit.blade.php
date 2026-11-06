@@ -35,6 +35,50 @@
         </section>
 
         <section class="admin-card space-y-5 p-6">
+            <div><h2 class="text-base font-bold">معرفی برند و نشان‌های رسمی</h2><p class="admin-help mt-1">نام، لوگو و توضیح برند از همین منبع برای هدر، فوتر و اطلاعات سازمانی SEO استفاده می‌شوند.</p></div>
+            <div class="grid gap-4 sm:grid-cols-2">
+                <label class="sm:col-span-2"><span class="admin-label">توضیح برند</span><textarea name="brand_description" rows="3" maxlength="3000" class="admin-textarea">{{ old('brand_description', $settings->brand_description ?? '') }}</textarea>@error('brand_description')<p class="admin-error">{{ $message }}</p>@enderror</label>
+                <label><span class="admin-label">لینک نماد اعتماد (Enamad)</span><input name="enamad_url" type="url" dir="ltr" class="admin-input" value="{{ old('enamad_url', $settings->enamad_url ?? '') }}">@error('enamad_url')<p class="admin-error">{{ $message }}</p>@enderror</label>
+                <label><span class="admin-label">لینک ساماندهی</span><input name="samandehi_url" type="url" dir="ltr" class="admin-input" value="{{ old('samandehi_url', $settings->samandehi_url ?? '') }}">@error('samandehi_url')<p class="admin-error">{{ $message }}</p>@enderror</label>
+                <label class="sm:col-span-2"><span class="admin-label">متن کپی‌رایت</span><input name="copyright_text" maxlength="255" class="admin-input" value="{{ old('copyright_text', $settings->copyright_text ?? '') }}" placeholder="تمام حقوق برای سیلا گالری محفوظ است.">@error('copyright_text')<p class="admin-error">{{ $message }}</p>@enderror</label>
+            </div>
+        </section>
+
+        <section class="admin-card space-y-5 p-6" x-data="footerSettingsBuilder(
+            @js(old('footer_menu.shop', data_get($settings->footer_menu, 'shop', []))),
+            @js(old('footer_menu.guide', data_get($settings->footer_menu, 'guide', []))),
+            @js(old('footer_menu.contact', data_get($settings->footer_menu, 'contact', []))),
+            @js(old('payment_methods', $settings->payment_methods ?? []))
+        )">
+            <div><h2 class="text-base font-bold">سازنده منوی فوتر</h2><p class="admin-help mt-1">لینک‌های هر ستون را اضافه، حذف و ویرایش کنید. مسیر داخلی با / و لینک خارجی با https:// وارد شود.</p></div>
+            <template x-for="group in groups" :key="group.key">
+                <div class="space-y-3 rounded-2xl border border-[var(--admin-border)] p-4">
+                    <div class="flex items-center justify-between gap-3"><h3 class="font-semibold" x-text="group.label"></h3><button type="button" class="admin-btn admin-btn-secondary" @click="addLink(group.key)">افزودن لینک</button></div>
+                    <template x-for="(link, index) in menus[group.key]" :key="group.key + '-' + index">
+                        <div class="grid gap-2 sm:grid-cols-[1fr_1.4fr_auto]">
+                            <input class="admin-input" :name="'footer_menu[' + group.key + '][' + index + '][label]'" x-model="link.label" placeholder="عنوان لینک">
+                            <input class="admin-input" dir="ltr" :name="'footer_menu[' + group.key + '][' + index + '][url]'" x-model="link.url" placeholder="/shop">
+                            <button type="button" class="admin-btn admin-btn-danger" @click="menus[group.key].splice(index, 1)">حذف</button>
+                        </div>
+                    </template>
+                    <p class="admin-help" x-show="menus[group.key].length === 0">برای این ستون هنوز لینکی ثبت نشده است.</p>
+                </div>
+            </template>
+            <div class="space-y-3 rounded-2xl border border-[var(--admin-border)] p-4">
+                <div class="flex items-center justify-between gap-3"><h3 class="font-semibold">روش‌های پرداخت و نشان‌های تصویری</h3><button type="button" class="admin-btn admin-btn-secondary" @click="payments.push({label:'', image:'', url:''})">افزودن نشان</button></div>
+                <template x-for="(item, index) in payments" :key="'payment-' + index">
+                    <div class="grid gap-2 sm:grid-cols-[1fr_1.3fr_1.3fr_auto]">
+                        <input class="admin-input" :name="'payment_methods[' + index + '][label]'" x-model="item.label" placeholder="عنوان">
+                        <input class="admin-input" dir="ltr" :name="'payment_methods[' + index + '][image]'" x-model="item.image" placeholder="URL تصویر نشان">
+                        <input class="admin-input" dir="ltr" :name="'payment_methods[' + index + '][url]'" x-model="item.url" placeholder="لینک مقصد (اختیاری)">
+                        <button type="button" class="admin-btn admin-btn-danger" @click="payments.splice(index, 1)">حذف</button>
+                    </div>
+                </template>
+                <p class="admin-help">فقط نشان‌ها و روش‌هایی نمایش داده می‌شوند که واقعاً توسط فروشگاه تأیید شده باشند.</p>
+            </div>
+        </section>
+
+        <section class="admin-card space-y-5 p-6">
             <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
                     <h2 class="text-base font-bold">اطلاعات اصلی تماس</h2>
@@ -298,4 +342,17 @@
         </div>
     </form>
 </div>
+@push('scripts')
+<script>
+function footerSettingsBuilder(shop, guide, contact, payments) {
+    return {
+        groups: [{key:'shop',label:'ستون فروشگاه'},{key:'guide',label:'راهنمای مشتریان'},{key:'contact',label:'ارتباط با ما'}],
+        menus: {shop:Array.isArray(shop)?shop:[],guide:Array.isArray(guide)?guide:[],contact:Array.isArray(contact)?contact:[]},
+        payments: Array.isArray(payments)?payments:[],
+        addLink(key) { this.menus[key].push({label:'',url:''}); }
+    };
+}
+</script>
+@endpush
+
 @endsection
