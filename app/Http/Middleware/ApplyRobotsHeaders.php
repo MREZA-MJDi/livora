@@ -14,7 +14,7 @@ class ApplyRobotsHeaders
 
         // Keep every non-production deployment out of search results,
         // regardless of the SEO switches stored in the database.
-        if (! app()->environment('production')) {
+        if (! config('app.env') !== 'production') {
             $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
 
             return $response;

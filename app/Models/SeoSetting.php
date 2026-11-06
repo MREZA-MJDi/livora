@@ -52,7 +52,7 @@ class SeoSetting extends Model
 
     public function robotsFor(bool $pageIndex = true, bool $pageFollow = true): string
     {
-        if (! app()->environment('production')) {
+        if (! config('app.env') !== 'production') {
             return 'noindex, nofollow';
         }
 

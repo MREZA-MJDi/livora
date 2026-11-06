@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\ContentPage;
 use App\Models\Product;
 use App\Models\SeoPageSetting;
+use App\Models\SeoSetting;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SitemapController extends Controller
@@ -17,8 +18,10 @@ class SitemapController extends Controller
             echo '<?xml version="1.0" encoding="UTF-8"?>';
             echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
 
-            // Non-production deployments are intentionally excluded from indexing.
-            if (! app()->environment('production')) {
+            // Sitemap publication is controlled by the explicit global SEO gate.
+            // Record-level index/follow permissions are checked below for each URL.
+            $settings = SeoSetting::current();
+            if (! $settings->indexing_enabled || ! $settings->following_enabled) {
                 echo '</urlset>';
                 return;
             }

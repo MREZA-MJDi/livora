@@ -26,6 +26,8 @@ class InitialCategorySeeder extends Seeder
                 [
                     ...$category,
                     'is_active' => true,
+                    'seo_index' => true,
+                    'seo_follow' => true,
                     'image' => null,
                 ]
             );
