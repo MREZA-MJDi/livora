@@ -113,7 +113,7 @@
                         <div class="sg-category-detail-visual relative aspect-[16/7] overflow-hidden rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-surface)]">
                             @if($category->banner_image_url)
                                 <img
-                                    src="{{ $category->homepage_image_url }}"
+                                    src="{{ $category->banner_image_url }}"
                                     alt="{{ $category->image_alt ?: $category->name }}"
                                     width="1440"
                                     height="1000"
