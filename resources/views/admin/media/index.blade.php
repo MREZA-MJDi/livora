@@ -15,7 +15,7 @@
                 </h1>
 
                 <p class="mt-1 text-sm text-[var(--admin-text-soft)]">
-                    تصاویر و فایل‌های عمومی سایت را مدیریت کنید.
+                    همه عکس‌های سایت اینجا نگهداری می‌شوند. قبل از حذف، محل استفاده هر تصویر را بررسی کنید.
                 </p>
             </div>
 
@@ -232,7 +232,7 @@
                                         type="submit"
                                         @disabled($usageCount > 0)
                                         class="flex h-8 w-8 items-center justify-center rounded-xl border border-red-200 text-red-500 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-30"
-                                        title="{{ $usageCount > 0 ? 'ابتدا این رسانه را از محتوای متصل جدا کنید.' : 'حذف' }}"
+                                        title="{{ $usageCount > 0 ? 'این تصویر در سایت استفاده می‌شود و برای جلوگیری از خراب شدن صفحه‌ها قابل حذف نیست.' : 'حذف' }}"
                                     >
 
                                         <svg
