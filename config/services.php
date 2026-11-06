@@ -15,7 +15,7 @@ return [
     */
 
     'turnstile' => [
-        'site_key' => env('TURNSTILE_SITE_KEY', '0x4AAAAAAF0qjF7cUoy072cx'),
+        'site_key' => env('TURNSTILE_SITE_KEY'),
         'secret' => env('TURNSTILE_SECRET'),
         'hostnames' => array_values(array_filter(array_map(
             static fn (string $host): string => strtolower(trim($host)),
