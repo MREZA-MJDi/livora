@@ -16,7 +16,7 @@
             <label class="sm:col-span-2"><span class="admin-label">توضیحات</span><textarea name="subtitle" rows="3" class="admin-textarea">{{ old('subtitle', $section->subtitle) }}</textarea></label>
             <label><span class="admin-label">متن دکمه</span><input name="cta_label" class="admin-input" value="{{ old('cta_label', $section->cta_label) }}"></label>
             <label><span class="admin-label">لینک دکمه</span><input name="cta_url" class="admin-input" dir="ltr" value="{{ old('cta_url', $section->cta_url) }}" placeholder="/shop"></label>
-            <label class="sm:col-span-2"><span class="admin-label">تصویر سکشن</span><input type="file" name="image" accept="image/jpeg,image/png,image/webp" class="admin-input"><input type="hidden" name="image_path" value="{{ old('image_path', $section->image_path) }}">@if($section->image_url)<img src="{{ $section->image_url }}" alt="" class="mt-3 max-h-48 rounded-xl object-cover">@endif</label>
+            <label class="sm:col-span-2"><span class="admin-label">تصویر سکشن</span><input type="file" name="image" accept="image/jpeg,image/png,image/webp" data-crop-ratio="1.25" class="admin-input"><input type="hidden" name="image_path" value="{{ old('image_path', $section->image_path) }}">@if($section->image_url)<img src="{{ $section->image_url }}" alt="" class="mt-3 max-h-48 rounded-xl object-cover">@endif</label>
         </div>
         <section x-show="['hero', 'products', 'categories'].includes(sectionType)" class="rounded-2xl bg-[var(--admin-surface)] p-4 space-y-4">
             <h2 class="font-bold">منبع محتوا</h2>
