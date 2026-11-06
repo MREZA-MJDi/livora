@@ -26,6 +26,10 @@
 
         <div class="flex flex-wrap gap-2">
 
+            @if($customer->email)
+                <a href="mailto:{{ $customer->email }}" class="admin-btn admin-btn-secondary">ارسال ایمیل به مشتری</a>
+            @endif
+
             <a
                 href="{{ route('admin.customers.edit', $customer) }}"
                 class="admin-btn admin-btn-primary"
