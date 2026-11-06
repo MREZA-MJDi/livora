@@ -40,7 +40,7 @@ class HomeSectionController extends Controller
         $data['sort_order'] = (HomeSection::max('sort_order') ?? 0) + 10;
         $data['enabled'] = $request->boolean('enabled');
         $data['payload'] = $this->normalizePayload($data['payload'] ?? []);
-        $data['image_path'] = $this->storeImage($request, $data['image_path'] ?? null);
+        $data['image_path'] = $this->storeImage($request, null);
 
         $this->assertProductsAreUnique($data['payload']['product_ids'] ?? []);
         HomeSection::create($data);
@@ -134,7 +134,7 @@ class HomeSectionController extends Controller
             return;
         }
 
-        $used = HomeSection::query()->when($ignoreId, fn ($query) => $query->whereKeyNot($ignoreId))->get(['id', 'payload'])
+        $used = HomeSection::query()->when($ignoreId, fn ($query) => $query->where('id', '!=', $ignoreId))->get(['id', 'payload'])
             ->flatMap(fn (HomeSection $item) => $item->payload['product_ids'] ?? [])
             ->map(fn ($id) => (int) $id)->unique();
 
