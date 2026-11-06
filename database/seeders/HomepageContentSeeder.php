@@ -108,7 +108,12 @@ class HomepageContentSeeder extends Seeder
             }
 
             if ($key === 'hero') {
+                // Keep CMS-managed hero slides and their uploaded media when refreshing defaults.
+                $heroSlides = is_array($section->payload) ? ($section->payload['slides'] ?? []) : [];
                 $section->payload = ['product_source' => 'latest', 'limit' => 6];
+                if (is_array($heroSlides) && $heroSlides !== []) {
+                    $section->payload['slides'] = $heroSlides;
+                }
             } elseif ($key === 'featured') {
                 $section->payload = ['product_source' => 'featured', 'limit' => 4];
             } elseif ($key === 'new-arrivals') {
