@@ -79,7 +79,7 @@
                                 @if(filled($slide['image_url'] ?? null))
                                     <img
                                         src="{{ $slide['image_url'] }}"
-                                        alt="{{ $slide['title'] ?: 'Silla Gallery' }}"
+                                        alt="{{ (! $hasConfiguredSlides && blank($section->image_path) && $heroProduct) ? $heroProduct->name : ($slide['title'] ?: 'Silla Gallery') }}"
                                         class="sg-home-hero__image {{ $index === 0 ? 'is-active' : '' }}"
                                         data-sg-hero-image="{{ $index }}"
                                         style="object-position: {{ $slide['object_position'] }}"
