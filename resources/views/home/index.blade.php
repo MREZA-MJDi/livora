@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', \App\Models\SeoPageSetting::forRoute('home')?->meta_title ?: 'SillaGallery | مبلمان و لوازم خانه')
+@section('title', \App\Models\SeoPageSetting::forRoute('home')?->meta_title ?: 'سیلا گالری | مبلمان و لوازم خانه')
 
 @section(
     'description',
-    (\App\Models\SeoPageSetting::forRoute('home')?->meta_description ?: 'SillaGallery؛ انتخابی دقیق برای خانه‌ای که قرار است ماندگار باشد. کشف مجموعه مبلمان، دکوراسیون و خرید اقساطی.')
+    (\App\Models\SeoPageSetting::forRoute('home')?->meta_description ?: 'سیلا گالری؛ انتخابی دقیق برای خانه‌ای که قرار است ماندگار باشد. کشف مجموعه مبلمان، دکوراسیون و خرید اقساطی.')
 )
 
 @section('canonical', \App\Models\SeoPageSetting::forRoute('home')?->canonical_url ?: url('/'))
@@ -220,7 +220,7 @@
                                                     <div class="min-w-0">
 
                                                         <p class="text-[10px] uppercase tracking-[0.18em] text-white/55">
-                                                            Featured Product
+                                                            محصول منتخب
                                                         </p>
 
                                                         <h2 class="mt-2 truncate text-lg font-semibold sm:text-xl">
@@ -330,7 +330,7 @@
                             <div class="flex min-h-[430px] items-center justify-center bg-[var(--sg-surface)]">
 
                                 <span class="text-sm tracking-[0.2em] text-[var(--sg-stone)]">
-                                    SillaGallery
+                                    سیلا گالری
                                 </span>
 
                             </div>
@@ -347,7 +347,7 @@
 
 
         {{-- =========================================================
-             CATEGORY DISCOVERY
+             دسته‌بندی‌ها
         ========================================================== --}}
 
         <section class="border-t border-[var(--sg-border)] bg-[var(--sg-white)]">
@@ -430,7 +430,7 @@
                         <div>
 
                             <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
-                                Curated collection
+                                مجموعه منتخب
                             </p>
 
                             <h2 class="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -480,135 +480,12 @@
                         <div class="mt-10 rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-surface)] p-10 text-center">
 
                             <p class="text-sm text-[var(--sg-stone)]">
-                                محصولات منتخب به‌زودی اینجا نمایش داده می‌شوند.
+
                             </p>
 
                         </div>
 
                     @endif
-
-                </div>
-
-            </x-layout.container>
-
-        </section>
-
-
-        {{-- =========================================================
-             INSTALLMENT HERO
-        ========================================================== --}}
-
-        <section class="border-t border-[var(--sg-border)] bg-[var(--sg-ink)] text-white">
-
-            <x-layout.container>
-
-                <div class="py-16 sm:py-20">
-
-                    <div class="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
-
-
-                        <div>
-
-                            <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-white/45">
-                                SillaGallery INSTALLMENTS
-                            </p>
-
-                            <h2 class="mt-4 max-w-xl text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
-
-                                خانه‌تان را انتخاب کنید.
-
-                                <span class="block text-white/50">
-                                    پرداختش را برنامه‌ریزی کنید.
-                                </span>
-
-                            </h2>
-
-
-                            <p class="mt-6 max-w-xl text-sm leading-8 text-white/60">
-
-                                بعضی از محصولات SillaGallery می‌توانند با شرایط اقساطی
-                                تعریف‌شده توسط فروشگاه خریداری شوند؛
-                                پیش‌پرداخت، تعداد چک و فاصله سررسید از قبل مشخص است.
-
-                            </p>
-
-
-                            {{-- Installment CTA --}}
-
-                            <a
-                                href="{{ route('shop.index') }}"
-                                class="mt-8 inline-flex items-center rounded-2xl bg-white px-6 py-4 text-sm font-medium text-[var(--sg-ink)] transition-colors duration-300 hover:bg-[var(--sg-cream)]"
-                            >
-                                مشاهده محصولات اقساطی
-                            </a>
-
-                        </div>
-
-
-                        <div class="grid grid-cols-2 gap-3">
-
-                            <div class="rounded-3xl border border-white/10 bg-white/5 p-5 sm:p-6">
-
-                                <span class="text-[10px] uppercase tracking-[0.18em] text-white/40">
-                                    Today
-                                </span>
-
-                                <p class="mt-4 text-2xl font-semibold">
-                                    50%
-                                </p>
-
-                                <p class="mt-2 text-xs leading-6 text-white/45">
-                                    پیش‌پرداخت نمونه
-                                </p>
-
-                            </div>
-
-
-                            <div class="rounded-3xl border border-white/10 bg-white/5 p-5 sm:p-6">
-
-                                <span class="text-[10px] uppercase tracking-[0.18em] text-white/40">
-                                    Cheques
-                                </span>
-
-                                <p class="mt-4 text-2xl font-semibold">
-                                    2+
-                                </p>
-
-                                <p class="mt-2 text-xs leading-6 text-white/45">
-                                    قابل تنظیم توسط فروشگاه
-                                </p>
-
-                            </div>
-
-
-                            <div class="col-span-2 rounded-3xl border border-white/10 bg-white/[0.07] p-5 sm:p-6">
-
-                                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-
-                                    <div>
-
-                                        <p class="text-sm font-semibold">
-                                            شرایط هر محصول متفاوت است
-                                        </p>
-
-                                        <p class="mt-2 text-xs leading-6 text-white/45">
-                                            درصد پیش‌پرداخت و برنامه تسویه را در صفحه محصول ببینید.
-                                        </p>
-
-                                    </div>
-
-
-                                    <span class="inline-flex w-fit rounded-full border border-white/10 px-4 py-2 text-[11px] text-white/60">
-                                        Transparent pricing
-                                    </span>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
 
                 </div>
 
@@ -700,7 +577,7 @@
                             </p>
 
                             <h2 class="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-                                تازه‌های SillaGallery
+                                تازه‌های سیلا گالری
                             </h2>
 
                             <p class="mt-3 max-w-xl text-sm leading-8 text-[var(--sg-stone)]">
@@ -741,7 +618,7 @@
                         <div class="mt-10 rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-surface)] p-10 text-center">
 
                             <p class="text-sm text-[var(--sg-stone)]">
-                                محصولات جدید به‌زودی اضافه می‌شوند.
+
                             </p>
 
                         </div>
@@ -798,7 +675,7 @@
                                 href="{{ route('about') }}"
                                 class="mt-7 inline-flex items-center text-sm font-medium text-[var(--sg-ink)] transition-colors duration-300 hover:text-[var(--sg-accent)]"
                             >
-                                درباره SillaGallery
+                                درباره سیلا گالری
 
                                 <span class="mr-2">
                                     ←
