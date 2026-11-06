@@ -157,6 +157,7 @@
     $classes = implode(' ', [
 
         // Layout
+        'sg-button',
         'inline-flex',
         'w-fit',
         'shrink-0',
