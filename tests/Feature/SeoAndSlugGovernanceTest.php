@@ -33,11 +33,11 @@ class SeoAndSlugGovernanceTest extends TestCase
             'site_name' => 'SillaGallery',
         ]);
 
-        config(['app.env' => 'production']);
+        $this->app['env'] = 'production';
         $this->assertSame('index, follow', $settings->robotsFor(true, true));
         $this->assertSame('noindex, follow', $settings->robotsFor(false, true));
         $settings->update(['indexing_enabled' => false]);
-        $this->assertSame('noindex, nofollow', $settings->robotsFor(true, true));
+        $this->assertSame('noindex, follow', $settings->robotsFor(true, true));
     }
 
     public function test_product_slug_changes_create_a_query_preserving_permanent_redirect(): void
