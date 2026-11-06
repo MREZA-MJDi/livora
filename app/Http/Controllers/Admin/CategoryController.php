@@ -36,7 +36,7 @@ class CategoryController extends Controller
         return view('admin.categories.create', [
             'category' => $category,
             'seoAnalysis' => $seoAnalyzer->analyze($category),
-            'availableRelatedCategories' => Category::query()->active()->orderBy('name')->limit(100)->get(['id', 'name']),
+            'availableRelatedCategories' => Category::query()->active()->whereNull('parent_id')->orderBy('name')->limit(100)->get(['id', 'name']),
             'availableRelatedProducts' => Product::query()->active()->orderBy('name')->limit(200)->get(['id', 'name']),
             'selectedRelatedCategoryIds' => [],
             'selectedRelatedProductIds' => [],
