@@ -438,7 +438,7 @@
         <div class="mb-5">
 
             <p class="px-3 text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--admin-muted)]">
-                STORE
+                محتوای سایت
             </p>
 
             <div class="mt-2 space-y-1">
@@ -512,6 +512,9 @@
                     <span class="flex-1">اطلاعات تماس و FAQ</span>
                 </a>
 
+                <details class="mt-2 rounded-xl border border-[var(--admin-border)] px-3 py-2">
+                    <summary class="cursor-pointer list-none text-xs font-semibold text-[var(--admin-text-soft)]">تنظیمات تخصصی و سئو</summary>
+                    <div class="mt-2 space-y-1">
                 <a href="{{ route('admin.seo.audit') }}" class="group flex items-center gap-3 rounded-2xl px-3 py-3 text-xs font-medium text-[var(--admin-text-soft)] transition hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text)]">
                     <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">✓</span>
                     <span class="flex-1">ممیزی فنی SEO</span>
@@ -526,6 +529,8 @@
                     <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">⌕</span>
                     <span class="flex-1">مدیریت SEO</span>
                 </a>
+                    </div>
+                </details>
 
             </div>
 
