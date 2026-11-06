@@ -57,7 +57,12 @@ sudo find /var/www/livora/bootstrap/cache -type d -exec chmod 2775 {} \;
 sudo find /var/www/livora/bootstrap/cache -type f -exec chmod 0664 {} \;
 ```
 
-The `.env` file should be owned by `livora:www-data` and mode `640`. Keep it in the project root.
+The `.env` file should be owned by `livora:www-data` and mode `640`. Keep it in the project root:
+
+```bash
+sudo chown livora:www-data /var/www/livora/.env
+sudo chmod 640 /var/www/livora/.env
+```
 
 ## 3. Production environment
 
@@ -104,12 +109,13 @@ Install `deploy/nginx/sillashop.com.conf` as the site's Nginx server block. It u
 - PHP front controller: `/var/www/livora/public/index.php`
 - Dedicated PHP-FPM socket: `/run/php/php8.5-fpm-livora.sock`
 
-Confirm the installed PHP-FPM version and socket before enabling the block. If the VPS uses another version, update the socket in both the Nginx block and `deploy/php-fpm/livora.conf` to match. Do not alter the Farzin virtual host or pool.
+Confirm the installed PHP-FPM version and socket before enabling the block. If the VPS uses another version, update the socket in both the Nginx block and `deploy/php-fpm/livora.conf` to match. Do not alter the Farzin virtual host or pool. Install the dedicated Livora pool only after confirming the matching PHP-FPM version:
 
 ```bash
-sudo nginx -t
+sudo install -m 644 deploy/php-fpm/livora.conf /etc/php/8.5/fpm/pool.d/livora.conf
 sudo php-fpm8.5 -t
 sudo systemctl reload php8.5-fpm
+sudo nginx -t
 sudo systemctl reload nginx
 ```
 
