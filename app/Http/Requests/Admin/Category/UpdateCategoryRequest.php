@@ -70,7 +70,7 @@ class UpdateCategoryRequest extends FormRequest
             'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string', 'max:1000'],
             'image_alt' => ['nullable', 'string', 'max:255'],
-            'parent_id' => ['nullable', 'integer', Rule::exists('categories', 'id')->where(fn ($query) => $query->where('id', '!=', $category->id))],
+            'parent_id' => ['nullable', 'integer', Rule::exists('categories', 'id')->whereNull('parent_id')->where(fn ($query) => $query->where('id', '!=', $category->id))],
             'card_media_id' => ['nullable', 'integer', 'exists:media,id'],
             'card_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
             'banner_media_id' => ['nullable', 'integer', 'exists:media,id'],
