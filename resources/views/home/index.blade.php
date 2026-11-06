@@ -31,11 +31,14 @@
                         'object_position' => '50% 50%',
                     ]]);
                 }
-                $heroSlides = $heroSlides->values()->map(function ($slide) use ($section, $heroProduct) {
+                $heroSlides = $heroSlides->values()->map(function ($slide, $index) use ($section, $heroProduct, $hasConfiguredSlides) {
                     $path = $slide['image_path'] ?? null;
+                    $legacyImage = ! $hasConfiguredSlides && $index === 0
+                        ? ($section->image_url ?: $heroProduct?->images?->first()?->detail_url)
+                        : null;
                     $image = $path
                         ? (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') ? $path : \Illuminate\Support\Facades\Storage::disk('public')->url($path))
-                        : ($section->image_url ?: $heroProduct?->images?->first()?->detail_url);
+                        : $legacyImage;
                     return [...$slide, 'image_url' => $image, 'object_position' => $slide['object_position'] ?? '50% 50%'];
                 });
             @endphp
