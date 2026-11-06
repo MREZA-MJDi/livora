@@ -116,6 +116,7 @@
 
                 <a
                     href="{{ $url }}"
+                    data-live-catalog-sort
                     role="option"
                     aria-selected="{{ $currentSort === $value ? 'true' : 'false' }}"
                     @click="
