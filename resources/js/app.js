@@ -599,7 +599,28 @@ window.richTextEditor = (uploadUrl) => ({
         input.addEventListener('change', async () => {
             if (processedInputs.has(input)) return;
             const selected = Array.from(input.files || []);
-            if (!selected.some(file => file.type.startsWith('image/'))) return;
+            const originalField = input.dataset.originalField;
+            let originalInput = null;
+            if (originalField) {
+                originalInput = form.querySelector('input[type="file"][name="' + originalField + '"]');
+                if (!originalInput) {
+                    originalInput = document.createElement('input');
+                    originalInput.type = 'file';
+                    originalInput.name = originalField;
+                    originalInput.accept = input.accept || 'image/jpeg,image/png,image/webp';
+                    originalInput.hidden = true;
+                    form.appendChild(originalInput);
+                }
+            }
+            if (!selected.some(file => file.type.startsWith('image/'))) {
+                if (originalInput) originalInput.value = '';
+                return;
+            }
+            if (originalInput) {
+                const originalTransfer = new DataTransfer();
+                originalTransfer.items.add(selected.find(file => file.type.startsWith('image/')));
+                originalInput.files = originalTransfer.files;
+            }
             if (selected.some(file => file.type.startsWith('image/') && file.size > 10 * 1024 * 1024)) {
                 input.value = '';
                 window.alert('حجم هر تصویر نباید بیشتر از ۱۰ مگابایت باشد.');
