@@ -660,7 +660,21 @@ window.richTextEditor = (uploadUrl) => ({
         });
     };
     const scan = () => document.querySelectorAll('input[type="file"]').forEach(attachInput);
+    window.initSillaCropInputs = scan;
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', scan); else scan();
+
+    // Alpine-powered CMS repeaters create file inputs after the first scan.
+    // Observe added nodes so every dynamically added hero slide receives the same crop workflow.
+    const observer = new MutationObserver(records => {
+        for (const record of records) {
+            for (const node of record.addedNodes) {
+                if (!(node instanceof Element)) continue;
+                if (node.matches?.('input[type="file"]')) attachInput(node);
+                node.querySelectorAll?.('input[type="file"]').forEach(attachInput);
+            }
+        }
+    });
+    if (document.body) observer.observe(document.body, { childList: true, subtree: true });
 })();
 
 // Resolve media skeletons only after the browser has loaded the actual image.
@@ -978,3 +992,71 @@ document.addEventListener('submit', async (event) => {
         button.innerHTML = originalButtonContent;
     }
 });
+
+
+/* Homepage hero slide controls: content and image stay in sync. */
+const initSgHomeHeroes = () => {
+    document.querySelectorAll('[data-sg-home-hero]').forEach((root) => {
+        if (root.dataset.heroReady === '1') return;
+        const dataNode = root.querySelector('[data-sg-hero-data]');
+        const dots = Array.from(root.querySelectorAll('[data-sg-hero-dot]'));
+        const images = Array.from(root.querySelectorAll('[data-sg-hero-image]'));
+        const eyebrow = root.querySelector('[data-sg-hero-eyebrow]');
+        const title = root.querySelector('[data-sg-hero-title]');
+        const subtitle = root.querySelector('[data-sg-hero-subtitle]');
+        const cta = root.querySelector('[data-sg-hero-cta]');
+        if (!dataNode || !dots.length) return;
+
+        let slides = [];
+        try {
+            slides = JSON.parse(dataNode.textContent || '[]');
+        } catch (_) {
+            return;
+        }
+        if (!Array.isArray(slides) || !slides.length) return;
+        root.dataset.heroReady = '1';
+
+        const show = (index) => {
+            const active = Math.max(0, Math.min(slides.length - 1, index));
+            const slide = slides[active] || {};
+            if (eyebrow) {
+                eyebrow.textContent = slide.eyebrow || '';
+                eyebrow.hidden = !slide.eyebrow;
+            }
+            if (title) title.textContent = slide.title || '';
+            if (subtitle) {
+                subtitle.textContent = slide.subtitle || '';
+                subtitle.hidden = !slide.subtitle;
+            }
+            if (cta) {
+                cta.textContent = slide.cta_label || '';
+                cta.hidden = !slide.cta_label;
+                cta.href = slide.cta_url || '/shop';
+                if (slide.cta_label) {
+                    const arrow = document.createElement('span');
+                    arrow.setAttribute('aria-hidden', 'true');
+                    arrow.textContent = '←';
+                    cta.append(arrow);
+                }
+            }
+            dots.forEach((dot, dotIndex) => {
+                const selected = dotIndex === active;
+                dot.classList.toggle('is-active', selected);
+                dot.setAttribute('aria-pressed', selected ? 'true' : 'false');
+            });
+            images.forEach((image) => {
+                image.classList.toggle('is-active', Number(image.dataset.sgHeroImage) === active);
+            });
+        };
+
+        dots.forEach((dot, index) => dot.addEventListener('click', () => show(index)));
+        show(0);
+    });
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSgHomeHeroes, { once: true });
+} else {
+    initSgHomeHeroes();
+}
+
