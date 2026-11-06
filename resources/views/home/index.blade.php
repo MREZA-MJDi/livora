@@ -415,8 +415,9 @@
         </section>
 
 
+        @if($featuredWithoutHero->isNotEmpty())
         {{-- =========================================================
-             FEATURED COLLECTION
+             مجموعه منتخب
         ========================================================== --}}
 
         <section class="border-t border-[var(--sg-border)]">
@@ -466,23 +467,13 @@
                                 <button type="button" data-carousel-prev aria-label="محصولات قبلی" class="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)] text-[var(--sg-ink)] transition hover:border-[var(--sg-ink)] hover:bg-[var(--sg-ink)] hover:text-white disabled:cursor-not-allowed disabled:opacity-35">→</button>
                                 <button type="button" data-carousel-next aria-label="محصولات بعدی" class="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)] text-[var(--sg-ink)] transition hover:border-[var(--sg-ink)] hover:bg-[var(--sg-ink)] hover:text-white disabled:cursor-not-allowed disabled:opacity-35">←</button>
                             </div>
-                            <div class="sg-product-carousel" data-carousel-track tabindex="0" role="region" aria-label="محصولات منتخب SillaGallery" dir="rtl">
+                            <div class="sg-product-carousel" data-carousel-track tabindex="0" role="region" aria-label="محصولات منتخب سیلا گالری" dir="rtl">
                                 @foreach($featuredWithoutHero as $product)
                                     <div class="sg-product-carousel-item">
                                         <x-product.card :product="$product" />
                                     </div>
                                 @endforeach
                             </div>
-                        </div>
-
-                    @else
-
-                        <div class="mt-10 rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-surface)] p-10 text-center">
-
-                            <p class="text-sm text-[var(--sg-stone)]">
-
-                            </p>
-
                         </div>
 
                     @endif
@@ -493,6 +484,8 @@
 
         </section>
 
+
+        @endif
 
         {{-- =========================================================
              INSTALLMENT PRODUCT PICKS
@@ -511,7 +504,7 @@
                             <div>
 
                                 <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
-                                    Flexible payment
+                                    پرداخت اقساطی
                                 </p>
 
                                 <h2 class="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -573,7 +566,7 @@
                         <div>
 
                             <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
-                                New arrivals
+                                تازه‌های فروشگاه
                             </p>
 
                             <h2 class="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -604,23 +597,13 @@
                                 <button type="button" data-carousel-prev aria-label="محصولات قبلی" class="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)] text-[var(--sg-ink)] transition hover:border-[var(--sg-ink)] hover:bg-[var(--sg-ink)] hover:text-white disabled:cursor-not-allowed disabled:opacity-35">→</button>
                                 <button type="button" data-carousel-next aria-label="محصولات بعدی" class="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)] text-[var(--sg-ink)] transition hover:border-[var(--sg-ink)] hover:bg-[var(--sg-ink)] hover:text-white disabled:cursor-not-allowed disabled:opacity-35">←</button>
                             </div>
-                            <div class="sg-product-carousel" data-carousel-track tabindex="0" role="region" aria-label="تازه‌های SillaGallery" dir="rtl">
+                            <div class="sg-product-carousel" data-carousel-track tabindex="0" role="region" aria-label="تازه‌های سیلا گالری" dir="rtl">
                                 @foreach($newProducts as $product)
                                     <div class="sg-product-carousel-item">
                                         <x-product.card :product="$product" />
                                     </div>
                                 @endforeach
                             </div>
-                        </div>
-
-                    @else
-
-                        <div class="mt-10 rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-surface)] p-10 text-center">
-
-                            <p class="text-sm text-[var(--sg-stone)]">
-
-                            </p>
-
                         </div>
 
                     @endif
@@ -648,7 +631,7 @@
                         <div>
 
                             <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
-                                Inspiration
+                                ایده‌های چیدمان
                             </p>
 
                             <h2 class="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -846,7 +829,7 @@
                     <div class="mx-auto max-w-3xl text-center">
 
                         <p class="text-[10px] font-medium uppercase tracking-[0.24em] text-[var(--sg-accent)]">
-                            SillaGallery
+                            سیلا گالری
                         </p>
 
                         <h2 class="mt-5 text-4xl font-semibold tracking-tight sm:text-5xl">
