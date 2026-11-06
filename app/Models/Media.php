@@ -17,6 +17,7 @@ class Media extends Model
         'user_id',
         'disk',
         'path',
+        'variant_source_path',
         'filename',
         'original_name',
         'mime_type',
