@@ -23,7 +23,7 @@
             <div class="flex flex-wrap items-start justify-between gap-3">
                 <div>
                     <h2 class="text-base font-bold">تصویر اصلی بنر</h2>
-                    <p class="admin-help mt-1">نسبت برش ۱۲:۵ است. تصویر در دسکتاپ و موبایل با همین کادر اصلی نمایش داده می‌شود.</p>
+                    <p class="admin-help mt-1">نسبت برش ۱۲:۵ است. پیش‌نمایش پایین دقیقاً قاب بنر فروشگاه را نشان می‌دهد؛ بعد از انتخاب عکس، همین‌جا نتیجه را ببینید.</p>
                 </div>
                 <label class="flex items-center gap-2 rounded-xl border border-[var(--admin-border)] px-4 py-3 text-xs">
                     <input type="hidden" name="is_active" value="0">
@@ -31,12 +31,6 @@
                     نمایش بنر در فروشگاه
                 </label>
             </div>
-
-            @if($settings->banner_image_url)
-                <div class="overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)]">
-                    <img src="{{ $settings->banner_image_url }}" alt="{{ $settings->banner_image_alt ?: 'پیش‌نمایش بنر فعلی فروشگاه' }}" class="aspect-[12/5] w-full object-cover">
-                </div>
-            @endif
 
             <div>
                 <label for="banner_image" class="admin-label">آپلود تصویر و تنظیم کادر</label>
