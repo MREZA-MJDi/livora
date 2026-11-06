@@ -41,6 +41,7 @@
                 <div><h2 class="text-lg font-bold">اسلایدهای هیرو</h2><p class="admin-help">برای هر اسلاید تصویر، متن و لینک جداگانه تعریف کنید. حداکثر ۴ اسلاید.</p></div>
                 <button type="button" class="admin-btn admin-btn-secondary" @click="addSlide()" :disabled="slides.length >= 4">افزودن اسلاید</button>
             </div>
+            <fieldset :disabled="sectionType !== 'hero'" class="space-y-4">
             <template x-for="(slide, index) in slides" :key="slide.uid">
                 <article class="space-y-4 rounded-2xl bg-[var(--admin-surface)] p-4">
                     <div class="flex items-center justify-between gap-3"><strong x-text="'اسلاید ' + (index + 1)"></strong><button type="button" class="admin-btn admin-btn-danger" @click="removeSlide(index)" :disabled="slides.length === 1">حذف اسلاید</button></div>
@@ -81,6 +82,7 @@
                     </div>
                 </article>
             </template>
+            </fieldset>
         </section>
 
         <section x-show="sectionType !== 'hero'" x-cloak class="grid gap-4 sm:grid-cols-2">
