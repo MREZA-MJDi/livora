@@ -30,17 +30,16 @@ class ReportSimilarProductNames extends Command
         for ($i = 0; $i < $products->count(); $i++) {
             $left = $products[$i];
             $leftName = $normalized[$left->id];
-            if ($leftName === '') continue;
+            if ($leftName['compact'] === '') continue;
 
             for ($j = $i + 1; $j < $products->count(); $j++) {
                 $right = $products[$j];
                 $rightName = $normalized[$right->id];
-                if ($rightName === '') continue;
+                if ($rightName['compact'] === '') continue;
 
-                if (mb_substr($leftName, 0, 1) !== mb_substr($rightName, 0, 1)) continue;
-
-                similar_text($leftName, $rightName, $percentage);
-                $similarity = $percentage / 100;
+                similar_text($leftName['compact'], $rightName['compact'], $directPercentage);
+                similar_text($leftName['tokens'], $rightName['tokens'], $tokenPercentage);
+                $similarity = max($directPercentage, $tokenPercentage) / 100;
                 if ($similarity >= $minimum) {
                     $matches[] = [
                         $left->id, $left->name, $left->slug,
@@ -69,8 +68,14 @@ class ReportSimilarProductNames extends Command
     {
         $value = str_replace(['ي', 'ى', 'ك', '‌', 'ـ'], ['ی', 'ی', 'ک', ' ', ''], $value);
         $value = mb_strtolower($value, 'UTF-8');
-        $value = preg_replace('/[\p{P}\p{S}\s]+/u', '', $value) ?? '';
+        $value = preg_replace('/[\p{P}\p{S}]+/u', ' ', $value) ?? '';
+        $tokens = preg_split('/\s+/u', trim($value), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        $sortedTokens = $tokens;
+        sort($sortedTokens, SORT_STRING);
 
-        return trim($value);
+        return [
+            'compact' => implode('', $tokens),
+            'tokens' => implode(' ', $sortedTokens),
+        ];
     }
 }
