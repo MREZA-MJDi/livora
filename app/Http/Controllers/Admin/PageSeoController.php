@@ -26,8 +26,6 @@ class PageSeoController extends Controller
             'pages.*.meta_description' => ['nullable', 'string', 'max:1000'],
             'pages.*.canonical_url' => ['nullable', 'url', 'max:2048'],
             'pages.*.og_image' => ['nullable', 'url', 'max:2048'],
-            'pages.*.seo_index' => ['nullable', 'boolean'],
-            'pages.*.seo_follow' => ['nullable', 'boolean'],
         ]);
 
         $settings = SeoPageSetting::query()->get()->keyBy('id');
@@ -42,8 +40,6 @@ class PageSeoController extends Controller
                 'meta_description' => $data['meta_description'] ?? null,
                 'canonical_url' => $data['canonical_url'] ?? null,
                 'og_image' => $data['og_image'] ?? null,
-                'seo_index' => (bool) ($data['seo_index'] ?? false),
-                'seo_follow' => (bool) ($data['seo_follow'] ?? false),
             ]);
         }
 

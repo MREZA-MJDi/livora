@@ -18,7 +18,6 @@ class SeoAuditController extends Controller
     public function index(): View
     {
         $settings = SeoSetting::current();
-        $globalGateOpen = $settings->indexing_enabled && $settings->following_enabled;
 
         $sections = [
             [
@@ -75,7 +74,6 @@ class SeoAuditController extends Controller
 
         return view('admin.seo.audit', [
             'settings' => $settings,
-            'globalGateOpen' => $globalGateOpen,
             'sections' => $sections,
             'totals' => $totals,
             'missingImageAlt' => $missingImageAlt,
@@ -96,7 +94,7 @@ class SeoAuditController extends Controller
 
         return [
             'total' => (clone $query)->count(),
-            'eligible' => (clone $query)->where('seo_index', true)->where('seo_follow', true)->count(),
+            'eligible' => (clone $query)->count(),
             'missing_titles' => $missingTitles,
             'missing_descriptions' => $missingDescriptions,
         ];
