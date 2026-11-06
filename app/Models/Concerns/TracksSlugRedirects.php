@@ -11,7 +11,7 @@ trait TracksSlugRedirects
     protected static function bootTracksSlugRedirects(): void
     {
         static::saving(function ($model): void {
-            $normalized = Str::slug((string) $model->slug);
+            $normalized = trim(preg_replace('/[^\\pL\\pN]+/u', '-', Str::lower(trim((string) $model->slug))), '-');
             if ($normalized !== '') {
                 $model->slug = $normalized;
             }
