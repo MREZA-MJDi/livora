@@ -25,25 +25,22 @@
                             @if($section->subtitle)<p class="mt-5 max-w-xl text-sm leading-8 {{ $section->type === 'cta' ? 'text-white/65' : 'text-[var(--sg-stone)]' }}">{{ $section->subtitle }}</p>@endif
                             @if($section->cta_label)<a href="{{ $ctaUrl }}" class="mt-8 inline-flex items-center justify-center rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] px-6 py-4 text-sm font-semibold text-[var(--sg-ink)] transition hover:border-[var(--sg-accent)]">{{ $section->cta_label }} <span class="mr-3" aria-hidden="true">←</span></a>@endif
                         </div>
-                        @php($heroProduct = $section->type === 'hero' ? $section->products->first() : null)
-                        @php($heroImage = $section->image_url ?: $heroProduct?->images?->first()?->detail_url)
-                        <div class="min-w-0 space-y-4 {{ $section->type === 'cta' ? 'lg:order-1' : '' }}">
-                            @if($heroImage)
-                                <div class="overflow-hidden rounded-[2rem] bg-[var(--sg-surface)]">
-                                    <img src="{{ $heroImage }}" alt="{{ $section->title ?: 'SillaGallery' }}" class="aspect-[5/4] h-full w-full object-cover" fetchpriority="{{ $section->type === 'hero' ? 'high' : 'auto' }}">
-                                </div>
-                            @endif
+                        <div class="min-w-0 {{ $section->type === 'cta' ? 'lg:order-1' : '' }}">
                             @if($section->type === 'hero' && $section->products->isNotEmpty())
-                                <div data-sg-carousel class="relative">
-                                    <div class="mb-2 hidden items-center justify-end gap-2 sm:flex">
-                                        <button type="button" data-carousel-prev aria-label="محصول قبلی" class="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)]">←</button>
-                                        <button type="button" data-carousel-next aria-label="محصول بعدی" class="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)]">→</button>
-                                    </div>
-                                    <div class="sg-product-carousel" data-carousel-track>
-                                        @foreach($section->products as $product)
-                                            <div class="sg-product-carousel-item"><x-product.card :product="$product" /></div>
-                                        @endforeach
-                                    </div>
+                                <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3" aria-label="تازه‌ترین محصولات سیلا گالری">
+                                    @foreach($section->products as $heroProduct)
+                                        @php($heroProductImage = $heroProduct->images->first()?->detail_url)
+                                        @if($heroProductImage)
+                                            <a href="{{ route('product.show', $heroProduct->slug) }}" class="group relative block min-h-0 overflow-hidden rounded-2xl bg-[var(--sg-surface)] {{ $loop->first ? 'col-span-2 row-span-2 sm:col-span-1' : '' }}">
+                                                <img src="{{ $heroProductImage }}" alt="{{ $heroProduct->name }}" class="h-full min-h-40 w-full aspect-[4/5] object-cover transition duration-700 group-hover:scale-105 {{ $loop->first ? 'sm:aspect-[4/5]' : '' }}" @if($loop->first) fetchpriority="high" loading="eager" @else loading="lazy" @endif decoding="async">
+                                                <span class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent px-3 pb-3 pt-10 text-xs font-medium text-white sm:text-sm">{{ $heroProduct->name }}</span>
+                                            </a>
+                                        @endif
+                                    @endforeach
+                                </div>
+                            @elseif($section->image_url)
+                                <div class="overflow-hidden rounded-[2rem] bg-[var(--sg-surface)]">
+                                    <img src="{{ $section->image_url }}" alt="{{ $section->title ?: 'سیلا گالری' }}" class="aspect-[5/4] h-full w-full object-cover" loading="lazy" decoding="async">
                                 </div>
                             @endif
                         </div>
@@ -109,5 +106,41 @@
             @endif
         @endif
     @endforeach
+
+    @if(($blogPosts ?? collect())->isNotEmpty())
+        <section class="border-b border-[var(--sg-border)] bg-[var(--sg-white)] py-14 sm:py-20">
+            <x-layout.container>
+                <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+                    <div>
+                        <p class="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--sg-accent)]">مجله سیلا</p>
+                        <h2 class="mt-3 text-3xl font-semibold tracking-tight text-[var(--sg-ink)] sm:text-4xl">ایده‌هایی برای خانه‌ای دلنشین‌تر</h2>
+                        <p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">راهنماها و نوشته‌های تازه برای انتخاب آگاهانه‌تر.</p>
+                    </div>
+                    <a href="{{ route('blog.index') }}" class="text-sm font-semibold text-[var(--sg-ink)] transition hover:text-[var(--sg-accent)]">همه نوشته‌ها ←</a>
+                </div>
+                <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                    @foreach($blogPosts as $post)
+                        <article class="group overflow-hidden rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-cream)]">
+                            <a href="{{ route('blog.show', $post->slug) }}" class="block overflow-hidden bg-[var(--sg-surface)]">
+                                @if($post->featured_image_url)
+                                    <img src="{{ $post->featured_image_url }}" alt="{{ $post->featured_image_alt ?: $post->title }}" class="aspect-[16/10] w-full object-cover transition duration-700 group-hover:scale-[1.035]" loading="lazy" decoding="async">
+                                @else
+                                    <div class="flex aspect-[16/10] items-center justify-center text-sm text-[var(--sg-stone)]">مجله سیلا</div>
+                                @endif
+                            </a>
+                            <div class="p-5">
+                                <p class="text-[10px] text-[var(--sg-stone)]">{{ $post->published_at?->format('Y/m/d') }}</p>
+                                <h3 class="mt-2 text-base font-semibold leading-7 text-[var(--sg-ink)]"><a href="{{ route('blog.show', $post->slug) }}">{{ $post->title }}</a></h3>
+                                @if(filled($post->excerpt))
+                                    <p class="mt-2 line-clamp-2 text-sm leading-7 text-[var(--sg-stone)]">{{ $post->excerpt }}</p>
+                                @endif
+                                <a href="{{ route('blog.show', $post->slug) }}" class="mt-4 inline-flex text-xs font-semibold text-[var(--sg-accent)]">ادامه مطلب ←</a>
+                            </div>
+                        </article>
+                    @endforeach
+                </div>
+            </x-layout.container>
+        </section>
+    @endif
 </div>
 @endsection
