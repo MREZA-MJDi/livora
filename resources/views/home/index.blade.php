@@ -25,7 +25,7 @@
                         $heroEyebrow = $isHero ? ($section->eyebrow ?: 'سیلا گالری | مبلمان و دکوراسیون') : $section->eyebrow;
                     @endphp
                     <div class="{{ $isHero ? 'sila-home-hero-grid' : 'grid' }} grid-cols-1 items-center gap-8 py-10 sm:py-14 lg:grid-cols-2 lg:gap-14 lg:py-16">
-                        <div class="sila-home-hero-copy max-w-2xl {{ $section->type === 'cta' ? 'lg:order-2' : '' }}">
+                        <div class="{{ $isHero ? 'sila-home-hero-copy' : 'max-w-2xl' }} max-w-2xl {{ $section->type === 'cta' ? 'lg:order-2' : '' }}">
                             @if($heroEyebrow)<p class="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--sg-accent)]">{{ $heroEyebrow }}</p>@endif
                             @if($heroTitle)<h1 class="{{ $isHero ? 'sila-home-hero-title' : 'mt-4 text-3xl sm:text-5xl' }} font-semibold leading-tight tracking-tight {{ $section->type === 'cta' ? 'text-white' : 'text-[var(--sg-ink)]' }}">{{ $heroTitle }}</h1>@endif
                             @if($heroSubtitle)<p class="mt-5 max-w-xl text-sm leading-8 {{ $section->type === 'cta' ? 'text-white/65' : 'text-[var(--sg-stone)]' }}">{{ $heroSubtitle }}</p>@endif
@@ -33,7 +33,7 @@
                         </div>
                         @php($heroProduct = $section->type === 'hero' ? $section->products->first() : null)
                         @php($heroImage = $section->image_url ?: $heroProduct?->images?->first()?->detail_url)
-                        <div class="sila-home-hero-media min-w-0 {{ $section->type === 'cta' ? 'lg:order-1' : '' }}">
+                        <div class="{{ $isHero ? 'sila-home-hero-media' : 'min-w-0' }} min-w-0 {{ $section->type === 'cta' ? 'lg:order-1' : '' }}">
                             @if($heroImage)
                                 <div class="overflow-hidden rounded-[1.5rem] sm:rounded-[2rem] bg-[var(--sg-surface)]">
                                     <img src="{{ $heroImage }}" alt="{{ $heroTitle ?: 'سیلا گالری' }}" class="sila-home-hero-image w-full object-cover" fetchpriority="{{ $section->type === 'hero' ? 'high' : 'auto' }}">
