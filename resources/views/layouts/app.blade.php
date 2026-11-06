@@ -9,19 +9,6 @@
         $brandName = $storeSettings?->brand_name ?: config('app.name');
         $seoTitle = $pageSeo?->meta_title ?: (trim($__env->yieldContent('title')) ?: ($siteSeo->default_title ?: $brandName));
         $seoDescription = $pageSeo?->meta_description ?: (trim($__env->yieldContent('description')) ?: ($siteSeo->default_description ?: 'فروشگاه اینترنتی '.$brandName));
-        $routeName = (string) \Illuminate\Support\Facades\Route::currentRouteName();
-        $privateRoute = in_array($routeName, [
-            'login', 'register', 'password.request', 'password.reset',
-            'account.index', 'account.profile.edit', 'account.addresses.index',
-            'account.orders.index', 'account.wishlist.index',
-        ], true)
-            || preg_match('/^(account|cart|checkout|login|register|password|logout)(\\.|$)/', $routeName) === 1
-            || request()->is('admin', 'admin/*', 'account/*', 'cart/*', 'checkout/*', 'cart', 'login', 'register', 'forgot-password', 'reset-password/*');
-        $seoRobots = $privateRoute
-            ? 'noindex, nofollow'
-            : ($pageSeo !== null
-                ? $pageSeo->robots()
-                : (trim($__env->yieldContent('robots')) ?: $siteSeo->robots()));
         // Canonical and social URLs must be bound to this application's configured origin.
         // Never let an inbound Host header from another virtual host poison SillaGallery metadata.
         $seoOrigin = rtrim((string) config('app.url', 'https://sillashop.com'), '/');
@@ -44,7 +31,6 @@
     @endphp
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="{{ $seoRobots }}">
     <meta name="description" content="{{ $seoDescription }}">
     <meta name="theme-color" content="#f3f1ed">
     <meta property="og:site_name" content="{{ $brandName }}">

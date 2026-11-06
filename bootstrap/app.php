@@ -3,7 +3,6 @@
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\CustomerMiddleware;
 use App\Http\Middleware\EnforceAdminSessionTimeout;
-use App\Http\Middleware\ApplyRobotsHeaders;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
@@ -27,8 +26,6 @@ return Application::configure(
             'customer' => CustomerMiddleware::class,
             'admin.session.timeout' => EnforceAdminSessionTimeout::class,
         ]);
-
-        $middleware->appendToGroup('web', [ApplyRobotsHeaders::class]);
 
         // External payment providers cannot send browser CSRF tokens. The callback
         // remains safe only because PaymentService verifies the transaction

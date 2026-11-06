@@ -30,11 +30,11 @@ class SeoSetting extends Model
         return Cache::rememberForever('seo_settings.current', static fn (): self => static::query()->firstOrCreate(
             ['id' => 1],
             [
-                'indexing_enabled' => false,
-                'following_enabled' => false,
+                'indexing_enabled' => true,
+                'following_enabled' => true,
                 'site_name' => 'SillaGallery',
-                'default_title' => 'SillaGallery | مبلمان و لوازم خانه',
-                'default_description' => 'فروشگاه SillaGallery؛ انتخاب مبلمان و لوازم خانه با طراحی و کیفیت ماندگار.',
+                'default_title' => 'مبلمان و دکوراسیون خانه | سیلا گالری | SillaGallery',
+                'default_description' => 'سیلا گالری | SillaGallery؛ مشاهده مبلمان، میز و صندلی، محصولات اتاق خواب و راهنمای انتخاب و چیدمان خانه.',
                 'organization_name' => 'SillaGallery',
             ]
         ));
@@ -52,10 +52,6 @@ class SeoSetting extends Model
 
     public function robotsFor(bool $pageIndex = true, bool $pageFollow = true): string
     {
-        if (! config('app.env') !== 'production') {
-            return 'noindex, nofollow';
-        }
-
         return 'index, follow';
     }
 
