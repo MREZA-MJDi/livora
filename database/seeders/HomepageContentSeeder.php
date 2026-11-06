@@ -41,7 +41,7 @@ class HomepageContentSeeder extends Seeder
                 'subtitle' => 'محصولات فعال و منتخب فروشگاه؛ همراه با قیمت و وضعیت موجودی ثبت‌شده.',
                 'cta_label' => 'مشاهده همه محصولات',
                 'cta_url' => '/shop',
-                'payload' => ['product_source' => 'featured', 'limit' => 6],
+                'payload' => ['product_source' => 'featured', 'limit' => 4],
             ],
             [
                 'key' => 'new-arrivals',
@@ -52,7 +52,7 @@ class HomepageContentSeeder extends Seeder
                 'subtitle' => 'جدیدترین محصولاتی که در کاتالوگ فروشگاه ثبت شده‌اند.',
                 'cta_label' => 'دیدن تازه‌ها',
                 'cta_url' => '/shop?sort=newest',
-                'payload' => ['product_source' => 'new', 'limit' => 6],
+                'payload' => ['product_source' => 'new', 'limit' => 4],
             ],
             [
                 'key' => 'trust',
@@ -100,9 +100,9 @@ class HomepageContentSeeder extends Seeder
             if ($key === 'hero') {
                 $section->payload = ['product_source' => 'latest', 'limit' => 6];
             } elseif ($key === 'featured') {
-                $section->payload = ['product_source' => 'featured', 'limit' => 6];
+                $section->payload = ['product_source' => 'featured', 'limit' => 4];
             } elseif ($key === 'new-arrivals') {
-                $section->payload = ['product_source' => 'new', 'limit' => 6];
+                $section->payload = ['product_source' => 'new', 'limit' => 4];
             } elseif ($key === 'categories' && ! is_array($section->payload)) {
                 $section->payload = ['limit' => 8];
             }
