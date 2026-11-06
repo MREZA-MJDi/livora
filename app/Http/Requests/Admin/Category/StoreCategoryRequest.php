@@ -68,7 +68,7 @@ class StoreCategoryRequest extends FormRequest
             'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string', 'max:1000'],
             'image_alt' => ['nullable', 'string', 'max:255'],
-            'parent_id' => ['nullable', 'integer', 'exists:categories,id'],
+            'parent_id' => ['nullable', 'integer', Rule::exists('categories', 'id')->whereNull('parent_id')],
             'card_media_id' => ['nullable', 'integer', 'exists:media,id'],
             'card_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
             'banner_media_id' => ['nullable', 'integer', 'exists:media,id'],
