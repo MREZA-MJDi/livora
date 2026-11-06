@@ -12,7 +12,14 @@ class ApplyRobotsHeaders
     public function handle(Request $request, Closure $next): Response
     {
         $response = $next($request);
-        $settings = SeoSetting::current();
+
+        // Keep every non-production deployment out of search results,
+        // regardless of the SEO switches stored in the database.
+        if (! app()->environment('production')) {
+            $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
+
+            return $response;
+        }
 
         $privateRoute = $request->is(
             'admin', 'admin/*',
@@ -22,16 +29,14 @@ class ApplyRobotsHeaders
             'login', 'register', 'forgot-password', 'reset-password/*', 'logout'
         );
 
-        // Admin, authentication and customer-specific responses must never be
-        // indexed, even after the public SEO release switch is enabled.
         if ($privateRoute) {
             $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
 
             return $response;
         }
 
-        // Apply the site-wide SEO gate to every Laravel response, not only HTML.
-        // This also covers XML sitemaps, JSON responses and controller-served files.
+        $settings = SeoSetting::current();
+
         if (! $settings->indexing_enabled || ! $settings->following_enabled) {
             $response->headers->set('X-Robots-Tag', $settings->robots());
         } else {
