@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class ContactSetting extends Model
 {
     protected $fillable = [
-        'brand_name',
+        'brand_name', 'brand_description',
+        'enamad_url', 'samandehi_url', 'footer_menu', 'payment_methods', 'copyright_text',
         'logo_path',
         'phone',
         'email',
@@ -100,6 +101,8 @@ class ContactSetting extends Model
     {
         return [
             'faqs' => 'array',
+            'footer_menu' => 'array',
+            'payment_methods' => 'array',
             'page_content' => 'array',
             'is_active' => 'boolean',
             'floating_actions_enabled' => 'boolean',
