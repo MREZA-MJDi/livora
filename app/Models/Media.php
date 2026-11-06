@@ -115,6 +115,16 @@ class Media extends Model
         return $this->hasMany(Category::class);
     }
 
+    public function categoryCards(): HasMany
+    {
+        return $this->hasMany(Category::class, 'card_media_id');
+    }
+
+    public function categoryBanners(): HasMany
+    {
+        return $this->hasMany(Category::class, 'banner_media_id');
+    }
+
     public function blogPosts(): HasMany
     {
         return $this->hasMany(BlogPost::class);
