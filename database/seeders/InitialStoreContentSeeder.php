@@ -74,7 +74,11 @@ class InitialStoreContentSeeder extends Seeder
         
         // Seed the public About page without overwriting content already managed by an administrator.
         $about = ContentPage::query()->firstOrNew(['slug' => 'about']);
-        $aboutWasMissingBody = ! filled($about->body);
+        $legacyMigrationBody = '<h1>درباره SillaGallery</h1><p>SillaGallery با تمرکز بر مبلمان و عناصر خانه، تلاش می‌کند انتخاب محصول را به تجربه‌ای روشن، دقیق و دلنشین تبدیل کند.</p><h2>نگاه ما</h2><p>ما باور داریم انتخاب خوب فقط به ظاهر محصول محدود نمی‌شود؛ کیفیت متریال، تناسب با فضا، کاربرد روزمره و دوام در طول زمان نیز اهمیت دارند.</p><h2>چیزهایی که برای ما مهم‌اند</h2><ul><li><strong>طراحی:</strong> فرم و ظاهر باید در خدمت فضای زندگی باشد.</li><li><strong>کیفیت:</strong> انتخاب متریال و ساخت خوب، ارزش محصول را در طول زمان حفظ می‌کند.</li><li><strong>شفافیت:</strong> مشخصات، قیمت، موجودی و شرایط خرید باید روشن باشند.</li><li><strong>تجربه:</strong> مسیر کشف، بررسی و سفارش باید ساده و قابل‌اعتماد باشد.</li></ul><h2>از کشف تا انتخاب</h2><p>در فروشگاه می‌توانید مجموعه‌ها را بررسی کنید، مشخصات محصولات را بخوانید و شرایط خرید را پیش از ثبت سفارش ببینید.</p><p>برای دریافت راهنمایی بیشتر از <a href="/contact">صفحه تماس با ما</a> با ما در ارتباط باشید.</p>';
+        $isLegacyMigrationContent = $about->exists
+            && $about->title === 'درباره SillaGallery'
+            && $about->body === $legacyMigrationBody;
+        $aboutWasMissingBody = ! filled($about->body) || $isLegacyMigrationContent;
         $aboutDefaults = [
             'title' => 'درباره سیلا گالری',
             'excerpt' => 'سیلا گالری برای انتخاب آگاهانه‌تر مبلمان و ساختن فضایی هماهنگ با زندگی روزمره شکل گرفته است.',
@@ -97,6 +101,11 @@ HTML,
             'seo_follow' => true,
             'published_at' => now(),
         ];
+
+        if ($isLegacyMigrationContent) {
+            $about->body = $aboutDefaults['body'];
+            $about->title = $aboutDefaults['title'];
+        }
 
         foreach ($aboutDefaults as $field => $value) {
             if (! filled($about->getAttribute($field))) {
