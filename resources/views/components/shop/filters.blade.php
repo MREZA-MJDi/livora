@@ -108,7 +108,6 @@
                 name="search"
                 value="{{ request('search') }}"
                 placeholder="نام یا مدل محصول..."
-                @keydown.enter.prevent="$el.form.submit()"
                 class="w-full rounded-xl border border-[var(--sg-border)] bg-[var(--sg-surface)] px-3 py-2.5 text-sm outline-none transition placeholder:text-[var(--sg-stone)] focus:border-[var(--sg-ink)]"
             >
 
