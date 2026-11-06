@@ -660,7 +660,21 @@ window.richTextEditor = (uploadUrl) => ({
         });
     };
     const scan = () => document.querySelectorAll('input[type="file"]').forEach(attachInput);
+    window.initSillaCropInputs = scan;
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', scan); else scan();
+
+    // Alpine-powered CMS repeaters create file inputs after the first scan.
+    // Observe added nodes so every dynamically added hero slide receives the same crop workflow.
+    const observer = new MutationObserver(records => {
+        for (const record of records) {
+            for (const node of record.addedNodes) {
+                if (!(node instanceof Element)) continue;
+                if (node.matches?.('input[type="file"]')) attachInput(node);
+                node.querySelectorAll?.('input[type="file"]').forEach(attachInput);
+            }
+        }
+    });
+    if (document.body) observer.observe(document.body, { childList: true, subtree: true });
 })();
 
 // Resolve media skeletons only after the browser has loaded the actual image.
