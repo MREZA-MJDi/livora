@@ -3,6 +3,7 @@
 namespace App\Models\Concerns;
 
 use App\Models\SlugRedirect;
+use Illuminate\Support\Facades\Cache;
 
 trait TracksSlugRedirects
 {
@@ -28,6 +29,7 @@ trait TracksSlugRedirects
                     ['old_path' => $oldPath],
                     ['new_path' => $newPath, 'is_active' => true]
                 );
+                Cache::forget('slug_redirect:'.$oldPath);
             }
         });
     }
