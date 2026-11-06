@@ -25,7 +25,11 @@ class HomeController extends Controller
 
         foreach ($sections as $section) {
             $payload = $section->payload ?? [];
-            $limit = $section->type === 'hero' ? 6 : max(1, min(24, (int) ($payload['limit'] ?? 8)));
+            $limit = match ($section->type) {
+                'hero' => 6,
+                'categories' => 4,
+                default => max(1, min(24, (int) ($payload['limit'] ?? 8))),
+            };
 
             if (in_array($section->type, ['hero', 'products'], true)) {
                 $query = Product::query()
@@ -76,6 +80,8 @@ class HomeController extends Controller
                     ->active()
                     ->withCount(['products' => fn ($productQuery) => $productQuery->active()])
                     ->with(['media', 'cardMedia', 'latestActiveProduct.images' => fn ($imageQuery) => $imageQuery->with('media')->limit(1)])
+                    ->orderByDesc('products_count')
+                    ->orderBy('name')
                     ->limit($limit)
                     ->get();
                 $section->setRelation('categories', $categories);
