@@ -65,8 +65,8 @@ class InitialStoreContentSeeder extends Seeder
                 'meta_title' => 'راهنمای انتخاب مبلمان | سیلا گالری',
                 'meta_description' => 'راهنمای اندازه‌گیری فضا، انتخاب متریال و بررسی شرایط سفارش مبلمان پیش از خرید.',
                 'status' => 'published',
-                'seo_index' => false,
-                'seo_follow' => false,
+                'seo_index' => true,
+                'seo_follow' => true,
                 'published_at' => now(),
             ]
         );

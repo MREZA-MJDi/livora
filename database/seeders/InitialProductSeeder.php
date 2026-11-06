@@ -86,6 +86,8 @@ class InitialProductSeeder extends Seeder
                 'short_description' => $product['description'],
                 'description' => $product['description'],
                 'status' => 'active',
+                'seo_index' => true,
+                'seo_follow' => true,
                 'is_featured' => str_starts_with($product['sku'], 'SG-SOF-101') || in_array($product['sku'], ['SG-SOF-102', 'SG-CHS-201', 'SG-DIN-401'], true),
                 'is_new' => in_array($product['sku'], ['SG-SOF-101', 'SG-SOF-103', 'SG-CHS-202', 'SG-MOD-301', 'SG-DIN-402'], true),
                 'meta_title' => $product['name'] . ' | سیلا گالری',

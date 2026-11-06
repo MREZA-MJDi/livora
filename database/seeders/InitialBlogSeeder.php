@@ -150,8 +150,8 @@ HTML,
                     'user_id' => null,
                     'featured_image' => null,
                     'status' => 'published',
-                    'seo_index' => false,
-                    'seo_follow' => false,
+                    'seo_index' => true,
+                    'seo_follow' => true,
                     'published_at' => $publishedAt,
                 ]
             );

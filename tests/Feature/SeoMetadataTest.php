@@ -74,6 +74,8 @@ class SeoMetadataTest extends TestCase
     {
         config(['app.env' => 'production']);
         $this->seed(\Database\Seeders\InitialDataSeeder::class);
+        SeoSetting::current()->update(['indexing_enabled' => true, 'following_enabled' => true]);
+        Cache::forget('seo_settings.current');
 
         $sitemap = $this->get('/sitemap.xml')
             ->assertOk()
