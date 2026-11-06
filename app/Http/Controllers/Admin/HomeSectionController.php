@@ -10,7 +10,6 @@ use App\Support\MediaLibrary;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -40,9 +39,8 @@ class HomeSectionController extends Controller
         $data['sort_order'] = (HomeSection::max('sort_order') ?? 0) + 10;
         $data['enabled'] = $request->boolean('enabled');
         $data['payload'] = $this->normalizePayload($data['payload'] ?? []);
-        $data['image_path'] = $this->storeImage($request, null);
-
         $this->assertProductsAreUnique($data['payload']['product_ids'] ?? []);
+        $data['image_path'] = $this->storeImage($request, null);
         HomeSection::create($data);
 
         return redirect()->route('admin.home-sections.index')->with('success', 'سکشن صفحه اصلی ایجاد شد.');
@@ -63,9 +61,8 @@ class HomeSectionController extends Controller
         $data['key'] = Str::slug($data['key']);
         $data['enabled'] = $request->boolean('enabled');
         $data['payload'] = $this->normalizePayload($data['payload'] ?? []);
-        $data['image_path'] = $this->storeImage($request, $homeSection->image_path);
-
         $this->assertProductsAreUnique($data['payload']['product_ids'] ?? [], $homeSection->id);
+        $data['image_path'] = $this->storeImage($request, $homeSection->image_path);
         $homeSection->update($data);
 
         return redirect()->route('admin.home-sections.index')->with('success', 'سکشن صفحه اصلی بروزرسانی شد.');
@@ -96,8 +93,10 @@ class HomeSectionController extends Controller
 
     private function validated(Request $request, ?HomeSection $section = null): array
     {
+        $request->merge(['key' => Str::slug((string) $request->input('key'))]);
+
         return $request->validate([
-            'key' => ['required', 'string', 'max:100', Rule::unique('home_sections', 'key')->ignore($section?->id)],
+            'key' => ['required', 'string', 'max:100', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/', Rule::unique('home_sections', 'key')->ignore($section?->id)],
             'type' => ['required', Rule::in(['hero', 'products', 'categories', 'editorial', 'trust', 'cta'])],
             'enabled' => ['nullable', 'boolean'],
             'eyebrow' => ['nullable', 'string', 'max:160'],
@@ -105,7 +104,6 @@ class HomeSectionController extends Controller
             'subtitle' => ['nullable', 'string', 'max:3000'],
             'cta_label' => ['nullable', 'string', 'max:120'],
             'cta_url' => ['nullable', 'string', 'max:2048'],
-            'image_path' => ['nullable', 'string', 'max:2048'],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
             'payload' => ['nullable', 'array'],
             'payload.product_source' => ['nullable', Rule::in(['latest', 'new', 'installments', 'selected', 'category'])],
