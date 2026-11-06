@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\SeoSetting;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,13 +34,9 @@ class ApplyRobotsHeaders
             return $response;
         }
 
-        $settings = SeoSetting::current();
-
-        if (! $settings->indexing_enabled || ! $settings->following_enabled) {
-            $response->headers->set('X-Robots-Tag', $settings->robots());
-        } else {
-            $response->headers->remove('X-Robots-Tag');
-        }
+        // Public production pages must remain crawlable. Per-page SEO metadata
+        // is still rendered in the document; private commerce routes stay blocked.
+        $response->headers->remove('X-Robots-Tag');
 
         return $response;
     }

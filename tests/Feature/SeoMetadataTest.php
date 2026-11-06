@@ -54,6 +54,22 @@ class SeoMetadataTest extends TestCase
         $this->assertStringNotContainsString('/checkout', json_encode($response->json('data')));
     }
 
+    public function test_production_public_pages_are_indexable_even_when_seo_switches_are_unconfigured(): void
+    {
+        config(['app.env' => 'production']);
+        Cache::forget('seo_settings.current');
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('<meta name="robots" content="index, follow">', false)
+            ->assertHeaderMissing('X-Robots-Tag');
+
+        $this->get('/cart')
+            ->assertOk()
+            ->assertSee('<meta name="robots" content="noindex, nofollow">', false)
+            ->assertHeader('X-Robots-Tag', 'noindex, nofollow');
+    }
+
     public function test_public_pages_are_noindex_nofollow_and_sitemap_is_empty_by_default(): void
     {
         $this->get('/')
