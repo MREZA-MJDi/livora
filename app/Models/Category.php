@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Concerns\TracksSlugRedirects;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
@@ -14,6 +15,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Category extends Model
 {
     use HasFactory;
+    use TracksSlugRedirects;
+
+    protected function slugRedirectPrefix(): string { return 'categories'; }
 
     protected $fillable = [
         'parent_id', 'name', 'slug', 'description', 'image', 'media_id',
