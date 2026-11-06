@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Models\SlugRedirect;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\Response;
 
 class RedirectLegacySlug
@@ -16,13 +17,13 @@ class RedirectLegacySlug
         }
 
         $oldPath = '/'.ltrim($request->path(), '/');
-        $redirect = SlugRedirect::query()
+        $newPath = Cache::remember('slug_redirect:'.$oldPath, now()->addHour(), fn () => SlugRedirect::query()
             ->where('old_path', $oldPath)
             ->where('is_active', true)
-            ->first();
+            ->value('new_path'));
 
-        if ($redirect && $redirect->new_path !== $oldPath) {
-            $target = $redirect->new_path;
+        if ($newPath && $newPath !== $oldPath) {
+            $target = $newPath;
             if ($request->getQueryString()) {
                 $target .= '?'.$request->getQueryString();
             }
