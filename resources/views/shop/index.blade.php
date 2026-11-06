@@ -274,7 +274,9 @@
                              ACTIVE FILTER
                         ================================================== --}}
 
-                                                <div id="shop-live-results" aria-live="polite" aria-busy="false">\n\n@if(request()->filled('category'))
+                                                <div id="shop-live-results" aria-live="polite" aria-busy="false">
+
+                        @if(request()->filled('category'))
 
                             @php
                                 $activeCategory = $categories->firstWhere(
