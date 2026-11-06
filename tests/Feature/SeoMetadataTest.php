@@ -118,7 +118,7 @@ class SeoMetadataTest extends TestCase
         // Private commerce routes also omit robots directives.
         $this->get('/cart')
             ->assertOk()
-            ->assertSee('<meta name="robots" content="noindex, nofollow">', false)
+            ->assertDontSee('<meta name="robots"', false)
             ->assertHeaderMissing('X-Robots-Tag');
     }
 
@@ -139,8 +139,8 @@ class SeoMetadataTest extends TestCase
         $this->get('/categories/' . $category->slug)
             ->assertOk()
             ->assertSee('<title>عنوان اختصاصی دسته‌بندی تست | SillaGallery</title>', false)
-            ->assertSee('<meta name="robots" content="noindex, nofollow">', false)
-            ->assertHeader('X-Robots-Tag', 'noindex, nofollow');
+            ->assertDontSee('<meta name="robots"', false)
+            ->assertHeaderMissing('X-Robots-Tag');
     }
 
     public function test_admin_cms_forms_render_editor_and_fixed_page_slugs_cannot_break_navigation(): void
@@ -254,7 +254,7 @@ class SeoMetadataTest extends TestCase
             ->assertOk()
             ->assertSee('property="og:image" content="' . $imageUrl . '"', false)
             ->assertSee('<meta name="twitter:image" content="' . $imageUrl . '">', false)
-            ->assertHeader('X-Robots-Tag', 'noindex, nofollow');
+            ->assertHeaderMissing('X-Robots-Tag');
     }
 
 
