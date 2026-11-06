@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ContactSetting;
 use App\Models\SeoSetting;
+use App\Support\MediaLibrary;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\RedirectResponse;
@@ -15,7 +16,7 @@ class ContactSettingController extends Controller
 {
     public function edit(): View
     {
-        $settings = ContactSetting::query()->firstOrNew(['id' => 1]);
+        $settings = ContactSetting::query()->with('logoMedia')->firstOrNew(['id' => 1]);
 
         return view('admin.contact-settings.edit', [
             'settings' => $settings,
@@ -97,21 +98,37 @@ class ContactSettingController extends Controller
             ->filter(fn ($item) => filled($item['label'] ?? null))
             ->map(fn ($item) => ['label' => trim($item['label']), 'image' => filled($item['image'] ?? null) ? trim($item['image']) : null, 'url' => filled($item['url'] ?? null) ? trim($item['url']) : null])
             ->values()->all();
+        if ($request->boolean('remove_logo')) {
+            $validated['logo_path'] = null;
+            $validated['logo_media_id'] = null;
+        } elseif ($request->hasFile('logo_image')) {
+            $logoMedia = MediaLibrary::store($request->file('logo_image'), (int) $request->user()->id, 'brand', $validated['brand_name'] ?? null);
+            $validated['logo_path'] = $logoMedia->path;
+            $validated['logo_media_id'] = $logoMedia->id;
+        } elseif (filled($validated['logo_media_id'] ?? null)) {
+            $logoMedia = MediaLibrary::image($validated['logo_media_id']);
+            $validated['logo_path'] = $logoMedia?->path;
+            $validated['logo_media_id'] = $logoMedia?->id;
+        } else {
+            unset($validated['logo_media_id']);
+        }
+        unset($validated['logo_image'], $validated['remove_logo']);
+
         $validated['is_active'] = $request->boolean('is_active');
         $validated['floating_actions_enabled'] = $request->boolean('floating_actions_enabled');
 
         DB::transaction(function () use ($validated): void {
-            ContactSetting::query()->updateOrCreate(['id' => 1], $validated);
+            $brandSettings = ContactSetting::query()->updateOrCreate(['id' => 1], $validated);
 
             $seo = SeoSetting::current();
-            $brandName = trim((string) ($validated['brand_name'] ?? config('app.name')));
+            $brandName = trim((string) ($brandSettings->brand_name ?? config('app.name')));
             $seo->update([
                 'site_name' => $brandName,
                 'organization_name' => $brandName,
-                'organization_description' => $validated['brand_description'] ?? null,
-                'organization_logo' => $validated['logo_path'] ?? null,
-                'contact_email' => $validated['is_active'] ? ($validated['email'] ?? null) : null,
-                'contact_phone' => $validated['is_active'] ? ($validated['phone'] ?? null) : null,
+                'organization_description' => $brandSettings->brand_description,
+                'organization_logo' => $brandSettings->logo_path,
+                'contact_email' => $brandSettings->is_active ? $brandSettings->email : null,
+                'contact_phone' => $brandSettings->is_active ? $brandSettings->phone : null,
             ]);
         });
         Cache::forget('seo_settings.current');
