@@ -32,7 +32,7 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\ProductImageController as AdminProductImageController;
 use App\Http\Controllers\Admin\ProductVariantController as AdminProductVariantController;
-use App\Http\Controllers\Admin\ShopBannerController as AdminShopBannerController;
+use App\Http\Controllers\Admin\ShopBannerController as AdminShopBannerController;\nuse App\Http\Controllers\Admin\HomeSectionController as AdminHomeSectionController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -388,6 +388,14 @@ Route::middleware(['auth', 'admin', 'admin.session.timeout'])
         Route::post('/session/heartbeat', fn () => response()->noContent())
             ->middleware('throttle:30,1')
             ->name('session.heartbeat');
+
+        Route::get('/home-sections', [AdminHomeSectionController::class, 'index'])->name('home-sections.index');
+        Route::get('/home-sections/create', [AdminHomeSectionController::class, 'create'])->name('home-sections.create');
+        Route::post('/home-sections', [AdminHomeSectionController::class, 'store'])->name('home-sections.store');
+        Route::post('/home-sections/reorder', [AdminHomeSectionController::class, 'reorder'])->name('home-sections.reorder');
+        Route::get('/home-sections/{homeSection}/edit', [AdminHomeSectionController::class, 'edit'])->name('home-sections.edit');
+        Route::put('/home-sections/{homeSection}', [AdminHomeSectionController::class, 'update'])->name('home-sections.update');
+        Route::delete('/home-sections/{homeSection}', [AdminHomeSectionController::class, 'destroy'])->name('home-sections.destroy');
 
         Route::get('/shop-banner', [AdminShopBannerController::class, 'edit'])->name('shop-banner.edit');
         Route::put('/shop-banner', [AdminShopBannerController::class, 'update'])->name('shop-banner.update');
