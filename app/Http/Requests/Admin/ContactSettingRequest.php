@@ -29,7 +29,9 @@ class ContactSettingRequest extends FormRequest
             'payment_methods.*.label' => ['required', 'string', 'max:120'],
             'payment_methods.*.image' => ['nullable', 'url', 'max:2048'],
             'payment_methods.*.url' => ['nullable', 'url', 'max:2048'],
-            'logo_path' => ['nullable', 'string', 'max:2048'],
+            'logo_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'logo_media_id' => ['nullable', 'integer', 'exists:media,id'],
+            'remove_logo' => ['nullable', 'boolean'],
             'phone' => [
                 'nullable',
                 'string',
