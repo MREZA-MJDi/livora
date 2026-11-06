@@ -98,6 +98,9 @@
             method="GET"
             action="{{ route('shop.index') }}"
             class="flex min-h-0 flex-1 flex-col"
+            data-live-catalog-filters
+            data-results-selector="#shop-live-results"
+            data-aux-selectors="#shop-sorting,#shop-product-count,#shop-mobile-product-count"
         >
             <input type="hidden" name="sort" value="{{ request('sort', 'latest') }}">
 
@@ -116,39 +119,13 @@
             </div>
 
 
-            {{-- =================================================
-                 BOTTOM ACTIONS
-            ================================================== --}}
-
-            <div
-                class="shrink-0 border-t border-[var(--sg-border)] bg-[var(--sg-white)] p-4"
-            >
-
-                <div class="grid grid-cols-2 gap-3">
-
-                    {{-- CLEAR --}}
-
-                    <a
-                        href="{{ route('shop.index') }}"
-                        @click="filterOpen = false"
-                        class="flex items-center justify-center rounded-2xl border border-[var(--sg-border)] px-4 py-3.5 text-xs font-medium text-[var(--sg-ink)] transition hover:border-[var(--sg-ink)]"
-                    >
-                        پاک کردن
-                    </a>
-
-
-                    {{-- APPLY --}}
-
-                    <button
-                        type="submit"
-                        @click="filterOpen = false"
-                        class="rounded-2xl bg-[var(--sg-ink)] px-4 py-3.5 text-xs font-medium text-white transition hover:bg-[var(--sg-accent)]"
-                    >
-                        اعمال فیلتر
-                    </button>
-
-                </div>
-
+            <div class="shrink-0 border-t border-[var(--sg-border)] bg-[var(--sg-white)] p-4">
+                <p class="text-center text-xs leading-6 text-[var(--sg-stone)]">
+                    تغییرات شما خودکار اعمال می‌شوند؛ برای دیدن محصولات نیازی به دکمه ثبت نیست.
+                </p>
+                <button type="button" @click="filterOpen = false" class="mt-3 w-full rounded-2xl bg-[var(--sg-ink)] px-4 py-3.5 text-xs font-semibold text-white">
+                    بستن فیلترها
+                </button>
             </div>
 
         </form>
