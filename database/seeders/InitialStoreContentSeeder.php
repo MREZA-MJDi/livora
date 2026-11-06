@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\ContactSetting;
 use App\Models\ContentPage;
+use App\Models\SeoSetting;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Seeder;
 
 class InitialStoreContentSeeder extends Seeder
@@ -64,13 +66,13 @@ class InitialStoreContentSeeder extends Seeder
             ],
         ]);
 
-        \\App\\Models\\SeoSetting::query()->updateOrCreate(['id' => 1], [
+        SeoSetting::query()->updateOrCreate(['id' => 1], [
             'site_name' => $settings->brand_name ?: config('app.name'),
             'organization_name' => $settings->brand_name ?: config('app.name'),
             'organization_description' => $settings->brand_description,
             'organization_logo' => $settings->logo_path,
         ]);
-        \\Illuminate\\Support\\Facades\\Cache::forget('seo_settings.current');
+        Cache::forget('seo_settings.current');
 
         ContentPage::query()->firstOrCreate(
             ['slug' => 'buying-guide'],
