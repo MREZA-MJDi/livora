@@ -18,8 +18,7 @@ class StoreCategoryRequest extends FormRequest
         $this->merge([
             'seo_index' => $this->boolean('seo_index'),
             'seo_follow' => $this->boolean('seo_follow'),
-            'slug' => $this->slug
-                ? $normalize,
+            'slug' => trim(preg_replace('/[^\\pL\\pN]+/u', '-', mb_strtolower(trim((string) ($this->slug ?: $this->name)), 'UTF-8')), '-'),
             'is_active' => $this->boolean('is_active'),
             'sort_order' => $this->sort_order ?? 0,
         ]);
