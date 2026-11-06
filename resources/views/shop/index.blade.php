@@ -297,7 +297,7 @@
                                 </span>
 
                                 <a
-                                    href="{{ route('shop.index') }}"
+                                    href="{{ route('shop.index', request()->except(['category', 'page'])) }}"
                                     class="inline-flex items-center rounded-full border border-[var(--sg-border)] px-3 py-1.5 text-[11px] text-[var(--sg-stone)] transition hover:border-[var(--sg-ink)] hover:text-[var(--sg-ink)]"
                                 >
                                     حذف
