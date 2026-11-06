@@ -171,6 +171,15 @@
 
                     </div>
 
+                    @if($customer->phone)
+                        <div>
+                            <dt class="admin-stat-label">شماره تماس</dt>
+                            <dd class="mt-2 text-sm font-semibold text-[var(--admin-text)]">
+                                <a href="tel:{{ preg_replace('/[^0-9+]/', '', $customer->phone) }}" dir="ltr">{{ $customer->phone }}</a>
+                            </dd>
+                        </div>
+                    @endif
+
 
                     <div>
 
