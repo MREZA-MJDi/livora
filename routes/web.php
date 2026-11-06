@@ -32,7 +32,8 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\ProductImageController as AdminProductImageController;
 use App\Http\Controllers\Admin\ProductVariantController as AdminProductVariantController;
-use App\Http\Controllers\Admin\ShopBannerController as AdminShopBannerController;\nuse App\Http\Controllers\Admin\HomeSectionController as AdminHomeSectionController;
+use App\Http\Controllers\Admin\ShopBannerController as AdminShopBannerController;
+use App\Http\Controllers\Admin\HomeSectionController as AdminHomeSectionController;
 use Illuminate\Support\Facades\Route;
 
 
