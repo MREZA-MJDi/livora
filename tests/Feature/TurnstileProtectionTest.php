@@ -84,6 +84,10 @@ class TurnstileProtectionTest extends TestCase
 
     public function test_registration_accepts_a_valid_signup_token(): void
     {
+        config([
+            'services.turnstile.hostnames' => [parse_url(route('register'), PHP_URL_HOST)],
+        ]);
+
         Http::fake([
             self::VERIFY_URL => Http::response([
                 'success' => true,
