@@ -15,6 +15,20 @@ class ContactSettingRequest extends FormRequest
     {
         return [
             'brand_name' => ['nullable', 'string', 'max:120'],
+            'brand_description' => ['nullable', 'string', 'max:3000'],
+            'enamad_url' => ['nullable', 'url', 'max:2048'],
+            'samandehi_url' => ['nullable', 'url', 'max:2048'],
+            'copyright_text' => ['nullable', 'string', 'max:255'],
+            'footer_menu' => ['nullable', 'array'],
+            'footer_menu.shop' => ['nullable', 'array', 'max:12'],
+            'footer_menu.guide' => ['nullable', 'array', 'max:12'],
+            'footer_menu.contact' => ['nullable', 'array', 'max:12'],
+            'footer_menu.*.*.label' => ['required', 'string', 'max:120'],
+            'footer_menu.*.*.url' => ['required', 'string', 'max:2048'],
+            'payment_methods' => ['nullable', 'array', 'max:12'],
+            'payment_methods.*.label' => ['required', 'string', 'max:120'],
+            'payment_methods.*.image' => ['nullable', 'url', 'max:2048'],
+            'payment_methods.*.url' => ['nullable', 'url', 'max:2048'],
             'logo_path' => ['nullable', 'string', 'max:2048'],
             'phone' => [
                 'nullable',
