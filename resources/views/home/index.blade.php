@@ -26,7 +26,7 @@
                             @if($section->cta_label)<a href="{{ $ctaUrl }}" class="mt-8 inline-flex items-center justify-center rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] px-6 py-4 text-sm font-semibold text-[var(--sg-ink)] transition hover:border-[var(--sg-accent)]">{{ $section->cta_label }} <span class="mr-3" aria-hidden="true">←</span></a>@endif
                         </div>
                         @php($heroProduct = $section->products?->first())
-                        @php($heroImage = $section->image_url ?: $heroProduct?->images?->first()?->url)
+                        @php($heroImage = $section->image_url ?: $heroProduct?->images?->first()?->detail_url)
                         @if($heroImage)
                             <div class="overflow-hidden rounded-[2rem] bg-[var(--sg-surface)] {{ $section->type === 'cta' ? 'lg:order-1' : '' }}">
                                 <img src="{{ $heroImage }}" alt="{{ $section->title ?: 'SillaGallery' }}" class="aspect-[5/4] h-full w-full object-cover" fetchpriority="{{ $section->type === 'hero' ? 'high' : 'auto' }}">
