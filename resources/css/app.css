@@ -2438,3 +2438,102 @@ body {
     .sila-home-hero-copy a { margin-top: 1.25rem; width: 100%; }
     .sila-home-hero-image { aspect-ratio: 4 / 3; border-radius: 1.1rem; }
 }
+
+
+/* Silla editorial hero slider — compact, product-led and responsive. */
+.sila-home-hero-grid {
+    min-height: 0;
+    padding-block: clamp(1.5rem, 3vw, 2.75rem);
+}
+.sila-home-hero-copy h1 { max-width: 11ch; }
+.sila-home-hero-copy p:not(:first-child) { max-width: 30rem; }
+.sila-home-hero-media { align-self: center; }
+.sila-hero-slider { width: 100%; min-width: 0; }
+.sila-hero-slider__stage {
+    position: relative;
+    overflow: hidden;
+    border-radius: clamp(1rem, 2vw, 1.75rem);
+    background: var(--sg-surface);
+}
+.sila-hero-slide {
+    display: none;
+    margin: 0;
+}
+.sila-hero-slide.is-active {
+    display: block;
+    animation: silaHeroReveal .45s ease both;
+}
+.sila-hero-slide .sila-home-hero-image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 5 / 4;
+    max-height: 470px;
+    object-fit: cover;
+    object-position: center 68%;
+}
+.sila-hero-slide__caption {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem 1.25rem;
+    flex-wrap: wrap;
+    padding: .85rem .15rem .1rem;
+    color: var(--sg-stone);
+    font-size: .72rem;
+}
+.sila-hero-slide__caption strong {
+    color: var(--sg-ink);
+    font-size: .88rem;
+    font-weight: 600;
+}
+.sila-hero-slide__caption a {
+    color: var(--sg-accent);
+    font-weight: 600;
+    white-space: nowrap;
+}
+.sila-hero-slider__controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: .9rem;
+}
+.sila-hero-slider__arrows { display: flex; gap: .5rem; }
+.sila-hero-slider__arrows button {
+    display: grid;
+    width: 2.5rem;
+    height: 2.5rem;
+    place-items: center;
+    border: 1px solid var(--sg-border);
+    border-radius: 999px;
+    color: var(--sg-ink);
+    transition: background .2s ease, border-color .2s ease;
+}
+.sila-hero-slider__arrows button:hover { border-color: var(--sg-ink); background: var(--sg-cream); }
+.sila-hero-slider__dots { display: flex; align-items: center; gap: .45rem; }
+.sila-hero-slider__dots button {
+    width: .45rem;
+    height: .45rem;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: var(--sg-border);
+    transition: width .2s ease, background .2s ease;
+}
+.sila-hero-slider__dots button.is-active { width: 1.5rem; background: var(--sg-ink); }
+@keyframes silaHeroReveal {
+    from { opacity: .55; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@media (max-width: 767px) {
+    .sila-home-hero-grid { gap: 1.25rem; padding-block: 1.25rem 1.75rem; }
+    .sila-home-hero-copy h1 { max-width: 14ch; }
+    .sila-hero-slide .sila-home-hero-image { aspect-ratio: 16 / 11; max-height: 360px; }
+    .sila-hero-slide__caption { font-size: .66rem; }
+    .sila-hero-slide__caption strong { flex: 1 1 100%; order: 2; }
+    .sila-hero-slide__caption a { order: 3; }
+    .sila-hero-slider__controls { padding-top: .65rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .sila-hero-slide.is-active { animation: none; }
+}
