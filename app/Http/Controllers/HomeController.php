@@ -27,7 +27,7 @@ class HomeController extends Controller
                 $query = Product::query()
                     ->active()
                     ->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('is_active', true))
-                    ->with(['category', 'images' => fn ($imageQuery) => $imageQuery->limit(1)])
+                    ->with(['category', 'images' => fn ($imageQuery) => $imageQuery->with('media')->limit(1)])
                     ->withCount('allVariants')
                     ->whereNotIn('products.id', $usedProductIds);
 
