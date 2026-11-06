@@ -96,7 +96,7 @@ class ProductController extends Controller
                         ? $this->registerUploadedMedia($request, $originalImageFile, $imagePath, $variantSourcePath)
                         : Media::query()->whereKey($mediaId)->where('mime_type', 'like', 'image/%')->firstOrFail();
 
-                    if (! $media->thumbnail_path || ! $media->card_path || ! $media->detail_path) {
+                    if ($imageFile && (! $media->thumbnail_path || ! $media->card_path || ! $media->detail_path)) {
                         $media = app(ProductImageVariantGenerator::class)->generate($media);
                     }
 
@@ -192,7 +192,7 @@ class ProductController extends Controller
                         ? $this->registerUploadedMedia($request, $originalImageFile, $imagePath, $variantSourcePath)
                         : Media::query()->whereKey($mediaId)->where('mime_type', 'like', 'image/%')->firstOrFail();
 
-                    if (! $media->thumbnail_path || ! $media->card_path || ! $media->detail_path) {
+                    if ($imageFile && (! $media->thumbnail_path || ! $media->card_path || ! $media->detail_path)) {
                         $media = app(ProductImageVariantGenerator::class)->generate($media);
                     }
 
