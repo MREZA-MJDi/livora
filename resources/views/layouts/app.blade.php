@@ -120,7 +120,6 @@
     <x-layout.navbar :cart-count="$storefrontCartCount" />
     <x-layout.mobile-menu />
     <x-layout.search-overlay />
-    <x-shop.filter-drawer />
     <main class="storefront-content">@yield('content')</main>
     <x-layout.footer />
     <x-layout.floating-actions />
