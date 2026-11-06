@@ -26,7 +26,7 @@ class HomeController extends Controller
          * moves it into the homepage collection without requiring flags.
          */
         $featuredProducts = Product::query()
-            ->active()
+            ->featured()
             ->whereHas('category', fn ($query) => $query->where('is_active', true))
             ->with([
                 'category',

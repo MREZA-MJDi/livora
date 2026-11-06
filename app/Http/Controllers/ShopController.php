@@ -77,6 +77,19 @@ class ShopController extends Controller
             });
         }
 
+        // Keep available products ahead of unavailable ones for every sort mode.
+        $query->orderByRaw("CASE WHEN EXISTS (
+            SELECT 1 FROM product_variants
+            WHERE product_variants.product_id = products.id
+              AND product_variants.is_active = 1
+              AND product_variants.stock > 0
+        ) OR (
+            NOT EXISTS (
+                SELECT 1 FROM product_variants
+                WHERE product_variants.product_id = products.id
+            ) AND products.stock > 0
+        ) THEN 0 ELSE 1 END");
+
         match ($filters['sort'] ?? 'latest') {
             'oldest' => $query->orderBy('created_at')->orderBy('id'),
             'price_asc' => $query->orderBy('price')->orderBy('id'),

@@ -211,7 +211,7 @@
             @else
 
                 <p class="text-sm font-semibold text-[var(--sg-ink)]">
-                    {{ number_format((float) $product->price) }}
+                    {{ $product->persian_price }}
                     <span class="text-[10px] font-normal text-[var(--sg-stone)]">
                         تومان
                     </span>
