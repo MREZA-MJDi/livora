@@ -10,6 +10,7 @@ use App\Models\Media;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Support\MediaLibrary;
+use App\Services\Media\ProductImageVariantGenerator;
 use App\Services\Seo\ContentSeoAnalyzer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
@@ -244,7 +245,7 @@ class ProductController extends Controller
 
     private function registerUploadedMedia(StoreProductRequest|UpdateProductRequest $request, $file, string $path): Media
     {
-        return Media::create([
+        $media = Media::create([
             'user_id' => $request->user()->id,
             'disk' => 'public',
             'path' => $path,
@@ -255,6 +256,8 @@ class ProductController extends Controller
             'size' => $file->getSize(),
             'alt' => $request->input('image_alt'),
         ]);
+
+        return app(ProductImageVariantGenerator::class)->generate($media);
     }
 
     private function deleteStoredPaths(array $paths): void
