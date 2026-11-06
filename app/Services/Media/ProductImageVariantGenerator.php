@@ -25,7 +25,7 @@ class ProductImageVariantGenerator
         }
 
         $disk = Storage::disk($media->disk);
-        $sourcePath = ltrim($media->path, '/');
+        $sourcePath = ltrim($media->variant_source_path ?: $media->path, '/');
         if (! $disk->exists($sourcePath)) {
             throw new RuntimeException('Original product image is missing: '.$sourcePath);
         }
