@@ -453,6 +453,7 @@
                         @if(
                             $unreadContactMessagesCount === 0
                             && $pendingOrdersCount === 0
+                            && $inventoryReviewCount === 0
                             && $outOfStockCount === 0
                         )
 
