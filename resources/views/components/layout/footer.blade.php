@@ -29,7 +29,7 @@
             <div>
 
                 <p class="text-[10px] font-medium uppercase tracking-[0.2em] text-white/40">
-                    SHOP
+                    فروشگاه
                 </p>
 
                 <nav
@@ -81,7 +81,7 @@
             <div>
 
                 <p class="text-[10px] font-medium uppercase tracking-[0.2em] text-white/40">
-                    CUSTOMER
+                    راهنمای مشتریان
                 </p>
 
                 <nav
@@ -166,7 +166,7 @@
             <div>
 
                 <p class="text-[10px] font-medium uppercase tracking-[0.2em] text-white/40">
-                    CONTACT
+                    ارتباط با ما
                 </p>
 
                 <div class="mt-5 space-y-4">
@@ -220,7 +220,7 @@
             <div class="border-b border-white/10 py-5 sm:border-b-0 sm:border-l sm:px-6 sm:py-6">
 
                 <p class="text-[10px] uppercase tracking-[0.18em] text-white/35">
-                    PAYMENT
+                    پرداخت
                 </p>
 
                 <p class="mt-2 text-xs leading-6 text-white/50">
@@ -232,7 +232,7 @@
             <div class="border-b border-white/10 py-5 sm:border-b-0 sm:px-6 sm:py-6">
 
                 <p class="text-[10px] uppercase tracking-[0.18em] text-white/35">
-                    INSTALLMENT
+                    خرید اقساطی
                 </p>
 
                 <p class="mt-2 text-xs leading-6 text-white/50">
@@ -244,7 +244,7 @@
             <div class="py-5 sm:px-6 sm:py-6">
 
                 <p class="text-[10px] uppercase tracking-[0.18em] text-white/35">
-                    SUPPORT
+                    پشتیبانی
                 </p>
 
                 <p class="mt-2 text-xs leading-6 text-white/50">

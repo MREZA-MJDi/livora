@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', \App\Models\SeoPageSetting::forRoute('shop')?->meta_title ?: 'فروشگاه مبلمان | SillaGallery')
+@section('title', \App\Models\SeoPageSetting::forRoute('shop')?->meta_title ?: 'فروشگاه مبلمان | سیلا گالری | SillaGallery')
 
 @section(
     'description',
-    (\App\Models\SeoPageSetting::forRoute('shop')?->meta_description ?: 'خرید مبلمان و لوازم خانه از SillaGallery؛ مشاهده محصولات جدید، ویژه، تخفیف‌دار و دارای شرایط خرید اقساطی.')
+    (\App\Models\SeoPageSetting::forRoute('shop')?->meta_description ?: 'خرید مبلمان و لوازم خانه از سیلا گالری | SillaGallery؛ مشاهده محصولات جدید، ویژه، تخفیف‌دار و دارای شرایط خرید اقساطی.')
 )
 
 @section('canonical', \App\Models\SeoPageSetting::forRoute('shop')?->canonical_url ?: route('shop.index'))
@@ -111,7 +111,7 @@
                                     <div>
 
                                         <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
-                                            DISCOVER
+                                            جست‌وجو و کشف محصولات
                                         </p>
 
                                         <h2 class="mt-2 text-sm font-semibold">
@@ -156,13 +156,13 @@
 
 
                             {{-- =================================================
-                                 DISCOVERY BOX
+                                 جست‌وجو و کشف محصولاتY BOX
                             ================================================== --}}
 
                             <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-surface)] p-5">
 
                                 <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-accent)]">
-                                    SillaGallery
+                                    سیلا گالری | SillaGallery
                                 </p>
 
                                 <h3 class="mt-3 text-sm font-semibold">
@@ -248,7 +248,7 @@
                                     </p>
 
                                     <p class="mt-2 text-sm font-medium text-[var(--sg-ink)]">
-                                        مجموعه SillaGallery
+                                        مجموعه سیلا گالری | SillaGallery
                                     </p>
 
                                 </div>

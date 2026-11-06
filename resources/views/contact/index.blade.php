@@ -112,14 +112,14 @@
                     @endif
                     @if($contactSetting?->googleMapsEmbedUrl())
                         <div class="overflow-hidden rounded-xl border border-[var(--sg-border)] bg-[var(--sg-white)]">
-                            <div class="border-b border-[var(--sg-border)] px-5 py-4"><p class="sg-eyebrow">FIND US</p><h3 class="mt-1 font-semibold">موقعیت فروشگاه</h3></div>
+                            <div class="border-b border-[var(--sg-border)] px-5 py-4"><p class="sg-eyebrow">موقعیت فروشگاه</p><h3 class="mt-1 font-semibold">موقعیت فروشگاه</h3></div>
                             <div class="aspect-[16/10] bg-[var(--sg-surface)] sm:aspect-[16/9]"><iframe src="{{ $contactSetting->googleMapsEmbedUrl() }}" title="نقشه موقعیت فروشگاه SillaGallery" class="h-full w-full border-0" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
                             @if($contactSetting->googleMapsDirectionsUrl())
-                                <div class="p-4"><a href="{{ $contactSetting->googleMapsDirectionsUrl() }}" target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-[var(--sg-accent)]">مسیریابی در Google Maps ↗</a></div>
+                                <div class="p-4"><a href="{{ $contactSetting->googleMapsDirectionsUrl() }}" target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-[var(--sg-accent)]">نمایش مسیر روی نقشه ↗</a></div>
                             @endif
                         </div>
                     @elseif($contactSetting?->googleMapsSearchUrl())
-                        <a href="{{ $contactSetting->googleMapsSearchUrl() }}" target="_blank" rel="noopener noreferrer" class="block rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5 text-sm font-semibold text-[var(--sg-accent)]">جستجوی آدرس در Google Maps ↗</a>
+                        <a href="{{ $contactSetting->googleMapsSearchUrl() }}" target="_blank" rel="noopener noreferrer" class="block rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5 text-sm font-semibold text-[var(--sg-accent)]">جست‌وجوی موقعیت روی نقشه ↗</a>
                     @endif
                 </aside>
 

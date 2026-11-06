@@ -72,7 +72,7 @@
 
                                 <span class="h-px w-8 bg-[var(--sg-accent)]"></span>
 
-                                Furniture & Living
+                                مبلمان و دکوراسیون
 
                             </div>
 
@@ -144,7 +144,7 @@
                             <div class="rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-4">
 
                                 <p class="text-[10px] uppercase tracking-[0.16em] text-[var(--sg-stone)]">
-                                    Payment
+                                    پرداخت
                                 </p>
 
                                 <p class="mt-2 text-sm font-semibold">
@@ -361,7 +361,7 @@
                         <div class="max-w-2xl">
 
                             <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
-                                Shop by space
+                                خرید بر اساس فضای خانه
                             </p>
 
                             <h2 class="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -745,7 +745,7 @@
                     <div class="px-2 py-8 sm:px-8">
 
                         <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-stone)]">
-                            Selection
+                            انتخاب
                         </p>
 
                         <h3 class="mt-3 text-sm font-semibold">
@@ -762,7 +762,7 @@
                     <div class="px-2 py-8 sm:px-8">
 
                         <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-stone)]">
-                            Payment
+                            پرداخت
                         </p>
 
                         <h3 class="mt-3 text-sm font-semibold">
@@ -779,7 +779,7 @@
                     <div class="px-2 py-8 sm:px-8">
 
                         <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-stone)]">
-                            Support
+                            پشتیبانی
                         </p>
 
                         <h3 class="mt-3 text-sm font-semibold">
@@ -796,7 +796,7 @@
                     <div class="px-2 py-8 sm:px-8">
 
                         <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-stone)]">
-                            Experience
+                            تجربه خرید
                         </p>
 
                         <h3 class="mt-3 text-sm font-semibold">
