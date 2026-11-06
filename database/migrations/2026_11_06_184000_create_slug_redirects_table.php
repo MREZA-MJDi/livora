@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('slug_redirects', function (Blueprint $table): void {
             $table->id();
-            $table->string('old_path', 2048)->unique();
+            $table->string('old_path', 512)->unique();
             $table->string('new_path', 2048);
             $table->boolean('is_active')->default(true)->index();
             $table->timestamps();
