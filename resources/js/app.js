@@ -869,6 +869,57 @@ window.iranShippingPicker = (regions, initialProvince = '', initialCity = '', in
 Alpine.start();
 
  
+// Homepage editorial hero slider: manual controls, gentle autoplay and reduced-motion support.
+const initSilaHeroSliders = () => {
+    document.querySelectorAll('[data-sila-hero-slider]').forEach((root) => {
+        if (root.dataset.sliderReady === '1') return;
+        const slides = Array.from(root.querySelectorAll('[data-sila-hero-slide]'));
+        const dots = Array.from(root.querySelectorAll('[data-sila-hero-dot]'));
+        const previous = root.querySelector('[data-sila-hero-prev]');
+        const next = root.querySelector('[data-sila-hero-next]');
+        if (slides.length < 2 || !previous || !next) return;
+        root.dataset.sliderReady = '1';
+
+        let active = Math.max(0, slides.findIndex(slide => slide.classList.contains('is-active')));
+        let interval = null;
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const show = (index) => {
+            active = (index + slides.length) % slides.length;
+            slides.forEach((slide, i) => {
+                const selected = i === active;
+                slide.classList.toggle('is-active', selected);
+                slide.setAttribute('aria-hidden', selected ? 'false' : 'true');
+            });
+            dots.forEach((dot, i) => {
+                const selected = i === active;
+                dot.classList.toggle('is-active', selected);
+                dot.setAttribute('aria-current', selected ? 'true' : 'false');
+            });
+        };
+        const stop = () => { if (interval) window.clearInterval(interval); interval = null; };
+        const start = () => {
+            stop();
+            if (!reducedMotion && !document.hidden) interval = window.setInterval(() => show(active + 1), 6000);
+        };
+        previous.addEventListener('click', () => { show(active - 1); start(); });
+        next.addEventListener('click', () => { show(active + 1); start(); });
+        dots.forEach((dot, i) => dot.addEventListener('click', () => { show(i); start(); }));
+        root.addEventListener('mouseenter', stop);
+        root.addEventListener('mouseleave', start);
+        root.addEventListener('focusin', stop);
+        root.addEventListener('focusout', (event) => { if (!root.contains(event.relatedTarget)) start(); });
+        document.addEventListener('visibilitychange', () => document.hidden ? stop() : start());
+        show(active);
+        start();
+    });
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSilaHeroSliders, { once: true });
+} else {
+    initSilaHeroSliders();
+}
+
 // Native scroll-snap product carousels: touch/trackpad work without JS,
 // while these controls add predictable one-card movement and keyboard labels.
 const initSgProductCarousels = () => {
