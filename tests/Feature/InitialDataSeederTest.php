@@ -21,10 +21,12 @@ class InitialDataSeederTest extends TestCase
         $this->assertDatabaseCount('contact_settings', 1);
         $this->assertDatabaseHas('content_pages', ['slug' => 'buying-guide']);
 
-        $this->assertDatabaseMissing('products', [
+        $this->assertDatabaseHas('products', [
             'status' => 'active',
             'sku' => 'SG-SOF-101',
         ]);
+
+        $this->assertSame(17, \App\Models\Product::query()->active()->count());
     }
 
     public function test_initial_data_seeder_is_idempotent_and_does_not_overwrite_existing_records(): void
@@ -41,7 +43,7 @@ class InitialDataSeederTest extends TestCase
 
         $this->assertDatabaseHas('products', [
             'slug' => 'مبل-راحتی-سه-نفره-آرتا',
-            'status' => 'draft',
+            'status' => 'active',
             'price' => 78000000,
         ]);
     }
