@@ -1156,7 +1156,24 @@
 
             </div>
 
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+
+                <a
+                    href="{{ $heroSection ? route('admin.home-sections.edit', $heroSection) : route('admin.home-sections.index') }}"
+                    class="admin-card admin-card-hover group overflow-hidden p-5"
+                >
+                    <div class="flex items-center gap-4">
+                        @if($heroSection?->image_url)
+                            <img src="{{ $heroSection->image_url }}" alt="" class="h-14 w-20 rounded-xl object-cover">
+                        @else
+                            <div class="admin-stat-icon">▧</div>
+                        @endif
+                        <div class="min-w-0">
+                            <h3 class="text-sm font-semibold text-[var(--admin-text)]">مدیریت اسلایدر هیرو</h3>
+                            <p class="mt-1 text-xs text-[var(--admin-muted)]">{{ number_format($heroSlidesCount) }} اسلاید · تغییر تصویر و متن</p>
+                        </div>
+                    </div>
+                </a>
 
                 <a
                     href="{{ route('admin.products.create') }}"
