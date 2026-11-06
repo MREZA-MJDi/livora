@@ -3,7 +3,7 @@
 ])
 
 @php
-    $image = $product->images?->first()?->url;
+    $image = $product->images?->first()?->card_url;
 
     $hasDiscount =
         $product->compare_at_price !== null
