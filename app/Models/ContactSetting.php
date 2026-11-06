@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ContactSetting extends Model
 {
     protected $fillable = [
         'brand_name', 'brand_description',
-        'enamad_url', 'samandehi_url', 'footer_menu', 'payment_methods', 'copyright_text',
+        'enamad_url', 'samandehi_url', 'footer_menu', 'payment_methods', 'copyright_text', 'logo_media_id',
         'logo_path',
         'phone',
         'email',
@@ -37,6 +38,11 @@ class ContactSetting extends Model
         'floating_actions_enabled',
     ];
 
+
+    public function logoMedia(): BelongsTo
+    {
+        return $this->belongsTo(Media::class, 'logo_media_id');
+    }
 
     public function hasMapLocation(): bool
     {
