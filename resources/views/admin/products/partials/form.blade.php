@@ -58,11 +58,11 @@
 
             <div class="mb-6">
                 <h3 class="text-base font-bold text-[var(--admin-text)]">
-                    اطلاعات محصول
+                    مرحله اول: اطلاعات محصول
                 </h3>
 
                 <p class="mt-1 text-xs text-[var(--admin-muted)]">
-                    اطلاعات اصلی محصول را وارد کنید.
+                    نام محصول و دسته‌بندی را وارد کنید. کد و آدرس محصول به‌صورت خودکار ساخته می‌شوند؛ توضیحات را می‌توانید بعداً اضافه کنید.
                 </p>
             </div>
 
@@ -176,7 +176,6 @@
                         value="{{ old('sku', $product->sku ?? '') }}"
                         dir="ltr"
                         class="admin-input text-left"
-                        required
                     >
 
                     @error('sku')
