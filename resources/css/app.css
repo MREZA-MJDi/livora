@@ -2233,7 +2233,7 @@ body {
 .storefront-content .sg-product-grid--catalog .product-card-media,
 .storefront-content .sg-product-grid--category .product-card-media,
 .storefront-content .sg-product-grid--showcase .product-card-media {
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 4 / 5;
     max-height: none;
 }
 
