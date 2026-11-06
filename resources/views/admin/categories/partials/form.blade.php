@@ -50,7 +50,7 @@
                 <div class="sm:col-span-2">
 
                     <label for="slug" class="admin-label">
-                        Slug
+                        آدرس اختصاصی دسته‌بندی (اختیاری)
                     </label>
 
                     <input
@@ -63,7 +63,7 @@
                     >
 
                     <p class="mt-2 text-xs text-[var(--admin-muted)]">
-                        برای URL دسته‌بندی استفاده می‌شود.
+                        اگر با این بخش آشنا نیستید، آن را خالی بگذارید تا آدرس به‌صورت خودکار ساخته شود.
                     </p>
 
                     @error('slug')
