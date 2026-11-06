@@ -70,6 +70,24 @@ class SeoMetadataTest extends TestCase
             ->assertHeader('X-Robots-Tag', 'noindex, nofollow');
     }
 
+    public function test_production_sitemap_contains_published_storefront_content(): void
+    {
+        config(['app.env' => 'production']);
+        $this->seed(\Database\Seeders\InitialDataSeeder::class);
+
+        $sitemap = $this->get('/sitemap.xml')
+            ->assertOk()
+            ->assertHeaderMissing('X-Robots-Tag');
+
+        ob_start();
+        $sitemap->baseResponse->sendContent();
+        $xml = (string) ob_get_clean();
+
+        $this->assertStringContainsString('/product/مبل-راحتی-سه-نفره-آرتا', $xml);
+        $this->assertStringContainsString('/categories/مبل-راحتی', $xml);
+        $this->assertStringContainsString('/blog/choosing-sofa-for-living-room', $xml);
+    }
+
     public function test_public_pages_are_noindex_nofollow_and_sitemap_is_empty_by_default(): void
     {
         $this->get('/')

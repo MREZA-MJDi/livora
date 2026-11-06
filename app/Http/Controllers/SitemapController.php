@@ -7,21 +7,18 @@ use App\Models\Category;
 use App\Models\ContentPage;
 use App\Models\Product;
 use App\Models\SeoPageSetting;
-use App\Models\SeoSetting;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SitemapController extends Controller
 {
     public function __invoke(): StreamedResponse
     {
-        $settings = SeoSetting::current();
-
-        return response()->stream(function () use ($settings): void {
+        return response()->stream(function (): void {
             echo '<?xml version="1.0" encoding="UTF-8"?>';
             echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
 
-            // Never publish URLs until both global SEO switches are enabled.
-            if (! $settings->indexing_enabled || ! $settings->following_enabled) {
+            // Non-production deployments are intentionally excluded from indexing.
+            if (! app()->environment('production')) {
                 echo '</urlset>';
                 return;
             }
@@ -29,8 +26,6 @@ class SitemapController extends Controller
             $base = rtrim(config('app.url'), '/');
 
             SeoPageSetting::query()
-                ->where('seo_index', true)
-                ->where('seo_follow', true)
                 ->orderBy('id')
                 ->cursor()
                 ->each(function (SeoPageSetting $page) use ($base): void {
