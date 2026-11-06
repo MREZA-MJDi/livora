@@ -42,6 +42,10 @@ class HomeSectionController extends Controller
         $data['payload'] = $this->normalizePayload($data['payload'] ?? []);
         $this->assertProductsAreUnique($data['payload']['product_ids'] ?? []);
         $data['image_path'] = $this->storeImage($request, null);
+        $data['payload'] = $this->storeHeroSlides($request, $data['payload'], []);
+        if (($data['type'] ?? null) === 'hero' && ! empty($data['payload']['slides'][0]['image_path'])) {
+            $data['image_path'] = $data['payload']['slides'][0]['image_path'];
+        }
         HomeSection::create($data);
 
         return redirect()->route('admin.home-sections.index')->with('success', 'سکشن صفحه اصلی ایجاد شد.');
@@ -68,6 +72,10 @@ class HomeSectionController extends Controller
         $data['payload'] = $this->normalizePayload($payload);
         $this->assertProductsAreUnique($data['payload']['product_ids'] ?? [], $homeSection->id);
         $data['image_path'] = $this->storeImage($request, $homeSection->image_path);
+        $data['payload'] = $this->storeHeroSlides($request, $data['payload'], $homeSection->payload['slides'] ?? []);
+        if (($data['type'] ?? null) === 'hero' && ! empty($data['payload']['slides'][0]['image_path'])) {
+            $data['image_path'] = $data['payload']['slides'][0]['image_path'];
+        }
         $homeSection->update($data);
 
         return redirect()->route('admin.home-sections.index')->with('success', 'سکشن صفحه اصلی بروزرسانی شد.');
@@ -110,6 +118,8 @@ class HomeSectionController extends Controller
             'cta_label' => ['nullable', 'string', 'max:120'],
             'cta_url' => ['nullable', 'string', 'max:2048'],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
+            'slide_images' => ['nullable', 'array', 'max:4'],
+            'slide_images.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
             'payload' => ['nullable', 'array'],
             'payload.product_source' => ['nullable', Rule::in(['latest', 'new', 'installments', 'selected', 'category'])],
             'payload.product_ids' => ['nullable', 'array', 'max:30'],
@@ -119,6 +129,14 @@ class HomeSectionController extends Controller
             'payload.items' => ['nullable', 'array', 'max:8'],
             'payload.items.*.title' => ['required_with:payload.items', 'string', 'max:120'],
             'payload.items.*.body' => ['required_with:payload.items', 'string', 'max:500'],
+            'payload.slides' => ['nullable', 'array', 'max:4'],
+            'payload.slides.*.eyebrow' => ['nullable', 'string', 'max:160'],
+            'payload.slides.*.title' => ['nullable', 'string', 'max:255'],
+            'payload.slides.*.subtitle' => ['nullable', 'string', 'max:1500'],
+            'payload.slides.*.cta_label' => ['nullable', 'string', 'max:120'],
+            'payload.slides.*.cta_url' => ['nullable', 'string', 'max:2048'],
+            'payload.slides.*.image_path' => ['nullable', 'string', 'max:2048'],
+            'payload.slides.*.object_position' => ['nullable', 'string', 'regex:/^(?:[0-9]{1,3})%\\s+(?:[0-9]{1,3})%$/'],
         ]);
     }
 
@@ -133,10 +151,50 @@ class HomeSectionController extends Controller
                 ->all();
         }
 
+        if (isset($payload['slides'])) {
+            $payload['slides'] = collect($payload['slides'])
+                ->filter(fn ($slide) => is_array($slide))
+                ->map(fn ($slide) => [
+                    'eyebrow' => trim((string) ($slide['eyebrow'] ?? '')),
+                    'title' => trim((string) ($slide['title'] ?? '')),
+                    'subtitle' => trim((string) ($slide['subtitle'] ?? '')),
+                    'cta_label' => trim((string) ($slide['cta_label'] ?? '')),
+                    'cta_url' => trim((string) ($slide['cta_url'] ?? '')),
+                    'image_path' => $slide['image_path'] ?? null,
+                    'object_position' => $slide['object_position'] ?? '50% 50%',
+                ])
+                ->filter(fn ($slide) => filled($slide['title']) || filled($slide['image_path']))
+                ->take(4)
+                ->values()
+                ->all();
+        }
+
         $payload['limit'] = max(1, min(24, (int) ($payload['limit'] ?? 8)));
         $payload['product_source'] = $payload['product_source'] ?? 'latest';
         $payload['product_ids'] = array_values(array_unique(array_map('intval', $payload['product_ids'] ?? [])));
 
+        return $payload;
+    }
+
+    private function storeHeroSlides(Request $request, array $payload, array $existingSlides): array
+    {
+        if (! isset($payload['slides'])) {
+            return $payload;
+        }
+
+        $slides = $payload['slides'];
+        foreach ($slides as $index => &$slide) {
+            $upload = $request->file("slide_images.{$index}");
+            if ($upload) {
+                $media = MediaLibrary::store($upload, (int) $request->user()->id, 'home-sections');
+                $slide['image_path'] = $media->path;
+            } elseif (blank($slide['image_path'] ?? null)) {
+                $slide['image_path'] = $existingSlides[$index]['image_path'] ?? null;
+            }
+        }
+        unset($slide);
+
+        $payload['slides'] = array_values(array_filter($slides, fn ($slide) => filled($slide['image_path']) || filled($slide['title'])));
         return $payload;
     }
 
@@ -152,7 +210,7 @@ class HomeSectionController extends Controller
 
         $duplicates = $used->intersect(array_map('intval', $productIds));
         if ($duplicates->isNotEmpty()) {
-                throw ValidationException::withMessages([
+            throw ValidationException::withMessages([
                 'payload.product_ids' => 'هر محصول فقط می‌تواند در یک سکشن دستی صفحه اصلی انتخاب شود.',
             ]);
         }
