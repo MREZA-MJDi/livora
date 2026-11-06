@@ -81,7 +81,7 @@
 
                     <div class="sg-category-detail-hero mt-8 grid items-center gap-8 lg:mt-12 lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] lg:gap-12">
                         <div class="max-w-3xl py-3">
-                            <p class="sg-eyebrow">THE COLLECTION</p>
+                            <p class="sg-eyebrow">مجموعه محصولات</p>
                             <h1 class="mt-4 text-4xl font-semibold leading-[1.35] tracking-tight text-[var(--sg-ink)] sm:text-5xl lg:text-6xl">
                                 {{ $category->banner_title ?: $category->name }}
                             </h1>
