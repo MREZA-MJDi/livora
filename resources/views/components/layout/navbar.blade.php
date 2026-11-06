@@ -19,8 +19,8 @@
                     class="group inline-flex items-center"
                     aria-label="{{ $storeSettings?->brand_name ?: config('app.name') }}"
                 >
-                    @if($storeSettings?->logo_path)
-                        <img src="{{ $storeSettings->logo_path }}" alt="{{ $storeSettings->brand_name ?: config('app.name') }}" class="max-h-10 max-w-40 object-contain">
+                    @if($storeSettings?->logo_url)
+                        <img src="{{ $storeSettings->logo_url }}" alt="{{ $storeSettings->brand_name ?: config('app.name') }}" class="max-h-10 max-w-40 object-contain">
                     @else
                         <span class="text-lg font-bold text-[var(--sg-ink)]">{{ $storeSettings?->brand_name ?: config('app.name') }}</span>
                     @endif
