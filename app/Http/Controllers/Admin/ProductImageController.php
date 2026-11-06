@@ -50,10 +50,22 @@ class ProductImageController extends Controller
     public function store(StoreProductImageRequest $request): RedirectResponse
     {
         $data = $request->validated();
-        $media = $request->hasFile('image')
-            ? MediaLibrary::store($request->file('image'), (int) $request->user()->id, 'products/images', $data['alt'] ?? null)
-            : MediaLibrary::image($data['media_id'] ?? null);
-        if ($media && (! $media->thumbnail_path || ! $media->card_path || ! $media->detail_path)) {\n            $media = app(ProductImageVariantGenerator::class)->generate($media);\n        }\n        $data['path'] = $media->path;
+        $media = null;
+        if ($request->hasFile('image')) {
+            $originalFile = $request->file('original_image') ?: $request->file('image');
+            $media = MediaLibrary::store($originalFile, (int) $request->user()->id, 'products/originals', $data['alt'] ?? null);
+            if ($request->hasFile('original_image')) {
+                $cropPath = $request->file('image')->store('products/crops', 'public');
+                $media->update(['variant_source_path' => $cropPath]);
+                $media->refresh();
+            }
+        } else {
+            $media = MediaLibrary::image($data['media_id'] ?? null);
+        }
+        if ($media && (! $media->thumbnail_path || ! $media->card_path || ! $media->detail_path)) {
+            $media = app(ProductImageVariantGenerator::class)->generate($media);
+        }
+        $data['path'] = $media->path;
         $data['media_id'] = $media->id;
 
         DB::transaction(function () use (&$data): void {
@@ -95,11 +107,23 @@ class ProductImageController extends Controller
     {
         $data = $request->validated();
         $oldProductId = (int) $productImage->product_id;
-        $newMedia = $request->hasFile('image')
-            ? MediaLibrary::store($request->file('image'), (int) $request->user()->id, 'products/images', $data['alt'] ?? null)
-            : (filled($data['media_id'] ?? null) ? MediaLibrary::image($data['media_id']) : null);
+        $newMedia = null;
+        if ($request->hasFile('image')) {
+            $originalFile = $request->file('original_image') ?: $request->file('image');
+            $newMedia = MediaLibrary::store($originalFile, (int) $request->user()->id, 'products/originals', $data['alt'] ?? null);
+            if ($request->hasFile('original_image')) {
+                $cropPath = $request->file('image')->store('products/crops', 'public');
+                $newMedia->update(['variant_source_path' => $cropPath]);
+                $newMedia->refresh();
+            }
+        } elseif (filled($data['media_id'] ?? null)) {
+            $newMedia = MediaLibrary::image($data['media_id']);
+        }
         if ($newMedia) {
-            if (! $newMedia->thumbnail_path || ! $newMedia->card_path || ! $newMedia->detail_path) {\n                $newMedia = app(ProductImageVariantGenerator::class)->generate($newMedia);\n            }\n            $data['path'] = $newMedia->path;
+            if (! $newMedia->thumbnail_path || ! $newMedia->card_path || ! $newMedia->detail_path) {
+                $newMedia = app(ProductImageVariantGenerator::class)->generate($newMedia);
+            }
+            $data['path'] = $newMedia->path;
             $data['media_id'] = $newMedia->id;
         } else {
             unset($data['media_id'], $data['path']);
