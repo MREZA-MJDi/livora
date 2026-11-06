@@ -18,6 +18,9 @@ class HomeController extends Controller
             ->orderBy('id')
             ->get();
 
+        $finalCta = $sections->firstWhere('key', 'final-cta');
+        $sections = $sections->reject(fn (HomeSection $section) => $section->key === 'final-cta')->values();
+
         $usedProductIds = [];
 
         foreach ($sections as $section) {
@@ -89,6 +92,7 @@ class HomeController extends Controller
         return view('home.index', [
             'homeSections' => $sections,
             'blogPosts' => $blogPosts,
+            'finalCta' => $finalCta,
         ]);
     }
 }
