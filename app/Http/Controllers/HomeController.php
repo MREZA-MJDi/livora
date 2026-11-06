@@ -72,7 +72,12 @@ class HomeController extends Controller
                 }
 
                 $section->setRelation('products', $products);
-                $usedProductIds = array_merge($usedProductIds, $products->modelKeys());
+
+                // The hero borrows one product image as editorial artwork; it must
+                // remain eligible for the dedicated featured/new-arrivals sections.
+                if ($section->type === 'products') {
+                    $usedProductIds = array_merge($usedProductIds, $products->modelKeys());
+                }
             }
 
             if ($section->type === 'categories') {
