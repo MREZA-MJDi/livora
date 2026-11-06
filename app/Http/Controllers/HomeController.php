@@ -32,10 +32,12 @@ class HomeController extends Controller
                     ->whereNotIn('products.id', $usedProductIds);
 
                 $source = $payload['product_source'] ?? 'latest';
-                if ($source === 'selected' && ! empty($payload['product_ids'])) {
-                    $ids = array_values(array_unique(array_map('intval', $payload['product_ids'])));
-                    $products = $query->whereIn('products.id', $ids)->limit($limit)->get()
-                        ->sortBy(fn (Product $product) => array_search($product->id, $ids, true))->values();
+                if ($source === 'selected') {
+                    $ids = array_values(array_unique(array_map('intval', $payload['product_ids'] ?? [])));
+                    $products = $ids === []
+                        ? collect()
+                        : $query->whereIn('products.id', $ids)->limit($limit)->get()
+                            ->sortBy(fn (Product $product) => array_search($product->id, $ids, true))->values();
                 } else {
                     if ($source === 'new') {
                         $query->new()->latest();
