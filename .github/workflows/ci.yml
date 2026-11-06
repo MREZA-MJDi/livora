@@ -20,7 +20,7 @@ jobs:
   quality:
     name: Laravel tests and storefront smoke checks
     permissions:
-      contents: read
+      contents: write
     runs-on: ubuntu-24.04
     timeout-minutes: 20
 
@@ -28,8 +28,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'main' || github.sha }}
-          persist-credentials: false
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: true
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -56,6 +56,19 @@ jobs:
 
       - name: Refresh patched Symfony dependencies
         run: composer update 'symfony/*' --with-all-dependencies --no-interaction --prefer-dist
+
+      - name: Commit patched dependency lockfile to the PR branch
+        if: github.event_name == 'pull_request'
+        env:
+          BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add composer.lock
+          if ! git diff --cached --quiet; then
+            git commit -m "Fix Symfony security advisories"
+            git push origin "HEAD:${BRANCH_NAME}"
+          fi
 
       - name: Upload refreshed Composer lockfile
         uses: actions/upload-artifact@v4
