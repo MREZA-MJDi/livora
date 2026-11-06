@@ -19,7 +19,7 @@ class ContactMessageController extends Controller
             'status' => ['nullable', 'in:unread,read,replied,closed'],
         ]);
 
-        $query = ContactMessage::query()->latest();
+        $query = ContactMessage::query()->with('user')->latest();
 
         if (filled($filters['search'] ?? null)) {
             $term = trim($filters['search']);
