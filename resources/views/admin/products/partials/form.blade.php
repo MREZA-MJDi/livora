@@ -121,7 +121,7 @@
             >
 
             @if($editing && $productImageUrl)
-                <label class="mt-3 flex items-center gap-2 text-sm text-rose-700"><input type="checkbox" name="remove_primary_image" value="1" class="admin-checkbox" @change="if ($event.target.checked) { selectedMedia = null; const fileInput = $root.closest('form')?.querySelector('input[type=file][name=image]'); if (fileInput) fileInput.value = ''; }"> حذف تصویر اصلی از این محصول</label>
+                <label class="mt-3 flex items-center gap-2 text-sm text-rose-700"><input type="checkbox" name="remove_primary_image" value="1" class="admin-checkbox" @change="if ($event.target.checked) { selectedMedia = null; const fileInput = $root.closest('form')?.querySelector('input[type=file][name=image]'); if (fileInput) fileInput.value = ''; const originalInput = $root.closest('form')?.querySelector('input[type=file][name=original_image]'); if (originalInput) originalInput.value = ''; }"> حذف تصویر اصلی از این محصول</label>
             @endif
 
             <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">
