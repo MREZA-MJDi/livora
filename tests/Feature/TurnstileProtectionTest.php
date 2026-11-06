@@ -9,6 +9,8 @@ use Tests\TestCase;
 
 class TurnstileProtectionTest extends TestCase
 {
+    use RefreshDatabase;
+
     private const VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 
     protected function setUp(): void
@@ -82,6 +84,10 @@ class TurnstileProtectionTest extends TestCase
 
     public function test_registration_accepts_a_valid_signup_token(): void
     {
+        config([
+            'services.turnstile.hostnames' => [parse_url(route('register'), PHP_URL_HOST)],
+        ]);
+
         Http::fake([
             self::VERIFY_URL => Http::response([
                 'success' => true,

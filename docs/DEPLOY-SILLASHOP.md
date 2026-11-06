@@ -1,240 +1,199 @@
-# SillaGallery / Livora production deployment — sillashop.com
+# SillaGallery / Livora — single-root VPS deployment
+
+Production domain: `sillashop.com` (canonical HTTPS host).
+
+This deployment keeps the complete Laravel application in one predictable directory:
+
+```text
+/var/www/livora/
+├── app/
+├── bootstrap/
+├── config/
+├── database/
+├── public/          # Nginx document root
+├── resources/
+├── routes/
+├── storage/         # persistent uploads, logs, sessions and cache
+├── vendor/
+├── .env             # server-only; never commit
+├── artisan
+├── composer.json
+└── package.json
+```
+
+There are no `releases/`, `shared/`, or `current` directories. The public web root remains Laravel's `public/` directory; never point Nginx at the project root.
+
+## 1. Existing VPS safety check
+
+Before moving or replacing anything, inspect the actual server and take a database + uploaded-files backup. Do not delete the old `storage`, `share`, `release`, or `current` directories until their contents have been compared and the live site has passed smoke tests.
 
-This deployment is intentionally isolated from farzindev and farajihome.com.
-It uses its own release tree, environment file, database, writable storage, PHP-FPM pool/socket (where provisioned), and Nginx server block. The only shared resources are the VPS operating system and Nginx service.
+```bash
+sudo nginx -T | grep -nE 'server_name|root |fastcgi_pass'
+ls -la /var/www
+find /var/www -maxdepth 3 -type d -print | sort
+php -v
+composer --version
+node -v
+npm -v
+ls -l /run/php/*fpm.sock
+```
+
+Use the current Livora database and preserve its credentials. Never run `migrate:fresh`, destructive seeders, or regenerate `APP_KEY` on the existing production site.
+
+## 2. Target directory and permissions
+
+The target project path is `/var/www/livora`. If it already contains the current production application, update it in place after backing up. If the project is currently under `current` or another release directory, first copy/merge the application code into `/var/www/livora` while explicitly preserving the real production `.env` and `storage/` contents.
+
+Use a dedicated account if one already exists; do not recreate it blindly:
+
+```bash
+id livora || sudo adduser --system --group --home /var/www/livora --shell /usr/sbin/nologin livora
+sudo usermod -aG www-data livora
+sudo chown -R livora:www-data /var/www/livora
+sudo find /var/www/livora/storage -type d -exec chmod 2775 {} \;
+sudo find /var/www/livora/storage -type f -exec chmod 0664 {} \;
+sudo chown -R livora:www-data /var/www/livora/bootstrap/cache
+sudo find /var/www/livora/bootstrap/cache -type d -exec chmod 2775 {} \;
+sudo find /var/www/livora/bootstrap/cache -type f -exec chmod 0664 {} \;
+```
+
+The `.env` file should be owned by `livora:www-data` and mode `640`. Keep it in the project root:
 
-## 1. DNS at Parspack
+```bash
+sudo chown livora:www-data /var/www/livora/.env
+sudo chmod 640 /var/www/livora/.env
+```
 
-The domain is delegated to the Parspack nameservers supplied in the CDN panel. In the DNS/CDN zone for sillashop.com, set the origin:
+## 3. Production environment
 
-- Apex @: A → 45.149.79.155
-- www: CNAME → sillashop.com (or A → 45.149.79.155 if the panel does not support an apex CNAME/alias)
-- Do not add an AAAA record unless IPv6 is actually configured on this VPS.
-- If the CDN panel has a separate Origin field, set it to 45.149.79.155 and make sure the origin host header is sillashop.com.
+Create or update `/var/www/livora/.env` using the current production values. Do not replace the existing `APP_KEY`, database name, database password, mail credentials, payment settings, or other secrets with placeholders.
 
-Check that DNS has propagated before requesting the origin certificate. Do not alter the existing Farzin DNS zone or its Nginx block.
+Required baseline:
 
-## 2. Verify the existing VPS before making changes
+```dotenv
+APP_NAME="SillaGallery"
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://sillashop.com
+APP_TIMEZONE=Asia/Tehran
+APP_LOCALE=fa
+APP_FALLBACK_LOCALE=fa
 
-    php -v
-    php-fpm8.5 -v 2>/dev/null || true
-    ls -l /run/php/*fpm.sock
-    nginx -v
-    node -v
-    npm -v
-    composer --version
-    sudo nginx -T | grep -nE 'server_name|listen 443|root '
+SESSION_DRIVER=database
+SESSION_SECURE_COOKIE=true
+SESSION_SAME_SITE=lax
+CACHE_STORE=database
+QUEUE_CONNECTION=database
+DB_QUEUE_RETRY_AFTER=120
+FILESYSTEM_DISK=public
 
-Use the matching PHP-FPM version and give Livora its own pool/socket. The included pool config caps the Livora pool at four on-demand workers so it cannot consume unlimited PHP workers on a VPS shared with Farzin.
+TURNSTILE_SITE_KEY=YOUR_CLOUDFLARE_PUBLIC_SITE_KEY
+TURNSTILE_SECRET=YOUR_CLOUDFLARE_SECRET_KEY
+TURNSTILE_HOSTNAMES=sillashop.com,www.sillashop.com
 
-For PHP 8.5, install and validate the pool after cloning the repository:
+PAYMENT_GATEWAYS_PRODUCTION_READY=false
+DIGIPAY_ENABLED=false
+SNAPPAY_ENABLED=false
+TOROBPAY_ENABLED=false
+```
 
-    sudo install -m 644 deploy/php-fpm/livora.conf /etc/php/8.5/fpm/pool.d/livora.conf
-    sudo php-fpm8.5 -t
-    sudo systemctl reload php8.5-fpm
-    sudo test -S /run/php/php8.5-fpm-livora.sock
+Keep the Turnstile secret only in this server-side `.env`. The configured Cloudflare widget must allow both production hostnames actually served by the site. The app validates the token with Cloudflare Siteverify and checks the returned hostname and action; do not remove the server-side middleware. If the secret is absent in production, protected form submissions intentionally fail closed.
 
-If the installed FPM version is different, copy the pool file into that version's /etc/php/VERSION/fpm/pool.d/ directory and change its listen path and the Nginx fastcgi_pass socket to match. Do not alter the existing Farzin pool.
+Set the existing MySQL/MariaDB credentials and real SMTP/contact values in the same file. Keep `APP_DEBUG=false`. Never commit `.env` or paste secret values into chat or deployment logs.
 
-## 3. Create Livora's separate directory and database
+## 4. Nginx and PHP-FPM
 
-Create a dedicated unprivileged deployment account. Do not clone Livora into /var/www/farzindev or reuse Farzin's .env, database, storage, or public directory.
+Install `deploy/nginx/sillashop.com.conf` as the site's Nginx server block. It uses:
 
-    sudo adduser --system --group --home /var/www/livora --shell /usr/sbin/nologin livora
-    sudo usermod -aG www-data livora
+- Document root: `/var/www/livora/public`
+- PHP front controller: `/var/www/livora/public/index.php`
+- Dedicated PHP-FPM socket: `/run/php/php8.5-fpm-livora.sock`
 
-    sudo install -d -o livora -g www-data -m 2775 /var/www/livora/releases
-    sudo install -d -o livora -g www-data -m 2775 /var/www/livora/shared
-    sudo install -d -o livora -g www-data -m 2775 /var/www/livora/shared/storage/app/public
-    sudo install -d -o livora -g www-data -m 2775 /var/www/livora/shared/storage/app/private
-    sudo install -d -o livora -g www-data -m 2775 /var/www/livora/shared/storage/framework/cache/data
-    sudo install -d -o livora -g www-data -m 2775 /var/www/livora/shared/storage/framework/sessions
-    sudo install -d -o livora -g www-data -m 2775 /var/www/livora/shared/storage/framework/views
-    sudo install -d -o livora -g www-data -m 2775 /var/www/livora/shared/storage/logs
+Confirm the installed PHP-FPM version and socket before enabling the block. If the VPS uses another version, update the socket in both the Nginx block and `deploy/php-fpm/livora.conf` to match. Do not alter the Farzin virtual host or pool. Install the dedicated Livora pool only after confirming the matching PHP-FPM version:
 
-Create a new MySQL/MariaDB database and least-privilege user for Livora only. Use a unique strong password and do not reuse Farzin's credentials:
+```bash
+sudo install -m 644 deploy/php-fpm/livora.conf /etc/php/8.5/fpm/pool.d/livora.conf
+sudo php-fpm8.5 -t
+sudo systemctl reload php8.5-fpm
+sudo nginx -t
+sudo systemctl reload nginx
+```
 
-    CREATE DATABASE livora_production CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-    CREATE USER 'livora_app'@'127.0.0.1' IDENTIFIED BY 'REPLACE_WITH_APP_PASSWORD';
-    GRANT SELECT, INSERT, UPDATE, DELETE
-    ON livora_production.* TO 'livora_app'@'127.0.0.1';
+Keep the domain's valid origin certificate and CDN configuration. Use HTTPS Full (strict) at the CDN when the origin certificate is valid.
 
-    CREATE USER 'livora_migrator'@'127.0.0.1' IDENTIFIED BY 'REPLACE_WITH_MIGRATOR_PASSWORD';
-    GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, INDEX, DROP, REFERENCES
-    ON livora_production.* TO 'livora_migrator'@'127.0.0.1';
-    FLUSH PRIVILEGES;
+## 5. First deployment / updating the existing checkout
 
-The normal APP .env uses livora_app (data access only). Use livora_migrator only for the deployment-time migration command below; never store its password in the shared .env. If PHP connects through a Unix socket, create both users for the matching host and set DB_HOST to match the actual PDO connection mode. Do not grant global privileges.
+Run commands from the single project root. For an existing checkout, do not clone a second nested copy:
 
-## 4. Clone the production branch into a release
+```bash
+cd /var/www/livora
+git status --short
+git fetch origin
+git pull --ff-only origin main
+composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+npm ci
+npm run build
+php artisan storage:link
+php artisan migrate --force
+php artisan optimize
+```
 
-The current production baseline is main. Merge the reviewed production-readiness PR before this step; do not deploy the audit branch directly.
+Run `php artisan key:generate` only once when creating a genuinely new installation with no existing encrypted data. Never run it during an update. Back up the database before migrations. Do not run demo seeders against production.
 
-    BUILD_ID=$(date -u +%Y%m%dT%H%M%SZ)
-    CHECKOUT=/var/www/livora/releases/.build-$BUILD_ID
+If the database requires a separate migrator account, supply its credentials only to the migration command through a temporary shell environment; do not save the migrator password in `.env` or Git.
 
-    sudo -u livora git clone --depth 1 --single-branch --branch main \
-      https://github.com/MREZA-MJDi/livora.git "$CHECKOUT"
+## 6. Persistent storage and uploads
 
-    COMMIT_SHA=$(sudo -u livora git -C "$CHECKOUT" rev-parse --short=12 HEAD)
-    RELEASE_ID="$BUILD_ID-$COMMIT_SHA"
-    RELEASE=/var/www/livora/releases/$RELEASE_ID
-    sudo -u livora mv "$CHECKOUT" "$RELEASE"
-    sudo -u livora bash -lc "printf '%s\\n' '$COMMIT_SHA' > '$RELEASE/REVISION'"
+All Laravel writable data stays under `/var/www/livora/storage`. The normal Laravel public-storage link is:
 
-    sudo -u livora ln -s /var/www/livora/shared/.env "$RELEASE/.env"
-    sudo -u livora ln -s /var/www/livora/shared/storage "$RELEASE/storage"
-    sudo -u livora ln -s /var/www/livora/shared/storage/app/public "$RELEASE/public/storage"
+```text
+/var/www/livora/public/storage -> /var/www/livora/storage/app/public
+```
 
-Create the shared environment file once:
+Check it with:
 
-    sudo -u livora cp "$RELEASE/.env.example" /var/www/livora/shared/.env
-    sudo chown livora:www-data /var/www/livora/shared/.env
-    sudo chmod 640 /var/www/livora/shared/.env
+```bash
+readlink -f public/storage
+ls -lah storage/app/public
+```
 
-Set these values in /var/www/livora/shared/.env before generating the application key or running migrations:
+Do not create another storage directory outside the project. Do not replace an existing storage link until its target and uploaded files have been verified. Public uploads must remain in `storage/app/public`; private files must remain in `storage/app/private`.
 
-    APP_NAME="SillaGallery"
-    APP_ENV=production
-    APP_DEBUG=false
-    APP_URL=https://sillashop.com
-    APP_TIMEZONE=Asia/Tehran
-    APP_LOCALE=fa
-    APP_FALLBACK_LOCALE=fa
+## 7. Queue worker and scheduler
 
-    DB_CONNECTION=mysql
-    DB_HOST=127.0.0.1
-    DB_PORT=3306
-    DB_DATABASE=livora_production
-    DB_USERNAME=livora_app
-    DB_PASSWORD=REPLACE_WITH_THE_DATABASE_PASSWORD
+Install `deploy/supervisor/livora-worker.conf` into Supervisor. It now runs Artisan and writes logs inside `/var/www/livora`.
 
-    SESSION_DRIVER=database
-    SESSION_SECURE_COOKIE=true
-    SESSION_SAME_SITE=lax
-    CACHE_STORE=database
-    QUEUE_CONNECTION=database
-    # Must exceed the Supervisor worker --timeout (90 seconds).
-    DB_QUEUE_RETRY_AFTER=120
-    FILESYSTEM_DISK=public
+```bash
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl status livora-worker:*
+```
 
-    # Keep empty while CDN serves the same sillashop.com host transparently.
-    ASSET_URL=
-    PUBLIC_STORAGE_URL=
+Install the scheduler once (skip if an equivalent Livora cron entry already exists):
 
-    LOG_CHANNEL=stack
-    LOG_LEVEL=warning
+```cron
+* * * * * livora cd /var/www/livora && /usr/bin/php artisan schedule:run >> /dev/null 2>&1
+```
 
-    # Cloudflare Turnstile — keep the secret only in this shared server-side .env.
-    TURNSTILE_SITE_KEY=0x4AAAAAAF0qjF7cUoy072cx
-    TURNSTILE_SECRET=SET_THE_ROTATED_CLOUDFLARE_SECRET_HERE
-    TURNSTILE_HOSTNAMES=sillashop.com,www.sillashop.com
+After code updates:
 
-    PAYMENT_GATEWAYS_PRODUCTION_READY=false
-    DIGIPAY_ENABLED=false
-    SNAPPAY_ENABLED=false
-    TOROBPAY_ENABLED=false
+```bash
+sudo -u livora php /var/www/livora/artisan queue:restart
+sudo systemctl reload php8.5-fpm
+```
 
-Also configure real SMTP settings, sender identity, and the public business contact values. Never put the Turnstile secret in Git, deployment logs, or frontend variables. Use a rotated secret in this server-side file, and list every exact production hostname in the Cloudflare widget allowlist. Keep all payment gateways disabled until each merchant account has passed its own current sandbox contract and callback/signature tests. Do not put secrets in GitHub.
+## 8. Post-deploy verification
 
-## 5. Install dependencies, build, migrate and cache
+Verify all of the following before removing any old deployment folders:
 
-    sudo -u livora bash -lc "cd '$RELEASE' && composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader"
-    sudo -u livora bash -lc "cd '$RELEASE' && npm ci && npm run build"
-    sudo -u livora bash -lc "cd '$RELEASE' && php artisan key:generate"
+1. `curl -I https://sillashop.com` and `curl -I https://www.sillashop.com`.
+2. `https://sillashop.com/up` returns HTTP 200.
+3. Login, registration, contact form and checkout show the Turnstile widget and reject invalid/missing tokens.
+4. A real successful Turnstile verification works on the exact production hostnames.
+5. Home, shop, categories, product details, search, filters and pagination load without console errors.
+6. Admin login, product/category CRUD, image uploads and media library work.
+7. Guest/customer cart and checkout flows work; payment gateways remain disabled until separately approved.
+8. Uploaded product images remain available after a normal `git pull` and asset build.
+9. Review Laravel, Nginx, PHP-FPM and queue logs.
 
-    read -rsp "Livora migration DB password: " LIVORA_MIGRATOR_PASSWORD; echo
-    sudo -u livora env DB_USERNAME=livora_migrator DB_PASSWORD="$LIVORA_MIGRATOR_PASSWORD" \
-      bash -lc "cd '$RELEASE' && php artisan config:clear && php artisan migrate --force"
-    unset LIVORA_MIGRATOR_PASSWORD
-
-    sudo -u livora bash -lc "cd '$RELEASE' && php artisan optimize"
-
-Run php artisan key:generate only when creating the first shared .env. Never regenerate APP_KEY during a routine release because that invalidates encrypted sessions and data. Do not run migrate:fresh, demo seeders, or destructive seed commands against production.
-
-If this is a brand-new database, create the initial administrator with the documented ADMIN_NAME, ADMIN_EMAIL, and a one-time strong ADMIN_PASSWORD in the environment, then run only the guarded first-admin seeder documented by the repository. Remove the one-time password from the environment after provisioning.
-
-Make sure Laravel's writable storage directories remain group-writable by www-data:
-
-    sudo chown -R livora:www-data /var/www/livora/shared/storage
-    sudo find /var/www/livora/shared/storage -type d -exec chmod 2775 {} \;
-    sudo find /var/www/livora/shared/storage -type f -exec chmod 0664 {} \;
-    sudo chown -R livora:www-data "$RELEASE/bootstrap/cache"
-    sudo find "$RELEASE/bootstrap/cache" -type d -exec chmod 2775 {} +
-    sudo find "$RELEASE/bootstrap/cache" -type f -exec chmod 0664 {} +
-
-## 6. Atomically activate the release
-
-    sudo ln -sfn "$RELEASE" /var/www/livora/current.new
-    sudo mv -Tf /var/www/livora/current.new /var/www/livora/current
-
-The Nginx root must be /var/www/livora/current/public. Keep at least the previous release for rollback.
-
-Install and start the dedicated database queue worker after the current symlink is active:
-
-    sudo apt-get install -y supervisor
-    sudo cp deploy/supervisor/livora-worker.conf /etc/supervisor/conf.d/livora-worker.conf
-    sudo supervisorctl reread
-    sudo supervisorctl update
-    sudo supervisorctl status livora-worker:*
-
-Enable Laravel's scheduler (safe even when no scheduled task is registered yet):
-
-    echo '* * * * * livora cd /var/www/livora/current && /usr/bin/php artisan schedule:run >> /dev/null 2>&1' | sudo tee /etc/cron.d/livora-scheduler
-    sudo chmod 644 /etc/cron.d/livora-scheduler
-
-## 7. Nginx and origin SSL
-
-Copy deploy/nginx/sillashop.com.conf to /etc/nginx/sites-available/sillashop.com. It points to the dedicated /run/php/php8.5-fpm-livora.sock pool, not the shared default PHP-FPM pool. Verify that socket exists, then enable only this new server block:
-
-    sudo ln -s /etc/nginx/sites-available/sillashop.com /etc/nginx/sites-enabled/sillashop.com
-    sudo nginx -t
-    sudo systemctl reload nginx
-
-Check that the existing farajihome.com server block remains enabled and unchanged. Ensure the VPS firewall/provider firewall allows inbound TCP 80 and 443.
-
-After the A records resolve to 45.149.79.155, issue the origin certificate:
-
-    sudo certbot --nginx -d sillashop.com -d www.sillashop.com
-    sudo certbot renew --dry-run
-
-Certbot will add the HTTPS server block and HTTP-to-HTTPS redirect. Test both hostnames. Use the CDN's HTTPS mode Full/Strict (never Flexible) once the origin certificate is valid. Enable the CDN's edge certificate for both sillashop.com and www.sillashop.com.
-
-## 8. CDN cache policy
-
-The domain uses the Parspack CDN nameservers. Start with conservative rules:
-
-- Cache /build/* for one year; filenames are content-hashed by Vite.
-- Cache /storage/* for seven days; uploads are stored under generated paths.
-- Do not cache HTML, admin, account, cart, checkout, login, registration, logout, or payment callback responses.
-- Bypass cache when Laravel session/XSRF cookies or authorization headers are present.
-- Keep font CORS enabled for public fonts.
-- Do not enable a second CSS/JS minifier: Vite already builds/minifies production assets.
-- Enable image format conversion only after confirming WebP/AVIF variants, correct content-type, cache variation by Accept header, and fallbacks in a real browser. Dynamic resizing is not useful until image URLs are wired to the CDN's resize endpoint.
-
-Because the CDN is attached to the same domain via nameservers, leave ASSET_URL and PUBLIC_STORAGE_URL empty unless Parspack supplies a distinct CDN hostname. In that case set ASSET_URL=https://THE_CDN_HOST for Vite/static assets and PUBLIC_STORAGE_URL=https://THE_CDN_HOST/storage for public uploads, then run php artisan config:cache again.
-
-## 9. First-release verification
-
-Check in this order:
-
-1. curl -I http://sillashop.com then curl -I https://sillashop.com and the www hostname.
-2. https://sillashop.com/up returns HTTP 200.
-3. Home, shop, categories, product details, search, all shop filters, sorting, and pagination.
-4. Admin login, product/category create-edit, image upload, media library, customer/order lists.
-5. Cart as guest and customer, checkout validation, stock/variant checks, order ownership and payment callback route.
-6. Browser mobile/desktop, console, failed assets, font CORS, image dimensions, cache headers, TTFB and PHP/database logs.
-7. Upload a test image; confirm its public URL works through the CDN and the file remains present after a release switch.
-
-Do not enable online payment gateways until the actual provider sandbox flow is tested and signed off. The default project configuration intentionally keeps them disabled.
-
-## 10. Routine release / rollback
-
-For each release, clone the approved main commit into a new releases/<UTC timestamp>-<12-character commit SHA> directory. The release includes a REVISION file containing the short Git SHA. Link the same shared .env and storage, install/build, run additive migrations, cache, and atomically switch current. Never overwrite the active release in place; keep the previous known-good release for immediate code rollback.
-
-After each release, gracefully signal the worker to finish its current job and restart on the new code, then reload the dedicated PHP-FPM pool (not restart the shared Nginx/PHP services):
-
-    sudo -u livora php /var/www/livora/current/artisan queue:restart
-    sudo systemctl reload php8.5-fpm
-
-Rollback the code by switching current to the previous release and reloading only the Livora PHP-FPM service where possible. Do not automatically roll back database migrations; use a tested forward fix when a schema migration has already been applied.
+Only after the site passes these checks and a backup is confirmed should obsolete `releases/`, `shared/`, `current`, or duplicate storage directories be archived and later removed. This is a one-root deployment, not an instruction to delete old folders before migration is verified.
