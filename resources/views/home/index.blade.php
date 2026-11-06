@@ -45,7 +45,7 @@
                                                     <figcaption class="sila-hero-slide__caption">
                                                         <span>{{ $slideProduct->category?->name ?: 'منتخب سیلا' }}</span>
                                                         <strong>{{ $slideProduct->name }}</strong>
-                                                        <a href="{{ route('products.show', $slideProduct->slug) }}" aria-label="مشاهده {{ $slideProduct->name }}">مشاهده محصول <span aria-hidden="true">←</span></a>
+                                                        <a href="{{ route('product.show', $slideProduct->slug) }}" aria-label="مشاهده {{ $slideProduct->name }}">مشاهده محصول <span aria-hidden="true">←</span></a>
                                                     </figcaption>
                                                 </figure>
                                             @endif
