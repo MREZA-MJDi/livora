@@ -899,6 +899,12 @@
         </div>
 
 
+        <details class="xl:col-span-2 overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-white)]">
+            <summary class="cursor-pointer list-none px-5 py-4 text-sm font-semibold text-[var(--admin-text)]">
+                تنظیمات پیشرفته (اختیاری) — عنوان گوگل و توضیحات جستجو
+                <span class="mt-1 block text-xs font-normal text-[var(--admin-muted)]">اگر با این موارد آشنا نیستید، لازم نیست چیزی تغییر دهید.</span>
+            </summary>
+            <div class="border-t border-[var(--admin-border)] p-4 sm:p-6">
         {{-- ========================================================
              SEO
         ========================================================= --}}
@@ -1069,6 +1075,10 @@
 
     </div>
 
+
+
+            </div>
+        </details>
 
     {{-- ============================================================
          Sidebar
