@@ -20,7 +20,10 @@ class SeoController extends Controller
 {
     public function edit(): View
     {
-        return view('admin.seo.edit', [\n            'settings' => SeoSetting::current()->load('defaultOgMedia'),\n            'brandSettings' => ContactSetting::query()->first(),\n        ]);
+        return view('admin.seo.edit', [
+            'settings' => SeoSetting::current()->load('defaultOgMedia'),
+            'brandSettings' => ContactSetting::query()->first(),
+        ]);
     }
 
 
