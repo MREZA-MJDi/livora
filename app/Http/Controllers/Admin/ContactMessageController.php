@@ -12,14 +12,34 @@ use Throwable;
 
 class ContactMessageController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $messages = ContactMessage::query()
-            ->latest()
-            ->paginate(15);
+        $filters = $request->validate([
+            'search' => ['nullable', 'string', 'max:120'],
+            'status' => ['nullable', 'in:unread,read,replied,closed'],
+        ]);
+
+        $query = ContactMessage::query()->latest();
+
+        if (filled($filters['search'] ?? null)) {
+            $term = trim($filters['search']);
+            $query->where(function ($builder) use ($term): void {
+                $builder->where('name', 'like', "%{$term}%")
+                    ->orWhere('phone', 'like', "%{$term}%")
+                    ->orWhere('email', 'like', "%{$term}%")
+                    ->orWhere('message', 'like', "%{$term}%");
+            });
+        }
+
+        if (filled($filters['status'] ?? null)) {
+            $query->where('status', $filters['status']);
+        }
+
+        $messages = $query->paginate(15)->withQueryString();
 
         return view('admin.contact-messages.index', [
             'messages' => $messages,
+            'filters' => $filters,
         ]);
     }
 
