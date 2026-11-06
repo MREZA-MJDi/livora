@@ -263,7 +263,7 @@ p {
 .admin-subtitle {
     color: var(--admin-muted);
 
-    font-size: 0.78rem;
+    font-size: 0.9rem;
     line-height: 1.9;
 }
 
@@ -377,8 +377,8 @@ p {
     border: 1px solid transparent;
     border-radius: 0.9rem;
 
-    font-size: 0.75rem;
-    font-weight: 600;
+    font-size: 0.875rem;
+    font-weight: 650;
 
     transition:
         transform var(--admin-duration-fast),
@@ -462,8 +462,8 @@ p {
 
     color: var(--admin-text);
 
-    font-size: 0.72rem;
-    font-weight: 600;
+    font-size: 0.875rem;
+    font-weight: 650;
 }
 
 .admin-input,
@@ -557,7 +557,7 @@ p {
 
     color: var(--admin-muted);
 
-    font-size: 0.65rem;
+    font-size: 0.78rem;
     line-height: 1.7;
 }
 
