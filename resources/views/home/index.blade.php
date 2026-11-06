@@ -70,8 +70,16 @@
                         </div>
                         @if($section->cta_label)<a href="{{ $ctaUrl }}" class="text-sm font-semibold text-[var(--sg-ink)] transition hover:text-[var(--sg-accent)]">{{ $section->cta_label }} ←</a>@endif
                     </div>
-                    <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4">
-                        @foreach($section->products as $product)<x-product.card :product="$product" />@endforeach
+                    <div data-sg-carousel class="relative">
+                        <div class="mb-3 hidden items-center justify-end gap-2 sm:flex">
+                            <button type="button" data-carousel-prev aria-label="محصول قبلی" class="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)] text-[var(--sg-ink)] transition hover:border-[var(--sg-ink)]">←</button>
+                            <button type="button" data-carousel-next aria-label="محصول بعدی" class="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)] text-[var(--sg-ink)] transition hover:border-[var(--sg-ink)]">→</button>
+                        </div>
+                        <div class="sg-product-carousel" data-carousel-track>
+                            @foreach($section->products as $product)
+                                <div class="sg-product-carousel-item"><x-product.card :product="$product" /></div>
+                            @endforeach
+                        </div>
                     </div>
                 </x-layout.container>
             </section>
