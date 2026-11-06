@@ -12,6 +12,7 @@ class InitialDataSeeder extends Seeder
             InitialCategorySeeder::class,
             InitialProductSeeder::class,
             InitialStoreContentSeeder::class,
+            HomepageContentSeeder::class,
             InitialBlogSeeder::class,
         ]);
     }

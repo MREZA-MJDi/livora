@@ -109,5 +109,61 @@
             @endif
         @endif
     @endforeach
+
+            <section class="border-b border-[var(--sg-border)] bg-[var(--sg-white)] py-14 sm:py-20">
+            <x-layout.container>
+                <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+                    <div>
+                        <p class="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--sg-accent)]">مجله سیلا</p>
+                        <h2 class="mt-3 text-3xl font-semibold tracking-tight text-[var(--sg-ink)] sm:text-4xl">ایده‌هایی برای خانه‌ای دلنشین‌تر</h2>
+                        <p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">راهنماها و نوشته‌های تازه برای انتخاب آگاهانه‌تر.</p>
+                    </div>
+                    <a href="{{ route('blog.index') }}" class="text-sm font-semibold text-[var(--sg-ink)] transition hover:text-[var(--sg-accent)]">همه نوشته‌ها ←</a>
+                </div>
+                <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                    @if($blogPosts->isNotEmpty())
+                    @foreach($blogPosts as $post)
+                        <article class="group overflow-hidden rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-cream)]">
+                            <a href="{{ route('blog.show', $post->slug) }}" class="block overflow-hidden bg-[var(--sg-surface)]">
+                                @if($post->featured_image_url)
+                                    <img src="{{ $post->featured_image_url }}" alt="{{ $post->featured_image_alt ?: $post->title }}" class="aspect-[16/10] w-full object-cover transition duration-700 group-hover:scale-[1.035]" loading="lazy" decoding="async">
+                                @else
+                                    <div class="flex aspect-[16/10] items-center justify-center text-sm text-[var(--sg-stone)]">مجله سیلا</div>
+                                @endif
+                            </a>
+                            <div class="p-5">
+                                <p class="text-[10px] text-[var(--sg-stone)]">{{ $post->published_at?->format('Y/m/d') }}</p>
+                                <h3 class="mt-2 text-base font-semibold leading-7 text-[var(--sg-ink)]"><a href="{{ route('blog.show', $post->slug) }}">{{ $post->title }}</a></h3>
+                                @if(filled($post->excerpt))
+                                    <p class="mt-2 line-clamp-2 text-sm leading-7 text-[var(--sg-stone)]">{{ $post->excerpt }}</p>
+                                @endif
+                                <a href="{{ route('blog.show', $post->slug) }}" class="mt-4 inline-flex text-xs font-semibold text-[var(--sg-accent)]">ادامه مطلب ←</a>
+                            </div>
+                        </article>
+                    @endforeach
+                    @else
+                        <article class="rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-cream)] p-6 sm:col-span-2 lg:col-span-3">
+                            <p class="text-sm font-semibold text-[var(--sg-ink)]">راهنمای انتخاب مبلمان</p>
+                            <p class="mt-2 text-sm leading-7 text-[var(--sg-stone)]">پیش از انتخاب، ابعاد فضا، متریال و شرایط سفارش را بررسی کنید.</p>
+                            <a href="{{ url('/buying-guide') }}" class="mt-4 inline-flex text-xs font-semibold text-[var(--sg-accent)]">مطالعه راهنمای خرید ←</a>
+                        </article>
+                    @endif
+                </div>
+            </x-layout.container>
+        </section>
+    @if($finalCta)
+        <section class="border-b border-[var(--sg-border)] bg-[var(--sg-ink)] py-14 text-white sm:py-20">
+            <x-layout.container>
+                <div class="flex flex-col items-start justify-between gap-7 sm:flex-row sm:items-center">
+                    <div class="max-w-2xl">
+                        @if($finalCta->eyebrow)<p class="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/55">{{ $finalCta->eyebrow }}</p>@endif
+                        <h2 class="mt-3 text-3xl font-semibold leading-tight sm:text-4xl">{{ $finalCta->title }}</h2>
+                        @if($finalCta->subtitle)<p class="mt-4 text-sm leading-8 text-white/65">{{ $finalCta->subtitle }}</p>@endif
+                    </div>
+                    @if($finalCta->cta_label)<a href="{{ filled($finalCta->cta_url) ? url($finalCta->cta_url) : route('shop.index') }}" class="inline-flex shrink-0 items-center justify-center rounded-xl bg-white px-6 py-4 text-sm font-semibold text-[var(--sg-ink)]">{{ $finalCta->cta_label }} ←</a>@endif
+                </div>
+            </x-layout.container>
+        </section>
+    @endif
 </div>
 @endsection
