@@ -72,6 +72,11 @@
                                 @else
                                     <a class="sg-home-hero__cta" data-sg-hero-cta href="{{ route('shop.index') }}" hidden></a>
                                 @endif
+                                <div class="sg-home-hero__proof" aria-label="اطلاعات خرید">
+                                    <span>بررسی مشخصات پیش از خرید</span>
+                                    <span>قیمت و موجودی قابل مشاهده</span>
+                                    <span>امکان ارتباط برای پرسش درباره سفارش</span>
+                                </div>
                             </div>
                         </div>
                         <div class="sg-home-hero__media">

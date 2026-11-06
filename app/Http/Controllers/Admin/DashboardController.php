@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BlogPost;
 use App\Models\ContactMessage;
 use App\Models\ContentPage;
+use App\Models\HomeSection;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
@@ -157,6 +158,9 @@ class DashboardController extends Controller
         $contentDraftCount = ContentPage::query()->where('status', 'draft')->count();
         $unreadContactMessages = ContactMessage::query()->where('status', 'unread')->count();
 
+        $heroSection = HomeSection::query()->where('key', 'hero')->first();
+        $heroSlidesCount = count(data_get($heroSection?->payload, 'slides', []));
+
         $seoSettings = SeoSetting::current();
         $seoGlobalGateOpen = $seoSettings->indexing_enabled && $seoSettings->following_enabled;
 
@@ -201,6 +205,8 @@ class DashboardController extends Controller
             'contentDraftCount' => $contentDraftCount,
             'unreadContactMessages' => $unreadContactMessages,
             'seoGlobalGateOpen' => $seoGlobalGateOpen,
+            'heroSection' => $heroSection,
+            'heroSlidesCount' => $heroSlidesCount,
 
             'featuredProductsCount' => (int) ($productStats->featured_products ?? 0),
             'newProductsCount' => (int) ($productStats->new_products ?? 0),
