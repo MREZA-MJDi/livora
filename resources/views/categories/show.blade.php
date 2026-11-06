@@ -97,7 +97,7 @@
                             </p>
 
                             <div class="mt-8 flex flex-wrap items-center gap-3">
-                                <span class="inline-flex min-h-11 items-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-surface)] px-4 text-xs font-medium text-[var(--sg-ink)]">
+                                <span id="category-product-count" class="inline-flex min-h-11 items-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-surface)] px-4 text-xs font-medium text-[var(--sg-ink)]">
                                     {{ number_format($products->total()) }} محصول
                                 </span>
                                 <a
@@ -144,7 +144,7 @@
 
             <x-layout.container>
 
-                <form method="GET" action="{{ route('categories.show', $category->slug) }}" class="sg-category-filter mb-8">
+                <form method="GET" action="{{ route('categories.show', $category->slug) }}" class="sg-category-filter mb-8" data-live-catalog-filters data-results-selector="#category-live-results" data-aux-selectors="#category-product-count">
                     <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-[minmax(0,1.5fr)_minmax(10rem,1fr)_minmax(8rem,.8fr)_minmax(8rem,.8fr)_auto]">
                         <label class="min-w-0">
                             <span class="mb-2 block text-[11px] font-medium text-[var(--sg-stone)]">جستجو در این مجموعه</span>
@@ -169,9 +169,9 @@
                             <input type="number" name="max_price" min="0" step="1" value="{{ request('max_price') }}" placeholder="تا" class="sg-category-filter__input w-full" inputmode="numeric">
                         </label>
                         <div class="flex items-end">
-                            <button type="submit" class="sg-button sg-button-primary w-full sm:col-span-2 xl:col-span-1">
-                                اعمال فیلتر
-                            </button>
+                            <p class="w-full rounded-xl bg-[var(--sg-surface)] px-3 py-3 text-center text-[11px] leading-6 text-[var(--sg-stone)] sm:col-span-2 xl:col-span-1">
+                                نتایج با هر تغییر به‌صورت خودکار به‌روز می‌شوند.
+                            </p>
                         </div>
                     </div>
 
@@ -196,7 +196,8 @@
                     </div>
                 </form>
 
-                <div class="py-10 sm:py-14">
+                <div id="category-live-results" aria-live="polite" aria-busy="false">
+<div class="py-10 sm:py-14">
 
                     <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
 
@@ -268,6 +269,8 @@
                         </div>
 
                     @endif
+
+                </div>
 
                 </div>
 
