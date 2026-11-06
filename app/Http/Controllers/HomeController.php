@@ -59,7 +59,7 @@ class HomeController extends Controller
                 $categories = Category::query()
                     ->active()
                     ->withCount(['products' => fn ($productQuery) => $productQuery->active()])
-                    ->with(['media', 'latestActiveProduct.images' => fn ($imageQuery) => $imageQuery->limit(1)])
+                    ->with(['media', 'cardMedia', 'latestActiveProduct.images' => fn ($imageQuery) => $imageQuery->limit(1)])
                     ->limit($limit)
                     ->get();
                 $section->setRelation('categories', $categories);
