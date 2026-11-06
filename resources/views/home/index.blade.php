@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', \\App\\Models\\SeoPageSetting::forRoute('home')?->meta_title ?: (($storeSettings?->brand_name ?: config('app.name')).' | مبلمان و دکوراسیون'))
+@section('title', \App\Models\SeoPageSetting::forRoute('home')?->meta_title ?: (($storeSettings?->brand_name ?: config('app.name')).' | مبلمان و دکوراسیون'))
 @section('description', \App\Models\SeoPageSetting::forRoute('home')?->meta_description ?: ('مجموعه مبلمان و عناصر خانه در '.($storeSettings?->brand_name ?: config('app.name')).'.'))
 @section('canonical', \App\Models\SeoPageSetting::forRoute('home')?->canonical_url ?: url('/'))
 @section('robots', \App\Models\SeoPageSetting::forRoute('home')?->robots() ?? \App\Models\SeoSetting::current()->robots())
