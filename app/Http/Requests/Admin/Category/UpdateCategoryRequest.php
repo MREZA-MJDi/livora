@@ -19,8 +19,7 @@ class UpdateCategoryRequest extends FormRequest
             'seo_index' => $this->boolean('seo_index'),
             'seo_follow' => $this->boolean('seo_follow'),
             'slug' => $this->slug
-                ? Str::slug($this->slug)
-                : Str::slug($this->name),
+                ? $normalize,
             'is_active' => $this->boolean('is_active'),
             'sort_order' => $this->sort_order ?? 0,
         ]);
