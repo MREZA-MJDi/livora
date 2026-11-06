@@ -25,22 +25,25 @@
                             @if($section->subtitle)<p class="mt-5 max-w-xl text-sm leading-8 {{ $section->type === 'cta' ? 'text-white/65' : 'text-[var(--sg-stone)]' }}">{{ $section->subtitle }}</p>@endif
                             @if($section->cta_label)<a href="{{ $ctaUrl }}" class="mt-8 inline-flex items-center justify-center rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] px-6 py-4 text-sm font-semibold text-[var(--sg-ink)] transition hover:border-[var(--sg-accent)]">{{ $section->cta_label }} <span class="mr-3" aria-hidden="true">←</span></a>@endif
                         </div>
-                        <div class="min-w-0 {{ $section->type === 'cta' ? 'lg:order-1' : '' }}">
-                            @if($section->type === 'hero' && $section->products->isNotEmpty())
-                                <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3" aria-label="تازه‌ترین محصولات سیلا گالری">
-                                    @foreach($section->products as $heroProduct)
-                                        @php($heroProductImage = $heroProduct->images->first()?->detail_url)
-                                        @if($heroProductImage)
-                                            <a href="{{ route('product.show', $heroProduct->slug) }}" class="group relative block min-h-0 overflow-hidden rounded-2xl bg-[var(--sg-surface)] {{ $loop->first ? 'col-span-2 row-span-2 sm:col-span-1' : '' }}">
-                                                <img src="{{ $heroProductImage }}" alt="{{ $heroProduct->name }}" class="h-full min-h-40 w-full aspect-[4/5] object-cover transition duration-700 group-hover:scale-105 {{ $loop->first ? 'sm:aspect-[4/5]' : '' }}" @if($loop->first) fetchpriority="high" loading="eager" @else loading="lazy" @endif decoding="async">
-                                                <span class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent px-3 pb-3 pt-10 text-xs font-medium text-white sm:text-sm">{{ $heroProduct->name }}</span>
-                                            </a>
-                                        @endif
-                                    @endforeach
-                                </div>
-                            @elseif($section->image_url)
+                        @php($heroProduct = $section->type === 'hero' ? $section->products->first() : null)
+                        @php($heroImage = $section->image_url ?: $heroProduct?->images?->first()?->detail_url)
+                        <div class="min-w-0 space-y-4 {{ $section->type === 'cta' ? 'lg:order-1' : '' }}">
+                            @if($heroImage)
                                 <div class="overflow-hidden rounded-[2rem] bg-[var(--sg-surface)]">
-                                    <img src="{{ $section->image_url }}" alt="{{ $section->title ?: 'سیلا گالری' }}" class="aspect-[5/4] h-full w-full object-cover" loading="lazy" decoding="async">
+                                    <img src="{{ $heroImage }}" alt="{{ $section->title ?: 'SillaGallery' }}" class="aspect-[5/4] h-full w-full object-cover" fetchpriority="{{ $section->type === 'hero' ? 'high' : 'auto' }}">
+                                </div>
+                            @endif
+                            @if($section->type === 'hero' && $section->products->isNotEmpty())
+                                <div data-sg-carousel class="relative">
+                                    <div class="mb-2 hidden items-center justify-end gap-2 sm:flex">
+                                        <button type="button" data-carousel-prev aria-label="محصول قبلی" class="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)]">←</button>
+                                        <button type="button" data-carousel-next aria-label="محصول بعدی" class="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)]">→</button>
+                                    </div>
+                                    <div class="sg-product-carousel" data-carousel-track>
+                                        @foreach($section->products as $product)
+                                            <div class="sg-product-carousel-item"><x-product.card :product="$product" /></div>
+                                        @endforeach
+                                    </div>
                                 </div>
                             @endif
                         </div>
