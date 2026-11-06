@@ -197,7 +197,7 @@
                 </form>
 
                 <div id="category-live-results" aria-live="polite" aria-busy="false">
-<div class="py-10 sm:py-14">
+                    <div class="py-10 sm:py-14">
 
                     <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
 
