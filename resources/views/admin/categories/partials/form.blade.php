@@ -50,7 +50,7 @@
                 <div class="sm:col-span-2">
 
                     <label for="slug" class="admin-label">
-                        Slug
+                        آدرس اختصاصی دسته‌بندی (اختیاری)
                     </label>
 
                     <input
@@ -63,7 +63,7 @@
                     >
 
                     <p class="mt-2 text-xs text-[var(--admin-muted)]">
-                        برای URL دسته‌بندی استفاده می‌شود.
+                        اگر با این بخش آشنا نیستید، آن را خالی بگذارید تا آدرس به‌صورت خودکار ساخته شود.
                     </p>
 
                     @error('slug')
@@ -307,6 +307,12 @@
     </div>
 
 
+    <details class="overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-white)]">
+        <summary class="cursor-pointer list-none px-5 py-4 text-sm font-semibold text-[var(--admin-text)]">
+            تنظیمات پیشرفته (اختیاری) — سئو
+            <span class="mt-1 block text-xs font-normal text-[var(--admin-muted)]">برای ثبت یک دسته‌بندی معمولی نیازی به تغییر این بخش نیست.</span>
+        </summary>
+        <div class="space-y-4 border-t border-[var(--admin-border)] p-4 sm:p-6">
     <div class="admin-card space-y-4 p-6">
         <h3 class="text-base font-bold text-[var(--admin-text)]">تنظیمات SEO دسته‌بندی</h3>
         <div><label class="admin-label" for="focus_keyword">کلمه کلیدی کانونی</label><input id="focus_keyword" name="focus_keyword" maxlength="120" class="admin-input" value="{{ old('focus_keyword', $category->focus_keyword ?? '') }}" placeholder="مثلاً مبلمان مدرن"></div>
@@ -332,6 +338,13 @@
         </div>
     </div>
 
+
+        </div>
+    </details>
+
+    <details class="overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-white)]">
+        <summary class="cursor-pointer list-none px-5 py-4 text-sm font-semibold text-[var(--admin-text)]">تنظیمات تکمیلی دسته‌بندی (اختیاری)<span class="mt-1 block text-xs font-normal text-[var(--admin-muted)]">زیر‌دسته، بنر اختصاصی، متن‌های تکمیلی و محتوای ویژه صفحه.</span></summary>
+        <div class="space-y-5 border-t border-[var(--admin-border)] p-4 sm:p-6">
     <div class="admin-card space-y-5 p-6">
         <div><h3 class="text-base font-bold text-[var(--admin-text)]">ساختار دسته‌بندی و تصاویر صفحه</h3><p class="admin-help mt-1">تصویر کارت و بنر صفحه دسته‌بندی مستقل هستند. تصویر قدیمی فقط به‌عنوان fallback حفظ می‌شود.</p></div>
         <div>
@@ -347,16 +360,16 @@
         <div class="grid gap-5 lg:grid-cols-2">
             <div class="space-y-3">
                 <h4 class="text-sm font-semibold">تصویر کارت</h4>
-                @if($category->card_image_url)<img src="{{ $category->card_image_url }}" alt="" class="aspect-[4/3] w-full rounded-xl object-cover">@endif
-                <input id="card_image" type="file" name="card_image" accept="image/jpeg,image/png,image/webp" data-crop-ratio="1.333333" class="admin-input">
+                <div class="overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]"><img id="category-card-image-preview" src="{{ $category->card_image_url ?: '' }}" alt="پیش‌نمایش تصویر کارت دسته‌بندی" class="{{ $category->card_image_url ? '' : 'hidden' }} aspect-[4/3] w-full object-cover"><div id="category-card-image-placeholder" class="{{ $category->card_image_url ? 'hidden' : 'flex' }} aspect-[4/3] items-center justify-center text-xs text-[var(--admin-muted)]">پیش‌نمایش تصویر کارت</div></div>
+                <input id="card_image" type="file" name="card_image" accept="image/jpeg,image/png,image/webp" data-crop-ratio="1.333333" data-preview-target="category-card-image-preview" data-preview-placeholder="category-card-image-placeholder" class="admin-input">
                 <label class="flex items-center gap-2 text-xs"><input type="checkbox" name="remove_card_image" value="1"> حذف تصویر کارت اختصاصی</label>
                 @error('card_image')<p class="admin-error">{{ $message }}</p>@enderror
                 <p class="admin-help">نسبت پیشنهادی ۴:۳؛ در صورت خالی بودن، تصویر قدیمی دسته‌بندی استفاده می‌شود.</p>
             </div>
             <div class="space-y-3">
                 <h4 class="text-sm font-semibold">بنر صفحه دسته‌بندی</h4>
-                @if($category->banner_image_url)<img src="{{ $category->banner_image_url }}" alt="" class="aspect-[16/7] w-full rounded-xl object-cover">@endif
-                <input id="banner_image" type="file" name="banner_image" accept="image/jpeg,image/png,image/webp" data-crop-ratio="2.285714" class="admin-input">
+                <div class="overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]"><img id="category-banner-image-preview" src="{{ $category->banner_image_url ?: '' }}" alt="پیش‌نمایش بنر دسته‌بندی" class="{{ $category->banner_image_url ? '' : 'hidden' }} aspect-[16/7] w-full object-cover"><div id="category-banner-image-placeholder" class="{{ $category->banner_image_url ? 'hidden' : 'flex' }} aspect-[16/7] items-center justify-center text-xs text-[var(--admin-muted)]">پیش‌نمایش بنر دسته‌بندی</div></div>
+                <input id="banner_image" type="file" name="banner_image" accept="image/jpeg,image/png,image/webp" data-crop-ratio="2.285714" data-preview-target="category-banner-image-preview" data-preview-placeholder="category-banner-image-placeholder" class="admin-input">
                 <label class="flex items-center gap-2 text-xs"><input type="checkbox" name="remove_banner_image" value="1"> حذف بنر اختصاصی</label>
                 @error('banner_image')<p class="admin-error">{{ $message }}</p>@enderror
                 <p class="admin-help">نسبت پیشنهادی ۱۶:۷؛ اگر بنر اختصاصی ثبت نشود، تصویر کارت fallback می‌شود.</p>
@@ -381,6 +394,8 @@
         'includeRelatedProducts' => true,
     ])
 
+        </div>
+    </details>
 </div>
 
 

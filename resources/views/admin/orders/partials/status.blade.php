@@ -7,7 +7,7 @@
         </h3>
 
         <p class="mt-1 text-xs text-[var(--admin-muted)]">
-            وضعیت سفارش را از اینجا بروزرسانی کنید.
+            بعد از بررسی پرداخت و آماده‌سازی، مرحله درست را انتخاب کنید. سفارش پرداخت‌نشده را ارسال‌شده یا تحویل‌شده ثبت نکنید.
         </p>
 
     </div>
@@ -26,7 +26,7 @@
             for="status"
             class="admin-label"
         >
-            وضعیت جدید
+            سفارش اکنون در چه مرحله‌ای است؟
         </label>
 
 
@@ -73,6 +73,8 @@
         </select>
 
 
+        <p class="mt-3 text-xs leading-6 text-[var(--admin-muted)]">در انتظار: تازه ثبت شده · در حال پردازش: در حال آماده‌سازی · ارسال شده: تحویل پست یا پیک · تحویل شده: به مشتری رسیده است.</p>
+
         @error('status')
         <p class="mt-2 text-xs text-[var(--admin-danger)]">
             {{ $message }}
@@ -84,7 +86,7 @@
             type="submit"
             class="admin-btn admin-btn-primary mt-5 w-full"
         >
-            بروزرسانی وضعیت
+            ثبت وضعیت جدید
         </button>
 
     </form>

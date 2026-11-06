@@ -51,189 +51,6 @@
             $productImageUrl = $primaryImage?->url;
         @endphp
 
-        {{-- Product Image --}}
-        <div class="admin-card p-6" x-data="mediaPicker('{{ route('admin.media.picker') }}', @js($primaryImage?->media_id), @js($productImageUrl), @js($primaryImage?->media?->original_name ?? $primaryImage?->alt ?? ''), 'product-image-preview', 'image', 'remove_primary_image')">
-
-            <div class="mb-6">
-                <h3 class="text-base font-bold text-[var(--admin-text)]">
-                    تصویر اصلی محصول
-                </h3>
-
-                <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">
-                    {{ $editing
-                        ? 'قاب نهایی تصویر با کارت فروشگاه یکسان است (۴:۵)؛ تصویر کامل محصول بدون برش ناخواسته نمایش داده می‌شود.'
-                        : 'تصویر اصلی محصول را در قاب ۴:۵ انتخاب کنید. این نسبت در پیش‌نمایش پنل، کارت فروشگاه و تصویر محصول یکسان خواهد بود.' }}
-                </p>
-            </div>
-
-            <div class="admin-image-preview mb-5 aspect-[4/5] bg-[var(--admin-white)]">
-
-                <img
-                    id="product-image-preview"
-                    src="{{ $productImageUrl ?: '' }}"
-                    alt="{{ $primaryImage?->alt ?: ($product->name ?? 'تصویر محصول') }}"
-                    class="admin-image product-primary-preview {{ $productImageUrl ? '' : 'hidden' }}"
-                >
-
-                <div
-                    id="product-image-placeholder"
-                    class="{{ $productImageUrl ? 'hidden' : 'flex' }} h-full flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--admin-border)] bg-[var(--admin-surface-soft)] p-6 text-center"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         fill="none"
-                         viewBox="0 0 24 24"
-                         stroke-width="1.5"
-                         stroke="currentColor"
-                         class="mb-3 h-10 w-10 text-[var(--admin-muted)]">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l2.659 2.659 1.5-1.5a2.25 2.25 0 0 1 3.182 0l3.068 3.068M3.75 19.5h16.5A1.5 1.5 0 0 0 21.75 18V6A1.5 1.5 0 0 0 20.25 4.5H3.75A1.5 1.5 0 0 0 2.25 6v12A1.5 1.5 0 0 0 3.75 19.5Z" />
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M8.25 8.25h.008v.008H8.25V8.25Z" />
-                    </svg>
-
-                    <span class="text-xs text-[var(--admin-muted)]">
-                        {{ $editing ? 'تصویری برای این محصول ثبت نشده است.' : 'هنوز تصویری انتخاب نشده است.' }}
-                    </span>
-                </div>
-
-            </div>
-
-            <input type="hidden" name="media_id" :value="selectedMedia?.id || ''">
-            <input type="hidden" name="remove_primary_image" value="0">
-
-            <div class="flex flex-wrap gap-3">
-                <button type="button" class="admin-btn admin-btn-secondary" @click="openPicker()">
-                    انتخاب از کتابخانه رسانه
-                </button>
-                <label for="image" class="admin-btn admin-btn-primary cursor-pointer">
-                    آپلود تصویر جدید
-                </label>
-            </div>
-
-            <input
-                id="image"
-                name="image"
-                data-preview-target="product-image-preview" data-preview-placeholder="product-image-placeholder"
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                data-crop-ratio="0.8" data-original-field="original_image"
-                class="admin-input mt-3 p-2"
-            >
-
-            @if($editing && $productImageUrl)
-                <label class="mt-3 flex items-center gap-2 text-sm text-rose-700"><input type="checkbox" name="remove_primary_image" value="1" class="admin-checkbox" @change="if ($event.target.checked) { selectedMedia = null; const fileInput = $root.closest('form')?.querySelector('input[type=file][name=image]'); if (fileInput) fileInput.value = ''; const originalInput = $root.closest('form')?.querySelector('input[type=file][name=original_image]'); if (originalInput) originalInput.value = ''; }"> حذف تصویر اصلی از این محصول</label>
-            @endif
-
-            <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">
-                انتخاب از کتابخانه، فایل را دوباره آپلود نمی‌کند. آپلود جدید، فایل اصلی مستقلی به کتابخانه اضافه می‌کند.
-            </p>
-
-            <div x-show="selectedMedia" x-cloak class="mt-3 flex items-center gap-3 rounded-xl border border-[var(--admin-border)] p-3">
-                <img :src="selectedMedia?.url" :alt="selectedMedia?.alt || selectedMedia?.name" class="h-16 w-14 rounded-lg object-contain">
-                <div class="min-w-0 flex-1">
-                    <p class="truncate text-sm font-semibold" x-text="selectedMedia?.name"></p>
-                    <p class="text-xs text-[var(--admin-muted)]">از کتابخانه رسانه انتخاب شده</p>
-                    <button type="button" class="admin-btn admin-btn-secondary mt-2" @click="cropSelected()">برش مستقل برای تصویر اصلی</button>
-                </div>
-                <button type="button" class="admin-btn admin-btn-secondary" @click="clearSelection()">لغو انتخاب</button>
-            </div>
-
-            <div x-show="pickerOpen" x-cloak x-transition class="fixed inset-0 z-[300] flex items-center justify-center bg-black/60 p-3 sm:p-6" @keydown.escape.window="pickerOpen = false">
-                <section class="flex max-h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-[var(--admin-white)] shadow-2xl" role="dialog" aria-modal="true" aria-label="کتابخانه رسانه">
-                    <header class="flex items-center justify-between border-b border-[var(--admin-border)] p-4 sm:p-5">
-                        <div><h3 class="font-bold">کتابخانه رسانه</h3><p class="mt-1 text-xs text-[var(--admin-muted)]">تصویر موردنظر را جست‌وجو و انتخاب کنید.</p></div>
-                        <button type="button" class="admin-btn admin-btn-secondary" @click="pickerOpen = false">بستن</button>
-                    </header>
-                    <div class="border-b border-[var(--admin-border)] p-4">
-                        <input type="search" x-model="search" @input.debounce.300ms="loadMedia(1)" class="admin-input" placeholder="جست‌وجوی نام یا متن جایگزین تصویر">
-                    </div>
-                    <div class="min-h-0 flex-1 overflow-y-auto p-4">
-                        <p x-show="loading" class="py-8 text-center text-sm text-[var(--admin-muted)]">در حال دریافت تصاویر…</p>
-                        <p x-show="errorMessage" x-text="errorMessage" class="py-4 text-center text-sm text-[var(--admin-danger)]"></p>
-                        <p x-show="!loading && items.length === 0" class="py-8 text-center text-sm text-[var(--admin-muted)]">تصویری پیدا نشد. می‌توانید تصویر جدید آپلود کنید.</p>
-                        <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                            <template x-for="item in items" :key="item.id">
-                                <button type="button" @click="selectMedia(item)" class="overflow-hidden rounded-xl border p-2 text-right transition hover:border-[var(--admin-accent)]" :class="selectedMedia?.id === item.id ? 'border-[var(--admin-accent)] bg-[var(--admin-accent-soft)]' : 'border-[var(--admin-border)]'">
-                                    <img :src="item.url" :alt="item.alt || item.name" loading="lazy" class="aspect-[4/5] w-full rounded-lg bg-[var(--admin-surface)] object-contain">
-                                    <span class="mt-2 block truncate text-xs font-medium" x-text="item.name"></span>
-                                    <span class="block text-[10px] text-[var(--admin-muted)]" x-text="item.size"></span>
-                                </button>
-                            </template>
-                        </div>
-                    </div>
-                    <footer class="flex items-center justify-between border-t border-[var(--admin-border)] p-4">
-                        <span class="text-xs text-[var(--admin-muted)]" x-text="total + ' تصویر'"></span>
-                        <div class="flex gap-2">
-                            <button type="button" class="admin-btn admin-btn-secondary" :disabled="page <= 1 || loading" @click="loadMedia(page - 1)">قبلی</button>
-                            <button type="button" class="admin-btn admin-btn-secondary" :disabled="page >= lastPage || loading" @click="loadMedia(page + 1)">بعدی</button>
-                        </div>
-                    </footer>
-                </section>
-            </div>
-
-            @error('image')
-            <p class="mt-2 text-xs text-[var(--admin-danger)]">
-                {{ $message }}
-            </p>
-            @enderror
-
-        </div>
-
-        {{-- Product Marketing Banner --}}
-        <section class="admin-card space-y-5 p-6">
-            <div>
-                <h3 class="text-base font-bold text-[var(--admin-text)]">بنر بالای صفحه محصول</h3>
-                <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">
-                    بنر اختصاصی این محصول در ابتدای صفحه نمایش داده می‌شود. نسبت تصویر ۱۲:۵ است؛ بهتر است پیام اصلی را داخل خود تصویر طراحی کنی و فضای امن اطراف متن را رعایت کنی.
-                </p>
-            </div>
-
-            @if($editing && $product->banner_image)
-                <div class="overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)]">
-                    <img
-                        src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($product->banner_image) }}"
-                        alt="{{ $product->banner_image_alt ?: $product->name }}"
-                        class="aspect-[12/5] w-full object-cover"
-                    >
-                </div>
-            @endif
-
-            <div>
-                <label for="banner_image" class="admin-label">انتخاب یا جایگزینی بنر</label>
-                <div class="aspect-[12/5] overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]"><img id="product-banner-image-preview" src="{{ $product->banner_image ? \Illuminate\Support\Facades\Storage::disk('public')->url($product->banner_image) : '' }}" alt="{{ $product->banner_image_alt ?: $product->name }}" class="{{ $product->banner_image ? '' : 'hidden' }} h-full w-full object-cover"></div>
-                <input
-                    id="banner_image"
-                    name="banner_image"
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    data-crop-ratio="2.4" data-preview-target="product-banner-image-preview"
-                    class="admin-input p-2"
-                >
-                @include('admin.media.partials.picker', ['mediaPickerField' => 'banner_image', 'mediaPickerId' => old('banner_media_id', $product->banner_media_id ?? null), 'mediaPickerUrl' => $product->banner_image ? \Illuminate\Support\Facades\Storage::disk('public')->url($product->banner_image) : null, 'mediaPickerName' => $product->name, 'mediaPickerPreviewId' => 'product-banner-image-preview', 'mediaPickerInputName' => 'banner_media_id', 'mediaPickerRemoveName' => 'remove_banner_image'])
-                <p class="admin-help">اندازه پیشنهادی ۱۹۲۰×۸۰۰ پیکسل؛ JPG، PNG یا WEBP تا ۱۰ مگابایت.</p>
-                @if($editing && $product->banner_image)
-                    <label class="mt-2 flex items-center gap-2 text-sm text-rose-700"><input type="checkbox" name="remove_banner_image" value="1" class="admin-checkbox"> حذف بنر فعلی از محصول</label>
-                @endif
-                @error('banner_image')<p class="admin-error">{{ $message }}</p>@enderror
-            </div>
-
-            <div>
-                <label for="banner_image_alt" class="admin-label">Alt بنر برای دسترس‌پذیری و SEO</label>
-                <input
-                    id="banner_image_alt"
-                    name="banner_image_alt"
-                    maxlength="255"
-                    class="admin-input"
-                    value="{{ old('banner_image_alt', $product->banner_image_alt ?? ($product->name ?? '')) }}"
-                    placeholder="توضیح کوتاه و واقعی تصویر بنر"
-                >
-                @error('banner_image_alt')<p class="admin-error">{{ $message }}</p>@enderror
-            </div>
-
-            <p class="admin-help">در صورت عدم انتخاب فایل جدید، بنر فعلی حفظ می‌شود.</p>
-        </section>
-
-
         {{-- ========================================================
              Product Information
         ========================================================= --}}
@@ -241,11 +58,11 @@
 
             <div class="mb-6">
                 <h3 class="text-base font-bold text-[var(--admin-text)]">
-                    اطلاعات محصول
+                    مرحله اول: اطلاعات محصول
                 </h3>
 
                 <p class="mt-1 text-xs text-[var(--admin-muted)]">
-                    اطلاعات اصلی محصول را وارد کنید.
+                    نام محصول و دسته‌بندی را وارد کنید. کد و آدرس محصول به‌صورت خودکار ساخته می‌شوند؛ توضیحات را می‌توانید بعداً اضافه کنید.
                 </p>
             </div>
 
@@ -312,11 +129,14 @@
                 </div>
 
 
+                <details class="sm:col-span-2 rounded-xl border border-[var(--admin-border)] px-4 py-3">
+                    <summary class="cursor-pointer list-none text-sm font-semibold text-[var(--admin-text)]">اطلاعات تکمیلی (اختیاری) — کد و آدرس محصول</summary>
+                    <div class="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2">
                 {{-- Slug --}}
                 <div>
 
                     <label for="slug" class="admin-label">
-                        Slug
+                        آدرس اختصاصی محصول (اختیاری)
                     </label>
 
                     <input
@@ -330,7 +150,7 @@
                     >
 
                     <p class="mt-2 text-xs text-[var(--admin-muted)]">
-                        در صورت خالی بودن، از نام محصول ساخته می‌شود.
+                        این بخش را خالی بگذارید؛ آدرس به‌صورت خودکار از نام محصول ساخته می‌شود.
                     </p>
 
                     @error('slug')
@@ -356,7 +176,6 @@
                         value="{{ old('sku', $product->sku ?? '') }}"
                         dir="ltr"
                         class="admin-input text-left"
-                        required
                     >
 
                     @error('sku')
@@ -367,6 +186,10 @@
 
                 </div>
 
+
+
+                    </div>
+                </details>
 
                 {{-- Short Description --}}
                 <div class="sm:col-span-2">
@@ -431,7 +254,7 @@
                 </h3>
 
                 <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">
-                    قیمت فروش، قیمت قبل و موجودی محصول را مشخص کنید.
+                    مرحله دوم: قیمت فروش و تعداد موجودی را وارد کنید. قیمت قبل اختیاری است.
                     هنگام ورود مبلغ، اعداد به‌صورت سه‌رقمی نمایش داده می‌شوند.
                 </p>
 
@@ -574,6 +397,200 @@
         </div>
 
 
+        {{-- Product Image --}}
+        <div class="admin-card p-6" x-data="mediaPicker('{{ route('admin.media.picker') }}', @js($primaryImage?->media_id), @js($productImageUrl), @js($primaryImage?->media?->original_name ?? $primaryImage?->alt ?? ''), 'product-image-preview', 'image', 'remove_primary_image')">
+
+            <div class="mb-6">
+                <h3 class="text-base font-bold text-[var(--admin-text)]">
+                    مرحله سوم: تصویر اصلی محصول
+                </h3>
+
+                <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">
+                    {{ $editing
+                        ? 'قاب نهایی تصویر با کارت فروشگاه یکسان است (۴:۵)؛ تصویر کامل محصول بدون برش ناخواسته نمایش داده می‌شود.'
+                        : 'تصویر اصلی محصول را در قاب ۴:۵ انتخاب کنید. این نسبت در پیش‌نمایش پنل، کارت فروشگاه و تصویر محصول یکسان خواهد بود.' }}
+                </p>
+            </div>
+
+            <div class="admin-image-preview mb-5 aspect-[4/5] bg-[var(--admin-white)]">
+
+                <img
+                    id="product-image-preview"
+                    src="{{ $productImageUrl ?: '' }}"
+                    alt="{{ $primaryImage?->alt ?: ($product->name ?? 'تصویر محصول') }}"
+                    class="admin-image product-primary-preview {{ $productImageUrl ? '' : 'hidden' }}"
+                >
+
+                <div
+                    id="product-image-placeholder"
+                    class="{{ $productImageUrl ? 'hidden' : 'flex' }} h-full flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--admin-border)] bg-[var(--admin-surface-soft)] p-6 text-center"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         fill="none"
+                         viewBox="0 0 24 24"
+                         stroke-width="1.5"
+                         stroke="currentColor"
+                         class="mb-3 h-10 w-10 text-[var(--admin-muted)]">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l2.659 2.659 1.5-1.5a2.25 2.25 0 0 1 3.182 0l3.068 3.068M3.75 19.5h16.5A1.5 1.5 0 0 0 21.75 18V6A1.5 1.5 0 0 0 20.25 4.5H3.75A1.5 1.5 0 0 0 2.25 6v12A1.5 1.5 0 0 0 3.75 19.5Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M8.25 8.25h.008v.008H8.25V8.25Z" />
+                    </svg>
+
+                    <span class="text-xs text-[var(--admin-muted)]">
+                        {{ $editing ? 'تصویری برای این محصول ثبت نشده است.' : 'هنوز تصویری انتخاب نشده است.' }}
+                    </span>
+                </div>
+
+            </div>
+
+            <input type="hidden" name="media_id" :value="selectedMedia?.id || ''">
+            <input type="hidden" name="remove_primary_image" value="0">
+
+            <div class="flex flex-wrap gap-3">
+                <button type="button" class="admin-btn admin-btn-secondary" @click="openPicker()">
+                    انتخاب از کتابخانه رسانه
+                </button>
+                <label for="image" class="admin-btn admin-btn-primary cursor-pointer">
+                    آپلود تصویر جدید
+                </label>
+            </div>
+
+            <input
+                id="image"
+                name="image"
+                data-preview-target="product-image-preview" data-preview-placeholder="product-image-placeholder"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                data-crop-ratio="0.8" data-original-field="original_image"
+                class="admin-input mt-3 p-2"
+            >
+
+            @if($editing && $productImageUrl)
+                <label class="mt-3 flex items-center gap-2 text-sm text-rose-700"><input type="checkbox" name="remove_primary_image" value="1" class="admin-checkbox" @change="if ($event.target.checked) { selectedMedia = null; const fileInput = $root.closest('form')?.querySelector('input[type=file][name=image]'); if (fileInput) fileInput.value = ''; const originalInput = $root.closest('form')?.querySelector('input[type=file][name=original_image]'); if (originalInput) originalInput.value = ''; }"> حذف تصویر اصلی از این محصول</label>
+            @endif
+
+            <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">
+                انتخاب از کتابخانه، فایل را دوباره آپلود نمی‌کند. آپلود جدید، فایل اصلی مستقلی به کتابخانه اضافه می‌کند.
+            </p>
+
+            <div x-show="selectedMedia" x-cloak class="mt-3 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--admin-border)] p-3">
+                <div class="min-w-0 flex-1">
+                    <p class="truncate text-sm font-semibold" x-text="selectedMedia?.name"></p>
+                    <p class="text-xs text-[var(--admin-muted)]">پیش‌نمایش نهایی در قاب فروشگاه، بالای همین بخش نمایش داده می‌شود.</p>
+                    <button type="button" class="admin-btn admin-btn-secondary mt-2" @click="cropSelected()">تنظیم برش برای نمایش در فروشگاه</button>
+                </div>
+                <button type="button" class="admin-btn admin-btn-secondary" @click="clearSelection()">لغو انتخاب</button>
+            </div>
+
+            <div x-show="pickerOpen" x-cloak x-transition class="fixed inset-0 z-[300] flex items-center justify-center bg-black/60 p-3 sm:p-6" @keydown.escape.window="pickerOpen = false">
+                <section class="flex max-h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-[var(--admin-white)] shadow-2xl" role="dialog" aria-modal="true" aria-label="کتابخانه رسانه">
+                    <header class="flex items-center justify-between border-b border-[var(--admin-border)] p-4 sm:p-5">
+                        <div><h3 class="font-bold">کتابخانه رسانه</h3><p class="mt-1 text-xs text-[var(--admin-muted)]">تصویر موردنظر را جست‌وجو و انتخاب کنید.</p></div>
+                        <button type="button" class="admin-btn admin-btn-secondary" @click="pickerOpen = false">بستن</button>
+                    </header>
+                    <div class="border-b border-[var(--admin-border)] p-4">
+                        <input type="search" x-model="search" @input.debounce.300ms="loadMedia(1)" class="admin-input" placeholder="جست‌وجوی نام یا متن جایگزین تصویر">
+                    </div>
+                    <div class="min-h-0 flex-1 overflow-y-auto p-4">
+                        <p x-show="loading" class="py-8 text-center text-sm text-[var(--admin-muted)]">در حال دریافت تصاویر…</p>
+                        <p x-show="errorMessage" x-text="errorMessage" class="py-4 text-center text-sm text-[var(--admin-danger)]"></p>
+                        <p x-show="!loading && items.length === 0" class="py-8 text-center text-sm text-[var(--admin-muted)]">تصویری پیدا نشد. می‌توانید تصویر جدید آپلود کنید.</p>
+                        <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                            <template x-for="item in items" :key="item.id">
+                                <button type="button" @click="selectMedia(item)" class="overflow-hidden rounded-xl border p-2 text-right transition hover:border-[var(--admin-accent)]" :class="selectedMedia?.id === item.id ? 'border-[var(--admin-accent)] bg-[var(--admin-accent-soft)]' : 'border-[var(--admin-border)]'">
+                                    <img :src="item.url" :alt="item.alt || item.name" loading="lazy" class="aspect-[4/5] w-full rounded-lg bg-[var(--admin-surface)] object-contain">
+                                    <span class="mt-2 block truncate text-xs font-medium" x-text="item.name"></span>
+                                    <span class="block text-[10px] text-[var(--admin-muted)]" x-text="item.size"></span>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+                    <footer class="flex items-center justify-between border-t border-[var(--admin-border)] p-4">
+                        <span class="text-xs text-[var(--admin-muted)]" x-text="total + ' تصویر'"></span>
+                        <div class="flex gap-2">
+                            <button type="button" class="admin-btn admin-btn-secondary" :disabled="page <= 1 || loading" @click="loadMedia(page - 1)">قبلی</button>
+                            <button type="button" class="admin-btn admin-btn-secondary" :disabled="page >= lastPage || loading" @click="loadMedia(page + 1)">بعدی</button>
+                        </div>
+                    </footer>
+                </section>
+            </div>
+
+            @error('image')
+            <p class="mt-2 text-xs text-[var(--admin-danger)]">
+                {{ $message }}
+            </p>
+            @enderror
+
+        </div>
+
+        {{-- Product Marketing Banner --}}
+        <section class="admin-card space-y-5 p-6">
+            <div>
+                <h3 class="text-base font-bold text-[var(--admin-text)]">بنر بالای صفحه محصول</h3>
+                <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">
+                    بنر اختصاصی این محصول در ابتدای صفحه نمایش داده می‌شود. نسبت تصویر ۱۲:۵ است؛ بهتر است پیام اصلی را داخل خود تصویر طراحی کنی و فضای امن اطراف متن را رعایت کنی.
+                </p>
+            </div>
+
+            <div>
+                <label for="banner_image" class="admin-label">انتخاب یا جایگزینی بنر</label>
+                <p class="admin-help mb-2">پیش‌نمایش زیر همان قاب ۱۲:۵ فروشگاه است؛ قبل از ذخیره، نتیجه نهایی را بررسی کن.</p>
+                <div class="relative aspect-[12/5] overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]">
+                    <img
+                        id="product-banner-image-preview"
+                        src="{{ $product->banner_image ? \Illuminate\Support\Facades\Storage::disk('public')->url($product->banner_image) : '' }}"
+                        alt="{{ $product->banner_image_alt ?: ($product->name ?? 'بنر محصول') }}"
+                        class="{{ $product->banner_image ? '' : 'hidden' }} h-full w-full object-cover"
+                    >
+                    <div
+                        id="product-banner-image-placeholder"
+                        class="{{ $product->banner_image ? 'hidden' : 'flex' }} absolute inset-0 flex-col items-center justify-center gap-2 p-4 text-center text-xs text-[var(--admin-muted)]"
+                    >
+                        <span>هنوز بنری انتخاب نشده است.</span>
+                    </div>
+                </div>
+                <input
+                    id="banner_image"
+                    name="banner_image"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    data-crop-ratio="2.4"
+                    data-preview-target="product-banner-image-preview"
+                    data-preview-placeholder="product-banner-image-placeholder"
+                    class="admin-input p-2"
+                >
+                @include('admin.media.partials.picker', ['mediaPickerField' => 'banner_image', 'mediaPickerId' => old('banner_media_id', $product->banner_media_id ?? null), 'mediaPickerUrl' => $product->banner_image ? \Illuminate\Support\Facades\Storage::disk('public')->url($product->banner_image) : null, 'mediaPickerName' => $product->name, 'mediaPickerPreviewId' => 'product-banner-image-preview', 'mediaPickerInputName' => 'banner_media_id', 'mediaPickerRemoveName' => 'remove_banner_image'])
+                <p class="admin-help">اندازه پیشنهادی ۱۹۲۰×۸۰۰ پیکسل؛ JPG، PNG یا WEBP تا ۱۰ مگابایت.</p>
+                @if($editing && $product->banner_image)
+                    <label class="mt-2 flex items-center gap-2 text-sm text-rose-700"><input type="checkbox" name="remove_banner_image" value="1" class="admin-checkbox"> حذف بنر فعلی از محصول</label>
+                @endif
+                @error('banner_image')<p class="admin-error">{{ $message }}</p>@enderror
+            </div>
+
+            <div>
+                <label for="banner_image_alt" class="admin-label">Alt بنر برای دسترس‌پذیری و SEO</label>
+                <input
+                    id="banner_image_alt"
+                    name="banner_image_alt"
+                    maxlength="255"
+                    class="admin-input"
+                    value="{{ old('banner_image_alt', $product->banner_image_alt ?? ($product->name ?? '')) }}"
+                    placeholder="توضیح کوتاه و واقعی تصویر بنر"
+                >
+                @error('banner_image_alt')<p class="admin-error">{{ $message }}</p>@enderror
+            </div>
+
+            <p class="admin-help">در صورت عدم انتخاب فایل جدید، بنر فعلی حفظ می‌شود.</p>
+        </section>
+
+
+        <details class="xl:col-span-2 overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-white)]">
+            <summary class="cursor-pointer list-none px-5 py-4 text-sm font-semibold text-[var(--admin-text)]">
+                فروش اقساطی (اختیاری)
+                <span class="mt-1 block text-xs font-normal text-[var(--admin-muted)]">فقط اگر این محصول را قسطی می‌فروشید، این بخش را باز کنید.</span>
+            </summary>
+            <div class="border-t border-[var(--admin-border)] p-4 sm:p-6">
         {{-- ========================================================
              Installment
         ========================================================= --}}
@@ -894,6 +911,16 @@
         </div>
 
 
+        <details class="xl:col-span-2 overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-white)]">
+            <summary class="cursor-pointer list-none px-5 py-4 text-sm font-semibold text-[var(--admin-text)]">
+                تنظیمات پیشرفته (اختیاری) — عنوان گوگل و توضیحات جستجو
+                <span class="mt-1 block text-xs font-normal text-[var(--admin-muted)]">اگر با این موارد آشنا نیستید، لازم نیست چیزی تغییر دهید.</span>
+            </summary>
+            <div class="border-t border-[var(--admin-border)] p-4 sm:p-6">
+
+            </div>
+        </details>
+
         {{-- ========================================================
              SEO
         ========================================================= --}}
@@ -1064,6 +1091,10 @@
 
     </div>
 
+
+
+            </div>
+        </details>
 
     {{-- ============================================================
          Sidebar

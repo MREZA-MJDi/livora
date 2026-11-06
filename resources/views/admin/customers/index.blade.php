@@ -45,7 +45,7 @@
                     type="text"
                     value="{{ request('search') }}"
                     class="admin-input"
-                    placeholder="نام یا ایمیل مشتری..."
+                    placeholder="نام، شماره تماس یا ایمیل مشتری..."
                 >
 
             </div>

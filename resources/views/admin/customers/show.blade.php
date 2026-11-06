@@ -26,6 +26,10 @@
 
         <div class="flex flex-wrap gap-2">
 
+            @if($customer->email)
+                <a href="mailto:{{ $customer->email }}" class="admin-btn admin-btn-secondary">ارسال ایمیل به مشتری</a>
+            @endif
+
             <a
                 href="{{ route('admin.customers.edit', $customer) }}"
                 class="admin-btn admin-btn-primary"
@@ -166,6 +170,15 @@
                         </dd>
 
                     </div>
+
+                    @if($customer->phone)
+                        <div>
+                            <dt class="admin-stat-label">شماره تماس</dt>
+                            <dd class="mt-2 text-sm font-semibold text-[var(--admin-text)]">
+                                <a href="tel:{{ preg_replace('/[^0-9+]/', '', $customer->phone) }}" dir="ltr">{{ $customer->phone }}</a>
+                            </dd>
+                        </div>
+                    @endif
 
 
                     <div>

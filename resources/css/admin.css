@@ -263,7 +263,7 @@ p {
 .admin-subtitle {
     color: var(--admin-muted);
 
-    font-size: 0.78rem;
+    font-size: 0.9rem;
     line-height: 1.9;
 }
 
@@ -377,8 +377,8 @@ p {
     border: 1px solid transparent;
     border-radius: 0.9rem;
 
-    font-size: 0.75rem;
-    font-weight: 600;
+    font-size: 0.875rem;
+    font-weight: 650;
 
     transition:
         transform var(--admin-duration-fast),
@@ -462,8 +462,8 @@ p {
 
     color: var(--admin-text);
 
-    font-size: 0.72rem;
-    font-weight: 600;
+    font-size: 0.875rem;
+    font-weight: 650;
 }
 
 .admin-input,
@@ -557,7 +557,7 @@ p {
 
     color: var(--admin-muted);
 
-    font-size: 0.65rem;
+    font-size: 0.78rem;
     line-height: 1.7;
 }
 
@@ -1585,4 +1585,29 @@ body.sg-crop-open{overflow:hidden}
     object-position: center;
     padding: 0.5rem;
     background: var(--admin-white);
+}
+
+/* Product admin preview must match the storefront product-card crop exactly. */
+.admin-image-preview .product-primary-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    background: var(--admin-white);
+}
+
+
+/* Staff-first usability polish */
+.admin-label { font-size: 0.9rem; line-height: 1.8; font-weight: 700; }
+.admin-help, .admin-subtitle { line-height: 1.9; }
+.admin-input, .admin-select, .admin-textarea { min-height: 48px; font-size: 0.95rem; }
+.admin-btn { min-height: 44px; font-size: 0.875rem; }
+.admin-sidebar a:focus-visible, .admin-btn:focus-visible, .admin-input:focus-visible, .admin-select:focus-visible, .admin-textarea:focus-visible, summary:focus-visible { outline: 3px solid var(--admin-accent); outline-offset: 3px; }
+details > summary::-webkit-details-marker { display: none; }
+details > summary::after { content: '＋'; float: left; color: var(--admin-accent); font-weight: 700; }
+details[open] > summary::after { content: '−'; }
+@media (max-width: 640px) {
+  .admin-card { border-radius: 1rem; }
+  .admin-input, .admin-select, .admin-textarea { font-size: 16px; }
+  .admin-table { min-width: 680px; }
 }

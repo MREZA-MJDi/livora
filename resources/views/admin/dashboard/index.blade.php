@@ -137,6 +137,41 @@
         </div>
 
 
+        {{-- Guided daily work --}}
+        <section class="admin-card overflow-hidden border-[var(--admin-border)]">
+            <div class="border-b border-[var(--admin-border)] bg-[var(--admin-surface)] px-5 py-5 sm:px-6">
+                <p class="text-xs font-semibold text-[var(--admin-accent)]">میز کار شما</p>
+                <h2 class="mt-2 text-xl font-bold text-[var(--admin-text)]">امروز می‌خواهید چه کاری انجام دهید؟</h2>
+                <p class="mt-2 text-sm leading-7 text-[var(--admin-muted)]">برای شروع فقط یکی از کارهای زیر را انتخاب کنید. لازم نیست با همه بخش‌های پنل آشنا باشید.</p>
+            </div>
+            <div class="grid grid-cols-1 gap-3 p-4 sm:grid-cols-2 xl:grid-cols-4 sm:p-5">
+                <a href="{{ route('admin.products.create') }}" class="group rounded-2xl border border-[var(--admin-border)] p-4 transition hover:border-[var(--admin-accent)] hover:bg-[var(--admin-surface)]">
+                    <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--admin-accent-soft)] text-lg text-[var(--admin-accent-dark)]">＋</span>
+                    <span class="mt-4 block text-sm font-bold text-[var(--admin-text)]">ثبت محصول جدید</span>
+                    <span class="mt-2 block text-xs leading-6 text-[var(--admin-muted)]">نام، قیمت و عکس محصول را وارد کنید.</span>
+                    <span class="mt-3 block text-xs font-semibold text-[var(--admin-accent)]">شروع ثبت محصول ←</span>
+                </a>
+                <a href="{{ route('admin.categories.create') }}" class="group rounded-2xl border border-[var(--admin-border)] p-4 transition hover:border-[var(--admin-accent)] hover:bg-[var(--admin-surface)]">
+                    <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-lg">▦</span>
+                    <span class="mt-4 block text-sm font-bold text-[var(--admin-text)]">ساخت دسته‌بندی</span>
+                    <span class="mt-2 block text-xs leading-6 text-[var(--admin-muted)]">محصول‌ها را مرتب و گروه‌بندی کنید.</span>
+                    <span class="mt-3 block text-xs font-semibold text-[var(--admin-accent)]">ساخت دسته‌بندی ←</span>
+                </a>
+                <a href="{{ route('admin.orders.index') }}" class="group rounded-2xl border border-[var(--admin-border)] p-4 transition hover:border-[var(--admin-accent)] hover:bg-[var(--admin-surface)]">
+                    <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-lg">▤</span>
+                    <span class="mt-4 block text-sm font-bold text-[var(--admin-text)]">رسیدگی به سفارش‌ها</span>
+                    <span class="mt-2 block text-xs leading-6 text-[var(--admin-muted)]">سفارش‌های تازه را ببینید و پیگیری کنید.</span>
+                    <span class="mt-3 block text-xs font-semibold text-[var(--admin-accent)]">دیدن سفارش‌ها ←</span>
+                </a>
+                <a href="{{ route('admin.contact-messages.index') }}" class="group rounded-2xl border border-[var(--admin-border)] p-4 transition hover:border-[var(--admin-accent)] hover:bg-[var(--admin-surface)]">
+                    <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-lg">✉</span>
+                    <span class="mt-4 block text-sm font-bold text-[var(--admin-text)]">پاسخ به پیام‌ها</span>
+                    <span class="mt-2 block text-xs leading-6 text-[var(--admin-muted)]">پیام‌های ارسال‌شده از طرف مشتریان.</span>
+                    <span class="mt-3 block text-xs font-semibold text-[var(--admin-accent)]">دیدن پیام‌ها ←</span>
+                </a>
+            </div>
+        </section>
+
         {{-- =========================================================
              KPI CARDS
         ========================================================== --}}
@@ -453,7 +488,10 @@
                                 <div class="group relative flex h-full flex-1 flex-col justify-end">
 
                                     {{-- Tooltip --}}
-                                    <div class="pointer-events-none absolute bottom-[calc({{ $height }}%+12px)] left-1/2 z-20 hidden -translate-x-1/2 whitespace-nowrap rounded-xl bg-[var(--admin-text)] px-3 py-2 text-[10px] text-white shadow-xl group-hover:block">
+                                    <div
+                                        class="pointer-events-none absolute left-1/2 z-20 hidden -translate-x-1/2 whitespace-nowrap rounded-xl bg-[var(--admin-text)] px-3 py-2 text-[10px] text-white shadow-xl group-hover:block"
+                                        style="bottom: calc({{ $height }}% + 12px);"
+                                    >
 
                                         {{ number_format($month['revenue']) }}
                                         تومان

@@ -57,18 +57,57 @@ window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName
         ? { id: Number(initialId), url: initialUrl, name: initialName || 'تصویر فعلی', alt: initialName || '' }
         : null,
     init() {
-        const fileInput = this.$root.closest('form')?.querySelector(`input[type=\"file\"][name=\"${this.fileField}\"]`);
+        const fileInput = this.$root.closest('form')?.querySelector(`input[type="file"][name="${this.fileField}"]`);
+        const preview = document.getElementById(this.previewId);
+        const placeholder = preview?.dataset.previewPlaceholder
+            ? document.getElementById(preview.dataset.previewPlaceholder)
+            : document.getElementById(this.previewId.replace(/-preview$/, '-placeholder'));
+
+        const showPreview = (url) => {
+            if (!preview || !url) return;
+            preview.src = url;
+            preview.classList.remove('hidden');
+            placeholder?.classList.add('hidden');
+            placeholder?.classList.remove('flex');
+        };
+        const showPlaceholder = (message = 'هنوز تصویری انتخاب نشده است.') => {
+            if (preview) {
+                preview.removeAttribute('src');
+                preview.classList.add('hidden');
+            }
+            if (placeholder) {
+                const label = placeholder.querySelector('[data-preview-placeholder-text]') || placeholder.querySelector('span');
+                if (label) label.textContent = message;
+                placeholder.classList.remove('hidden');
+                placeholder.classList.add('flex');
+            }
+        };
+
+        preview?.addEventListener('load', () => {
+            if (preview.naturalWidth > 0) {
+                placeholder?.classList.add('hidden');
+                placeholder?.classList.remove('flex');
+            }
+        });
+        preview?.addEventListener('error', () => showPlaceholder('بارگذاری تصویر ناموفق بود؛ تصویر دیگری انتخاب کنید.'));
+        if (this.selectedMedia?.url) showPreview(this.selectedMedia.url);
+
         fileInput?.addEventListener('change', () => {
             if (fileInput.files?.length) {
                 this.selectedMedia = null;
-                const removeInput = this.$root.querySelector(`input[name=\"${this.removeField}\"]`);
+                const removeInput = this.$root.querySelector(`input[name="${this.removeField}"]`);
                 if (removeInput) removeInput.value = '0';
                 const removeCheckbox = this.$root.closest('form')?.querySelector(`input[type="checkbox"][name="${this.removeField}"]`);
                 if (removeCheckbox) removeCheckbox.checked = false;
                 const ogRemoval = this.$root.closest('form')?.querySelector('input[type="checkbox"][name="remove_default_og_image"]');
                 if (ogRemoval) ogRemoval.checked = false;
+            } else if (!this.selectedMedia) {
+                showPlaceholder();
             }
         });
+
+        this.showPreview = showPreview;
+        this.showPlaceholder = showPlaceholder;
     },
     async openPicker() {
         this.pickerOpen = true;
@@ -111,8 +150,7 @@ window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName
                 if (removeCheckbox) removeCheckbox.checked = false;
         const ogRemoval = this.$root.closest('form')?.querySelector('input[type="checkbox"][name="remove_default_og_image"]');
         if (ogRemoval) ogRemoval.checked = false;
-        const preview = document.getElementById(this.previewId);
-        if (preview) { preview.src = item.url; preview.classList.remove('hidden'); }
+        this.showPreview?.(item.url);
         this.pickerOpen = false;
     },
     clearSelection() {
@@ -127,8 +165,7 @@ window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName
         const originalName = fileInput?.dataset.originalField;
         const originalInput = originalName ? form?.querySelector(`input[type="file"][name="${originalName}"]`) : null;
         if (originalInput) originalInput.value = '';
-        const preview = document.getElementById(this.previewId);
-        if (preview) { preview.removeAttribute('src'); preview.classList.add('hidden'); }
+        this.showPlaceholder?.();
     },
     async cropSelected() {
         if (!this.selectedMedia || this.loading) return;
@@ -164,8 +201,7 @@ window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName
             const payload = await response.json();
             if (!response.ok || !payload.id || !payload.url) throw new Error(payload.message || 'ذخیره نسخه برش‌خورده ناموفق بود.');
             this.selectedMedia = payload;
-            const preview = document.getElementById(this.previewId);
-            if (preview) { preview.src = payload.url; preview.classList.remove('hidden'); }
+            this.showPreview?.(payload.url);
         } catch (error) {
             if (error?.message !== 'Crop cancelled') this.errorMessage = error.message || 'برش تصویر انجام نشد.';
         } finally {

@@ -57,6 +57,32 @@
         @endif
 
 
+        <form method="GET" action="{{ route('admin.contact-messages.index') }}" class="admin-card grid gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_220px_auto_auto]">
+            <label class="block">
+                <span class="admin-label">جستجوی پیام‌ها</span>
+                <input type="search" name="search" value="{{ $filters['search'] ?? '' }}" class="admin-input" placeholder="نام، تلفن، ایمیل یا متن پیام">
+            </label>
+            <label class="block">
+                <span class="admin-label">وضعیت پیام</span>
+                <select name="status" class="admin-select">
+                    <option value="">همه پیام‌ها</option>
+                    <option value="unread" @selected(($filters['status'] ?? '') === 'unread')>جدید</option>
+                    <option value="read" @selected(($filters['status'] ?? '') === 'read')>خوانده‌شده</option>
+                    <option value="replied" @selected(($filters['status'] ?? '') === 'replied')>پاسخ داده‌شده</option>
+                    <option value="closed" @selected(($filters['status'] ?? '') === 'closed')>بسته‌شده</option>
+                </select>
+            </label>
+            <div class="flex items-end">
+                <button type="submit" class="admin-btn admin-btn-primary w-full">جستجو</button>
+            </div>
+            @if(request()->filled('search') || request()->filled('status'))
+                <div class="flex items-end">
+                    <a href="{{ route('admin.contact-messages.index') }}" class="admin-btn admin-btn-secondary w-full">پاک کردن</a>
+                </div>
+            @endif
+        </form>
+
+
         {{-- =========================================================
              MESSAGE LIST
         ========================================================== --}}
@@ -336,7 +362,7 @@
                                     </div>
 
                                     <h2 class="mt-5 text-sm font-bold text-[var(--admin-text)]">
-                                        هنوز پیامی دریافت نشده است
+                                        {{ request()->filled('search') || request()->filled('status') ? 'پیامی با این جستجو پیدا نشد' : 'هنوز پیامی دریافت نشده است' }}
                                     </h2>
 
                                     <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">

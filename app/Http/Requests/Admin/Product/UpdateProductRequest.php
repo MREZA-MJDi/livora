@@ -27,6 +27,10 @@ class UpdateProductRequest extends FormRequest
                 $this->slug
                     ?: trim(preg_replace('/[^\\pL\\pN]+/u', '-', mb_strtolower(trim((string) $this->name), 'UTF-8')), '-'),
 
+            'sku' => filled($this->input('sku'))
+                ? trim((string) $this->input('sku'))
+                : 'SG-' . Str::upper(Str::random(10)),
+
             'stock' =>
                 $this->normalizeNumericInput($this->input('stock')) ?? 0,
 

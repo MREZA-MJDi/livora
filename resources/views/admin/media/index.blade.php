@@ -15,7 +15,7 @@
                 </h1>
 
                 <p class="mt-1 text-sm text-[var(--admin-text-soft)]">
-                    تصاویر و فایل‌های عمومی سایت را مدیریت کنید.
+                    همه عکس‌های سایت اینجا نگهداری می‌شوند. قبل از حذف، محل استفاده هر تصویر را بررسی کنید.
                 </p>
             </div>
 
@@ -194,12 +194,12 @@
 
 
                             @php
-                                $usageCount = $item->product_images_count + $item->product_banners_count + $item->categories_count + $item->blog_posts_count + $item->content_pages_count + $item->shop_banner_settings_count;
+                                $usageCount = $item->product_images_count + $item->product_banners_count + $item->categories_count + $item->category_cards_count + $item->category_banners_count + $item->blog_posts_count + $item->content_pages_count + $item->shop_banner_settings_count + $item->seo_settings_count;
                             @endphp
                             @if($usageCount > 0)
                                 <div class="rounded-xl bg-amber-50 px-3 py-2 text-[10px] leading-5 text-amber-800">
                                     <strong>{{ $usageCount }} اتصال فعال به محتوا</strong>
-                                    <p>گالری محصول: {{ $item->product_images_count }} · بنر محصول: {{ $item->product_banners_count }} · دسته: {{ $item->categories_count }} · مقاله: {{ $item->blog_posts_count }} · صفحه: {{ $item->content_pages_count }} · بنر فروشگاه: {{ $item->shop_banner_settings_count }}</p>
+                                    <p>محل استفاده: تصاویر محصول {{ $item->product_images_count }} · بنر محصول {{ $item->product_banners_count }} · تصویر اصلی دسته {{ $item->categories_count }} · کارت دسته {{ $item->category_cards_count }} · بنر دسته {{ $item->category_banners_count }} · مقاله {{ $item->blog_posts_count }} · صفحه {{ $item->content_pages_count }} · بنر فروشگاه {{ $item->shop_banner_settings_count }} · تصویر SEO {{ $item->seo_settings_count }}</p>
                                 </div>
                             @else
                                 <p class="text-[10px] text-emerald-700">این رسانه در هیچ محتوایی استفاده نشده است.</p>
@@ -232,7 +232,7 @@
                                         type="submit"
                                         @disabled($usageCount > 0)
                                         class="flex h-8 w-8 items-center justify-center rounded-xl border border-red-200 text-red-500 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-30"
-                                        title="{{ $usageCount > 0 ? 'ابتدا این رسانه را از محتوای متصل جدا کنید.' : 'حذف' }}"
+                                        title="{{ $usageCount > 0 ? 'این تصویر در سایت استفاده می‌شود و برای جلوگیری از خراب شدن صفحه‌ها قابل حذف نیست.' : 'حذف' }}"
                                     >
 
                                         <svg

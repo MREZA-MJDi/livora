@@ -32,8 +32,8 @@
     <form method="POST" enctype="multipart/form-data" action="{{ $section->exists ? route('admin.home-sections.update', $section) : route('admin.home-sections.store') }}" class="admin-card space-y-5 p-6">
         @csrf @if($section->exists) @method('PUT') @endif
         <div class="grid gap-4 sm:grid-cols-2">
-            <label><span class="admin-label">شناسه یکتا</span><input name="key" class="admin-input" required maxlength="100" value="{{ old('key', $section->key) }}" placeholder="مثلاً featured-products">@error('key')<small class="admin-error">{{ $message }}</small>@enderror</label>
-            <label><span class="admin-label">نوع سکشن</span><select name="type" x-model="sectionType" class="admin-input" required>@foreach(['hero'=>'Hero','products'=>'محصولات','categories'=>'دسته‌بندی‌ها','editorial'=>'محتوای تصویری','trust'=>'ویژگی‌ها','cta'=>'دعوت به اقدام'] as $value=>$label)<option value="{{ $value }}" @selected(old('type', $section->type) === $value)>{{ $label }}</option>@endforeach</select></label>
+            <label><span class="admin-label">شناسه داخلی (اختیاری)</span><input name="key" class="admin-input" maxlength="100" value="{{ old('key', $section->key) }}" placeholder="اگر نمی‌دانید، خالی بگذارید">@error('key')<small class="admin-error">{{ $message }}</small>@enderror<span class="admin-help">این شناسه فقط برای سیستم است و در سایت دیده نمی‌شود؛ اگر خالی بماند خودکار ساخته می‌شود.</span></label>
+            <label><span class="admin-label">نوع سکشن</span><select name="type" x-model="sectionType" class="admin-input" required>@foreach(['hero'=>'اسلایدر صفحه اصلی','products'=>'محصولات','categories'=>'دسته‌بندی‌ها','editorial'=>'محتوای تصویری','trust'=>'ویژگی‌ها','cta'=>'دعوت به اقدام'] as $value=>$label)<option value="{{ $value }}" @selected(old('type', $section->type) === $value)>{{ $label }}</option>@endforeach</select></label>
         </div>
 
         <section x-show="sectionType === 'hero'" x-cloak class="space-y-4 rounded-2xl border border-[var(--admin-border)] p-4">
@@ -49,7 +49,7 @@
                         <div class="space-y-3">
                             <label class="block"><span class="admin-label">تصویر اسلاید</span><input type="file" accept="image/jpeg,image/png,image/webp" :name="'slide_images[' + index + ']'" data-crop-ratio="1.5" class="admin-input" @change="previewFile($event, slide)"><small class="admin-help">تصویر در قاب ۳:۲ برش می‌خورد؛ می‌توانید در پنجره برش، کادر را جابه‌جا و بزرگ‌نمایی کنید.</small></label>
                             <input type="hidden" :name="'payload[slides][' + index + '][image_path]'" x-model="slide.image_path">
-                            <label class="block"><span class="admin-label">Eyebrow</span><input class="admin-input" :name="'payload[slides][' + index + '][eyebrow]'" x-model="slide.eyebrow" maxlength="160"></label>
+                            <label class="block"><span class="admin-label">متن کوتاه بالای عنوان</span><input class="admin-input" :name="'payload[slides][' + index + '][eyebrow]'" x-model="slide.eyebrow" maxlength="160"></label>
                             <label class="block"><span class="admin-label">عنوان</span><input class="admin-input" :name="'payload[slides][' + index + '][title]'" x-model="slide.title" maxlength="255" required></label>
                             <label class="block"><span class="admin-label">توضیحات</span><textarea class="admin-textarea" rows="3" :name="'payload[slides][' + index + '][subtitle]'" x-model="slide.subtitle" maxlength="1500"></textarea></label>
                             <div class="grid gap-3 sm:grid-cols-2">

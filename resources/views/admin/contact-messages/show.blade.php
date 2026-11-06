@@ -137,8 +137,8 @@
 
         @if($contactMessage->email)
             <section class="rounded-3xl border border-[var(--admin-border)] bg-[var(--admin-white)] p-6">
-                <h2 class="text-base font-bold">پاسخ ایمیلی به کاربر</h2>
-                <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">پاسخ پس از ارسال از طریق Mail تنظیم‌شده در Laravel ثبت می‌شود. قبل از استفاده در Production، SMTP واقعی را تنظیم و تست کنید.</p>
+                <h2 class="text-base font-bold">پاسخ به مشتری</h2>
+                <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">پاسخ شما به نشانی ایمیل مشتری فرستاده می‌شود و در همین صفحه نگهداری خواهد شد.</p>
                 <form method="POST" action="{{ route('admin.contact-messages.reply', $contactMessage) }}" class="mt-5 space-y-4">
                     @csrf
                     @method('PATCH')
@@ -147,7 +147,7 @@
                         <textarea id="admin_reply" name="admin_reply" rows="7" maxlength="5000" required class="admin-textarea">{{ old('admin_reply', $contactMessage->admin_reply) }}</textarea>
                         @error('admin_reply')<p class="admin-error">{{ $message }}</p>@enderror
                     </div>
-                    <button type="submit" class="admin-btn admin-btn-primary">ارسال پاسخ ایمیلی و ثبت در سابقه</button>
+                    <button type="submit" class="admin-btn admin-btn-primary">ارسال پاسخ به مشتری</button>
                 </form>
             </section>
         @else
