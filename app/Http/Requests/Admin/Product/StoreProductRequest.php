@@ -25,7 +25,7 @@ class StoreProductRequest extends FormRequest
             'compare_at_price' => $this->normalizeNumericInput($this->input('compare_at_price')),
             'slug' =>
                 $this->slug
-                    ?: Str::slug($this->name),
+                    ?: trim(preg_replace('/[^\\pL\\pN]+/u', '-', mb_strtolower(trim((string) $this->name), 'UTF-8')), '-'),
 
             'stock' =>
                 $this->normalizeNumericInput($this->input('stock')) ?? 0,
