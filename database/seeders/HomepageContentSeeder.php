@@ -1,11 +1,11 @@
 <?php
 
-namespace Database\\Seeders;
+namespace Database\Seeders;
 
-use App\\Models\\ContactSetting;
-use App\\Models\\HomeSection;
-use Illuminate\\Database\\Seeder;
-use Illuminate\\Support\\Facades\\Cache;
+use App\Models\ContactSetting;
+use App\Models\HomeSection;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Cache;
 
 class HomepageContentSeeder extends Seeder
 {
