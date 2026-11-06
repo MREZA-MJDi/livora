@@ -29,7 +29,7 @@
                 </p>
 
                 <p class="mt-0.5 text-[9px] uppercase tracking-[0.16em] text-[var(--admin-muted)]">
-                    Administration
+                    پنل مدیریت
                 </p>
 
             </div>
