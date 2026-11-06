@@ -123,9 +123,14 @@
                 <p class="text-center text-xs leading-6 text-[var(--sg-stone)]">
                     تغییرات شما خودکار اعمال می‌شوند؛ برای دیدن محصولات نیازی به دکمه ثبت نیست.
                 </p>
-                <button type="button" @click="filterOpen = false" class="mt-3 w-full rounded-2xl bg-[var(--sg-ink)] px-4 py-3.5 text-xs font-semibold text-white">
-                    بستن فیلترها
-                </button>
+                <div class="mt-3 grid grid-cols-2 gap-3">
+                    <a href="{{ route('shop.index') }}" class="flex items-center justify-center rounded-2xl border border-[var(--sg-border)] px-3 py-3.5 text-xs font-semibold text-[var(--sg-ink)]">
+                        پاک کردن فیلترها
+                    </a>
+                    <button type="button" @click="filterOpen = false" class="rounded-2xl bg-[var(--sg-ink)] px-3 py-3.5 text-xs font-semibold text-white">
+                        بستن فیلترها
+                    </button>
+                </div>
             </div>
 
         </form>
