@@ -19,6 +19,14 @@
                 @if(filled($storeSettings?->brand_description))
                     <p class="mt-5 max-w-sm text-sm leading-8 text-white/55">{{ $storeSettings->brand_description }}</p>
                 @endif
+                @php($footerSocials = ['WhatsApp' => $storeSettings?->whatsapp_url, 'Telegram' => $storeSettings?->telegram_url, 'Instagram' => $storeSettings?->instagram_url, 'Eitaa' => $storeSettings?->eitaa_url, 'Bale' => $storeSettings?->bale_url])
+                <div class="mt-5 flex flex-wrap gap-3">
+                    @foreach($footerSocials as $network => $url)
+                        @if(filled($url))
+                            <a href="{{ $url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ $network }}" class="text-xs text-white/55 transition hover:text-white">{{ $network }}</a>
+                        @endif
+                    @endforeach
+                </div>
                 <div class="mt-6 flex flex-wrap gap-2">
                     @if(filled($storeSettings?->enamad_url))
                         <a href="{{ $storeSettings->enamad_url }}" target="_blank" rel="noopener noreferrer" class="rounded-full border border-white/15 px-3 py-2 text-[11px] text-white/70 transition hover:border-white/40 hover:text-white">نماد اعتماد</a>
