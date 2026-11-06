@@ -26,11 +26,11 @@
             <div><label class="admin-label" for="organization_name">نام سازمان</label><input id="organization_name" class="admin-input" readonly value="{{ $brandSettings?->brand_name ?: config('app.name') }}"><p class="admin-help">برای تغییر نام برند از تنظیمات برند استفاده کنید.</p></div>
             <div><label class="admin-label" for="organization_description">معرفی کوتاه سازمان</label><textarea id="organization_description" rows="3" class="admin-textarea" readonly>{{ $brandSettings?->brand_description }}</textarea><p class="admin-help">توضیح برند از تنظیمات برند خوانده می‌شود.</p></div>
             <div><label class="admin-label">لوگوی برند</label><p class="admin-help">لوگو از تنظیمات برند خوانده می‌شود و در این بخش جداگانه تغییر نمی‌کند.</p>@if($brandSettings?->logo_path)<img src="{{ str_starts_with($brandSettings->logo_path, 'http') ? $brandSettings->logo_path : \Illuminate\Support\Facades\Storage::disk('public')->url($brandSettings->logo_path) }}" alt="{{ $brandSettings->brand_name }}" class="mt-3 h-20 w-40 rounded-xl object-contain">@endif</div>
-            <div class="grid gap-4 sm:grid-cols-2"><div><label class="admin-label">ایمیل</label><input type="email" name="contact_email" class="admin-input" value="{{ old('contact_email', $settings->contact_email) }}"></div><div><label class="admin-label">تلفن</label><input name="contact_phone" class="admin-input" value="{{ old('contact_phone', $settings->contact_phone) }}"></div></div>
+            <div class="grid gap-4 sm:grid-cols-2"><div><label class="admin-label">ایمیل</label><input type="email" class="admin-input" readonly value="{{ $brandSettings?->email }}"></div><div><label class="admin-label">تلفن</label><input class="admin-input" readonly value="{{ $brandSettings?->phone }}"></div></div>
             <div><label class="admin-label">شناسه X / Twitter</label><input name="twitter_handle" class="admin-input" dir="ltr" value="{{ old('twitter_handle', $settings->twitter_handle) }}" placeholder="@SillaGallery"></div>
             <div class="grid gap-4 sm:grid-cols-2">
-                @foreach(['instagram'=>'اینستاگرام','telegram'=>'تلگرام','linkedin'=>'لینکدین','youtube'=>'یوتیوب'] as $key=>$label)
-                    <div><label class="admin-label">{{ $label }}</label><input type="url" name="social_links[{{ $key }}]" dir="ltr" class="admin-input" value="{{ old("social_links.{$key}", $settings->social_links[$key] ?? '') }}"></div>
+                @foreach(['instagram'=>'اینستاگرام','telegram'=>'تلگرام','whatsapp'=>'واتساپ','eitaa'=>'ایتا','bale'=>'بله'] as $key=>$label)
+                    <div><label class="admin-label">{{ $label }}</label><input type="url" dir="ltr" class="admin-input" readonly value="{{ $brandSettings?->{$key.'_url'} }}"></div>
                 @endforeach
             </div>
         </section>
