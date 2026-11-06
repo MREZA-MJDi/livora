@@ -67,7 +67,7 @@
                                     <span aria-hidden="true">←</span>
                                 </a>
                                 <span class="rounded-xl border border-white/25 bg-black/20 px-4 py-3 text-xs text-white/90 backdrop-blur-sm">
-                                    {{ number_format($products->total()) }} محصول در مجموعه
+                                    <span id="shop-product-count">{{ number_format($products->total()) }} محصول در مجموعه</span>
                                 </span>
                             </div>
                         </div>
@@ -137,6 +137,9 @@
                                     method="GET"
                                     action="{{ route('shop.index') }}"
                                     class="mt-6"
+                                    data-live-catalog-filters
+                                    data-results-selector="#shop-live-results"
+                                    data-aux-selectors="#shop-sorting,#shop-product-count,#shop-mobile-product-count"
                                 >
 
                                     <input type="hidden" name="sort" value="{{ request('sort', 'latest') }}">
@@ -146,9 +149,9 @@
                                         :selected-category="request('category')"
                                     />
 
-                                    <button type="submit" class="mt-4 w-full rounded-xl bg-[var(--sg-ink)] px-4 py-3 text-xs font-semibold text-white transition hover:bg-[var(--sg-accent)]">
-                                        اعمال فیلترها
-                                    </button>
+                                    <p class="mt-4 rounded-xl bg-[var(--sg-surface)] px-3 py-3 text-center text-[11px] leading-6 text-[var(--sg-stone)]">
+                                        با تغییر هر گزینه، نتایج به‌صورت خودکار به‌روز می‌شوند.
+                                    </p>
 
                                 </form>
 
@@ -222,7 +225,7 @@
 
                             <span class="text-xs text-[var(--sg-stone)]">
 
-                                <span class="font-medium text-[var(--sg-ink)]">
+                                <span id="shop-mobile-product-count" class="font-medium text-[var(--sg-ink)]">
                                     {{ number_format($products->total()) }}
                                 </span>
 
@@ -254,7 +257,7 @@
                                 </div>
 
 
-                                <div class="w-full sm:min-w-[220px] sm:w-auto">
+                                <div id="shop-sorting" class="w-full sm:min-w-[220px] sm:w-auto">
 
                                     <x-shop.sorting
                                         :products="$products"
@@ -270,6 +273,8 @@
                         {{-- =================================================
                              ACTIVE FILTER
                         ================================================== --}}
+
+                        <div id="shop-live-results" aria-live="polite" aria-busy="false">
 
                         @if(request()->filled('category'))
 
@@ -292,7 +297,7 @@
                                 </span>
 
                                 <a
-                                    href="{{ route('shop.index') }}"
+                                    href="{{ route('shop.index', request()->except(['category', 'page'])) }}"
                                     class="inline-flex items-center rounded-full border border-[var(--sg-border)] px-3 py-1.5 text-[11px] text-[var(--sg-stone)] transition hover:border-[var(--sg-ink)] hover:text-[var(--sg-ink)]"
                                 >
                                     حذف
@@ -408,6 +413,8 @@
                             </div>
 
                         @endif
+
+                        </div>
 
                     </div>
 

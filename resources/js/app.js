@@ -919,6 +919,183 @@ window.iranShippingPicker = (regions, initialProvince = '', initialCity = '', in
 Alpine.start();
 
  
+// Live catalog filters: update results as visitors type or change an option.
+(() => {
+    let activeRequest = null;
+    const timers = new WeakMap();
+
+    const syncForms = (url) => {
+        document.querySelectorAll('form[data-live-catalog-filters]').forEach((form) => {
+            form.querySelectorAll('input, select').forEach((control) => {
+                if (!control.name || control.type === 'submit' || control.type === 'button') return;
+                const values = url.searchParams.getAll(control.name);
+                if (control.type === 'checkbox' || control.type === 'radio') control.checked = values.includes(control.value);
+                else control.value = url.searchParams.get(control.name) ?? '';
+            });
+        });
+    };
+
+    const replaceAux = (parsed, selectors) => selectors.split(',').map((value) => value.trim()).filter(Boolean).forEach((selector) => {
+        const current = document.querySelector(selector);
+        const incoming = parsed.querySelector(selector);
+        if (current && incoming) current.replaceWith(incoming);
+    });
+
+    const load = async (url, form, historyMode = 'push') => {
+        const targetSelector = form?.dataset.resultsSelector || document.querySelector('form[data-live-catalog-filters]')?.dataset.resultsSelector;
+        const target = targetSelector ? document.querySelector(targetSelector) : null;
+        if (!target) return window.location.assign(url.toString());
+
+        const minimum = Number(url.searchParams.get('min_price'));
+        const maximum = Number(url.searchParams.get('max_price'));
+        const minValue = url.searchParams.get('min_price');
+        const maxValue = url.searchParams.get('max_price');
+        const minInput = form?.querySelector('[name="min_price"]');
+        const maxInput = form?.querySelector('[name="max_price"]');
+        document.querySelectorAll('form[data-live-catalog-filters] [name="max_price"]').forEach((input) => input.setCustomValidity(''));
+        if (minInput && !minInput.validity.valid) {
+            minInput.reportValidity();
+            return;
+        }
+        if (maxInput && !maxInput.validity.valid) {
+            maxInput.reportValidity();
+            return;
+        }
+        if (minValue && maxValue && Number.isFinite(minimum) && Number.isFinite(maximum) && maximum < minimum) {
+            maxInput?.setCustomValidity('حداکثر قیمت باید برابر یا بیشتر از حداقل قیمت باشد.');
+            maxInput?.reportValidity();
+            return;
+        }
+        
+        activeRequest?.abort();
+        const controller = new AbortController();
+        activeRequest = controller;
+        document.querySelectorAll('form[data-live-catalog-filters]').forEach((item) => {
+            item.setAttribute('aria-busy', 'true');
+            item.classList.add('opacity-70');
+        });
+        target.setAttribute('aria-busy', 'true');
+        target.classList.add('opacity-60', 'pointer-events-none');
+
+        try {
+            const response = await fetch(url, {
+                credentials: 'same-origin',
+                headers: { Accept: 'text/html', 'X-Requested-With': 'XMLHttpRequest' },
+                signal: controller.signal,
+            });
+            if (!response.ok) throw new Error('Catalog request failed');
+            const parsed = new DOMParser().parseFromString(await response.text(), 'text/html');
+            const incoming = parsed.querySelector(targetSelector);
+            if (!incoming) throw new Error('Catalog results container was not found');
+
+            target.replaceWith(incoming);
+            replaceAux(parsed, form?.dataset.auxSelectors || '');
+            if (historyMode === 'push') history.pushState({}, '', url);
+            else if (historyMode === 'replace') history.replaceState({}, '', url);
+            syncForms(url);
+            document.querySelectorAll('form[data-live-catalog-filters]').forEach((item) => {
+                item.removeAttribute('aria-busy');
+                item.classList.remove('opacity-70');
+            });
+            const refreshed = document.querySelector(targetSelector);
+            refreshed?.removeAttribute('aria-busy');
+            refreshed?.classList.remove('opacity-60', 'pointer-events-none');
+        } catch (error) {
+            if (error.name !== 'AbortError') window.location.assign(url.toString());
+        } finally {
+            if (activeRequest === controller) activeRequest = null;
+        }
+    };
+
+    const fromForm = (form) => {
+        const url = new URL(form.action, location.origin);
+        for (const [key, value] of new FormData(form).entries()) {
+            if (typeof value === 'string' && value.trim() !== '') url.searchParams.append(key, value);
+        }
+        url.searchParams.delete('page');
+        return url;
+    };
+
+    const schedule = (form, delay) => {
+        activeRequest?.abort();
+        activeRequest = null;
+        document.querySelectorAll('form[data-live-catalog-filters]').forEach((item) => {
+            item.removeAttribute('aria-busy');
+            item.classList.remove('opacity-70');
+            const target = item.dataset.resultsSelector ? document.querySelector(item.dataset.resultsSelector) : null;
+            target?.removeAttribute('aria-busy');
+            target?.classList.remove('opacity-60', 'pointer-events-none');
+        });
+        const old = timers.get(form);
+        if (old) clearTimeout(old);
+        timers.set(form, setTimeout(() => {
+            timers.delete(form);
+            load(fromForm(form), form, 'replace');
+        }, delay));
+    };
+
+    document.addEventListener('input', (event) => {
+        const form = event.target.closest('form[data-live-catalog-filters]');
+        if (!form || !['search', 'number'].includes(event.target.type)) return;
+        schedule(form, event.target.type === 'search' ? 420 : 550);
+    });
+
+    document.addEventListener('change', (event) => {
+        const form = event.target.closest('form[data-live-catalog-filters]');
+        if (!form) return;
+        if (['checkbox', 'radio', 'number'].includes(event.target.type) || event.target.tagName === 'SELECT') {
+            const old = timers.get(form);
+            if (old) clearTimeout(old);
+            timers.delete(form);
+            load(fromForm(form), form);
+        }
+    });
+
+    document.addEventListener('submit', (event) => {
+        const form = event.target.closest('form[data-live-catalog-filters]');
+        if (!form) return;
+        event.preventDefault();
+        const old = timers.get(form);
+        if (old) clearTimeout(old);
+        timers.delete(form);
+        load(fromForm(form), form);
+    });
+
+    document.addEventListener('click', (event) => {
+        const link = event.target.closest('a[data-live-catalog-sort]');
+        if (!link || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        const forms = [...document.querySelectorAll('form[data-live-catalog-filters]')];
+        const form = forms.find((item) => timers.has(item)) || forms[0];
+        if (!form) return;
+        const linkUrl = new URL(link.href, location.origin);
+        if (linkUrl.origin !== location.origin) return;
+        event.preventDefault();
+        forms.forEach((item) => {
+            const pending = timers.get(item);
+            if (pending) clearTimeout(pending);
+            timers.delete(item);
+        });
+        const url = fromForm(form);
+        const selectedSort = linkUrl.searchParams.get('sort');
+        if (selectedSort) url.searchParams.set('sort', selectedSort);
+        load(url, form);
+    });
+
+    window.addEventListener('popstate', () => {
+        const forms = [...document.querySelectorAll('form[data-live-catalog-filters]')];
+        const form = forms[0];
+        if (!form) return;
+        forms.forEach((item) => {
+            const pending = timers.get(item);
+            if (pending) clearTimeout(pending);
+            timers.delete(item);
+        });
+        const url = new URL(location.href);
+        syncForms(url);
+        load(url, form, false);
+    });
+})();
+
 // Native scroll-snap product carousels: touch/trackpad work without JS,
 // while these controls add predictable one-card movement and keyboard labels.
 const initSgProductCarousels = () => {
