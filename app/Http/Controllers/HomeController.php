@@ -26,7 +26,7 @@ class HomeController extends Controller
         foreach ($sections as $section) {
             $payload = $section->payload ?? [];
             $limit = match ($section->type) {
-                'hero' => 6,
+                'hero' => 1,
                 'categories' => 4,
                 default => max(1, min(24, (int) ($payload['limit'] ?? 8))),
             };
