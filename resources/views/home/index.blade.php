@@ -15,61 +15,70 @@
                 : route('shop.index');
         @endphp
 
-        @if(in_array($section->type, ['hero', 'editorial', 'cta'], true))
+        @if($section->type === 'hero')
             <section class="border-b border-[var(--sg-border)] {{ $section->type === 'cta' ? 'bg-[var(--sg-ink)] text-white' : 'bg-[var(--sg-white)]' }}">
                 <x-layout.container>
-                    @php
-                        $isHero = $section->type === 'hero';
-                        $heroTitle = $isHero ? ($section->title ?: 'خانه‌ای که شبیه توست.') : $section->title;
-                        $heroSubtitle = $isHero ? ($section->subtitle ?: 'مبلمان و جزئیات دکوراسیون را با آرامش ببینید و برای فضای زندگی‌تان انتخاب کنید.') : $section->subtitle;
-                        $heroEyebrow = $isHero ? ($section->eyebrow ?: 'سیلا گالری | مبلمان و دکوراسیون') : $section->eyebrow;
-                    @endphp
-                    <div class="{{ $isHero ? 'sila-home-hero-grid' : 'grid' }} grid-cols-1 items-center gap-8 py-10 sm:py-14 lg:grid-cols-2 lg:gap-14 lg:py-16">
-                        <div class="{{ $isHero ? 'sila-home-hero-copy' : 'max-w-2xl' }} max-w-2xl {{ $section->type === 'cta' ? 'lg:order-2' : '' }}">
-                            @if($heroEyebrow)<p class="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--sg-accent)]">{{ $heroEyebrow }}</p>@endif
-                            @if($heroTitle)<h1 class="{{ $isHero ? 'sila-home-hero-title' : 'mt-4 text-3xl sm:text-5xl' }} font-semibold leading-tight tracking-tight {{ $section->type === 'cta' ? 'text-white' : 'text-[var(--sg-ink)]' }}">{{ $heroTitle }}</h1>@endif
-                            @if($heroSubtitle)<p class="mt-5 max-w-xl text-sm leading-8 {{ $section->type === 'cta' ? 'text-white/65' : 'text-[var(--sg-stone)]' }}">{{ $heroSubtitle }}</p>@endif
-                            @if($section->cta_label)<a href="{{ $ctaUrl }}" class="mt-7 inline-flex min-h-12 items-center justify-center rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] px-6 py-3 text-sm font-semibold text-[var(--sg-ink)] transition hover:border-[var(--sg-accent)]">{{ $section->cta_label }} <span class="mr-3" aria-hidden="true">←</span></a>@endif
+                    <div class="grid items-center gap-8 py-12 sm:py-16 lg:grid-cols-2 lg:gap-14 lg:py-20">
+                        <div class="max-w-2xl {{ $section->type === 'cta' ? 'lg:order-2' : '' }}">
+                            @if($section->eyebrow)<p class="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--sg-accent)]">{{ $section->eyebrow }}</p>@endif
+                            @if($section->title)<h1 class="mt-4 text-3xl font-semibold leading-tight tracking-tight sm:text-5xl {{ $section->type === 'cta' ? 'text-white' : 'text-[var(--sg-ink)]' }}">{{ $section->title }}</h1>@endif
+                            @if($section->subtitle)<p class="mt-5 max-w-xl text-sm leading-8 {{ $section->type === 'cta' ? 'text-white/65' : 'text-[var(--sg-stone)]' }}">{{ $section->subtitle }}</p>@endif
+                            @if($section->cta_label)<a href="{{ $ctaUrl }}" class="mt-8 inline-flex items-center justify-center rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] px-6 py-4 text-sm font-semibold text-[var(--sg-ink)] transition hover:border-[var(--sg-accent)]">{{ $section->cta_label }} <span class="mr-3" aria-hidden="true">←</span></a>@endif
                         </div>
                         @php($heroProduct = $section->type === 'hero' ? $section->products->first() : null)
                         @php($heroImage = $section->image_url ?: $heroProduct?->images?->first()?->detail_url)
-                        <div class="{{ $isHero ? 'sila-home-hero-media' : 'min-w-0' }} min-w-0 {{ $section->type === 'cta' ? 'lg:order-1' : '' }}">
-                            @if($isHero && $section->products->isNotEmpty())
-                                <div class="sila-hero-slider" data-sila-hero-slider aria-roledescription="carousel" aria-label="منتخب سیلا گالری">
-                                    <div class="sila-hero-slider__stage">
-                                        @foreach($section->products as $slideIndex => $slideProduct)
-                                            @php($slideImage = $slideProduct->images->first()?->detail_url)
-                                            @if($slideImage)
-                                                <figure class="sila-hero-slide {{ $slideIndex === 0 ? 'is-active' : '' }}" data-sila-hero-slide aria-hidden="{{ $slideIndex === 0 ? 'false' : 'true' }}">
-                                                    <img src="{{ $slideImage }}" alt="{{ $slideProduct->name }}" class="sila-home-hero-image" loading="{{ $slideIndex === 0 ? 'eager' : 'lazy' }}" fetchpriority="{{ $slideIndex === 0 ? 'high' : 'auto' }}">
-                                                    <figcaption class="sila-hero-slide__caption">
-                                                        <span>{{ $slideProduct->category?->name ?: 'منتخب سیلا' }}</span>
-                                                        <strong>{{ $slideProduct->name }}</strong>
-                                                        <a href="{{ route('product.show', $slideProduct->slug) }}" aria-label="مشاهده {{ $slideProduct->name }}">مشاهده محصول <span aria-hidden="true">←</span></a>
-                                                    </figcaption>
-                                                </figure>
-                                            @endif
+                        <div class="min-w-0 space-y-4 {{ $section->type === 'cta' ? 'lg:order-1' : '' }}">
+                            @if($heroImage)
+                                <div class="overflow-hidden rounded-[2rem] bg-[var(--sg-surface)]">
+                                    <img src="{{ $heroImage }}" alt="{{ $section->title ?: 'SillaGallery' }}" class="aspect-[5/4] h-full w-full object-cover" fetchpriority="{{ $section->type === 'hero' ? 'high' : 'auto' }}">
+                                </div>
+                            @endif
+                            @if($section->type === 'hero' && $section->products->isNotEmpty())
+                                <div data-sg-carousel class="relative">
+                                    <div class="mb-2 hidden items-center justify-end gap-2 sm:flex">
+                                        <button type="button" data-carousel-prev aria-label="محصول قبلی" class="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)]">←</button>
+                                        <button type="button" data-carousel-next aria-label="محصول بعدی" class="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)]">→</button>
+                                    </div>
+                                    <div class="sg-product-carousel" data-carousel-track>
+                                        @foreach($section->products as $product)
+                                            <div class="sg-product-carousel-item"><x-product.card :product="$product" /></div>
                                         @endforeach
                                     </div>
-                                    @if($section->products->count() > 1)
-                                        <div class="sila-hero-slider__controls">
-                                            <div class="sila-hero-slider__dots" aria-label="انتخاب اسلاید">
-                                                @foreach($section->products as $slideIndex => $slideProduct)
-                                                    @if($slideProduct->images->first()?->detail_url)
-                                                        <button type="button" data-sila-hero-dot="{{ $loop->index }}" class="{{ $slideIndex === 0 ? 'is-active' : '' }}" aria-label="رفتن به اسلاید {{ $loop->iteration }}" aria-current="{{ $slideIndex === 0 ? 'true' : 'false' }}"></button>
-                                                    @endif
-                                                @endforeach
-                                            </div>
-                                            <div class="sila-hero-slider__arrows">
-                                                <button type="button" data-sila-hero-prev aria-label="اسلاید قبلی">←</button>
-                                                <button type="button" data-sila-hero-next aria-label="اسلاید بعدی">→</button>
-                                            </div>
-                                        </div>
-                                    @endif
                                 </div>
-                            @elseif($heroImage)
-                                <div class="overflow-hidden rounded-[1.5rem] sm:rounded-[2rem] bg-[var(--sg-surface)]">
-                                    <img src="{{ $heroImage }}" alt="{{ $heroTitle ?: 'سیلا گالری' }}" class="sila-home-hero-image w-full object-cover" fetchpriority="auto">
+                            @endif
+                        </div>
+                    </div>
+                </x-layout.container>
+            </section>
+        @elseif(in_array($section->type, ['editorial', 'cta'], true))
+            <section class="border-b border-[var(--sg-border)] {{ $section->type === 'cta' ? 'bg-[var(--sg-ink)] text-white' : 'bg-[var(--sg-white)]' }}">
+                <x-layout.container>
+                    <div class="grid items-center gap-8 py-12 sm:py-16 lg:grid-cols-2 lg:gap-14 lg:py-20">
+                        <div class="max-w-2xl {{ $section->type === 'cta' ? 'lg:order-2' : '' }}">
+                            @if($section->eyebrow)<p class="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--sg-accent)]">{{ $section->eyebrow }}</p>@endif
+                            @if($section->title)<h1 class="mt-4 text-3xl font-semibold leading-tight tracking-tight sm:text-5xl {{ $section->type === 'cta' ? 'text-white' : 'text-[var(--sg-ink)]' }}">{{ $section->title }}</h1>@endif
+                            @if($section->subtitle)<p class="mt-5 max-w-xl text-sm leading-8 {{ $section->type === 'cta' ? 'text-white/65' : 'text-[var(--sg-stone)]' }}">{{ $section->subtitle }}</p>@endif
+                            @if($section->cta_label)<a href="{{ $ctaUrl }}" class="mt-8 inline-flex items-center justify-center rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] px-6 py-4 text-sm font-semibold text-[var(--sg-ink)] transition hover:border-[var(--sg-accent)]">{{ $section->cta_label }} <span class="mr-3" aria-hidden="true">←</span></a>@endif
+                        </div>
+                        @php($heroProduct = $section->type === 'hero' ? $section->products->first() : null)
+                        @php($heroImage = $section->image_url ?: $heroProduct?->images?->first()?->detail_url)
+                        <div class="min-w-0 space-y-4 {{ $section->type === 'cta' ? 'lg:order-1' : '' }}">
+                            @if($heroImage)
+                                <div class="overflow-hidden rounded-[2rem] bg-[var(--sg-surface)]">
+                                    <img src="{{ $heroImage }}" alt="{{ $section->title ?: 'SillaGallery' }}" class="aspect-[5/4] h-full w-full object-cover" fetchpriority="{{ $section->type === 'hero' ? 'high' : 'auto' }}">
+                                </div>
+                            @endif
+                            @if($section->type === 'hero' && $section->products->isNotEmpty())
+                                <div data-sg-carousel class="relative">
+                                    <div class="mb-2 hidden items-center justify-end gap-2 sm:flex">
+                                        <button type="button" data-carousel-prev aria-label="محصول قبلی" class="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)]">←</button>
+                                        <button type="button" data-carousel-next aria-label="محصول بعدی" class="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)]">→</button>
+                                    </div>
+                                    <div class="sg-product-carousel" data-carousel-track>
+                                        @foreach($section->products as $product)
+                                            <div class="sg-product-carousel-item"><x-product.card :product="$product" /></div>
+                                        @endforeach
+                                    </div>
                                 </div>
                             @endif
                         </div>

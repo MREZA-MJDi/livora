@@ -98,16 +98,17 @@ class HomepageContentSeeder extends Seeder
                 'sort_order' => $attributes['sort_order'],
             ]);
 
-            // Repair missing copy without overwriting content edited in the CMS.
-            foreach (['eyebrow', 'title', 'subtitle', 'cta_label', 'cta_url'] as $field) {
-                if (blank($section->{$field}) && filled($attributes[$field] ?? null)) {
-                    $section->{$field} = $attributes[$field];
+            if ($key !== 'hero') {
+                // Preserve existing CMS content while repairing missing copy in other sections.
+                foreach (['eyebrow', 'title', 'subtitle', 'cta_label', 'cta_url'] as $field) {
+                    if (blank($section->{$field}) && filled($attributes[$field] ?? null)) {
+                        $section->{$field} = $attributes[$field];
+                    }
                 }
             }
 
-            // Keep the hero image backed by one real catalogue product when no CMS image is set.
             if ($key === 'hero') {
-                $section->payload = ['product_source' => 'latest', 'limit' => 1];
+                $section->payload = ['product_source' => 'latest', 'limit' => 6];
             } elseif ($key === 'featured') {
                 $section->payload = ['product_source' => 'featured', 'limit' => 4];
             } elseif ($key === 'new-arrivals') {
