@@ -134,6 +134,17 @@ final class JalaliHelper
         return self::toPersianDigits($formatted);
     }
 
+    public static function formatYear(DateTimeInterface $date): string
+    {
+        [$year] = self::toJalali(
+            (int) $date->format('Y'),
+            (int) $date->format('n'),
+            (int) $date->format('j')
+        );
+
+        return self::toPersianDigits((string) $year);
+    }
+
     public static function formatDateTime(DateTimeInterface $date, bool $withWeekday = false): string
     {
         return self::formatDate($date, $withWeekday)

@@ -195,6 +195,12 @@
                         </p>
                     @endif
 
+                    @if(filled($storeSettings?->hours))
+                        <p class="text-sm leading-7 text-white/45">
+                            ساعات پاسخ‌گویی: {{ $storeSettings->hours }}
+                        </p>
+                    @endif
+
                 </div>
 
 
@@ -264,7 +270,7 @@
             <div>
 
                 <p class="text-xs text-white/40">
-                    © {{ \App\Helpers\JalaliHelper::formatDate(now()) }} {{ $storeSettings?->brand_name ?: config('app.name') }}.
+                    © {{ \App\Helpers\JalaliHelper::formatYear(now()) }} {{ $storeSettings?->brand_name ?: config('app.name') }}.
                     تمامی حقوق محفوظ است.
                 </p>
 

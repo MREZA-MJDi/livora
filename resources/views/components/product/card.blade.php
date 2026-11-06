@@ -50,13 +50,13 @@
                     data-card-image
                     class="product-card-image h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.045]"
                 >
-                <span data-card-image-fallback class="hidden h-full w-full items-center justify-center text-xs tracking-[0.2em] text-[var(--sg-stone)]" aria-hidden="true">SillaGallery</span>
+                <span data-card-image-fallback class="hidden h-full w-full items-center justify-center text-xs tracking-[0.2em] text-[var(--sg-stone)]" aria-hidden="true">سیلا گالری</span>
 
             @else
 
                 <div class="flex h-full w-full items-center justify-center">
                     <span class="text-xs tracking-[0.2em] text-[var(--sg-stone)]">
-                        SillaGallery
+                        سیلا گالری
                     </span>
                 </div>
 

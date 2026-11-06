@@ -50,7 +50,7 @@
 
                         <div class="shop-hero-banner__content relative z-10 w-full max-w-3xl p-5 sm:p-7 lg:p-9">
                             <p class="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/75 sm:text-xs">
-                                {{ $shopBanner->eyebrow ?: 'SILLAGALLERY COLLECTION' }}
+                                {{ $shopBanner->eyebrow ?: 'مجموعه سیلا گالری' }}
                             </p>
                             <h1 class="mt-4 max-w-2xl text-2xl font-semibold leading-snug tracking-tight sm:text-3xl lg:text-4xl">
                                 {{ $shopBanner->title ?: 'برای خانه‌ای با امضای شما' }}
