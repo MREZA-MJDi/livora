@@ -950,7 +950,16 @@ Alpine.start();
         const maximum = Number(url.searchParams.get('max_price'));
         const minValue = url.searchParams.get('min_price');
         const maxValue = url.searchParams.get('max_price');
+        const minInput = form?.querySelector('[name="min_price"]');
         const maxInput = form?.querySelector('[name="max_price"]');
+        if (minInput && !minInput.validity.valid) {
+            minInput.reportValidity();
+            return;
+        }
+        if (maxInput && !maxInput.validity.valid) {
+            maxInput.reportValidity();
+            return;
+        }
         if (minValue && maxValue && Number.isFinite(minimum) && Number.isFinite(maximum) && maximum < minimum) {
             maxInput?.setCustomValidity('حداکثر قیمت باید برابر یا بیشتر از حداقل قیمت باشد.');
             maxInput?.reportValidity();
