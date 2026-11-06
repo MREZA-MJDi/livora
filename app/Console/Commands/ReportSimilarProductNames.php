@@ -64,7 +64,7 @@ class ReportSimilarProductNames extends Command
         return self::SUCCESS;
     }
 
-    private function normalize(string $value): string
+    private function normalize(string $value): array
     {
         $value = str_replace(['ي', 'ى', 'ك', '‌', 'ـ'], ['ی', 'ی', 'ک', ' ', ''], $value);
         $value = mb_strtolower($value, 'UTF-8');
