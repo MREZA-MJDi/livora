@@ -62,7 +62,7 @@ class ProductImageController extends Controller
         } else {
             $media = MediaLibrary::image($data['media_id'] ?? null);
         }
-        if ($media && (! $media->thumbnail_path || ! $media->card_path || ! $media->detail_path)) {
+        if ($request->hasFile('image') && (! $media->thumbnail_path || ! $media->card_path || ! $media->detail_path)) {
             $media = app(ProductImageVariantGenerator::class)->generate($media);
         }
         $data['path'] = $media->path;
@@ -120,7 +120,7 @@ class ProductImageController extends Controller
             $newMedia = MediaLibrary::image($data['media_id']);
         }
         if ($newMedia) {
-            if (! $newMedia->thumbnail_path || ! $newMedia->card_path || ! $newMedia->detail_path) {
+            if ($request->hasFile('image') && (! $newMedia->thumbnail_path || ! $newMedia->card_path || ! $newMedia->detail_path)) {
                 $newMedia = app(ProductImageVariantGenerator::class)->generate($newMedia);
             }
             $data['path'] = $newMedia->path;
