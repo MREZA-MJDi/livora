@@ -170,7 +170,7 @@ class MediaController extends Controller
                 ->with('error', 'این رسانه هنوز استفاده می‌شود: '.$usedBy->implode('، ').'. ابتدا اتصال‌های آن را حذف یا جایگزین کنید.');
         }
 
-        $variantPaths = [$media->thumbnail_path, $media->card_path, $media->detail_path];
+        $variantPaths = [$media->variant_source_path, $media->thumbnail_path, $media->card_path, $media->detail_path];
         DB::transaction(fn () => $media->delete());
 
         if ($media->disk && $media->path
