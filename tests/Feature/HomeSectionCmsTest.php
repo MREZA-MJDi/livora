@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\HomeSection;
 use App\Models\User;
 use Database\Seeders\InitialDataSeeder;
+use Database\Seeders\HomepageContentSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
