@@ -952,6 +952,7 @@ Alpine.start();
         const maxValue = url.searchParams.get('max_price');
         const minInput = form?.querySelector('[name="min_price"]');
         const maxInput = form?.querySelector('[name="max_price"]');
+        document.querySelectorAll('form[data-live-catalog-filters] [name="max_price"]').forEach((input) => input.setCustomValidity(''));
         if (minInput && !minInput.validity.valid) {
             minInput.reportValidity();
             return;
@@ -965,8 +966,7 @@ Alpine.start();
             maxInput?.reportValidity();
             return;
         }
-        document.querySelectorAll('form[data-live-catalog-filters] [name="max_price"]').forEach((input) => input.setCustomValidity(''));
-
+        
         activeRequest?.abort();
         const controller = new AbortController();
         activeRequest = controller;
