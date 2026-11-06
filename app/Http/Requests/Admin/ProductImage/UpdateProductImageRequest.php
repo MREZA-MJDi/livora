@@ -21,6 +21,7 @@ class UpdateProductImageRequest extends FormRequest
             ],
 
             'media_id' => ['nullable', 'integer', 'exists:media,id'],
+            'original_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'dimensions:min_width=400,min_height=500', 'max:10240'],
             'image' => [
                 'nullable',
                 'image',
