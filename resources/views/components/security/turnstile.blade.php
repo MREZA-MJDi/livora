@@ -2,10 +2,10 @@
     $siteKey = config('services.turnstile.site_key');
     $secret = config('services.turnstile.secret');
     $action = match (request()->route()?->getName()) {
-        'login.store' => 'login',
-        'register.store' => 'signup',
-        'checkout.place' => 'checkout',
-        'contact.store' => 'contact',
+        'login', 'login.store' => 'login',
+        'register', 'register.store' => 'signup',
+        'checkout.index', 'checkout.place' => 'checkout',
+        'contact', 'contact.store' => 'contact',
         default => 'form',
     };
 @endphp

@@ -41,6 +41,21 @@ class TurnstileProtectionTest extends TestCase
             ->assertSee('data-sitekey="test-site-key"', false);
     }
 
+    public function test_turnstile_widget_uses_the_action_expected_by_each_submission_route(): void
+    {
+        $this->get(route('login'))
+            ->assertOk()
+            ->assertSee('data-action="login"', false);
+
+        $this->get(route('register'))
+            ->assertOk()
+            ->assertSee('data-action="signup"', false);
+
+        $this->get(route('contact'))
+            ->assertOk()
+            ->assertSee('data-action="contact"', false);
+    }
+
     public function test_login_is_blocked_when_turnstile_verification_fails(): void
     {
         User::query()->create([
