@@ -39,7 +39,10 @@ class CategoryController extends Controller
 
         $filters = $request->validated();
         $category->load([
-            'media', 'cardMedia', 'bannerMedia', 'children.cardMedia', 'children.latestActiveProduct.images',
+            'media', 'cardMedia', 'bannerMedia',
+            'children' => fn ($query) => $query->where('is_active', true)
+                ->withCount(['products' => fn ($productQuery) => $productQuery->active()])
+                ->with(['cardMedia', 'latestActiveProduct.images' => fn ($imageQuery) => $imageQuery->with('media')->orderByDesc('is_primary')->orderBy('sort_order')->limit(1)]),
             'latestActiveProduct.images' => fn ($imageQuery) => $imageQuery
                     ->with('media')
                     ->orderByDesc('is_primary')
