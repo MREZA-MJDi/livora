@@ -1064,17 +1064,32 @@ Alpine.start();
     document.addEventListener('click', (event) => {
         const link = event.target.closest('a[data-live-catalog-sort]');
         if (!link || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-        const form = document.querySelector('form[data-live-catalog-filters]');
+        const forms = [...document.querySelectorAll('form[data-live-catalog-filters]')];
+        const form = forms.find((item) => timers.has(item)) || forms[0];
         if (!form) return;
-        const url = new URL(link.href, location.origin);
-        if (url.origin !== location.origin) return;
+        const linkUrl = new URL(link.href, location.origin);
+        if (linkUrl.origin !== location.origin) return;
         event.preventDefault();
+        forms.forEach((item) => {
+            const pending = timers.get(item);
+            if (pending) clearTimeout(pending);
+            timers.delete(item);
+        });
+        const url = fromForm(form);
+        const selectedSort = linkUrl.searchParams.get('sort');
+        if (selectedSort) url.searchParams.set('sort', selectedSort);
         load(url, form);
     });
 
     window.addEventListener('popstate', () => {
-        const form = document.querySelector('form[data-live-catalog-filters]');
+        const forms = [...document.querySelectorAll('form[data-live-catalog-filters]')];
+        const form = forms[0];
         if (!form) return;
+        forms.forEach((item) => {
+            const pending = timers.get(item);
+            if (pending) clearTimeout(pending);
+            timers.delete(item);
+        });
         const url = new URL(location.href);
         syncForms(url);
         load(url, form, false);
