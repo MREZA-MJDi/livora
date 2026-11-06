@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Media\MediaUploadRequest;
 use App\Models\Media;
+use App\Models\HomeSection;
+use App\Models\ContactSetting;
 use App\Support\MediaLibrary;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -162,6 +164,8 @@ class MediaController extends Controller
             'صفحه‌ها' => $media->contentPages()->count(),
             'بنر فروشگاه' => $media->shopBannerSettings()->count(),
             'تصویر پیش‌فرض Open Graph' => $media->seoSettings()->count(),
+            'لوگوی برند' => ContactSetting::query()->where('logo_media_id', $media->id)->count(),
+            'تصویر سکشن صفحه اصلی' => HomeSection::query()->where('image_path', $media->path)->count(),
         ];
         $usedBy = collect($usages)->filter()->map(fn ($count, $label) => $label.' ('.$count.')')->values();
 
