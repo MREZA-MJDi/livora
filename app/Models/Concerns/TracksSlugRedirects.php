@@ -4,13 +4,14 @@ namespace App\Models\Concerns;
 
 use App\Models\SlugRedirect;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 trait TracksSlugRedirects
 {
     protected static function bootTracksSlugRedirects(): void
     {
         static::saving(function ($model): void {
-            $normalized = \\Illuminate\\Support\\Str::slug((string) $model->slug);
+            $normalized = Str::slug((string) $model->slug);
             if ($normalized !== '') {
                 $model->slug = $normalized;
             }
