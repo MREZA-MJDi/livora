@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\SeoSetting;
+use App\Models\ContactSetting;
 use App\Models\BlogPost;
 use App\Models\Category;
 use App\Models\ContentPage;
@@ -19,7 +20,7 @@ class SeoController extends Controller
 {
     public function edit(): View
     {
-        return view('admin.seo.edit', ['settings' => SeoSetting::current()->load('defaultOgMedia')]);
+        return view('admin.seo.edit', [\n            'settings' => SeoSetting::current()->load('defaultOgMedia'),\n            'brandSettings' => ContactSetting::query()->first(),\n        ]);
     }
 
 
@@ -102,10 +103,11 @@ class SeoController extends Controller
         ]);
 
         $settings = SeoSetting::current();
-        $oldFiles = ['organization_logo' => $settings->organization_logo];
+        $brandSettings = ContactSetting::query()->first();
+        $oldFiles = [];
         $newFiles = [];
 
-        foreach (['organization_logo' => 'brand'] as $field => $folder) {
+        foreach ([] as $field => $folder) {
             if ($request->hasFile($field)) {
                 $path = $request->file($field)->store($folder, 'public');
                 if (! $path) {
@@ -119,14 +121,14 @@ class SeoController extends Controller
         }
 
         $data = [
-            'site_name' => 'SillaGallery',
+            'site_name' => $brandSettings?->brand_name ?: config('app.name'),
             'default_title' => $validated['default_title'] ?? null,
             'default_description' => $validated['default_description'] ?? null,
             'twitter_handle' => $validated['twitter_handle'] ?? null,
             'google_site_verification' => $validated['google_site_verification'] ?? null,
             'bing_site_verification' => $validated['bing_site_verification'] ?? null,
-            'organization_name' => $validated['organization_name'] ?? 'SillaGallery',
-            'organization_description' => $validated['organization_description'] ?? null,
+            'organization_name' => $brandSettings?->brand_name ?: config('app.name'),
+            'organization_description' => $brandSettings?->brand_description,
             'contact_email' => $validated['contact_email'] ?? null,
             'contact_phone' => $validated['contact_phone'] ?? null,
             'social_links' => array_filter($validated['social_links'] ?? [], fn ($url) => filled($url)),
@@ -145,9 +147,7 @@ class SeoController extends Controller
             $data['default_og_media_id'] = $ogMedia->id;
         }
 
-        foreach ($newFiles as $field => $path) {
-            $data[$field] = $path;
-        }
+        $data['organization_logo'] = $brandSettings?->logo_path;
 
         $settings->update($data);
         \Illuminate\Support\Facades\Cache::forget('seo_settings.current');
