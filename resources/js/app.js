@@ -941,7 +941,7 @@ Alpine.start();
         if (current && incoming) current.replaceWith(incoming);
     });
 
-    const load = async (url, form, push = true) => {
+    const load = async (url, form, historyMode = 'push') => {
         const targetSelector = form?.dataset.resultsSelector || document.querySelector('form[data-live-catalog-filters]')?.dataset.resultsSelector;
         const target = targetSelector ? document.querySelector(targetSelector) : null;
         if (!target) return window.location.assign(url.toString());
@@ -981,7 +981,8 @@ Alpine.start();
 
             target.replaceWith(incoming);
             replaceAux(parsed, form?.dataset.auxSelectors || '');
-            if (push) history.pushState({}, '', url);
+            if (historyMode === 'push') history.pushState({}, '', url);
+            else if (historyMode === 'replace') history.replaceState({}, '', url);
             syncForms(url);
             document.querySelectorAll('form[data-live-catalog-filters]').forEach((item) => {
                 item.removeAttribute('aria-busy');
@@ -1012,7 +1013,7 @@ Alpine.start();
         if (old) clearTimeout(old);
         timers.set(form, setTimeout(() => {
             timers.delete(form);
-            load(fromForm(form), form);
+            load(fromForm(form), form, 'replace');
         }, delay));
     };
 
