@@ -33,8 +33,13 @@ class HomeController extends Controller
                     ->withCount('allVariants')
                     ->whereNotIn('products.id', $usedProductIds);
 
-                $source = $section->type === 'hero' ? 'latest' : ($payload['product_source'] ?? 'latest');
-                if ($source === 'selected') {
+                $source = $section->type === 'hero' ? 'latest' : ($section->key === 'featured' ? 'featured' : ($payload['product_source'] ?? 'latest'));
+                if ($source === 'featured') {
+                    $products = (clone $query)->featured()->latest('created_at')->limit($limit)->get();
+                    if ($products->isEmpty()) {
+                        $products = $query->latest('created_at')->limit($limit)->get();
+                    }
+                } elseif ($source === 'selected') {
                     $ids = array_values(array_unique(array_map('intval', $payload['product_ids'] ?? [])));
                     $products = $ids === []
                         ? collect()
