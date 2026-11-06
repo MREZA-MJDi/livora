@@ -49,11 +49,11 @@ class InitialProductSeeder extends Seeder
         foreach ($products as $product) {
             $installment = $product['installment'];
             $specifications = [
-                'ابعاد' => $product['dimensions'],
-                'جنس' => $product['material'],
-                'رنگ‌بندی' => $product['colors'],
-                'زمان تحویل' => $product['delivery'],
-                'یادداشت' => 'اطلاعات این رکورد برای آماده‌سازی کاتالوگ اولیه است و باید پیش از انتشار با مشخصات واقعی محصول تطبیق داده شود.',
+                ['label' => 'ابعاد', 'value' => $product['dimensions']],
+                ['label' => 'جنس', 'value' => $product['material']],
+                ['label' => 'رنگ‌بندی', 'value' => $product['colors']],
+                ['label' => 'زمان تحویل', 'value' => $product['delivery']],
+                ['label' => 'یادداشت', 'value' => 'اطلاعات این رکورد برای آماده‌سازی کاتالوگ اولیه است و باید پیش از انتشار با مشخصات واقعی محصول تطبیق داده شود.'],
             ];
             unset(
                 $product['category'],
