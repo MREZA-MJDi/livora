@@ -19,7 +19,8 @@
             @php
                 $heroProduct = $section->products->first();
                 $heroSlides = collect($payload['slides'] ?? []);
-                if ($heroSlides->isEmpty()) {
+                $hasConfiguredSlides = $heroSlides->isNotEmpty();
+                if (! $hasConfiguredSlides) {
                     $heroSlides = collect([[
                         'eyebrow' => $section->eyebrow,
                         'title' => $section->title,
@@ -41,13 +42,13 @@
             <section class="sg-home-hero border-b border-[var(--sg-border)] bg-[var(--sg-white)]" data-sg-home-hero dir="ltr">
                 <x-layout.container>
                     <div class="sg-home-hero__layout">
-                        <div class="sg-home-hero__content" dir="rtl">
+                        <div class="sg-home-hero__content" dir="ltr">
                             <div class="sg-home-hero__dots" role="tablist" aria-label="انتخاب اسلاید هیرو">
                                 @foreach($heroSlides as $index => $slide)
                                     <button type="button" class="sg-home-hero__dot {{ $index === 0 ? 'is-active' : '' }}" data-sg-hero-dot="{{ $index }}" aria-label="نمایش اسلاید {{ $index + 1 }}" aria-pressed="{{ $index === 0 ? 'true' : 'false' }}"></button>
                                 @endforeach
                             </div>
-                            <div class="sg-home-hero__copy">
+                            <div class="sg-home-hero__copy" dir="rtl">
                                 <p class="sg-home-hero__eyebrow" data-sg-hero-eyebrow>{{ $heroSlides[0]['eyebrow'] ?? '' }}</p>
                                 <h1 class="sg-home-hero__title" data-sg-hero-title>{{ $heroSlides[0]['title'] ?? $section->title }}</h1>
                                 <p class="sg-home-hero__subtitle" data-sg-hero-subtitle>{{ $heroSlides[0]['subtitle'] ?? $section->subtitle }}</p>
