@@ -103,6 +103,90 @@ button {
     cursor: pointer;
 }
 
+
+/* =========================================================
+   BUTTON SAFETY NET + SHARED STOREFRONT BUTTON PRIMITIVE
+   Keeps native/unclassed controls visible after Tailwind preflight.
+   ========================================================= */
+button:not([class]),
+a[role="button"]:not([class]) {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    padding: .7rem 1.1rem;
+    border: 1px solid var(--sg-border);
+    border-radius: .9rem;
+    background: var(--sg-white);
+    color: var(--sg-ink);
+    font: inherit;
+    font-size: .875rem;
+    font-weight: 600;
+    line-height: 1.4;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color var(--sg-duration-fast), border-color var(--sg-duration-fast), color var(--sg-duration-fast), transform var(--sg-duration-fast), box-shadow var(--sg-duration-fast);
+}
+
+button:not([class]):hover,
+a[role="button"]:not([class]):hover {
+    border-color: var(--sg-ink);
+    background: var(--sg-surface);
+    transform: translateY(-1px);
+}
+
+button:not([class]):focus-visible,
+a[role="button"]:not([class]):focus-visible {
+    outline: 2px solid var(--sg-accent);
+    outline-offset: 3px;
+}
+
+button:not([class]):disabled {
+    opacity: .55;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.sg-button {
+    display: inline-flex;
+    min-height: 2.875rem;
+    max-width: 100%;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    padding: .75rem 1.25rem;
+    border: 1px solid transparent;
+    border-radius: 1rem;
+    font: inherit;
+    font-size: .875rem;
+    font-weight: 650;
+    line-height: 1.4;
+    text-align: center;
+    text-decoration: none;
+    white-space: normal;
+    cursor: pointer;
+    transition: background-color var(--sg-duration-fast), border-color var(--sg-duration-fast), color var(--sg-duration-fast), transform var(--sg-duration-fast), box-shadow var(--sg-duration-fast);
+}
+
+.sg-button:hover:not(:disabled) { transform: translateY(-1px); }
+.sg-button:active:not(:disabled) { transform: translateY(0); }
+.sg-button:disabled, .sg-button[aria-disabled="true"] { opacity: .55; cursor: not-allowed; }
+.sg-button:focus-visible { outline: 2px solid var(--sg-accent); outline-offset: 3px; }
+.sg-button--primary { background: var(--sg-ink); border-color: var(--sg-ink); color: #fff; }
+.sg-button--primary:hover:not(:disabled) { background: var(--sg-accent); border-color: var(--sg-accent); color: #fff; }
+.sg-button--secondary { background: var(--sg-white); border-color: var(--sg-border); color: var(--sg-ink); }
+.sg-button--secondary:hover:not(:disabled) { background: var(--sg-surface); border-color: var(--sg-ink); }
+
+@media (max-width: 639px) {
+    .sg-button { min-height: 2.75rem; padding: .7rem 1rem; font-size: .8125rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sg-button, button:not([class]), a[role="button"]:not([class]) { transition: none; }
+}
+
 button:disabled {
     cursor: not-allowed;
 }

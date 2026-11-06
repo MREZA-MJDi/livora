@@ -109,7 +109,7 @@
                             @if($section->eyebrow)<p class="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--sg-accent)]">{{ $section->eyebrow }}</p>@endif
                             @if($section->title)<h1 class="mt-4 text-3xl font-semibold leading-tight tracking-tight sm:text-5xl {{ $section->type === 'cta' ? 'text-white' : 'text-[var(--sg-ink)]' }}">{{ $section->title }}</h1>@endif
                             @if($section->subtitle)<p class="mt-5 max-w-xl text-sm leading-8 {{ $section->type === 'cta' ? 'text-white/65' : 'text-[var(--sg-stone)]' }}">{{ $section->subtitle }}</p>@endif
-                            @if($section->cta_label)<a href="{{ $ctaUrl }}" class="mt-8 inline-flex items-center justify-center rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] px-6 py-4 text-sm font-semibold text-[var(--sg-ink)] transition hover:border-[var(--sg-accent)]">{{ $section->cta_label }} <span class="mr-3" aria-hidden="true">←</span></a>@endif
+                            @if($section->cta_label)<a href="{{ $ctaUrl }}" class="sg-button sg-button--secondary mt-8">{{ $section->cta_label }} <span class="mr-3" aria-hidden="true">←</span></a>@endif
                         </div>
                         @php($heroProduct = $section->type === 'hero' ? $section->products->first() : null)
                         @php($heroImage = $section->image_url ?: $heroProduct?->images?->first()?->detail_url)
@@ -246,7 +246,7 @@
                         <h2 class="mt-3 text-3xl font-semibold leading-tight sm:text-4xl">{{ $finalCta->title }}</h2>
                         @if($finalCta->subtitle)<p class="mt-4 text-sm leading-8 text-white/65">{{ $finalCta->subtitle }}</p>@endif
                     </div>
-                    @if($finalCta->cta_label)<a href="{{ filled($finalCta->cta_url) ? url($finalCta->cta_url) : route('shop.index') }}" class="inline-flex shrink-0 items-center justify-center rounded-xl bg-white px-6 py-4 text-sm font-semibold text-[var(--sg-ink)]">{{ $finalCta->cta_label }} ←</a>@endif
+                    @if($finalCta->cta_label)<a href="{{ filled($finalCta->cta_url) ? url($finalCta->cta_url) : route('shop.index') }}" class="sg-button sg-button--secondary shrink-0">{{ $finalCta->cta_label }} ←</a>@endif
                 </div>
             </x-layout.container>
         </section>
