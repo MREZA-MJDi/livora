@@ -321,7 +321,7 @@
                 <div>
 
                     <label for="slug" class="admin-label">
-                        Slug
+                        آدرس اختصاصی محصول (اختیاری)
                     </label>
 
                     <input
@@ -335,7 +335,7 @@
                     >
 
                     <p class="mt-2 text-xs text-[var(--admin-muted)]">
-                        در صورت خالی بودن، از نام محصول ساخته می‌شود.
+                        این بخش را خالی بگذارید؛ آدرس به‌صورت خودکار از نام محصول ساخته می‌شود.
                     </p>
 
                     @error('slug')
