@@ -41,6 +41,18 @@
                         : $legacyImage;
                     return [...$slide, 'image_url' => $image, 'object_position' => $slide['object_position'] ?? '50% 50%'];
                 });
+                $heroSlideData = $heroSlides->map(function ($slide) {
+                    return [
+                        'eyebrow' => $slide['eyebrow'] ?? '',
+                        'title' => $slide['title'] ?? '',
+                        'subtitle' => $slide['subtitle'] ?? '',
+                        'cta_label' => $slide['cta_label'] ?? '',
+                        'cta_url' => filled($slide['cta_url'] ?? null)
+                            ? (str_starts_with($slide['cta_url'], 'http') ? $slide['cta_url'] : url($slide['cta_url']))
+                            : route('shop.index'),
+                    ];
+                })->values();
+
             @endphp
             <section class="sg-home-hero border-b border-[var(--sg-border)] bg-[var(--sg-white)]" data-sg-home-hero dir="ltr">
                 <x-layout.container>
@@ -82,13 +94,7 @@
                         </div>
                     </div>
                 </x-layout.container>
-                <script type="application/json" data-sg-hero-data>@json($heroSlides->map(fn ($slide) => [
-                    'eyebrow' => $slide['eyebrow'] ?? '',
-                    'title' => $slide['title'] ?? '',
-                    'subtitle' => $slide['subtitle'] ?? '',
-                    'cta_label' => $slide['cta_label'] ?? '',
-                    'cta_url' => filled($slide['cta_url'] ?? null) ? (str_starts_with($slide['cta_url'], 'http') ? $slide['cta_url'] : url($slide['cta_url'])) : route('shop.index'),
-                ])->values())</script>
+                <script type="application/json" data-sg-hero-data>@json($heroSlideData)</script>
             </section>
         @elseif(in_array($section->type, ['editorial', 'cta'], true))
             <section class="border-b border-[var(--sg-border)] {{ $section->type === 'cta' ? 'bg-[var(--sg-ink)] text-white' : 'bg-[var(--sg-white)]' }}">
