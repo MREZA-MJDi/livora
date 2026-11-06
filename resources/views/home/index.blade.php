@@ -16,39 +16,75 @@
         @endphp
 
         @if($section->type === 'hero')
-            <section class="border-b border-[var(--sg-border)] {{ $section->type === 'cta' ? 'bg-[var(--sg-ink)] text-white' : 'bg-[var(--sg-white)]' }}">
+            @php
+                $heroProduct = $section->products->first();
+                $heroSlides = collect($payload['slides'] ?? []);
+                if ($heroSlides->isEmpty()) {
+                    $heroSlides = collect([[
+                        'eyebrow' => $section->eyebrow,
+                        'title' => $section->title,
+                        'subtitle' => $section->subtitle,
+                        'cta_label' => $section->cta_label,
+                        'cta_url' => $section->cta_url,
+                        'image_path' => $section->image_path,
+                        'object_position' => '50% 50%',
+                    ]]);
+                }
+                $heroSlides = $heroSlides->values()->map(function ($slide) use ($section, $heroProduct) {
+                    $path = $slide['image_path'] ?? null;
+                    $image = $path
+                        ? (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') ? $path : \Illuminate\Support\Facades\Storage::disk('public')->url($path))
+                        : ($section->image_url ?: $heroProduct?->images?->first()?->detail_url);
+                    return [...$slide, 'image_url' => $image, 'object_position' => $slide['object_position'] ?? '50% 50%'];
+                });
+            @endphp
+            <section class="sg-home-hero border-b border-[var(--sg-border)] bg-[var(--sg-white)]" data-sg-home-hero dir="ltr">
                 <x-layout.container>
-                    <div class="grid items-center gap-8 py-12 sm:py-16 lg:grid-cols-2 lg:gap-14 lg:py-20">
-                        <div class="max-w-2xl {{ $section->type === 'cta' ? 'lg:order-2' : '' }}">
-                            @if($section->eyebrow)<p class="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--sg-accent)]">{{ $section->eyebrow }}</p>@endif
-                            @if($section->title)<h1 class="mt-4 text-3xl font-semibold leading-tight tracking-tight sm:text-5xl {{ $section->type === 'cta' ? 'text-white' : 'text-[var(--sg-ink)]' }}">{{ $section->title }}</h1>@endif
-                            @if($section->subtitle)<p class="mt-5 max-w-xl text-sm leading-8 {{ $section->type === 'cta' ? 'text-white/65' : 'text-[var(--sg-stone)]' }}">{{ $section->subtitle }}</p>@endif
-                            @if($section->cta_label)<a href="{{ $ctaUrl }}" class="mt-8 inline-flex items-center justify-center rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] px-6 py-4 text-sm font-semibold text-[var(--sg-ink)] transition hover:border-[var(--sg-accent)]">{{ $section->cta_label }} <span class="mr-3" aria-hidden="true">←</span></a>@endif
+                    <div class="sg-home-hero__layout">
+                        <div class="sg-home-hero__content" dir="rtl">
+                            <div class="sg-home-hero__dots" role="tablist" aria-label="انتخاب اسلاید هیرو">
+                                @foreach($heroSlides as $index => $slide)
+                                    <button type="button" class="sg-home-hero__dot {{ $index === 0 ? 'is-active' : '' }}" data-sg-hero-dot="{{ $index }}" aria-label="نمایش اسلاید {{ $index + 1 }}" aria-pressed="{{ $index === 0 ? 'true' : 'false' }}"></button>
+                                @endforeach
+                            </div>
+                            <div class="sg-home-hero__copy">
+                                <p class="sg-home-hero__eyebrow" data-sg-hero-eyebrow>{{ $heroSlides[0]['eyebrow'] ?? '' }}</p>
+                                <h1 class="sg-home-hero__title" data-sg-hero-title>{{ $heroSlides[0]['title'] ?? $section->title }}</h1>
+                                <p class="sg-home-hero__subtitle" data-sg-hero-subtitle>{{ $heroSlides[0]['subtitle'] ?? $section->subtitle }}</p>
+                                @if(filled($heroSlides[0]['cta_label'] ?? null))
+                                    <a class="sg-home-hero__cta" data-sg-hero-cta href="{{ filled($heroSlides[0]['cta_url'] ?? null) ? (str_starts_with($heroSlides[0]['cta_url'], 'http') ? $heroSlides[0]['cta_url'] : url($heroSlides[0]['cta_url'])) : route('shop.index') }}">{{ $heroSlides[0]['cta_label'] }} <span aria-hidden="true">←</span></a>
+                                @else
+                                    <a class="sg-home-hero__cta" data-sg-hero-cta href="{{ route('shop.index') }}" hidden></a>
+                                @endif
+                            </div>
                         </div>
-                        @php($heroProduct = $section->type === 'hero' ? $section->products->first() : null)
-                        @php($heroImage = $section->image_url ?: $heroProduct?->images?->first()?->detail_url)
-                        <div class="min-w-0 space-y-4 {{ $section->type === 'cta' ? 'lg:order-1' : '' }}">
-                            @if($heroImage)
-                                <div class="overflow-hidden rounded-[2rem] bg-[var(--sg-surface)]">
-                                    <img src="{{ $heroImage }}" alt="{{ $section->title ?: 'SillaGallery' }}" class="aspect-[5/4] h-full w-full object-cover" fetchpriority="{{ $section->type === 'hero' ? 'high' : 'auto' }}">
-                                </div>
-                            @endif
-                            @if($section->type === 'hero' && $section->products->isNotEmpty())
-                                <div data-sg-carousel class="relative">
-                                    <div class="mb-2 hidden items-center justify-end gap-2 sm:flex">
-                                        <button type="button" data-carousel-prev aria-label="محصول قبلی" class="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)]">←</button>
-                                        <button type="button" data-carousel-next aria-label="محصول بعدی" class="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)]">→</button>
-                                    </div>
-                                    <div class="sg-product-carousel" data-carousel-track>
-                                        @foreach($section->products as $product)
-                                            <div class="sg-product-carousel-item"><x-product.card :product="$product" /></div>
-                                        @endforeach
-                                    </div>
-                                </div>
+                        <div class="sg-home-hero__media">
+                            @foreach($heroSlides as $index => $slide)
+                                @if(filled($slide['image_url'] ?? null))
+                                    <img
+                                        src="{{ $slide['image_url'] }}"
+                                        alt="{{ $slide['title'] ?: 'Silla Gallery' }}"
+                                        class="sg-home-hero__image {{ $index === 0 ? 'is-active' : '' }}"
+                                        data-sg-hero-image="{{ $index }}"
+                                        style="object-position: {{ $slide['object_position'] }}"
+                                        loading="{{ $index === 0 ? 'eager' : 'lazy' }}"
+                                        fetchpriority="{{ $index === 0 ? 'high' : 'auto' }}"
+                                    >
+                                @endif
+                            @endforeach
+                            @if($heroSlides->every(fn ($slide) => blank($slide['image_url'] ?? null)))
+                                <div class="sg-home-hero__placeholder">تصویر هیرو را از داشبورد بارگذاری کنید</div>
                             @endif
                         </div>
                     </div>
                 </x-layout.container>
+                <script type="application/json" data-sg-hero-data>@json($heroSlides->map(fn ($slide) => [
+                    'eyebrow' => $slide['eyebrow'] ?? '',
+                    'title' => $slide['title'] ?? '',
+                    'subtitle' => $slide['subtitle'] ?? '',
+                    'cta_label' => $slide['cta_label'] ?? '',
+                    'cta_url' => filled($slide['cta_url'] ?? null) ? (str_starts_with($slide['cta_url'], 'http') ? $slide['cta_url'] : url($slide['cta_url'])) : route('shop.index'),
+                ])->values())</script>
             </section>
         @elseif(in_array($section->type, ['editorial', 'cta'], true))
             <section class="border-b border-[var(--sg-border)] {{ $section->type === 'cta' ? 'bg-[var(--sg-ink)] text-white' : 'bg-[var(--sg-white)]' }}">
