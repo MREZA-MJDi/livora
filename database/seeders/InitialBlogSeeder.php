@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\BlogPost;
+use App\Models\BlogTag;
 use Illuminate\Database\Seeder;
 
 class InitialBlogSeeder extends Seeder
@@ -13,6 +14,8 @@ class InitialBlogSeeder extends Seeder
             [
                 'title' => 'چطور مبل مناسب فضای نشیمن را انتخاب کنیم؟',
                 'slug' => 'choosing-sofa-for-living-room',
+                'featured_image' => 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=80',
+                'featured_image_alt' => 'چیدمان نشیمن با مبل راحتی در فضای روشن',
                 'category' => 'راهنمای خرید',
                 'excerpt' => 'با اندازه‌گیری درست، شناخت کاربرد فضا و مقایسه مشخصات، انتخاب مبل را ساده‌تر کنید.',
                 'days_ago' => 2,
@@ -34,6 +37,8 @@ HTML,
             [
                 'title' => 'راهنمای اندازه‌گیری میز ناهارخوری و فضای اطراف آن',
                 'slug' => 'dining-table-measurement-guide',
+                'featured_image' => 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80',
+                'featured_image_alt' => 'میز ناهارخوری مدرن در فضای داخلی',
                 'category' => 'راهنمای خرید',
                 'excerpt' => 'ظرفیت میز تنها معیار انتخاب نیست؛ فضای صندلی و رفت‌وآمد را هم محاسبه کنید.',
                 'days_ago' => 6,
@@ -55,6 +60,8 @@ HTML,
             [
                 'title' => 'هماهنگ کردن رنگ مبلمان با نور و رنگ خانه',
                 'slug' => 'matching-furniture-colors-with-home',
+                'featured_image' => 'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=1200&q=80',
+                'featured_image_alt' => 'ترکیب رنگ و متریال در دکوراسیون خانه',
                 'category' => 'دکوراسیون',
                 'excerpt' => 'برای انتخاب رنگ، نور طبیعی، کف‌پوش و رنگ‌های ثابت خانه را هم‌زمان بررسی کنید.',
                 'days_ago' => 11,
@@ -76,6 +83,8 @@ HTML,
             [
                 'title' => 'چطور یک نشیمن کوچک را کاربردی و مرتب بچینیم؟',
                 'slug' => 'small-living-room-layout',
+                'featured_image' => 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=80',
+                'featured_image_alt' => 'چیدمان مینیمال و کاربردی نشیمن',
                 'category' => 'دکوراسیون',
                 'excerpt' => 'با انتخاب مقیاس مناسب، مسیرهای عبور و مبلمان چندمنظوره از شلوغی فضا کم کنید.',
                 'days_ago' => 16,
@@ -97,6 +106,8 @@ HTML,
             [
                 'title' => 'روش نگهداری روزمره از پارچه مبلمان',
                 'slug' => 'daily-care-for-upholstery',
+                'featured_image' => 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=80',
+                'featured_image_alt' => 'نمای نزدیک مبل پارچه‌ای در فضای نشیمن',
                 'category' => 'نگهداری',
                 'excerpt' => 'برچسب مراقبت و توصیه سازنده را مبنا قرار دهید و لکه‌ها را با روش مناسب پاک کنید.',
                 'days_ago' => 22,
@@ -118,6 +129,8 @@ HTML,
             [
                 'title' => 'پیش از انتخاب خرید اقساطی چه مواردی را بررسی کنیم؟',
                 'slug' => 'before-choosing-installment-purchase',
+                'featured_image' => 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=80',
+                'featured_image_alt' => 'مبلمان و میز در فضای داخلی مدرن',
                 'category' => 'خرید اقساطی',
                 'excerpt' => 'مبلغ پیش‌پرداخت، تعداد چک‌ها و هزینه نهایی را پیش از تعهد مالی محاسبه کنید.',
                 'days_ago' => 36,
@@ -139,22 +152,49 @@ HTML,
             ],
         ];
 
+        $tagByCategory = [
+            'راهنمای خرید' => ['name' => 'راهنمای خرید', 'slug' => 'buying-guides'],
+            'دکوراسیون' => ['name' => 'دکوراسیون داخلی', 'slug' => 'interior-design'],
+            'نگهداری' => ['name' => 'نگهداری مبلمان', 'slug' => 'furniture-care'],
+            'خرید اقساطی' => ['name' => 'خرید اقساطی', 'slug' => 'installment-buying'],
+        ];
+
         foreach ($articles as $article) {
             $publishedAt = now()->subDays($article['days_ago'])->startOfDay();
             unset($article['days_ago']);
 
-            BlogPost::query()->firstOrCreate(
-                ['slug' => $article['slug']],
-                [
+            $slug = $article['slug'];
+            $tagData = $tagByCategory[$article['category']] ?? null;
+            $post = BlogPost::query()->firstOrNew(['slug' => $slug]);
+
+            if (! $post->exists) {
+                $post->fill([
                     ...$article,
                     'user_id' => null,
-                    'featured_image' => null,
                     'status' => 'published',
                     'seo_index' => true,
                     'seo_follow' => true,
                     'published_at' => $publishedAt,
-                ]
-            );
+                ]);
+            } else {
+                // Existing editorial content remains untouched; only fill missing media metadata.
+                if (! filled($post->featured_image) && filled($article['featured_image'] ?? null)) {
+                    $post->featured_image = $article['featured_image'];
+                }
+                if (! filled($post->featured_image_alt) && filled($article['featured_image_alt'] ?? null)) {
+                    $post->featured_image_alt = $article['featured_image_alt'];
+                }
+            }
+
+            $post->save();
+
+            if ($tagData) {
+                $tag = BlogTag::query()->firstOrCreate(
+                    ['slug' => $tagData['slug']],
+                    ['name' => $tagData['name']]
+                );
+                $post->tags()->syncWithoutDetaching([$tag->id]);
+            }
         }
     }
 }

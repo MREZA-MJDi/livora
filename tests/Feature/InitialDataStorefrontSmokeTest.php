@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\BlogPost;
+use App\Models\ContentPage;
 use App\Models\Category;
 use App\Models\Product;
 use Database\Seeders\InitialDataSeeder;
@@ -19,7 +20,8 @@ class InitialDataStorefrontSmokeTest extends TestCase
 
         $product = Product::query()->active()->firstOrFail();
         $category = Category::query()->active()->firstOrFail();
-        $article = BlogPost::query()->published()->firstOrFail();
+        $article = BlogPost::query()->published()->whereNotNull('featured_image')->firstOrFail();
+        $about = ContentPage::query()->published()->where('slug', 'about')->firstOrFail();
 
         $urls = [
             route('home'),
@@ -32,6 +34,16 @@ class InitialDataStorefrontSmokeTest extends TestCase
             route('about'),
             route('contact'),
         ];
+
+        $this->get(route('about'))
+            ->assertOk()
+            ->assertSee($about->featured_image)
+            ->assertSee('خانه، بازتابی از شیوه زندگی ما');
+
+        $this->get(route('blog.index'))
+            ->assertOk()
+            ->assertSee($article->featured_image)
+            ->assertSee($article->title);
 
         foreach ($urls as $url) {
             $this->get($url)->assertOk();
