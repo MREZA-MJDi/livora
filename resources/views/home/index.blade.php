@@ -7,8 +7,7 @@
 
 @section('content')
 <div class="sila-home overflow-hidden bg-[var(--sg-cream)]">
-    @php($finalCta = $homeSections->firstWhere("key", "final-cta"))
-    @foreach($homeSections->where("key", "!=", "final-cta") as $section)
+    @foreach($homeSections as $section)
         @php
             $payload = $section->payload ?? [];
             $ctaUrl = filled($section->cta_url)
@@ -122,7 +121,8 @@
                     <a href="{{ route('blog.index') }}" class="text-sm font-semibold text-[var(--sg-ink)] transition hover:text-[var(--sg-accent)]">همه نوشته‌ها ←</a>
                 </div>
                 <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                    @forelse($blogPosts as $post)
+                    @if($blogPosts->isNotEmpty())
+                    @foreach($blogPosts as $post)
                         <article class="group overflow-hidden rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-cream)]">
                             <a href="{{ route('blog.show', $post->slug) }}" class="block overflow-hidden bg-[var(--sg-surface)]">
                                 @if($post->featured_image_url)
