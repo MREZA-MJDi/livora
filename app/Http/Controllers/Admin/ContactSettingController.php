@@ -34,7 +34,7 @@ class ContactSettingController extends Controller
             'footer_menu.guide' => ['nullable', 'array', 'max:12'],
             'footer_menu.contact' => ['nullable', 'array', 'max:12'],
             'footer_menu.*.*.label' => ['required', 'string', 'max:120'],
-            'footer_menu.*.*.url' => ['required', 'string', 'max:2048'],
+            'footer_menu.*.*.url' => ['required', 'string', 'max:2048', function ($attribute, $value, $fail): void { if (! str_starts_with($value, '/') && ! str_starts_with($value, 'https://')) $fail('لینک فوتر باید مسیر داخلی یا HTTPS باشد.'); }],
             'payment_methods' => ['nullable', 'array', 'max:12'],
             'payment_methods.*.label' => ['required', 'string', 'max:120'],
             'payment_methods.*.image' => ['nullable', 'url', 'max:2048'],
