@@ -360,16 +360,16 @@
         <div class="grid gap-5 lg:grid-cols-2">
             <div class="space-y-3">
                 <h4 class="text-sm font-semibold">تصویر کارت</h4>
-                <div class="overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]"><img id="category-card-image-preview" src="{{ $category->card_image_url ?: '' }}" alt="پیش‌نمایش تصویر کارت دسته‌بندی" class="{{ $category->card_image_url ? '' : 'hidden' }} aspect-[4/3] w-full object-cover"><div class="{{ $category->card_image_url ? 'hidden' : 'flex' }} aspect-[4/3] items-center justify-center text-xs text-[var(--admin-muted)]">پیش‌نمایش تصویر کارت</div></div>
-                <input id="card_image" type="file" name="card_image" accept="image/jpeg,image/png,image/webp" data-crop-ratio="1.333333" data-preview-target="category-card-image-preview" class="admin-input">
+                <div class="overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]"><img id="category-card-image-preview" src="{{ $category->card_image_url ?: '' }}" alt="پیش‌نمایش تصویر کارت دسته‌بندی" class="{{ $category->card_image_url ? '' : 'hidden' }} aspect-[4/3] w-full object-cover"><div id="category-card-image-placeholder" class="{{ $category->card_image_url ? 'hidden' : 'flex' }} aspect-[4/3] items-center justify-center text-xs text-[var(--admin-muted)]">پیش‌نمایش تصویر کارت</div></div>
+                <input id="card_image" type="file" name="card_image" accept="image/jpeg,image/png,image/webp" data-crop-ratio="1.333333" data-preview-target="category-card-image-preview" data-preview-placeholder="category-card-image-placeholder" class="admin-input">
                 <label class="flex items-center gap-2 text-xs"><input type="checkbox" name="remove_card_image" value="1"> حذف تصویر کارت اختصاصی</label>
                 @error('card_image')<p class="admin-error">{{ $message }}</p>@enderror
                 <p class="admin-help">نسبت پیشنهادی ۴:۳؛ در صورت خالی بودن، تصویر قدیمی دسته‌بندی استفاده می‌شود.</p>
             </div>
             <div class="space-y-3">
                 <h4 class="text-sm font-semibold">بنر صفحه دسته‌بندی</h4>
-                <div class="overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]"><img id="category-banner-image-preview" src="{{ $category->banner_image_url ?: '' }}" alt="پیش‌نمایش بنر دسته‌بندی" class="{{ $category->banner_image_url ? '' : 'hidden' }} aspect-[16/7] w-full object-cover"><div class="{{ $category->banner_image_url ? 'hidden' : 'flex' }} aspect-[16/7] items-center justify-center text-xs text-[var(--admin-muted)]">پیش‌نمایش بنر دسته‌بندی</div></div>
-                <input id="banner_image" type="file" name="banner_image" accept="image/jpeg,image/png,image/webp" data-crop-ratio="2.285714" data-preview-target="category-banner-image-preview" class="admin-input">
+                <div class="overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]"><img id="category-banner-image-preview" src="{{ $category->banner_image_url ?: '' }}" alt="پیش‌نمایش بنر دسته‌بندی" class="{{ $category->banner_image_url ? '' : 'hidden' }} aspect-[16/7] w-full object-cover"><div id="category-banner-image-placeholder" class="{{ $category->banner_image_url ? 'hidden' : 'flex' }} aspect-[16/7] items-center justify-center text-xs text-[var(--admin-muted)]">پیش‌نمایش بنر دسته‌بندی</div></div>
+                <input id="banner_image" type="file" name="banner_image" accept="image/jpeg,image/png,image/webp" data-crop-ratio="2.285714" data-preview-target="category-banner-image-preview" data-preview-placeholder="category-banner-image-placeholder" class="admin-input">
                 <label class="flex items-center gap-2 text-xs"><input type="checkbox" name="remove_banner_image" value="1"> حذف بنر اختصاصی</label>
                 @error('banner_image')<p class="admin-error">{{ $message }}</p>@enderror
                 <p class="admin-help">نسبت پیشنهادی ۱۶:۷؛ اگر بنر اختصاصی ثبت نشود، تصویر کارت fallback می‌شود.</p>
