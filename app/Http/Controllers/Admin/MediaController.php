@@ -156,6 +156,8 @@ class MediaController extends Controller
             'تصاویر محصولات' => $media->productImages()->count(),
             'بنر محصولات' => $media->productBanners()->count(),
             'دسته‌بندی‌ها' => $media->categories()->count(),
+            'تصاویر کارت دسته‌بندی' => $media->categoryCards()->count(),
+            'بنرهای دسته‌بندی' => $media->categoryBanners()->count(),
             'مقاله‌ها' => $media->blogPosts()->count(),
             'صفحه‌ها' => $media->contentPages()->count(),
             'بنر فروشگاه' => $media->shopBannerSettings()->count(),
@@ -168,13 +170,14 @@ class MediaController extends Controller
                 ->with('error', 'این رسانه هنوز استفاده می‌شود: '.$usedBy->implode('، ').'. ابتدا اتصال‌های آن را حذف یا جایگزین کنید.');
         }
 
+        $variantPaths = [$media->thumbnail_path, $media->card_path, $media->detail_path];
         DB::transaction(fn () => $media->delete());
 
         if ($media->disk && $media->path
             && ! str_starts_with($media->path, 'http://')
             && ! str_starts_with($media->path, 'https://')
             && ! str_starts_with($media->path, '//')) {
-            Storage::disk($media->disk)->delete($media->path);
+            Storage::disk($media->disk)->delete(array_filter(array_merge([$media->path], $variantPaths)));
         }
 
         return redirect()->route('admin.media.index')
