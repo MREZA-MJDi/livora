@@ -20,6 +20,8 @@ class StoreProductImageRequest extends FormRequest
                 'exists:products,id',
             ],
 
+            'original_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'dimensions:min_width=400,min_height=500', 'max:10240'],
+
             'image' => [
                 'required_without:media_id',
                 'nullable',
