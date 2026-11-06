@@ -116,6 +116,7 @@ class HomeSectionController extends Controller
             'payload.category_id' => ['nullable', 'integer', 'exists:categories,id'],
             'payload.limit' => ['nullable', 'integer', 'between:1,24'],
             'payload.items' => ['nullable', 'array', 'max:8'],
+            'payload.items_json' => ['nullable', 'string', 'max:12000'],
             'payload.items.*.title' => ['required_with:payload.items', 'string', 'max:120'],
             'payload.items.*.body' => ['required_with:payload.items', 'string', 'max:500'],
         ]);
@@ -123,6 +124,24 @@ class HomeSectionController extends Controller
 
     private function normalizePayload(array $payload): array
     {
+        if (isset($payload['items_json'])) {
+            try {
+                $items = json_decode($payload['items_json'], true, 512, JSON_THROW_ON_ERROR);
+            } catch (\\JsonException) {
+                throw \\Illuminate\\Validation\\ValidationException::withMessages([
+                    'payload.items_json' => 'ساختار JSON آیتم‌های سکشن معتبر نیست.',
+                ]);
+            }
+            if (! is_array($items) || count($items) > 8) {
+                throw \\Illuminate\\Validation\\ValidationException::withMessages([
+                    'payload.items_json' => 'حداکثر ۸ آیتم معتبر برای سکشن وارد کنید.',
+                ]);
+            }
+            $payload['items'] = collect($items)->filter(fn ($item) => is_array($item) && filled($item['title'] ?? null) && filled($item['body'] ?? null))
+                ->map(fn ($item) => ['title' => trim($item['title']), 'body' => trim($item['body'])])->values()->all();
+            unset($payload['items_json']);
+        }
+
         $payload['limit'] = max(1, min(24, (int) ($payload['limit'] ?? 8)));
         $payload['product_source'] = $payload['product_source'] ?? 'latest';
         $payload['product_ids'] = array_values(array_unique(array_map('intval', $payload['product_ids'] ?? [])));
