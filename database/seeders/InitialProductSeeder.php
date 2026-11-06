@@ -87,7 +87,7 @@ class InitialProductSeeder extends Seeder
                 'description' => $product['description'],
                 'status' => 'draft',
                 'is_featured' => str_starts_with($product['sku'], 'SG-SOF-101') || in_array($product['sku'], ['SG-SOF-102', 'SG-CHS-201', 'SG-DIN-401'], true),
-                'is_new' => in_array($product['sku'], ['SG-SOF-101', 'SG-SOF-103', 'SG-CHS-202', 'SG-MOD-301', 'SG-DIN-402', 'SG-BED-502', 'SG-TBL-602', 'SG-LGT-801'], true),
+                'is_new' => in_array($product['sku'], ['SG-SOF-101', 'SG-SOF-103', 'SG-CHS-202', 'SG-MOD-301', 'SG-DIN-402'], true),
                 'meta_title' => $product['name'] . ' | سیلا گالری',
                 'meta_description' => 'مشاهده مشخصات و دریافت استعلام قیمت ' . $product['name'] . ' از سیلا گالری.',
                 'specifications' => $specifications,
