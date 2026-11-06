@@ -307,6 +307,12 @@
     </div>
 
 
+    <details class="overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-white)]">
+        <summary class="cursor-pointer list-none px-5 py-4 text-sm font-semibold text-[var(--admin-text)]">
+            تنظیمات پیشرفته (اختیاری) — سئو
+            <span class="mt-1 block text-xs font-normal text-[var(--admin-muted)]">برای ثبت یک دسته‌بندی معمولی نیازی به تغییر این بخش نیست.</span>
+        </summary>
+        <div class="space-y-4 border-t border-[var(--admin-border)] p-4 sm:p-6">
     <div class="admin-card space-y-4 p-6">
         <h3 class="text-base font-bold text-[var(--admin-text)]">تنظیمات SEO دسته‌بندی</h3>
         <div><label class="admin-label" for="focus_keyword">کلمه کلیدی کانونی</label><input id="focus_keyword" name="focus_keyword" maxlength="120" class="admin-input" value="{{ old('focus_keyword', $category->focus_keyword ?? '') }}" placeholder="مثلاً مبلمان مدرن"></div>
@@ -331,6 +337,10 @@
             <label class="flex items-center gap-3 rounded-xl border border-[var(--admin-border)] p-4"><input type="checkbox" name="seo_follow" value="1" class="admin-checkbox" @checked(old('seo_follow', $category->seo_follow ?? false))><span class="text-sm">اجازه دنبال‌کردن لینک‌ها</span></label>
         </div>
     </div>
+
+
+        </div>
+    </details>
 
     <div class="admin-card space-y-5 p-6">
         <div><h3 class="text-base font-bold text-[var(--admin-text)]">ساختار دسته‌بندی و تصاویر صفحه</h3><p class="admin-help mt-1">تصویر کارت و بنر صفحه دسته‌بندی مستقل هستند. تصویر قدیمی فقط به‌عنوان fallback حفظ می‌شود.</p></div>
