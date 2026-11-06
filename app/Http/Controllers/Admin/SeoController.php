@@ -132,9 +132,15 @@ class SeoController extends Controller
             'bing_site_verification' => $validated['bing_site_verification'] ?? null,
             'organization_name' => $brandSettings?->brand_name ?: config('app.name'),
             'organization_description' => $brandSettings?->brand_description,
-            'contact_email' => $validated['contact_email'] ?? null,
-            'contact_phone' => $validated['contact_phone'] ?? null,
-            'social_links' => array_filter($validated['social_links'] ?? [], fn ($url) => filled($url)),
+            'contact_email' => $brandSettings?->email,
+            'contact_phone' => $brandSettings?->phone,
+            'social_links' => array_filter([
+                'instagram' => $brandSettings?->instagram_url,
+                'telegram' => $brandSettings?->telegram_url,
+                'whatsapp' => $brandSettings?->whatsapp_url,
+                'eitaa' => $brandSettings?->eitaa_url,
+                'bale' => $brandSettings?->bale_url,
+            ], fn ($url) => filled($url)),
         ];
 
         if ($request->boolean('remove_default_og_image')) {
