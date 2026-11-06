@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
+                throw ValidationException::withMessages([
 use JsonException;
 use Illuminate\View\View;
 
@@ -135,7 +135,7 @@ class HomeSectionController extends Controller
                 ]);
             }
             if (! is_array($items) || count($items) > 8) {
-                throw \\Illuminate\\Validation\\ValidationException::withMessages([
+                throw ValidationException::withMessages([
                     'payload.items_json' => 'حداکثر ۸ آیتم معتبر برای سکشن وارد کنید.',
                 ]);
             }
@@ -163,7 +163,7 @@ class HomeSectionController extends Controller
 
         $duplicates = $used->intersect(array_map('intval', $productIds));
         if ($duplicates->isNotEmpty()) {
-            throw \Illuminate\Validation\ValidationException::withMessages([
+                throw ValidationException::withMessages([
                 'payload.product_ids' => 'هر محصول فقط می‌تواند در یک سکشن دستی صفحه اصلی انتخاب شود.',
             ]);
         }
