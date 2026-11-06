@@ -27,22 +27,29 @@
                         </div>
                         @php($heroProduct = $section->products?->first())
                         @php($heroImage = $section->image_url ?: $heroProduct?->images?->first()?->detail_url)
-                        @if($heroImage)
-                            <div class="overflow-hidden rounded-[2rem] bg-[var(--sg-surface)] {{ $section->type === 'cta' ? 'lg:order-1' : '' }}">
-                                <img src="{{ $heroImage }}" alt="{{ $section->title ?: 'SillaGallery' }}" class="aspect-[5/4] h-full w-full object-cover" fetchpriority="{{ $section->type === 'hero' ? 'high' : 'auto' }}">
-                            </div>
-                        @elseif($heroProduct)
-                            <div class="grid grid-cols-2 gap-3 sm:gap-5">
-                                @foreach($section->products->take(2) as $product)<x-product.card :product="$product" />@endforeach
-                            </div>
-                        @endif
+                        <div class="min-w-0 space-y-4 {{ $section->type === 'cta' ? 'lg:order-1' : '' }}">
+                            @if($heroImage)
+                                <div class="overflow-hidden rounded-[2rem] bg-[var(--sg-surface)]">
+                                    <img src="{{ $heroImage }}" alt="{{ $section->title ?: 'SillaGallery' }}" class="aspect-[5/4] h-full w-full object-cover" fetchpriority="{{ $section->type === 'hero' ? 'high' : 'auto' }}">
+                                </div>
+                            @endif
+                            @if($section->type === 'hero' && $section->products->isNotEmpty())
+                                <div data-sg-carousel class="relative">
+                                    <div class="mb-2 hidden items-center justify-end gap-2 sm:flex">
+                                        <button type="button" data-carousel-prev aria-label="محصول قبلی" class="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)]">←</button>
+                                        <button type="button" data-carousel-next aria-label="محصول بعدی" class="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)]">→</button>
+                                    </div>
+                                    <div class="sg-product-carousel" data-carousel-track>
+                                        @foreach($section->products as $product)
+                                            <div class="sg-product-carousel-item"><x-product.card :product="$product" /></div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
                     </div>
                 </x-layout.container>
             </section>
-            @if($section->type === 'hero' && $section->products->count() > 1)
-                <section class="bg-[var(--sg-cream)] py-8"><x-layout.container><div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">@foreach($section->products->skip(1) as $product)<x-product.card :product="$product" />@endforeach</div></x-layout.container></section>
-            @endif
-
         @elseif($section->type === 'categories' && $section->categories->isNotEmpty())
             <section class="border-b border-[var(--sg-border)] bg-[var(--sg-white)] py-14 sm:py-20">
                 <x-layout.container>
