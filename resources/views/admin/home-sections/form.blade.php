@@ -32,7 +32,7 @@
     <form method="POST" enctype="multipart/form-data" action="{{ $section->exists ? route('admin.home-sections.update', $section) : route('admin.home-sections.store') }}" class="admin-card space-y-5 p-6">
         @csrf @if($section->exists) @method('PUT') @endif
         <div class="grid gap-4 sm:grid-cols-2">
-            <label><span class="admin-label">شناسه داخلی (اختیاری)</span><input name="key" class="admin-input" maxlength="100" value="{{ old('key', $section->key) }}" placeholder="اگر نمی‌دانید، خالی بگذارید">@error('key')<small class="admin-error">{{ $message }}</small>@enderror</label>
+            <label><span class="admin-label">شناسه داخلی (اختیاری)</span><input name="key" class="admin-input" maxlength="100" value="{{ old('key', $section->key) }}" placeholder="اگر نمی‌دانید، خالی بگذارید">@error('key')<small class="admin-error">{{ $message }}</small>@enderror<span class="admin-help">این شناسه فقط برای سیستم است و در سایت دیده نمی‌شود؛ اگر خالی بماند خودکار ساخته می‌شود.</span></label>
             <label><span class="admin-label">نوع سکشن</span><select name="type" x-model="sectionType" class="admin-input" required>@foreach(['hero'=>'اسلایدر صفحه اصلی','products'=>'محصولات','categories'=>'دسته‌بندی‌ها','editorial'=>'محتوای تصویری','trust'=>'ویژگی‌ها','cta'=>'دعوت به اقدام'] as $value=>$label)<option value="{{ $value }}" @selected(old('type', $section->type) === $value)>{{ $label }}</option>@endforeach</select></label>
         </div>
 
