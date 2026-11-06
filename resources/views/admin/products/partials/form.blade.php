@@ -128,12 +128,11 @@
                 انتخاب از کتابخانه، فایل را دوباره آپلود نمی‌کند. آپلود جدید، فایل اصلی مستقلی به کتابخانه اضافه می‌کند.
             </p>
 
-            <div x-show="selectedMedia" x-cloak class="mt-3 flex items-center gap-3 rounded-xl border border-[var(--admin-border)] p-3">
-                <img :src="selectedMedia?.url" :alt="selectedMedia?.alt || selectedMedia?.name" class="h-16 w-14 rounded-lg object-contain">
+            <div x-show="selectedMedia" x-cloak class="mt-3 flex flex-wrap items-center gap-3 rounded-xl border border-[var(--admin-border)] p-3">
                 <div class="min-w-0 flex-1">
                     <p class="truncate text-sm font-semibold" x-text="selectedMedia?.name"></p>
-                    <p class="text-xs text-[var(--admin-muted)]">از کتابخانه رسانه انتخاب شده</p>
-                    <button type="button" class="admin-btn admin-btn-secondary mt-2" @click="cropSelected()">برش مستقل برای تصویر اصلی</button>
+                    <p class="text-xs text-[var(--admin-muted)]">پیش‌نمایش نهایی در قاب فروشگاه، بالای همین بخش نمایش داده می‌شود.</p>
+                    <button type="button" class="admin-btn admin-btn-secondary mt-2" @click="cropSelected()">تنظیم برش برای نمایش در فروشگاه</button>
                 </div>
                 <button type="button" class="admin-btn admin-btn-secondary" @click="clearSelection()">لغو انتخاب</button>
             </div>
