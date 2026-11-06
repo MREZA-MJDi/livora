@@ -1009,6 +1009,14 @@ Alpine.start();
 
     const schedule = (form, delay) => {
         activeRequest?.abort();
+        activeRequest = null;
+        document.querySelectorAll('form[data-live-catalog-filters]').forEach((item) => {
+            item.removeAttribute('aria-busy');
+            item.classList.remove('opacity-70');
+            const target = item.dataset.resultsSelector ? document.querySelector(item.dataset.resultsSelector) : null;
+            target?.removeAttribute('aria-busy');
+            target?.classList.remove('opacity-60', 'pointer-events-none');
+        });
         const old = timers.get(form);
         if (old) clearTimeout(old);
         timers.set(form, setTimeout(() => {
