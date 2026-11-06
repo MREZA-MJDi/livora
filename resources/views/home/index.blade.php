@@ -7,7 +7,9 @@
 
 @section('content')
 <div class="sila-home overflow-hidden bg-[var(--sg-cream)]">
+    @php($finalCta = $homeSections->firstWhere("key", "final-cta"))
     @foreach($homeSections as $section)
+        @if($section->key === "final-cta") @continue @endif
         @php
             $payload = $section->payload ?? [];
             $ctaUrl = filled($section->cta_url)
@@ -110,8 +112,7 @@
         @endif
     @endforeach
 
-    @if(($blogPosts ?? collect())->isNotEmpty())
-        <section class="border-b border-[var(--sg-border)] bg-[var(--sg-white)] py-14 sm:py-20">
+            <section class="border-b border-[var(--sg-border)] bg-[var(--sg-white)] py-14 sm:py-20">
             <x-layout.container>
                 <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
                     <div>
@@ -141,6 +142,19 @@
                             </div>
                         </article>
                     @endforeach
+                </div>
+            </x-layout.container>
+        </section>
+    @if($finalCta)
+        <section class="border-b border-[var(--sg-border)] bg-[var(--sg-ink)] py-14 text-white sm:py-20">
+            <x-layout.container>
+                <div class="flex flex-col items-start justify-between gap-7 sm:flex-row sm:items-center">
+                    <div class="max-w-2xl">
+                        @if($finalCta->eyebrow)<p class="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/55">{{ $finalCta->eyebrow }}</p>@endif
+                        <h2 class="mt-3 text-3xl font-semibold leading-tight sm:text-4xl">{{ $finalCta->title }}</h2>
+                        @if($finalCta->subtitle)<p class="mt-4 text-sm leading-8 text-white/65">{{ $finalCta->subtitle }}</p>@endif
+                    </div>
+                    @if($finalCta->cta_label)<a href="{{ filled($finalCta->cta_url) ? url($finalCta->cta_url) : route('shop.index') }}" class="inline-flex shrink-0 items-center justify-center rounded-xl bg-white px-6 py-4 text-sm font-semibold text-[var(--sg-ink)]">{{ $finalCta->cta_label }} ←</a>@endif
                 </div>
             </x-layout.container>
         </section>
