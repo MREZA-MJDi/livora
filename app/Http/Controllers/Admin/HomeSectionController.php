@@ -12,6 +12,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
+use JsonException;
 use Illuminate\View\View;
 
 class HomeSectionController extends Controller
@@ -127,8 +129,8 @@ class HomeSectionController extends Controller
         if (isset($payload['items_json'])) {
             try {
                 $items = json_decode($payload['items_json'], true, 512, JSON_THROW_ON_ERROR);
-            } catch (\\JsonException) {
-                throw \\Illuminate\\Validation\\ValidationException::withMessages([
+            } catch (JsonException) {
+                throw ValidationException::withMessages([
                     'payload.items_json' => 'ساختار JSON آیتم‌های سکشن معتبر نیست.',
                 ]);
             }
