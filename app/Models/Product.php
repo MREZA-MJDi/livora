@@ -14,6 +14,9 @@ class Product extends Model
 {
     use HasFactory;
     use SoftDeletes;
+    use TracksSlugRedirects;
+
+    protected function slugRedirectPrefix(): string { return 'product'; }
 
     protected $fillable = [
         'category_id',
