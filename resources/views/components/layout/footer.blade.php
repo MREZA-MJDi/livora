@@ -19,10 +19,18 @@
                 @if(filled($storeSettings?->brand_description))
                     <p class="mt-5 max-w-sm text-sm leading-8 text-white/55">{{ $storeSettings->brand_description }}</p>
                 @endif
-                @php($footerSocials = ['WhatsApp' => $storeSettings?->whatsapp_url, 'Telegram' => $storeSettings?->telegram_url, 'Instagram' => $storeSettings?->instagram_url, 'Eitaa' => $storeSettings?->eitaa_url, 'Bale' => $storeSettings?->bale_url])
+                @php
+                    $footerSocials = [
+                        'WhatsApp' => $storeSettings?->whatsapp_url,
+                        'Telegram' => $storeSettings?->telegram_url,
+                        'Instagram' => $storeSettings?->instagram_url,
+                        'Eitaa' => $storeSettings?->eitaa_url,
+                        'Bale' => $storeSettings?->bale_url,
+                    ];
+                @endphp
                 <div class="mt-5 flex flex-wrap gap-3">
                     @foreach($footerSocials as $network => $url)
-                        @if(filled($url))
+                        @if($url)
                             <a href="{{ $url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ $network }}" class="text-xs text-white/55 transition hover:text-white">{{ $network }}</a>
                         @endif
                     @endforeach
