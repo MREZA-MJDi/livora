@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\Storage;
 
 class ContentPage extends Model
 {
+    use \App\Models\Concerns\TracksSlugRedirects;
+
+    protected function slugRedirectPrefix(): string { return ''; }
+
     protected $fillable = [
         'user_id', 'title', 'slug', 'excerpt', 'body', 'featured_image', 'media_id',
         'featured_image_alt', 'meta_title', 'meta_description', 'canonical_url',
