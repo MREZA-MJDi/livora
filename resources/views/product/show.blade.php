@@ -557,15 +557,30 @@
 
                             {{-- CTA --}}
                             <div class="border-t border-[var(--sg-border)] pt-7">
-
-                                <button
-                                    type="submit"
-                                    @disabled(!$canPurchase)
-                                    class="flex w-full items-center justify-center rounded-2xl bg-[var(--sg-ink)] px-6 py-4 text-sm font-medium text-white transition duration-300 hover:bg-[var(--sg-accent)] disabled:cursor-not-allowed disabled:opacity-40"
+                                <div class="grid gap-3 sm:grid-cols-2">
+                                    <button
+                                        type="submit"
+                                        @disabled(!$canPurchase)
+                                        class="flex min-h-12 w-full items-center justify-center rounded-2xl bg-[var(--sg-ink)] px-5 py-4 text-sm font-medium text-white transition duration-300 hover:bg-[var(--sg-accent)] disabled:cursor-not-allowed disabled:opacity-40"
                                     >
-                                    {{ $canPurchase ? 'افزودن به سبد خرید' : 'این محصول ناموجود است' }}
-                                </button>
-
+                                        {{ $canPurchase ? 'افزودن به سبد خرید' : 'این محصول ناموجود است' }}
+                                    </button>
+                                    <a
+                                        href="{{ filled($storeSettings?->whatsapp_url) ? $storeSettings->whatsapp_url : route('contact', ['product' => $product->slug]) }}"
+                                        @if(filled($storeSettings?->whatsapp_url)) target="_blank" rel="noopener noreferrer" @endif
+                                        class="flex min-h-12 w-full items-center justify-center rounded-2xl border border-[var(--sg-border)] px-5 py-4 text-sm font-medium text-[var(--sg-ink)] transition hover:border-[var(--sg-accent)] hover:text-[var(--sg-accent)]"
+                                    >
+                                        درخواست مشاوره خرید
+                                    </a>
+                                </div>
+                                @unless($canPurchase)
+                                    <a
+                                        href="{{ route('contact', ['product' => $product->slug, 'request' => 'stock-notification']) }}"
+                                        class="mt-3 flex min-h-11 items-center justify-center rounded-xl bg-[var(--sg-surface)] px-4 py-3 text-sm font-medium text-[var(--sg-accent)]"
+                                    >
+                                        درخواست اطلاع از موجودی
+                                    </a>
+                                @endunless
                             </div>
 
                         </form>
@@ -633,7 +648,7 @@
                     <div>
 
                         <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
-                            PRODUCT DETAILS
+                            مشخصات محصول
                         </p>
 
                         <h2 class="mt-3 text-3xl font-semibold tracking-tight">
