@@ -23,12 +23,6 @@ class TurnstileProtectionTest extends TestCase
             'services.turnstile.hostnames' => ['localhost'],
         ]);
 
-        Http::fake([
-            self::VERIFY_URL => Http::response([
-                'success' => false,
-                'error-codes' => ['invalid-input-response'],
-            ], 200),
-        ]);
     }
 
     public function test_turnstile_widget_renders_with_public_site_key_when_secret_is_missing(): void
@@ -41,8 +35,25 @@ class TurnstileProtectionTest extends TestCase
             ->assertSee('data-sitekey="test-site-key"', false);
     }
 
+    public function test_turnstile_widget_uses_the_action_expected_by_each_submission_route(): void
+    {
+        $this->get(route('login'))
+            ->assertOk()
+            ->assertSee('data-action="login"', false);
+
+        $this->get(route('register'))
+            ->assertOk()
+            ->assertSee('data-action="signup"', false);
+
+        $this->get(route('contact'))
+            ->assertOk()
+            ->assertSee('data-action="contact"', false);
+    }
+
     public function test_login_is_blocked_when_turnstile_verification_fails(): void
     {
+        $this->fakeTurnstileFailure();
+
         User::query()->create([
             'name' => 'Test Customer',
             'email' => 'customer@example.test',
@@ -65,6 +76,8 @@ class TurnstileProtectionTest extends TestCase
 
     public function test_registration_is_blocked_when_turnstile_verification_fails(): void
     {
+        $this->fakeTurnstileFailure();
+
         $this->from(route('register'))
             ->post(route('register.store'), [
                 'first_name' => 'Test',
@@ -105,7 +118,8 @@ class TurnstileProtectionTest extends TestCase
             'password_confirmation' => 'StrongPass123',
             'terms' => '1',
             'cf-turnstile-response' => 'valid-test-token',
-        ])->assertRedirect();
+        ])->assertRedirect(route('account.index'))
+            ->assertSessionHasNoErrors();
 
         $this->assertDatabaseHas('users', [
             'email' => 'human@example.test',
@@ -142,6 +156,8 @@ class TurnstileProtectionTest extends TestCase
 
     public function test_checkout_order_creation_is_blocked_when_turnstile_verification_fails(): void
     {
+        $this->fakeTurnstileFailure();
+
         $customer = User::query()->create([
             'name' => 'Test Customer',
             'email' => 'customer@example.test',
@@ -163,6 +179,8 @@ class TurnstileProtectionTest extends TestCase
 
     public function test_contact_messages_are_blocked_when_turnstile_verification_fails(): void
     {
+        $this->fakeTurnstileFailure();
+
         $this->from(route('contact'))
             ->post(route('contact.store'), [
                 'cf-turnstile-response' => 'invalid-token',
@@ -172,6 +190,16 @@ class TurnstileProtectionTest extends TestCase
 
         $this->assertDatabaseCount('contact_messages', 0);
         $this->assertTurnstileWasCalled('invalid-token');
+    }
+
+    private function fakeTurnstileFailure(): void
+    {
+        Http::fake([
+            self::VERIFY_URL => Http::response([
+                'success' => false,
+                'error-codes' => ['invalid-input-response'],
+            ], 200),
+        ]);
     }
 
     private function assertTurnstileWasCalled(string $token): void

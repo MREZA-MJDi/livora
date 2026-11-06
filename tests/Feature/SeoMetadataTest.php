@@ -54,30 +54,43 @@ class SeoMetadataTest extends TestCase
         $this->assertStringNotContainsString('/checkout', json_encode($response->json('data')));
     }
 
-    public function test_public_pages_are_noindex_nofollow_and_sitemap_is_empty_by_default(): void
+    public function test_production_public_pages_are_indexable_even_when_seo_switches_are_unconfigured(): void
     {
+        config(['app.env' => 'production']);
+        Cache::forget('seo_settings.current');
+
         $this->get('/')
             ->assertOk()
-            ->assertSee('<meta name="robots" content="noindex, nofollow">', false)
-            ->assertHeader('X-Robots-Tag', 'noindex, nofollow');
+            ->assertDontSee('<meta name="robots"', false)
+            ->assertHeaderMissing('X-Robots-Tag');
 
-        $sitemap = $this->get('/sitemap.xml');
-        $sitemap
+        $this->get('/cart')
             ->assertOk()
-            ->assertHeader('Content-Type', 'application/xml; charset=UTF-8')
-            ->assertHeader('X-Robots-Tag', 'noindex, nofollow');
+            ->assertDontSee('<meta name="robots"', false)
+            ->assertHeaderMissing('X-Robots-Tag');
+    }
 
-        // StreamedResponse content is emitted only when sendContent() runs;
-        // TestResponse::assertSee() cannot inspect an unexecuted stream callback.
+    public function test_production_sitemap_contains_published_storefront_content(): void
+    {
+        config(['app.env' => 'production']);
+        $this->seed(\Database\Seeders\InitialDataSeeder::class);
+        SeoSetting::current()->update(['indexing_enabled' => true, 'following_enabled' => true]);
+        Cache::forget('seo_settings.current');
+
+        $sitemap = $this->get('/sitemap.xml')
+            ->assertOk()
+            ->assertHeaderMissing('X-Robots-Tag');
+
         ob_start();
         $sitemap->baseResponse->sendContent();
         $xml = (string) ob_get_clean();
 
-        $this->assertStringContainsString('<urlset', $xml);
-        $this->assertStringNotContainsString('<url>', $xml);
+        $this->assertStringContainsString('/product/مبل-راحتی-سه-نفره-آرتا', $xml);
+        $this->assertStringContainsString('/categories/مبل-راحتی', $xml);
+        $this->assertStringContainsString('/blog/choosing-sofa-for-living-room', $xml);
     }
 
-    public function test_fixed_page_seo_values_override_template_defaults_when_global_gate_is_enabled(): void
+    public function test_fixed_page_seo_values_override_template_defaults_without_robots_directives(): void
     {
         SeoSetting::current()->update([
             'indexing_enabled' => true,
@@ -100,17 +113,16 @@ class SeoMetadataTest extends TestCase
             ->assertOk()
             ->assertSee('<title>SillaGallery Contact SEO Test</title>', false)
             ->assertSee('<meta name="description" content="Contact page metadata controlled from the SEO panel.">', false)
-            ->assertSee('<meta name="robots" content="index, follow">', false);
+            ->assertDontSee('<meta name="robots"', false);
 
-        // Private commerce routes must stay noindex even after global indexing
-        // is enabled for public catalogue and content pages.
+        // Private commerce routes also omit robots directives.
         $this->get('/cart')
             ->assertOk()
-            ->assertSee('<meta name="robots" content="noindex, nofollow">', false)
-            ->assertHeader('X-Robots-Tag', 'noindex, nofollow');
+            ->assertDontSee('<meta name="robots"', false)
+            ->assertHeaderMissing('X-Robots-Tag');
     }
 
-    public function test_category_meta_title_is_used_while_global_noindex_lock_remains_enforced(): void
+    public function test_category_meta_title_is_used_without_robots_directives(): void
     {
         $category = Category::query()->create([
             'name' => 'مبلمان تست',
@@ -127,54 +139,10 @@ class SeoMetadataTest extends TestCase
         $this->get('/categories/' . $category->slug)
             ->assertOk()
             ->assertSee('<title>عنوان اختصاصی دسته‌بندی تست | SillaGallery</title>', false)
-            ->assertSee('<meta name="robots" content="noindex, nofollow">', false)
-            ->assertHeader('X-Robots-Tag', 'noindex, nofollow');
+            ->assertDontSee('<meta name="robots"', false)
+            ->assertHeaderMissing('X-Robots-Tag');
     }
 
-    public function test_both_global_seo_switches_are_required_before_any_public_page_can_be_indexed(): void
-    {
-        SeoPageSetting::query()
-            ->where('route_key', 'contact')
-            ->firstOrFail()
-            ->update(['seo_index' => true, 'seo_follow' => true]);
-        Cache::forget('seo_page_settings.contact');
-
-        foreach ([[true, false], [false, true]] as [$indexingEnabled, $followingEnabled]) {
-            SeoSetting::current()->update([
-                'indexing_enabled' => $indexingEnabled,
-                'following_enabled' => $followingEnabled,
-            ]);
-            Cache::forget('seo_settings.current');
-
-            $this->get('/contact')
-                ->assertOk()
-                ->assertSee('<meta name="robots" content="noindex, nofollow">', false)
-                ->assertHeader('X-Robots-Tag', 'noindex, nofollow');
-        }
-    }
-
-    public function test_sitemap_stays_empty_when_only_one_global_seo_switch_is_enabled(): void
-    {
-        SeoSetting::current()->update([
-            'indexing_enabled' => true,
-            'following_enabled' => false,
-        ]);
-        Cache::forget('seo_settings.current');
-
-        SeoPageSetting::query()
-            ->where('route_key', 'home')
-            ->firstOrFail()
-            ->update(['seo_index' => true]);
-        Cache::forget('seo_page_settings.home');
-
-        $sitemap = $this->get('/sitemap.xml')->assertOk();
-        ob_start();
-        $sitemap->baseResponse->sendContent();
-        $xml = (string) ob_get_clean();
-
-        $this->assertStringContainsString('<urlset', $xml);
-        $this->assertStringNotContainsString('<url>', $xml);
-    }
     public function test_admin_cms_forms_render_editor_and_fixed_page_slugs_cannot_break_navigation(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);
@@ -286,7 +254,7 @@ class SeoMetadataTest extends TestCase
             ->assertOk()
             ->assertSee('property="og:image" content="' . $imageUrl . '"', false)
             ->assertSee('<meta name="twitter:image" content="' . $imageUrl . '">', false)
-            ->assertHeader('X-Robots-Tag', 'noindex, nofollow');
+            ->assertHeaderMissing('X-Robots-Tag');
     }
 
 

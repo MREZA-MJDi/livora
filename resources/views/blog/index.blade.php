@@ -12,7 +12,7 @@
         <x-layout.container>
             <div class="grid gap-8 py-12 sm:py-16 lg:grid-cols-[1fr_.7fr] lg:items-end lg:py-20">
                 <div>
-                    <p class="sg-eyebrow">SILLAGALLERY JOURNAL</p>
+                    <p class="sg-eyebrow">مجله سیلا گالری</p>
                     <h1 class="mt-4 text-4xl font-semibold leading-tight tracking-tight text-[var(--sg-ink)] sm:text-5xl">{{ isset($activeTag) ? 'مطالب: '.$activeTag->name : 'مجله سیلاگالری' }}</h1>
                 </div>
                 <p class="max-w-xl text-sm leading-8 text-[var(--sg-stone)] sm:text-base">{{ isset($activeTag) ? ('مقاله‌های مرتبط با برچسب ' . $activeTag->name) : ($blogPageSeo?->meta_description ?: 'ایده‌ها، راهنماها و روایت‌هایی برای انتخاب آگاهانه‌تر مبلمان و ساختن فضایی که به شما تعلق دارد.') }}</p>
@@ -34,7 +34,7 @@
             @if($posts->count())
                 <div class="mb-7 flex items-center justify-between gap-4">
                     <p class="text-sm text-[var(--sg-stone)]">{{ number_format($posts->total()) }} مطلب</p>
-                    <span class="text-xs tracking-[.16em] text-[var(--sg-accent)]">READ · DISCOVER · LIVE</span>
+                    <span class="text-xs tracking-[.16em] text-[var(--sg-accent)]">بخوانید · ایده بگیرید · انتخاب کنید</span>
                 </div>
                 <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
                     @foreach($posts as $post)
@@ -43,7 +43,7 @@
                                 @if($post->featured_image_url)
                                     <img src="{{ $post->featured_image_url }}" alt="{{ $post->featured_image_alt ?: $post->title }}" class="h-full w-full object-cover transition duration-700 group-hover:scale-[1.035]" loading="lazy" decoding="async">
                                 @else
-                                    <div class="flex h-full items-center justify-center"><span class="sg-eyebrow">SILLAGALLERY JOURNAL</span></div>
+                                    <div class="flex h-full items-center justify-center"><span class="sg-eyebrow">مجله سیلا گالری</span></div>
                                 @endif
                             </a>
                             <div class="flex flex-1 flex-col p-5 sm:p-6">

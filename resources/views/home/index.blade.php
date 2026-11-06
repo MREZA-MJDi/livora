@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', \App\Models\SeoPageSetting::forRoute('home')?->meta_title ?: 'SillaGallery | مبلمان و لوازم خانه')
+@section('title', \App\Models\SeoPageSetting::forRoute('home')?->meta_title ?: 'سیلا گالری | مبلمان و لوازم خانه')
 
 @section(
     'description',
-    (\App\Models\SeoPageSetting::forRoute('home')?->meta_description ?: 'SillaGallery؛ انتخابی دقیق برای خانه‌ای که قرار است ماندگار باشد. کشف مجموعه مبلمان، دکوراسیون و خرید اقساطی.')
+    (\App\Models\SeoPageSetting::forRoute('home')?->meta_description ?: 'سیلا گالری؛ انتخابی دقیق برای خانه‌ای که قرار است ماندگار باشد. کشف مجموعه مبلمان، دکوراسیون و خرید اقساطی.')
 )
 
 @section('canonical', \App\Models\SeoPageSetting::forRoute('home')?->canonical_url ?: url('/'))
@@ -72,7 +72,7 @@
 
                                 <span class="h-px w-8 bg-[var(--sg-accent)]"></span>
 
-                                Furniture & Living
+                                مبلمان و دکوراسیون
 
                             </div>
 
@@ -144,7 +144,7 @@
                             <div class="rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-4">
 
                                 <p class="text-[10px] uppercase tracking-[0.16em] text-[var(--sg-stone)]">
-                                    Payment
+                                    پرداخت
                                 </p>
 
                                 <p class="mt-2 text-sm font-semibold">
@@ -220,7 +220,7 @@
                                                     <div class="min-w-0">
 
                                                         <p class="text-[10px] uppercase tracking-[0.18em] text-white/55">
-                                                            Featured Product
+                                                            محصول منتخب
                                                         </p>
 
                                                         <h2 class="mt-2 truncate text-lg font-semibold sm:text-xl">
@@ -330,7 +330,7 @@
                             <div class="flex min-h-[430px] items-center justify-center bg-[var(--sg-surface)]">
 
                                 <span class="text-sm tracking-[0.2em] text-[var(--sg-stone)]">
-                                    SillaGallery
+                                    سیلا گالری
                                 </span>
 
                             </div>
@@ -347,7 +347,7 @@
 
 
         {{-- =========================================================
-             CATEGORY DISCOVERY
+             دسته‌بندی‌ها
         ========================================================== --}}
 
         <section class="border-t border-[var(--sg-border)] bg-[var(--sg-white)]">
@@ -361,7 +361,7 @@
                         <div class="max-w-2xl">
 
                             <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
-                                Shop by space
+                                خرید بر اساس فضای خانه
                             </p>
 
                             <h2 class="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -415,8 +415,9 @@
         </section>
 
 
+        @if($featuredWithoutHero->isNotEmpty())
         {{-- =========================================================
-             FEATURED COLLECTION
+             مجموعه منتخب
         ========================================================== --}}
 
         <section class="border-t border-[var(--sg-border)]">
@@ -430,7 +431,7 @@
                         <div>
 
                             <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
-                                Curated collection
+                                مجموعه منتخب
                             </p>
 
                             <h2 class="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -466,23 +467,13 @@
                                 <button type="button" data-carousel-prev aria-label="محصولات قبلی" class="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)] text-[var(--sg-ink)] transition hover:border-[var(--sg-ink)] hover:bg-[var(--sg-ink)] hover:text-white disabled:cursor-not-allowed disabled:opacity-35">→</button>
                                 <button type="button" data-carousel-next aria-label="محصولات بعدی" class="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)] text-[var(--sg-ink)] transition hover:border-[var(--sg-ink)] hover:bg-[var(--sg-ink)] hover:text-white disabled:cursor-not-allowed disabled:opacity-35">←</button>
                             </div>
-                            <div class="sg-product-carousel" data-carousel-track tabindex="0" role="region" aria-label="محصولات منتخب SillaGallery" dir="rtl">
+                            <div class="sg-product-carousel" data-carousel-track tabindex="0" role="region" aria-label="محصولات منتخب سیلا گالری" dir="rtl">
                                 @foreach($featuredWithoutHero as $product)
                                     <div class="sg-product-carousel-item">
                                         <x-product.card :product="$product" />
                                     </div>
                                 @endforeach
                             </div>
-                        </div>
-
-                    @else
-
-                        <div class="mt-10 rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-surface)] p-10 text-center">
-
-                            <p class="text-sm text-[var(--sg-stone)]">
-                                محصولات منتخب به‌زودی اینجا نمایش داده می‌شوند.
-                            </p>
-
                         </div>
 
                     @endif
@@ -494,128 +485,7 @@
         </section>
 
 
-        {{-- =========================================================
-             INSTALLMENT HERO
-        ========================================================== --}}
-
-        <section class="border-t border-[var(--sg-border)] bg-[var(--sg-ink)] text-white">
-
-            <x-layout.container>
-
-                <div class="py-16 sm:py-20">
-
-                    <div class="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
-
-
-                        <div>
-
-                            <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-white/45">
-                                SillaGallery INSTALLMENTS
-                            </p>
-
-                            <h2 class="mt-4 max-w-xl text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
-
-                                خانه‌تان را انتخاب کنید.
-
-                                <span class="block text-white/50">
-                                    پرداختش را برنامه‌ریزی کنید.
-                                </span>
-
-                            </h2>
-
-
-                            <p class="mt-6 max-w-xl text-sm leading-8 text-white/60">
-
-                                بعضی از محصولات SillaGallery می‌توانند با شرایط اقساطی
-                                تعریف‌شده توسط فروشگاه خریداری شوند؛
-                                پیش‌پرداخت، تعداد چک و فاصله سررسید از قبل مشخص است.
-
-                            </p>
-
-
-                            {{-- Installment CTA --}}
-
-                            <a
-                                href="{{ route('shop.index') }}"
-                                class="mt-8 inline-flex items-center rounded-2xl bg-white px-6 py-4 text-sm font-medium text-[var(--sg-ink)] transition-colors duration-300 hover:bg-[var(--sg-cream)]"
-                            >
-                                مشاهده محصولات اقساطی
-                            </a>
-
-                        </div>
-
-
-                        <div class="grid grid-cols-2 gap-3">
-
-                            <div class="rounded-3xl border border-white/10 bg-white/5 p-5 sm:p-6">
-
-                                <span class="text-[10px] uppercase tracking-[0.18em] text-white/40">
-                                    Today
-                                </span>
-
-                                <p class="mt-4 text-2xl font-semibold">
-                                    50%
-                                </p>
-
-                                <p class="mt-2 text-xs leading-6 text-white/45">
-                                    پیش‌پرداخت نمونه
-                                </p>
-
-                            </div>
-
-
-                            <div class="rounded-3xl border border-white/10 bg-white/5 p-5 sm:p-6">
-
-                                <span class="text-[10px] uppercase tracking-[0.18em] text-white/40">
-                                    Cheques
-                                </span>
-
-                                <p class="mt-4 text-2xl font-semibold">
-                                    2+
-                                </p>
-
-                                <p class="mt-2 text-xs leading-6 text-white/45">
-                                    قابل تنظیم توسط فروشگاه
-                                </p>
-
-                            </div>
-
-
-                            <div class="col-span-2 rounded-3xl border border-white/10 bg-white/[0.07] p-5 sm:p-6">
-
-                                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-
-                                    <div>
-
-                                        <p class="text-sm font-semibold">
-                                            شرایط هر محصول متفاوت است
-                                        </p>
-
-                                        <p class="mt-2 text-xs leading-6 text-white/45">
-                                            درصد پیش‌پرداخت و برنامه تسویه را در صفحه محصول ببینید.
-                                        </p>
-
-                                    </div>
-
-
-                                    <span class="inline-flex w-fit rounded-full border border-white/10 px-4 py-2 text-[11px] text-white/60">
-                                        Transparent pricing
-                                    </span>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </x-layout.container>
-
-        </section>
-
+        @endif
 
         {{-- =========================================================
              INSTALLMENT PRODUCT PICKS
@@ -634,7 +504,7 @@
                             <div>
 
                                 <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
-                                    Flexible payment
+                                    پرداخت اقساطی
                                 </p>
 
                                 <h2 class="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -696,11 +566,11 @@
                         <div>
 
                             <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
-                                New arrivals
+                                تازه‌های فروشگاه
                             </p>
 
                             <h2 class="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-                                تازه‌های SillaGallery
+                                تازه‌های سیلا گالری
                             </h2>
 
                             <p class="mt-3 max-w-xl text-sm leading-8 text-[var(--sg-stone)]">
@@ -727,23 +597,13 @@
                                 <button type="button" data-carousel-prev aria-label="محصولات قبلی" class="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)] text-[var(--sg-ink)] transition hover:border-[var(--sg-ink)] hover:bg-[var(--sg-ink)] hover:text-white disabled:cursor-not-allowed disabled:opacity-35">→</button>
                                 <button type="button" data-carousel-next aria-label="محصولات بعدی" class="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)] text-[var(--sg-ink)] transition hover:border-[var(--sg-ink)] hover:bg-[var(--sg-ink)] hover:text-white disabled:cursor-not-allowed disabled:opacity-35">←</button>
                             </div>
-                            <div class="sg-product-carousel" data-carousel-track tabindex="0" role="region" aria-label="تازه‌های SillaGallery" dir="rtl">
+                            <div class="sg-product-carousel" data-carousel-track tabindex="0" role="region" aria-label="تازه‌های سیلا گالری" dir="rtl">
                                 @foreach($newProducts as $product)
                                     <div class="sg-product-carousel-item">
                                         <x-product.card :product="$product" />
                                     </div>
                                 @endforeach
                             </div>
-                        </div>
-
-                    @else
-
-                        <div class="mt-10 rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-surface)] p-10 text-center">
-
-                            <p class="text-sm text-[var(--sg-stone)]">
-                                محصولات جدید به‌زودی اضافه می‌شوند.
-                            </p>
-
                         </div>
 
                     @endif
@@ -771,7 +631,7 @@
                         <div>
 
                             <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
-                                Inspiration
+                                ایده‌های چیدمان
                             </p>
 
                             <h2 class="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -798,7 +658,7 @@
                                 href="{{ route('about') }}"
                                 class="mt-7 inline-flex items-center text-sm font-medium text-[var(--sg-ink)] transition-colors duration-300 hover:text-[var(--sg-accent)]"
                             >
-                                درباره SillaGallery
+                                درباره سیلا گالری
 
                                 <span class="mr-2">
                                     ←
@@ -873,90 +733,6 @@
 
 
         {{-- =========================================================
-             TRUST
-        ========================================================== --}}
-
-        <section class="border-t border-[var(--sg-border)] bg-[var(--sg-white)]">
-
-            <x-layout.container>
-
-                <div class="grid grid-cols-1 divide-y divide-[var(--sg-border)] py-4 sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4">
-
-                    <div class="px-2 py-8 sm:px-8">
-
-                        <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-stone)]">
-                            Selection
-                        </p>
-
-                        <h3 class="mt-3 text-sm font-semibold">
-                            انتخاب با دقت
-                        </h3>
-
-                        <p class="mt-2 text-xs leading-7 text-[var(--sg-stone)]">
-                            محصولات با تمرکز بر فرم، کاربرد و کیفیت انتخاب می‌شوند.
-                        </p>
-
-                    </div>
-
-
-                    <div class="px-2 py-8 sm:px-8">
-
-                        <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-stone)]">
-                            Payment
-                        </p>
-
-                        <h3 class="mt-3 text-sm font-semibold">
-                            پرداخت منعطف
-                        </h3>
-
-                        <p class="mt-2 text-xs leading-7 text-[var(--sg-stone)]">
-                            برای برخی محصولات، شرایط خرید اقساطی در دسترس است.
-                        </p>
-
-                    </div>
-
-
-                    <div class="px-2 py-8 sm:px-8">
-
-                        <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-stone)]">
-                            Support
-                        </p>
-
-                        <h3 class="mt-3 text-sm font-semibold">
-                            همراهی تا خرید
-                        </h3>
-
-                        <p class="mt-2 text-xs leading-7 text-[var(--sg-stone)]">
-                            اطلاعات محصول و مسیر خرید را شفاف و ساده نگه می‌داریم.
-                        </p>
-
-                    </div>
-
-
-                    <div class="px-2 py-8 sm:px-8">
-
-                        <p class="text-[10px] uppercase tracking-[0.18em] text-[var(--sg-stone)]">
-                            Experience
-                        </p>
-
-                        <h3 class="mt-3 text-sm font-semibold">
-                            تجربه‌ای آرام
-                        </h3>
-
-                        <p class="mt-2 text-xs leading-7 text-[var(--sg-stone)]">
-                            از کشف محصول تا پرداخت، همه‌چیز با کمترین اصطکاک طراحی شده است.
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </x-layout.container>
-
-        </section>
-
-
-        {{-- =========================================================
              FINAL CTA
         ========================================================== --}}
 
@@ -969,7 +745,7 @@
                     <div class="mx-auto max-w-3xl text-center">
 
                         <p class="text-[10px] font-medium uppercase tracking-[0.24em] text-[var(--sg-accent)]">
-                            SillaGallery
+                            سیلا گالری
                         </p>
 
                         <h2 class="mt-5 text-4xl font-semibold tracking-tight sm:text-5xl">

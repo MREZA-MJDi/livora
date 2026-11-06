@@ -109,7 +109,7 @@
                         <div class="max-w-4xl">
 
                             <p class="text-[10px] font-medium uppercase tracking-[0.24em] text-[var(--sg-accent)]">
-                                ABOUT SillaGallery
+                                درباره سیلا گالری | SillaGallery
                             </p>
 
                             <h1 class="mt-5 text-5xl font-semibold leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl">
@@ -133,7 +133,7 @@
                                 href="{{ route('shop.index') }}"
                                 class="mt-7 inline-flex items-center rounded-2xl bg-[var(--sg-ink)] px-6 py-4 text-sm font-medium !text-white transition-colors duration-300 hover:bg-[var(--sg-accent)] hover:!text-white"
                             >
-                                کشف مجموعه SillaGallery
+                                کشف مجموعه سیلا گالری
                             </a>
                         </div>
 

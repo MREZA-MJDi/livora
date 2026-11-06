@@ -17,19 +17,6 @@
         </div>
     </header>
 
-    <section class="admin-card flex flex-wrap items-center justify-between gap-4 p-5">
-        <div>
-            <h2 class="text-base font-bold">قفل انتشار موتورهای جست‌وجو</h2>
-            <p class="admin-help mt-2">برای index/follow شدن محتوا، هر دو سوییچ سراسری و مجوز هر رکورد باید روشن باشند.</p>
-            <p class="mt-3 font-mono text-xs" dir="ltr">Robots: {{ $settings->robots() }}</p>
-        </div>
-        @if($globalGateOpen)
-            <span class="admin-badge admin-badge-success">قفل سراسری باز است</span>
-        @else
-            <span class="admin-badge admin-badge-warning">قفل سراسری بسته است</span>
-        @endif
-    </section>
-
     <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <article class="admin-stat admin-card p-5">
             <p class="admin-stat-label">کل رکوردهای بررسی‌شده</p>
@@ -37,14 +24,14 @@
             <p class="admin-help mt-2">محصول، دسته، مقاله و صفحه ثابت/محتوایی</p>
         </article>
         <article class="admin-stat admin-card p-5">
-            <p class="admin-stat-label">دارای مجوز محتوایی Index + Follow</p>
+            <p class="admin-stat-label">رکوردهای قابل انتشار</p>
             <p class="mt-2 text-3xl font-bold">{{ number_format($totals['eligible']) }}</p>
-            <p class="admin-help mt-2">قبل از اعمال قفل سراسری</p>
+            <p class="admin-help mt-2">صفحات عمومی و محتوای منتشرشده</p>
         </article>
         <article class="admin-stat admin-card p-5">
-            <p class="admin-stat-label">قابل ایندکس در وضعیت فعلی</p>
-            <p class="mt-2 text-3xl font-bold">{{ number_format($globalGateOpen ? $totals['eligible'] : 0) }}</p>
-            <p class="admin-help mt-2">خروجی واقعی ترکیب قفل سراسری و مجوز رکورد</p>
+            <p class="admin-stat-label">رکوردهای قابل انتشار</p>
+            <p class="mt-2 text-3xl font-bold">{{ number_format($totals['eligible']) }}</p>
+            <p class="admin-help mt-2">بر اساس وضعیت انتشار و فعال بودن محتوا</p>
         </article>
         <article class="admin-stat admin-card p-5">
             <p class="admin-stat-label">تصویر بدون Alt</p>
@@ -64,7 +51,7 @@
                     <tr>
                         <th>نوع محتوا</th>
                         <th>تعداد</th>
-                        <th>دارای مجوز Index + Follow</th>
+                        <th>قابل انتشار</th>
                         <th>بدون Meta Title</th>
                         <th>بدون Meta Description</th>
                         <th>مدیریت</th>
@@ -108,7 +95,7 @@
             <p class="text-sm leading-7">۱. برای همه محصولات، مقاله‌ها و صفحات مهم Meta Title و Description یکتا و توصیفی ثبت کن.</p>
             <p class="text-sm leading-7">۲. برای هر تصویر محتوایی Alt دقیق و غیرتکراری وارد کن.</p>
             <p class="text-sm leading-7">۳. Canonical، لینک‌های داخلی، محتوای تکراری و وضعیت HTTP را در بازبینی جداگانه کنترل کن.</p>
-            <p class="text-sm leading-7">۴. قفل سراسری SEO را فقط پس از بررسی انسانی و اتصال ابزارهای Search Console باز کن.</p>
+            <p class="text-sm leading-7">۴. نقشه سایت را در Google Search Console و Bing Webmaster ثبت و وضعیت پوشش را بررسی کن.</p>
         </article>
     </section>
 </div>

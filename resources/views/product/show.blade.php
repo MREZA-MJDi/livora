@@ -375,7 +375,7 @@
                         <div class="mt-4 flex flex-wrap items-center gap-3 text-[11px] text-[var(--sg-stone)]">
 
                         <span>
-                            SKU:
+                            کد محصول:
                             {{ $product->sku }}
                         </span>
 
@@ -557,15 +557,30 @@
 
                             {{-- CTA --}}
                             <div class="border-t border-[var(--sg-border)] pt-7">
-
-                                <button
-                                    type="submit"
-                                    @disabled(!$canPurchase)
-                                    class="flex w-full items-center justify-center rounded-2xl bg-[var(--sg-ink)] px-6 py-4 text-sm font-medium text-white transition duration-300 hover:bg-[var(--sg-accent)] disabled:cursor-not-allowed disabled:opacity-40"
+                                <div class="grid gap-3 sm:grid-cols-2">
+                                    <button
+                                        type="submit"
+                                        @disabled(!$canPurchase)
+                                        class="flex min-h-12 w-full items-center justify-center rounded-2xl bg-[var(--sg-ink)] px-5 py-4 text-sm font-medium text-white transition duration-300 hover:bg-[var(--sg-accent)] disabled:cursor-not-allowed disabled:opacity-40"
                                     >
-                                    {{ $canPurchase ? 'افزودن به سبد خرید' : 'این محصول ناموجود است' }}
-                                </button>
-
+                                        {{ $canPurchase ? 'افزودن به سبد خرید' : 'این محصول ناموجود است' }}
+                                    </button>
+                                    <a
+                                        href="{{ filled($storeSettings?->whatsapp_url) ? $storeSettings->whatsapp_url : route('contact', ['product' => $product->slug]) }}"
+                                        @if(filled($storeSettings?->whatsapp_url)) target="_blank" rel="noopener noreferrer" @endif
+                                        class="flex min-h-12 w-full items-center justify-center rounded-2xl border border-[var(--sg-border)] px-5 py-4 text-sm font-medium text-[var(--sg-ink)] transition hover:border-[var(--sg-accent)] hover:text-[var(--sg-accent)]"
+                                    >
+                                        درخواست مشاوره خرید
+                                    </a>
+                                </div>
+                                @unless($canPurchase)
+                                    <a
+                                        href="{{ route('contact', ['product' => $product->slug, 'request' => 'stock-notification']) }}"
+                                        class="mt-3 flex min-h-11 items-center justify-center rounded-xl bg-[var(--sg-surface)] px-4 py-3 text-sm font-medium text-[var(--sg-accent)]"
+                                    >
+                                        درخواست اطلاع از موجودی
+                                    </a>
+                                @endunless
                             </div>
 
                         </form>
@@ -577,7 +592,7 @@
                             <div class="rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-4">
 
                                 <p class="text-[10px] uppercase tracking-[0.16em] text-[var(--sg-stone)]">
-                                    STOCK
+                                    موجودی انبار
                                 </p>
 
                                 <p class="mt-2 text-xs font-medium">
@@ -589,7 +604,7 @@
                             <div class="rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-4">
 
                                 <p class="text-[10px] uppercase tracking-[0.16em] text-[var(--sg-stone)]">
-                                    PAYMENT
+                                    روش پرداخت
                                 </p>
 
                                 <p class="mt-2 text-xs font-medium">
@@ -622,7 +637,7 @@
 
 
         {{-- =========================================================
-             PRODUCT INFORMATION
+             مشخصات محصول
         ========================================================== --}}
         <section class="border-t border-[var(--sg-border)] bg-[var(--sg-white)]">
 
@@ -633,7 +648,7 @@
                     <div>
 
                         <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
-                            PRODUCT DETAILS
+                            مشخصات محصول
                         </p>
 
                         <h2 class="mt-3 text-3xl font-semibold tracking-tight">
@@ -678,7 +693,7 @@
                         @foreach($product->content_sections ?? [] as $section)
                             @if(filled($section['heading'] ?? null) && filled($section['body'] ?? null))
                                 <article class="max-w-4xl">
-                                    <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">PRODUCT GUIDE</p>
+                                    <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">راهنمای محصول</p>
                                     <h2 class="mt-3 text-2xl font-semibold sm:text-3xl">{{ $section['heading'] }}</h2>
                                     <p class="mt-4 whitespace-pre-line text-sm leading-9 text-[var(--sg-stone)]">{{ $section['body'] }}</p>
                                 </article>
@@ -737,7 +752,7 @@
                 <x-layout.container>
                     <div class="py-12 sm:py-16">
                         <div class="max-w-3xl">
-                            <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">KEY FEATURES</p>
+                            <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">ویژگی‌های اصلی</p>
                             <h2 class="mt-3 text-2xl font-semibold">ویژگی‌های کلیدی {{ $product->name }}</h2>
                         </div>
                         <ul class="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -756,7 +771,7 @@
         @endif
 
         {{-- =========================================================
-             PRODUCT FACTS
+             اطلاعات محصول
         ========================================================== --}}
         <section class="border-t border-[var(--sg-border)]">
 
@@ -767,7 +782,7 @@
                     <div class="mb-8">
 
                         <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
-                            AT A GLANCE
+                            نگاهی کوتاه
                         </p>
 
                         <h2 class="mt-3 text-2xl font-semibold">
@@ -781,7 +796,7 @@
                         <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
 
                             <p class="text-[10px] uppercase tracking-[0.16em] text-[var(--sg-stone)]">
-                                CATEGORY
+                                دسته‌بندی
                             </p>
 
                             <p class="mt-3 text-sm font-semibold">
@@ -805,7 +820,7 @@
                         <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
 
                             <p class="text-[10px] uppercase tracking-[0.16em] text-[var(--sg-stone)]">
-                                AVAILABILITY
+                                وضعیت موجودی
                             </p>
 
                             <p class="mt-3 text-sm font-semibold">
@@ -817,7 +832,7 @@
                         <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
 
                             <p class="text-[10px] uppercase tracking-[0.16em] text-[var(--sg-stone)]">
-                                PAYMENT
+                                روش پرداخت
                             </p>
 
                             <p class="mt-3 text-sm font-semibold">
@@ -836,7 +851,7 @@
 
 
         {{-- =========================================================
-             RELATED PRODUCTS
+             محصولات مرتبط
         ========================================================== --}}
         @if($relatedProducts->count())
 
@@ -851,7 +866,7 @@
                             <div>
 
                                 <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
-                                    YOU MAY ALSO LIKE
+                                    شاید این محصولات را هم بپسندید
                                 </p>
 
                                 <h2 class="mt-3 text-2xl font-semibold">
@@ -896,7 +911,7 @@
 
 
         {{-- =========================================================
-             MOBILE STICKY CTA
+             اقدام سریع خرید
         ========================================================== --}}
         <div class="fixed inset-x-0 bottom-[5.5rem] z-[80] border-y border-[var(--sg-border)] bg-[var(--sg-white)]/95 p-3 shadow-[0_-10px_30px_rgba(24,23,21,.08)] backdrop-blur-xl lg:hidden">
 

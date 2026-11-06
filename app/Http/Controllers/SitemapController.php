@@ -7,30 +7,19 @@ use App\Models\Category;
 use App\Models\ContentPage;
 use App\Models\Product;
 use App\Models\SeoPageSetting;
-use App\Models\SeoSetting;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SitemapController extends Controller
 {
     public function __invoke(): StreamedResponse
     {
-        $settings = SeoSetting::current();
-
-        return response()->stream(function () use ($settings): void {
+        return response()->stream(function (): void {
             echo '<?xml version="1.0" encoding="UTF-8"?>';
             echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
-
-            // Never publish URLs until both global SEO switches are enabled.
-            if (! $settings->indexing_enabled || ! $settings->following_enabled) {
-                echo '</urlset>';
-                return;
-            }
 
             $base = rtrim(config('app.url'), '/');
 
             SeoPageSetting::query()
-                ->where('seo_index', true)
-                ->where('seo_follow', true)
                 ->orderBy('id')
                 ->cursor()
                 ->each(function (SeoPageSetting $page) use ($base): void {
@@ -39,8 +28,6 @@ class SitemapController extends Controller
                 });
 
             ContentPage::published()
-                ->where('seo_index', true)
-                ->where('seo_follow', true)
                 ->select(['id', 'slug', 'updated_at', 'canonical_url'])
                 ->chunkById(300, function ($pages) use ($base): void {
                     foreach ($pages as $page) {
@@ -50,8 +37,6 @@ class SitemapController extends Controller
 
             Product::query()
                 ->where('status', 'active')
-                ->where('seo_index', true)
-                ->where('seo_follow', true)
                 ->select(['id', 'slug', 'updated_at', 'canonical_url'])
                 ->chunkById(300, function ($products) use ($base): void {
                     foreach ($products as $product) {
@@ -61,8 +46,6 @@ class SitemapController extends Controller
 
             Category::query()
                 ->where('is_active', true)
-                ->where('seo_index', true)
-                ->where('seo_follow', true)
                 ->select(['id', 'slug', 'updated_at', 'canonical_url'])
                 ->chunkById(300, function ($categories) use ($base): void {
                     foreach ($categories as $category) {
@@ -71,8 +54,6 @@ class SitemapController extends Controller
                 });
 
             BlogPost::published()
-                ->where('seo_index', true)
-                ->where('seo_follow', true)
                 ->select(['id', 'slug', 'updated_at', 'canonical_url'])
                 ->chunkById(300, function ($posts) use ($base): void {
                     foreach ($posts as $post) {

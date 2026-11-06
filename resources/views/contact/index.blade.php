@@ -46,10 +46,10 @@
 
     @php
         $contactMethods = collect([
-            ['number' => '01', 'label' => $contactSetting?->phone_label ?? 'تماس تلفنی', 'value' => $contactSetting?->phone, 'href' => $contactSetting?->phone ? 'tel:'.$contactSetting->phone : null, 'eyebrow' => 'PHONE'],
-            ['number' => '02', 'label' => $contactSetting?->email_label ?? 'ایمیل', 'value' => $contactSetting?->email, 'href' => $contactSetting?->email ? 'mailto:'.$contactSetting->email : null, 'eyebrow' => 'EMAIL'],
-            ['number' => '03', 'label' => $contactSetting?->support_label ?? 'پشتیبانی', 'value' => $contactSetting?->support_description, 'href' => null, 'eyebrow' => 'SUPPORT'],
-            ['number' => '04', 'label' => $contactSetting?->online_label ?? 'ارتباط آنلاین', 'value' => $contactSetting?->online_description, 'href' => null, 'eyebrow' => 'ONLINE'],
+            ['number' => '01', 'label' => $contactSetting?->phone_label ?? 'تماس تلفنی', 'value' => $contactSetting?->phone, 'href' => $contactSetting?->phone ? 'tel:'.$contactSetting->phone : null, 'eyebrow' => 'تلفن'],
+            ['number' => '02', 'label' => $contactSetting?->email_label ?? 'ایمیل', 'value' => $contactSetting?->email, 'href' => $contactSetting?->email ? 'mailto:'.$contactSetting->email : null, 'eyebrow' => 'ایمیل'],
+            ['number' => '03', 'label' => $contactSetting?->support_label ?? 'پشتیبانی', 'value' => $contactSetting?->support_description, 'href' => null, 'eyebrow' => 'پشتیبانی'],
+            ['number' => '04', 'label' => $contactSetting?->online_label ?? 'ارتباط آنلاین', 'value' => $contactSetting?->online_description, 'href' => null, 'eyebrow' => 'آنلاین'],
         ])->filter(fn ($item) => filled($item['value']))->values();
     @endphp
     @if($contactMethods->isNotEmpty())
@@ -112,7 +112,7 @@
                     @endif
                     @if($contactSetting?->googleMapsEmbedUrl())
                         <div class="overflow-hidden rounded-xl border border-[var(--sg-border)] bg-[var(--sg-white)]">
-                            <div class="border-b border-[var(--sg-border)] px-5 py-4"><p class="sg-eyebrow">FIND US</p><h3 class="mt-1 font-semibold">موقعیت فروشگاه</h3></div>
+                            <div class="border-b border-[var(--sg-border)] px-5 py-4"><p class="sg-eyebrow">موقعیت فروشگاه</p><h3 class="mt-1 font-semibold">موقعیت فروشگاه</h3></div>
                             <div class="aspect-[16/10] bg-[var(--sg-surface)] sm:aspect-[16/9]"><iframe src="{{ $contactSetting->googleMapsEmbedUrl() }}" title="نقشه موقعیت فروشگاه SillaGallery" class="h-full w-full border-0" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
                             @if($contactSetting->googleMapsDirectionsUrl())
                                 <div class="p-4"><a href="{{ $contactSetting->googleMapsDirectionsUrl() }}" target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-[var(--sg-accent)]">مسیریابی در Google Maps ↗</a></div>

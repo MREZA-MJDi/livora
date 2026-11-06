@@ -9,6 +9,13 @@ use PHPUnit\Framework\TestCase;
 
 class JalaliHelperTest extends TestCase
 {
+    public function test_format_year_returns_only_the_persian_solar_hijri_year(): void
+    {
+        $date = new \DateTimeImmutable('2026-11-06 12:00:00');
+
+        $this->assertSame('۱۴۰۵', JalaliHelper::formatYear($date));
+    }
+
     public function test_gregorian_dates_convert_to_jalali_dates(): void
     {
         $this->assertSame([1404, 1, 1], JalaliHelper::toJalali(2025, 3, 21));

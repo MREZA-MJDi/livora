@@ -187,6 +187,39 @@ class Product extends Model
         );
     }
 
+    public function getDimensionsAttribute(): ?string
+    {
+        return collect($this->specifications ?? [])
+            ->firstWhere('label', 'ابعاد')['value'] ?? null;
+    }
+
+    public function getMaterialAttribute(): ?string
+    {
+        return collect($this->specifications ?? [])
+            ->firstWhere('label', 'جنس')['value'] ?? null;
+    }
+
+    public function getPersianPriceAttribute(): string
+    {
+        return \App\Helpers\JalaliHelper::toPersianDigits(
+            number_format((float) $this->price)
+        );
+    }
+
+    public function getApproximateInstallmentAmountAttribute(): ?int
+    {
+        $cashPercent = (int) $this->installment_cash_percent;
+        $chequeCount = (int) $this->installment_cheque_count;
+
+        if (! $this->installment_enabled || $cashPercent < 1 || $cashPercent >= 100 || $chequeCount < 1) {
+            return null;
+        }
+
+        return (int) round(
+            ((float) $this->price * (100 - $cashPercent) / 100) / $chequeCount
+        );
+    }
+
     public function scopeActive($query)
     {
         return $query->where('status', 'active');

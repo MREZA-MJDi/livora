@@ -50,13 +50,13 @@
                     data-card-image
                     class="product-card-image h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.045]"
                 >
-                <span data-card-image-fallback class="hidden h-full w-full items-center justify-center text-xs tracking-[0.2em] text-[var(--sg-stone)]" aria-hidden="true">SillaGallery</span>
+                <span data-card-image-fallback class="hidden h-full w-full items-center justify-center text-xs tracking-[0.2em] text-[var(--sg-stone)]" aria-hidden="true">سیلا گالری</span>
 
             @else
 
                 <div class="flex h-full w-full items-center justify-center">
                     <span class="text-xs tracking-[0.2em] text-[var(--sg-stone)]">
-                        SillaGallery
+                        سیلا گالری
                     </span>
                 </div>
 
@@ -164,6 +164,29 @@
             <p class="product-card-description mt-1.5 line-clamp-1 text-[11px] leading-5 text-[var(--sg-stone)]">{{ $product->short_description }}</p>
         @endif
 
+        @if(filled($product->dimensions) || filled($product->material))
+            <div class="mt-2 space-y-1 text-[10px] leading-5 text-[var(--sg-stone)]">
+                @if(filled($product->dimensions))
+                    <p><span class="font-semibold text-[var(--sg-ink)]">ابعاد:</span> {{ $product->dimensions }}</p>
+                @endif
+                @if(filled($product->material))
+                    <p class="line-clamp-1"><span class="font-semibold text-[var(--sg-ink)]">جنس:</span> {{ $product->material }}</p>
+                @endif
+            </div>
+        @endif
+
+        <p class="mt-2 text-[10px] font-medium {{ (int) $product->stock > 0 ? 'text-emerald-700' : 'text-rose-700' }}">
+            {{ (int) $product->stock > 0 ? 'موجود' : 'ناموجود' }}
+        </p>
+
+        @if($installmentEnabled && $product->approximate_installment_amount)
+            <p class="mt-1 text-[10px] leading-5 text-[var(--sg-stone)]">
+                هر چک حدود
+                <strong class="text-[var(--sg-ink)]">{{ \App\Helpers\JalaliHelper::toPersianDigits(number_format($product->approximate_installment_amount)) }}</strong>
+                تومان
+            </p>
+        @endif
+
         {{-- Price --}}
         <div class="product-card-price mt-3 flex-col">
             <span class="text-[10px] font-medium text-[var(--sg-stone)]">قیمت محصول</span>
@@ -173,14 +196,14 @@
                 <div class="flex flex-wrap items-center gap-2">
 
                     <span class="text-sm font-semibold text-[var(--sg-ink)]">
-                        {{ number_format((float) $product->price) }}
+                        {{ $product->persian_price }}
                         <span class="text-[10px] font-normal text-[var(--sg-stone)]">
                             تومان
                         </span>
                     </span>
 
                     <span class="text-xs text-[var(--sg-stone)] line-through">
-                        {{ number_format((float) $product->compare_at_price) }}
+                        {{ \App\Helpers\JalaliHelper::toPersianDigits(number_format((float) $product->compare_at_price)) }}
                     </span>
 
                 </div>
@@ -188,7 +211,7 @@
             @else
 
                 <p class="text-sm font-semibold text-[var(--sg-ink)]">
-                    {{ number_format((float) $product->price) }}
+                    {{ $product->persian_price }}
                     <span class="text-[10px] font-normal text-[var(--sg-stone)]">
                         تومان
                     </span>
@@ -232,9 +255,12 @@
                     <span class="product-card-quick-add-feedback" data-cart-feedback role="status" aria-live="polite"></span>
                 </form>
             @else
-                <button type="button" class="product-card-quick-add is-unavailable" disabled>
-                    ناموجود
-                </button>
+                <a
+                    href="{{ route('contact') }}?product={{ urlencode($product->slug) }}"
+                    class="product-card-quick-add is-unavailable"
+                >
+                    درخواست اطلاع از موجودی
+                </a>
             @endif
         </div>
 

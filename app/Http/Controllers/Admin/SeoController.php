@@ -130,8 +130,6 @@ class SeoController extends Controller
             'contact_email' => $validated['contact_email'] ?? null,
             'contact_phone' => $validated['contact_phone'] ?? null,
             'social_links' => array_filter($validated['social_links'] ?? [], fn ($url) => filled($url)),
-            'indexing_enabled' => $request->boolean('indexing_enabled'),
-            'following_enabled' => $request->boolean('following_enabled'),
         ];
 
         if ($request->boolean('remove_default_og_image')) {

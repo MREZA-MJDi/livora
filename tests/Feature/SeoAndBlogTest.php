@@ -10,12 +10,12 @@ class SeoAndBlogTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_storefront_defaults_to_noindex_nofollow(): void
+    public function test_storefront_does_not_emit_robots_directives(): void
     {
         $this->get('/')
             ->assertOk()
-            ->assertSee('name="robots" content="noindex, nofollow"', false)
-            ->assertHeader('X-Robots-Tag', 'noindex, nofollow');
+            ->assertDontSee('name="robots"', false)
+            ->assertHeaderMissing('X-Robots-Tag');
     }
 
     public function test_blog_only_shows_published_posts(): void
@@ -48,14 +48,29 @@ class SeoAndBlogTest extends TestCase
 
         $this->get('/blog/published-article')
             ->assertOk()
-            ->assertSee('noindex, nofollow');
+            ->assertDontSee('name="robots"', false);
     }
 
-    public function test_sitemap_is_empty_until_global_indexing_is_enabled(): void
+    public function test_sitemap_lists_published_blog_posts_without_global_indexing_switch(): void
     {
-        $this->get('/sitemap.xml')
+        BlogPost::create([
+            'title' => 'Published sitemap article',
+            'slug' => 'published-sitemap-article',
+            'body' => 'Published content',
+            'status' => 'published',
+            'published_at' => now()->subMinute(),
+            'seo_index' => false,
+            'seo_follow' => false,
+        ]);
+
+        $sitemap = $this->get('/sitemap.xml')
             ->assertOk()
-            ->assertHeader('Content-Type', 'application/xml; charset=UTF-8')
-            ->assertDontSee('/product/');
+            ->assertHeader('Content-Type', 'application/xml; charset=UTF-8');
+
+        ob_start();
+        $sitemap->baseResponse->sendContent();
+        $xml = (string) ob_get_clean();
+
+        $this->assertStringContainsString('/blog/published-sitemap-article', $xml);
     }
 }

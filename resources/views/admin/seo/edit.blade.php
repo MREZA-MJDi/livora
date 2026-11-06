@@ -8,27 +8,14 @@
     <header>
         <p class="mb-2 text-xs font-medium text-[var(--admin-accent)]">GROWTH / SEO</p>
         <h1 class="admin-title">مرکز مدیریت SEO | SillaGallery</h1>
-        <p class="admin-subtitle mt-2">هویت برند، تنظیمات موتورهای جست‌وجو، شبکه‌های اجتماعی و قفل انتشار سراسری.</p>
+        <p class="admin-subtitle mt-2">هویت برند، اطلاعات متادیتا، شبکه‌های اجتماعی و داده‌های ساختاریافته سیلا گالری.</p>
     </header>
-
-    <div class="admin-card border border-amber-300/60 p-5">
-        <p class="text-sm font-semibold">حالت محافظتی فعال</p>
-        <p class="mt-2 text-xs leading-7 text-[var(--admin-muted)]">تا زمان تأیید همکار SEO، هر دو گزینه زیر خاموش بمانند. فقط وقتی هر دو گزینه سراسری روشن باشند و مجوزهای اختصاصی صفحه هم فعال باشند، صفحه قابلیت ایندکس و دنبال‌کردن لینک‌ها را خواهد داشت؛ تنظیمات یک صفحه به‌تنهایی این قفل را باز نمی‌کند.</p>
-        <p class="mt-3 font-mono text-xs" dir="ltr">Current: {{ $settings->robots() }}</p>
-    </div>
 
     <form method="POST" action="{{ route('admin.seo.update') }}" enctype="multipart/form-data" class="space-y-6">
         @csrf @method('PUT')
         <section class="admin-card space-y-5 p-6">
-            <h2 class="text-base font-bold">قفل سراسری موتورهای جست‌وجو</h2>
-            <label class="flex items-start gap-3 rounded-xl border border-[var(--admin-border)] p-4"><input type="checkbox" name="indexing_enabled" value="1" class="admin-checkbox mt-1" @checked(old('indexing_enabled', $settings->indexing_enabled))><span><strong class="block text-sm">اجازه ایندکس صفحات عمومی</strong><span class="mt-1 block text-xs leading-6 text-[var(--admin-muted)]">فقط پس از تأیید نهایی محتوا روشن شود. در حالت خاموش تمام URLها noindex خواهند بود.</span></span></label>
-            <label class="flex items-start gap-3 rounded-xl border border-[var(--admin-border)] p-4"><input type="checkbox" name="following_enabled" value="1" class="admin-checkbox mt-1" @checked(old('following_enabled', $settings->following_enabled))><span><strong class="block text-sm">اجازه دنبال‌کردن لینک‌ها</strong><span class="mt-1 block text-xs leading-6 text-[var(--admin-muted)]">در حالت خاموش، دستور nofollow به تمام صفحات عمومی اعمال می‌شود.</span></span></label>
-            <p class="admin-help">پیش‌فرض Production باید هر دو خاموش باشد. خاموش‌شدن یک گزینه فوراً در HTML و HTTP Header اعمال می‌شود.</p>
-        </section>
-
-        <section class="admin-card space-y-5 p-6">
             <h2 class="text-base font-bold">هویت سایت و متادیتای پیش‌فرض</h2>
-            <div><label class="admin-label" for="site_name">نام برند</label><input id="site_name" name="site_name" class="admin-input" maxlength="255" required readonly value="SillaGallery"><p class="admin-help">نام برند عمومی قفل شده است؛ SillaGallery فقط نام فنی مخزن است.</p></div>
+            <div><label class="admin-label" for="site_name">نام برند</label><input id="site_name" name="site_name" class="admin-input" maxlength="255" required readonly value="SillaGallery"><p class="admin-help">نام فارسی و لاتین برند در عنوان‌ها و داده‌های ساختاریافته استفاده می‌شود.</p></div>
             <div><label class="admin-label" for="default_title">عنوان پیش‌فرض</label><input id="default_title" name="default_title" class="admin-input" maxlength="255" value="{{ old('default_title', $settings->default_title) }}"></div>
             <div><label class="admin-label" for="default_description">توضیحات پیش‌فرض</label><textarea id="default_description" name="default_description" rows="3" maxlength="1000" class="admin-textarea">{{ old('default_description', $settings->default_description) }}</textarea></div>
             <div><label class="admin-label" for="default_og_image">تصویر پیش‌فرض اشتراک‌گذاری (Open Graph)</label><input id="default_og_image" name="default_og_image" type="file" accept="image/jpeg,image/png,image/webp" data-crop-ratio="1.9047619" class="admin-input p-2"><p class="admin-help">تصویر را از Media Library انتخاب کنید یا از رایانه آپلود کنید. نسبت پیشنهادی ۱۲۰۰×۶۳۰ است.</p><div class="mt-3"><img id="default-og-image-preview" src="{{ $settings->default_og_image_url ?? '' }}" alt="تصویر اشتراک‌گذاری پیش‌فرض" class="{{ $settings->default_og_image_url ? '' : 'hidden' }} aspect-[1200/630] max-h-48 rounded-xl object-cover"></div>@include('admin.media.partials.picker', ['mediaPickerField' => 'default_og_image', 'mediaPickerId' => old('default_og_media_id', $settings->default_og_media_id), 'mediaPickerUrl' => $settings->defaultOgMedia?->url, 'mediaPickerName' => $settings->defaultOgMedia?->original_name ?? 'Open Graph image', 'mediaPickerPreviewId' => 'default-og-image-preview', 'mediaPickerInputName' => 'default_og_media_id', 'mediaPickerRemoveName' => 'remove_default_og_image'])<label class="mt-3 flex items-center gap-2 text-xs text-rose-700"><input type="checkbox" name="remove_default_og_image" value="1" class="admin-checkbox"> حذف تصویر Open Graph فعلی از تنظیمات سایت</label></div>
