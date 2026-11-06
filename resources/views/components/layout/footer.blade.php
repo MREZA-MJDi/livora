@@ -31,7 +31,7 @@
                 <div class="mt-5 flex flex-wrap gap-3">
                     @foreach($footerSocials as $network => $url)
                         @if($url)
-                            <a href="{{ $url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ $network }}" class="text-xs text-white/55 transition hover:text-white">{{ $network }}</a>
+                            <a href="{{ $url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ $network }}" class="text-xs text-white/55 transition hover:text-white">{{ mb_strtoupper(mb_substr($network, 0, 2)) }}</a>
                         @endif
                     @endforeach
                 </div>
