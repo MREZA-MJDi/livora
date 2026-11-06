@@ -20,6 +20,17 @@ class InitialDataSeederTest extends TestCase
         $this->assertDatabaseCount('blog_posts', 6);
         $this->assertDatabaseCount('contact_settings', 1);
         $this->assertDatabaseHas('content_pages', ['slug' => 'buying-guide']);
+        $this->assertDatabaseHas('content_pages', [
+            'slug' => 'about',
+            'status' => 'published',
+            'featured_image' => 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1800&q=85',
+        ]);
+        $this->assertDatabaseHas('blog_posts', [
+            'slug' => 'choosing-sofa-for-living-room',
+            'status' => 'published',
+            'featured_image' => 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=80',
+        ]);
+        $this->assertDatabaseCount('blog_tags', 4);
 
         $this->assertDatabaseHas('products', [
             'status' => 'active',
@@ -40,6 +51,8 @@ class InitialDataSeederTest extends TestCase
         $this->assertDatabaseCount('categories', 8);
         $this->assertDatabaseCount('products', 17);
         $this->assertDatabaseCount('blog_posts', 6);
+        $this->assertDatabaseCount('blog_tags', 4);
+        $this->assertDatabaseHas('content_pages', ['slug' => 'about']);
 
         $this->assertDatabaseHas('products', [
             'slug' => 'مبل-راحتی-سه-نفره-آرتا',
