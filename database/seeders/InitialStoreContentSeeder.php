@@ -74,6 +74,7 @@ class InitialStoreContentSeeder extends Seeder
         
         // Seed the public About page without overwriting content already managed by an administrator.
         $about = ContentPage::query()->firstOrNew(['slug' => 'about']);
+        $aboutWasMissingBody = ! filled($about->body);
         $aboutDefaults = [
             'title' => 'درباره سیلا گالری',
             'excerpt' => 'سیلا گالری برای انتخاب آگاهانه‌تر مبلمان و ساختن فضایی هماهنگ با زندگی روزمره شکل گرفته است.',
@@ -105,6 +106,11 @@ HTML,
 
         if (! $about->exists) {
             $about->user_id = null;
+        }
+
+        if ($aboutWasMissingBody) {
+            $about->status = 'published';
+            $about->published_at = $about->published_at ?: now();
         }
 
         $about->save();
