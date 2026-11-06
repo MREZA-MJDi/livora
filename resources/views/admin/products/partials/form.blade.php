@@ -116,7 +116,7 @@
                 data-preview-target="product-image-preview" data-preview-placeholder="product-image-placeholder"
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
-                data-crop-ratio="0.8"
+                data-crop-ratio="0.8" data-original-field="original_image"
                 class="admin-input mt-3 p-2"
             >
 
