@@ -47,7 +47,13 @@ class HomeController extends Controller
                             ->sortBy(fn (Product $product) => array_search($product->id, $ids, true))->values();
                 } else {
                     if ($source === 'new') {
-                        $query->new()->latest();
+                        $newProducts = (clone $query)->new()->latest('created_at')->limit($limit)->get();
+                        $products = $newProducts->isNotEmpty()
+                            ? $newProducts
+                            : $query->latest('created_at')->limit($limit)->get();
+                        $section->setRelation('products', $products);
+                        $usedProductIds = array_merge($usedProductIds, $products->modelKeys());
+                        continue;
                     } elseif ($source === 'installments') {
                         $query->where('installment_enabled', true)->latest();
                     } elseif ($source === 'category' && ! empty($payload['category_id'])) {
