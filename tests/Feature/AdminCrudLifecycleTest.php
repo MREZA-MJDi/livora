@@ -404,7 +404,7 @@ class AdminCrudLifecycleTest extends TestCase
         $this->actingAs($this->admin)
             ->post(route('admin.product-images.store'), [
                 'product_id' => $product->id,
-                'image' => UploadedFile::fake()->image('table-old.jpg'),
+                'image' => UploadedFile::fake()->image('table-old.jpg', 800, 1000),
                 'alt' => 'تصویر میز',
                 'sort_order' => 0,
                 'is_primary' => '0',
@@ -427,7 +427,7 @@ class AdminCrudLifecycleTest extends TestCase
         $this->actingAs($this->admin)
             ->put(route('admin.product-images.update', $image), [
                 'product_id' => $product->id,
-                'image' => UploadedFile::fake()->image('table-new.jpg'),
+                'image' => UploadedFile::fake()->image('table-new.jpg', 800, 1000),
                 'alt' => 'تصویر جدید میز',
                 'sort_order' => 1,
                 'is_primary' => '0',

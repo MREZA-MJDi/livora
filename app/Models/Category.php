@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Concerns\TracksSlugRedirects;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
@@ -14,88 +15,34 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Category extends Model
 {
     use HasFactory;
+    use TracksSlugRedirects;
+
+    protected function slugRedirectPrefix(): string { return 'categories'; }
 
     protected $fillable = [
-        'name',
-        'slug',
-        'description',
-        'image',
-        'media_id',
-        'image_alt',
-        'meta_title',
-        'meta_description',
-        'focus_keyword',
-        'content_sections',
-        'comparison_rows',
-        'faq_items',
-        'canonical_url',
-        'og_image',
-        'is_active',
-        'sort_order',
-        'seo_index',
-        'seo_follow',
+        'parent_id', 'name', 'slug', 'description', 'image', 'media_id',
+        'card_image', 'card_media_id', 'banner_image', 'banner_media_id',
+        'banner_title', 'banner_subtitle', 'image_alt', 'meta_title',
+        'meta_description', 'focus_keyword', 'content_sections', 'comparison_rows',
+        'faq_items', 'canonical_url', 'og_image', 'is_active', 'sort_order',
+        'seo_index', 'seo_follow',
     ];
 
     protected function casts(): array
     {
         return [
-            'is_active' => 'boolean',
-            'sort_order' => 'integer',
-            'seo_index' => 'boolean',
-            'seo_follow' => 'boolean',
-            'content_sections' => 'array',
-            'comparison_rows' => 'array',
-            'faq_items' => 'array',
+            'parent_id' => 'integer', 'is_active' => 'boolean', 'sort_order' => 'integer',
+            'seo_index' => 'boolean', 'seo_follow' => 'boolean',
+            'content_sections' => 'array', 'comparison_rows' => 'array', 'faq_items' => 'array',
         ];
     }
 
-    public function getImageUrlAttribute(): ?string
-    {
-        // The Media Library relation is the canonical source for newly
-        // selected/uploaded category artwork.
-        $media = $this->relationLoaded('media')
-            ? $this->getRelation('media')
-            : $this->media()->first();
-
-        if ($media) {
-            $disk = Storage::disk($media->disk ?: 'public');
-            $mediaPath = ltrim($media->path, '/');
-
-            if (Str::startsWith($media->path, ['http://', 'https://', '//'])) {
-                return $media->url;
-            }
-
-            if ($disk->exists($mediaPath)) {
-                return $media->url;
-            }
-        }
-
-        // Keep compatibility with categories saved before Media Library
-        // references were introduced.
-        if (! $this->image) {
-            return null;
-        }
-
-        if (Str::startsWith($this->image, ['http://', 'https://', '//'])) {
-            return $this->image;
-        }
-
-        $path = ltrim($this->image, '/');
-
-        return Storage::disk('public')->exists($path)
-            ? Storage::disk('public')->url($path)
-            : null;
-    }
-
-    public function media(): BelongsTo
-    {
-        return $this->belongsTo(Media::class);
-    }
-
-    public function products(): HasMany
-    {
-        return $this->hasMany(Product::class);
-    }
+    public function media(): BelongsTo { return $this->belongsTo(Media::class); }
+    public function cardMedia(): BelongsTo { return $this->belongsTo(Media::class, 'card_media_id'); }
+    public function bannerMedia(): BelongsTo { return $this->belongsTo(Media::class, 'banner_media_id'); }
+    public function parent(): BelongsTo { return $this->belongsTo(self::class, 'parent_id'); }
+    public function children(): HasMany { return $this->hasMany(self::class, 'parent_id')->orderBy('sort_order'); }
+    public function products(): HasMany { return $this->hasMany(Product::class); }
 
     public function relatedCategories(): BelongsToMany
     {
@@ -109,34 +56,48 @@ class Category extends Model
             ->withPivot('sort_order')->orderByPivot('sort_order');
     }
 
-    /**
-     * Latest active product used as the homepage image fallback.
-     *
-     * Admin-uploaded category images keep priority. Seeded/external
-     * category images fall back to the latest active product image.
-     */
     public function latestActiveProduct(): HasOne
     {
-        return $this->hasOne(Product::class)
-            ->where('status', 'active')
-            ->latestOfMany('updated_at');
+        return $this->hasOne(Product::class)->where('status', 'active')->latestOfMany('updated_at');
+    }
+
+    public function getImageUrlAttribute(): ?string
+    {
+        return $this->storedImageUrl($this->media, $this->image);
+    }
+
+    public function getCardImageUrlAttribute(): ?string
+    {
+        return $this->storedImageUrl($this->cardMedia, $this->card_image) ?: $this->image_url;
+    }
+
+    public function getBannerImageUrlAttribute(): ?string
+    {
+        return $this->storedImageUrl($this->bannerMedia, $this->banner_image) ?: $this->card_image_url;
     }
 
     public function getHomepageImageUrlAttribute(): ?string
     {
-        // An explicitly selected category image always wins, whether it came
-        // from a direct upload, the Media Library, or an external URL.
-        if ($categoryImage = $this->image_url) {
-            return $categoryImage;
+        return $this->card_image_url ?: $this->latestActiveProduct?->images?->first()?->card_url;
+    }
+
+    private function storedImageUrl(?Media $media, ?string $path): ?string
+    {
+        if ($media) {
+            if (Str::startsWith($media->path, ['http://', 'https://', '//'])) return $media->url;
+            $disk = Storage::disk($media->disk ?: 'public');
+            if ($disk->exists(ltrim($media->path, '/'))) return $media->url;
         }
 
-        return $this->latestActiveProduct?->images?->first()?->url;
+        if (! $path) return null;
+        if (Str::startsWith($path, ['http://', 'https://', '//'])) return $path;
+        $path = ltrim($path, '/');
+
+        return Storage::disk('public')->exists($path) ? Storage::disk('public')->url($path) : null;
     }
 
     public function scopeActive($query)
     {
-        return $query
-            ->where('is_active', true)
-            ->orderBy('sort_order');
+        return $query->where('is_active', true)->orderBy('sort_order');
     }
 }

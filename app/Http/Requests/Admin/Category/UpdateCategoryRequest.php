@@ -18,9 +18,7 @@ class UpdateCategoryRequest extends FormRequest
         $this->merge([
             'seo_index' => $this->boolean('seo_index'),
             'seo_follow' => $this->boolean('seo_follow'),
-            'slug' => $this->slug
-                ? Str::slug($this->slug)
-                : Str::slug($this->name),
+            'slug' => trim(preg_replace('/[^\\pL\\pN]+/u', '-', mb_strtolower(trim((string) ($this->slug ?: $this->name)), 'UTF-8')), '-'),
             'is_active' => $this->boolean('is_active'),
             'sort_order' => $this->sort_order ?? 0,
         ]);
@@ -70,6 +68,15 @@ class UpdateCategoryRequest extends FormRequest
             'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string', 'max:1000'],
             'image_alt' => ['nullable', 'string', 'max:255'],
+            'parent_id' => ['nullable', 'integer', Rule::exists('categories', 'id')->whereNull('parent_id')->where(fn ($query) => $query->where('id', '!=', $category->id))],
+            'card_media_id' => ['nullable', 'integer', 'exists:media,id'],
+            'card_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
+            'banner_media_id' => ['nullable', 'integer', 'exists:media,id'],
+            'banner_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
+            'banner_title' => ['nullable', 'string', 'max:255'],
+            'banner_subtitle' => ['nullable', 'string', 'max:2000'],
+            'remove_card_image' => ['nullable', 'boolean'],
+            'remove_banner_image' => ['nullable', 'boolean'],
             'focus_keyword' => ['nullable', 'string', 'max:120'],
             'content_sections' => ['nullable', 'array', 'max:12'],
             'content_sections.*.heading' => ['required', 'string', 'max:160'],

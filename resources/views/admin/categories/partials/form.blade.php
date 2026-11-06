@@ -332,6 +332,42 @@
         </div>
     </div>
 
+    <div class="admin-card space-y-5 p-6">
+        <div><h3 class="text-base font-bold text-[var(--admin-text)]">ساختار دسته‌بندی و تصاویر صفحه</h3><p class="admin-help mt-1">تصویر کارت و بنر صفحه دسته‌بندی مستقل هستند. تصویر قدیمی فقط به‌عنوان fallback حفظ می‌شود.</p></div>
+        <div>
+            <label class="admin-label" for="parent_id">دسته‌بندی والد (برای زیر‌دسته)</label>
+            <select id="parent_id" name="parent_id" class="admin-input">
+                <option value="">دسته اصلی</option>
+                @foreach(($availableRelatedCategories ?? collect()) as $parentCategory)
+                    <option value="{{ $parentCategory->id }}" @selected((string) old('parent_id', $category->parent_id ?? '') === (string) $parentCategory->id)>{{ $parentCategory->name }}</option>
+                @endforeach
+            </select>
+            @error('parent_id')<p class="admin-error">{{ $message }}</p>@enderror
+        </div>
+        <div class="grid gap-5 lg:grid-cols-2">
+            <div class="space-y-3">
+                <h4 class="text-sm font-semibold">تصویر کارت</h4>
+                @if($category->card_image_url)<img src="{{ $category->card_image_url }}" alt="" class="aspect-[4/3] w-full rounded-xl object-cover">@endif
+                <input id="card_image" type="file" name="card_image" accept="image/jpeg,image/png,image/webp" data-crop-ratio="1.333333" class="admin-input">
+                <label class="flex items-center gap-2 text-xs"><input type="checkbox" name="remove_card_image" value="1"> حذف تصویر کارت اختصاصی</label>
+                @error('card_image')<p class="admin-error">{{ $message }}</p>@enderror
+                <p class="admin-help">نسبت پیشنهادی ۴:۳؛ در صورت خالی بودن، تصویر قدیمی دسته‌بندی استفاده می‌شود.</p>
+            </div>
+            <div class="space-y-3">
+                <h4 class="text-sm font-semibold">بنر صفحه دسته‌بندی</h4>
+                @if($category->banner_image_url)<img src="{{ $category->banner_image_url }}" alt="" class="aspect-[16/7] w-full rounded-xl object-cover">@endif
+                <input id="banner_image" type="file" name="banner_image" accept="image/jpeg,image/png,image/webp" data-crop-ratio="2.285714" class="admin-input">
+                <label class="flex items-center gap-2 text-xs"><input type="checkbox" name="remove_banner_image" value="1"> حذف بنر اختصاصی</label>
+                @error('banner_image')<p class="admin-error">{{ $message }}</p>@enderror
+                <p class="admin-help">نسبت پیشنهادی ۱۶:۷؛ اگر بنر اختصاصی ثبت نشود، تصویر کارت fallback می‌شود.</p>
+            </div>
+        </div>
+        <div class="grid gap-4 sm:grid-cols-2">
+            <label><span class="admin-label">عنوان بنر</span><input name="banner_title" maxlength="255" class="admin-input" value="{{ old('banner_title', $category->banner_title ?? '') }}">@error('banner_title')<p class="admin-error">{{ $message }}</p>@enderror</label>
+            <label class="sm:col-span-2"><span class="admin-label">زیرعنوان بنر</span><textarea name="banner_subtitle" rows="3" maxlength="2000" class="admin-textarea">{{ old('banner_subtitle', $category->banner_subtitle ?? '') }}</textarea>@error('banner_subtitle')<p class="admin-error">{{ $message }}</p>@enderror</label>
+        </div>
+    </div>
+
     @include('admin.partials.content-builder', [
         'sections' => $category->content_sections ?? [],
         'comparisonRows' => $category->comparison_rows ?? [],

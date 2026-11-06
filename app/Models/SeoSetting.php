@@ -52,7 +52,14 @@ class SeoSetting extends Model
 
     public function robotsFor(bool $pageIndex = true, bool $pageFollow = true): string
     {
-        return 'index, follow';
+        if (! app()->isProduction()) {
+            return 'noindex, nofollow';
+        }
+
+        $index = $this->indexing_enabled && $pageIndex ? 'index' : 'noindex';
+        $follow = $this->following_enabled && $pageFollow ? 'follow' : 'nofollow';
+
+        return $index.', '.$follow;
     }
 
     public function getDefaultOgImageUrlAttribute(): ?string

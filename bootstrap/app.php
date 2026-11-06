@@ -3,6 +3,7 @@
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\CustomerMiddleware;
 use App\Http\Middleware\EnforceAdminSessionTimeout;
+use App\Http\Middleware\RedirectLegacySlug;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
@@ -21,6 +22,7 @@ return Application::configure(
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->web(prepend: [RedirectLegacySlug::class]);
         $middleware->alias([
             'admin' => AdminMiddleware::class,
             'customer' => CustomerMiddleware::class,

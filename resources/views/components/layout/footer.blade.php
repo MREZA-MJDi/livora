@@ -1,319 +1,102 @@
+@php
+    $footerBrandName = $storeSettings?->brand_name ?: config('app.name');
+    $footerLogoUrl = $storeSettings?->logo_url;
+    $footerMenus = $storeSettings?->footer_menu ?? [];
+    $footerPayments = $storeSettings?->payment_methods ?? [];
+@endphp
+
 <footer class="border-t border-white/10 bg-[var(--sg-ink)] text-[var(--sg-cream)]">
-
     <x-layout.container>
-
-        {{-- =========================================================
-             MAIN FOOTER
-        ========================================================== --}}
-        <div class="grid gap-12 py-14 sm:py-16 lg:grid-cols-[1.25fr_0.75fr_0.75fr_1fr] lg:py-20">
-
-            {{-- Brand --}}
+        <div class="grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[1.3fr_0.8fr_0.9fr_1fr] lg:gap-12 lg:py-18">
             <div class="max-w-md">
-
-                <a
-                    href="{{ route('home') }}"
-                    aria-label="{{ $storeSettings?->brand_name ?: config('app.name') }}"
-                    class="inline-flex items-center"
-                >
-                    <span class="text-2xl font-semibold tracking-[0.24em] text-white transition hover:text-[var(--sg-cream)]">
-                        {{ $storeSettings?->brand_name ?: config('app.name') }}
-                    </span>
-                </a>
-
-                @if($storeSettings?->warranty_text)<p class="mt-6 max-w-sm text-sm leading-8 text-white/50">{{ $storeSettings->warranty_text }}</p>@endif
-
-            </div>
-
-
-            {{-- Shop --}}
-            <div>
-
-                <p class="text-[10px] font-medium uppercase tracking-[0.2em] text-white/40">
-                    فروشگاه
-                </p>
-
-                <nav
-                    aria-label="لینک‌های فروشگاه"
-                    class="mt-5 flex flex-col gap-3"
-                >
-
-                    <a
-                        href="{{ route('shop.index') }}"
-                        class="text-sm text-white/55 transition hover:text-white"
-                    >
-                        همه محصولات
-                    </a>
-
-                    <a
-                        href="{{ route('categories.index') }}"
-                        class="text-sm text-white/55 transition hover:text-white"
-                    >
-                        دسته‌بندی‌ها
-                    </a>
-
-                    <a
-                        href="{{ route('shop.index', ['sort' => 'newest']) }}"
-                        class="text-sm text-white/55 transition hover:text-white"
-                    >
-                        تازه‌ها
-                    </a>
-
-                    <a
-                        href="{{ route('shop.index') }}"
-                        class="text-sm text-white/55 transition hover:text-white"
-                    >
-                        محصولات منتخب
-                    </a>
-
-                    <a
-                        href="{{ route('cart.index') }}"
-                        class="text-sm text-white/55 transition hover:text-white"
-                    >
-                        سبد خرید
-                    </a>
-
-                </nav>
-
-            </div>
-
-
-            {{-- Customer --}}
-            <div>
-
-                <p class="text-[10px] font-medium uppercase tracking-[0.2em] text-white/40">
-                    راهنمای مشتریان
-                </p>
-
-                <nav
-                    aria-label="لینک‌های مشتریان"
-                    class="mt-5 flex flex-col gap-3"
-                >
-
-                    @auth
-
-                        @if(auth()->user()->isCustomer())
-
-                            <a
-                                href="{{ route('account.index') }}"
-                                class="text-sm text-white/55 transition hover:text-white"
-                            >
-                                حساب کاربری
-                            </a>
-
-                            <a
-                                href="{{ route('account.orders.index') }}"
-                                class="text-sm text-white/55 transition hover:text-white"
-                            >
-                                سفارش‌های من
-                            </a>
-
-                            <a
-                                href="{{ route('account.wishlist.index') }}"
-                                class="text-sm text-white/55 transition hover:text-white"
-                            >
-                                علاقه‌مندی‌ها
-                            </a>
-
-                            <a
-                                href="{{ route('account.addresses.index') }}"
-                                class="text-sm text-white/55 transition hover:text-white"
-                            >
-                                آدرس‌ها
-                            </a>
-
-                        @elseif(auth()->user()->isAdmin())
-
-                            <a
-                                href="{{ route('admin.dashboard') }}"
-                                class="text-sm text-white/55 transition hover:text-white"
-                            >
-                                پنل مدیریت
-                            </a>
-
-                        @endif
-
+                <a href="{{ route('home') }}" aria-label="{{ $footerBrandName }}" class="inline-flex items-center gap-3">
+                    @if($footerLogoUrl)
+                        <img src="{{ $footerLogoUrl }}" alt="{{ $footerBrandName }}" class="max-h-12 max-w-44 object-contain">
                     @else
-
-                        <a
-                            href="{{ route('login') }}"
-                            class="text-sm text-white/55 transition hover:text-white"
-                        >
-                            ورود
-                        </a>
-
-                        <a
-                            href="{{ route('register') }}"
-                            class="text-sm text-white/55 transition hover:text-white"
-                        >
-                            ثبت‌نام
-                        </a>
-
-                    @endauth
-
-                    <a
-                        href="{{ route('contact') }}"
-                        class="text-sm text-white/55 transition hover:text-white"
-                    >
-                        تماس با ما
-                    </a>
-
-                </nav>
-
-            </div>
-
-
-            {{-- Contact / Newsletter --}}
-            <div>
-
-                <p class="text-[10px] font-medium uppercase tracking-[0.2em] text-white/40">
-                    ارتباط با ما
-                </p>
-
-                <div class="mt-5 space-y-4">
-
-                    @if(filled($storeSettings?->phone))
-                        <a
-                            href="tel:{{ preg_replace('/[^0-9+]/', '', (string) $storeSettings->phone) }}"
-                            class="block break-all text-sm text-white/55 transition hover:text-white"
-                        >
-                            {{ $storeSettings->phone }}
-                        </a>
+                        <span class="text-2xl font-semibold tracking-[0.12em] text-white">{{ $footerBrandName }}</span>
                     @endif
-
-                    @if(filled($storeSettings?->email))
-                        <a
-                            href="mailto:{{ $storeSettings->email }}"
-                            class="block break-all text-sm text-white/55 transition hover:text-white"
-                        >
-                            {{ $storeSettings->email }}
-                        </a>
-                    @endif
-
-                    @if(filled($storeSettings?->address))
-                        <p class="text-sm leading-7 text-white/45">
-                            {{ $storeSettings->address }}
-                        </p>
-                    @endif
-
-                    @if(filled($storeSettings?->hours))
-                        <p class="text-sm leading-7 text-white/45">
-                            ساعات پاسخ‌گویی: {{ $storeSettings->hours }}
-                        </p>
-                    @endif
-
+                </a>
+                @if(filled($storeSettings?->brand_description))
+                    <p class="mt-5 max-w-sm text-sm leading-8 text-white/55">{{ $storeSettings->brand_description }}</p>
+                @endif
+                @php
+                    $footerSocials = [
+                        'WhatsApp' => $storeSettings?->whatsapp_url,
+                        'Telegram' => $storeSettings?->telegram_url,
+                        'Instagram' => $storeSettings?->instagram_url,
+                        'Eitaa' => $storeSettings?->eitaa_url,
+                        'Bale' => $storeSettings?->bale_url,
+                    ];
+                @endphp
+                <div class="mt-5 flex flex-wrap gap-3">
+                    @foreach($footerSocials as $network => $url)
+                        @if($url)
+                            <a href="{{ $url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ $network }}" class="text-xs text-white/55 transition hover:text-white">{{ mb_strtoupper(mb_substr($network, 0, 2)) }}</a>
+                        @endif
+                    @endforeach
                 </div>
-
-
-                {{-- Contact CTA --}}
-                <a
-                    href="{{ route('contact') }}"
-                    class="mt-6 inline-flex items-center rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-xs font-medium text-white transition hover:border-white/20 hover:bg-white/10"
-                >
-                    ارتباط با {{ $storeSettings?->brand_name ?: config('app.name') }}
-                    <span class="mr-2">←</span>
-                </a>
-
-            </div>
-
-        </div>
-
-
-        {{-- =========================================================
-             TRUST STRIP
-        ========================================================== --}}
-        <div class="grid border-t border-white/10 sm:grid-cols-3">
-
-            <div class="border-b border-white/10 py-5 sm:border-b-0 sm:border-l sm:px-6 sm:py-6">
-
-                <p class="text-[10px] uppercase tracking-[0.18em] text-white/35">
-                    پرداخت
-                </p>
-
-                <p class="mt-2 text-xs leading-6 text-white/50">
-                    مسیر پرداخت متناسب با سفارش و روش انتخابی مدیریت می‌شود.
-                </p>
-
-            </div>
-
-            <div class="border-b border-white/10 py-5 sm:border-b-0 sm:px-6 sm:py-6">
-
-                <p class="text-[10px] uppercase tracking-[0.18em] text-white/35">
-                    خرید اقساطی
-                </p>
-
-                <p class="mt-2 text-xs leading-6 text-white/50">
-                    برای محصولات دارای شرایط اقساط، پیش‌پرداخت و برنامه تسویه شفاف نمایش داده می‌شود.
-                </p>
-
-            </div>
-
-            <div class="py-5 sm:px-6 sm:py-6">
-
-                <p class="text-[10px] uppercase tracking-[0.18em] text-white/35">
-                    پشتیبانی
-                </p>
-
-                <p class="mt-2 text-xs leading-6 text-white/50">
-                    برای راهنمایی درباره محصول، سفارش یا پرداخت با ما در تماس باشید.
-                </p>
-
-            </div>
-
-        </div>
-
-
-        {{-- =========================================================
-             BOTTOM
-        ========================================================== --}}
-        <div class="flex flex-col gap-5 border-t border-white/10 py-6 sm:flex-row sm:items-center sm:justify-between">
-
-            <div>
-
-                <p class="text-xs text-white/40">
-                    © {{ \App\Helpers\JalaliHelper::formatYear(now()) }} {{ $storeSettings?->brand_name ?: config('app.name') }}.
-                    تمامی حقوق محفوظ است.
-                </p>
-
-            </div>
-
-
-            <div class="flex flex-wrap items-center gap-4 sm:gap-6">
-
-                <a
-                    href="{{ route('about') }}"
-                    class="text-xs text-white/40 transition hover:text-white"
-                >
-                    درباره ما
-                </a>
-
-                <a
-                    href="{{ route('contact') }}"
-                    class="text-xs text-white/40 transition hover:text-white"
-                >
-                    تماس
-                </a>
-
-                @auth
-
-                    @if(auth()->user()->isCustomer())
-
-                        <a
-                            href="{{ route('account.index') }}"
-                            class="text-xs text-white/40 transition hover:text-white"
-                        >
-                            حساب من
-                        </a>
-
+                <div class="mt-6 flex flex-wrap gap-2">
+                    @if(filled($storeSettings?->enamad_url))
+                        <a href="{{ $storeSettings->enamad_url }}" target="_blank" rel="noopener noreferrer" class="rounded-full border border-white/15 px-3 py-2 text-[11px] text-white/70 transition hover:border-white/40 hover:text-white">نماد اعتماد</a>
                     @endif
-
-                @endauth
-
-                <x-layout.social-links :settings="$storeSettings" variant="footer" />
-
+                    @if(filled($storeSettings?->samandehi_url))
+                        <a href="{{ $storeSettings->samandehi_url }}" target="_blank" rel="noopener noreferrer" class="rounded-full border border-white/15 px-3 py-2 text-[11px] text-white/70 transition hover:border-white/40 hover:text-white">ساماندهی</a>
+                    @endif
+                </div>
             </div>
 
+            @foreach([
+                'shop' => 'فروشگاه',
+                'guide' => 'راهنمای مشتریان',
+                'contact' => 'دسترسی و ارتباط',
+            ] as $menuKey => $menuTitle)
+                <div>
+                    <h2 class="text-[11px] font-semibold tracking-[0.12em] text-white/45">{{ $menuTitle }}</h2>
+                    <nav aria-label="{{ $menuTitle }}" class="mt-5 flex flex-col gap-3">
+                        @foreach(data_get($footerMenus, $menuKey, []) as $link)
+                            @php
+                                $linkUrl = (string) ($link['url'] ?? '');
+                                $externalLink = str_starts_with($linkUrl, 'https://');
+                                $href = $externalLink ? $linkUrl : url($linkUrl ?: '/');
+                            @endphp
+                            @if(filled($link['label'] ?? null) && filled($linkUrl))
+                                <a href="{{ $href }}" @if($externalLink) target="_blank" rel="noopener noreferrer" @endif class="text-sm text-white/60 transition hover:text-white">{{ $link['label'] }}</a>
+                            @endif
+                        @endforeach
+                    </nav>
+                </div>
+            @endforeach
         </div>
 
-    </x-layout.container>
+        @if(filled($storeSettings?->phone) || filled($storeSettings?->email) || filled($storeSettings?->address) || filled($storeSettings?->hours))
+            <div class="grid gap-4 border-t border-white/10 py-6 text-sm text-white/55 sm:grid-cols-2 lg:grid-cols-4">
+                @if(filled($storeSettings?->phone))<a href="tel:{{ preg_replace('/[^0-9+]/', '', (string) $storeSettings->phone) }}">{{ $storeSettings->phone }}</a>@endif
+                @if(filled($storeSettings?->email))<a href="mailto:{{ $storeSettings->email }}">{{ $storeSettings->email }}</a>@endif
+                @if(filled($storeSettings?->address))<p class="leading-7">{{ $storeSettings->address }}</p>@endif
+                @if(filled($storeSettings?->hours))<p class="leading-7">ساعات پاسخ‌گویی: {{ $storeSettings->hours }}</p>@endif
+            </div>
+        @endif
 
+        @if(count($footerPayments))
+            <div class="flex flex-wrap items-center gap-4 border-t border-white/10 py-6">
+                <span class="text-[10px] text-white/40">روش‌های پرداخت</span>
+                @foreach($footerPayments as $payment)
+                    @if(filled($payment['label'] ?? null))
+                        @if(filled($payment['url'] ?? null))
+                            <a href="{{ $payment['url'] }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2">
+                        @else
+                            <span class="inline-flex items-center gap-2">
+                        @endif
+                            @if(filled($payment['image'] ?? null))<img src="{{ $payment['image'] }}" alt="{{ $payment['label'] }}" loading="lazy" class="h-8 max-w-24 object-contain">@else<span class="rounded-lg border border-white/15 px-3 py-2 text-xs text-white/65">{{ $payment['label'] }}</span>@endif
+                        @if(filled($payment['url'] ?? null))</a>@else</span>@endif
+                    @endif
+                @endforeach
+            </div>
+        @endif
+
+        <div class="flex flex-col gap-3 border-t border-white/10 py-6 text-[11px] text-white/40 sm:flex-row sm:items-center sm:justify-between">
+            <p>© {{ \App\Helpers\JalaliHelper::formatYear(now()) }} {{ $storeSettings?->copyright_text ?: ('تمام حقوق برای '.$footerBrandName.' محفوظ است.') }}</p>
+            <a href="{{ route('home') }}" class="transition hover:text-white">{{ $footerBrandName }}</a>
+        </div>
+    </x-layout.container>
 </footer>

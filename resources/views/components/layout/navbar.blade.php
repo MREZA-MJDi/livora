@@ -19,8 +19,8 @@
                     class="group inline-flex items-center"
                     aria-label="{{ $storeSettings?->brand_name ?: config('app.name') }}"
                 >
-                    @if($storeSettings?->logo_path)
-                        <img src="{{ $storeSettings->logo_path }}" alt="{{ $storeSettings->brand_name ?: config('app.name') }}" class="max-h-10 max-w-40 object-contain">
+                    @if($storeSettings?->logo_url)
+                        <img src="{{ $storeSettings->logo_url }}" alt="{{ $storeSettings->brand_name ?: config('app.name') }}" class="max-h-10 max-w-40 object-contain">
                     @else
                         <span class="text-lg font-bold text-[var(--sg-ink)]">{{ $storeSettings?->brand_name ?: config('app.name') }}</span>
                     @endif
@@ -167,11 +167,9 @@
                 </button>
 
 
-                {{-- Wishlist --}}
+                {{-- Wishlist is available only to signed-in customers. Guest login is handled by the account action below. --}}
                 @auth
-
                     @if(auth()->user()->isCustomer())
-
                         <a
                             href="{{ route('account.wishlist.index') }}"
                             aria-label="علاقه‌مندی‌ها"
@@ -181,70 +179,11 @@
                                 'text-[var(--sg-ink)] hover:bg-[var(--sg-white)]' => !request()->routeIs('account.wishlist.*'),
                             ])
                         >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke-width="1.5"
-                                stroke="currentColor"
-                                class="h-[19px] w-[19px] transition duration-300 group-hover:scale-105"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M21.75 8.25c0 6-9.75 11.25-9.75 11.25S2.25 14.25 2.25 8.25A5.25 5.25 0 0 1 12 5.58a5.25 5.25 0 0 1 9.75 2.67Z"
-                                />
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-[19px] w-[19px] transition duration-300 group-hover:scale-105">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 8.25c0 6-9.75 11.25-9.75 11.25S2.25 14.25 2.25 8.25A5.25 5.25 0 0 1 12 5.58a5.25 5.25 0 0 1 9.75 2.67Z" />
                             </svg>
                         </a>
-
-                    @else
-
-                        <a
-                            href="{{ route('login') }}"
-                            aria-label="ورود برای مشاهده علاقه‌مندی‌ها"
-                            class="group hidden h-10 w-10 items-center justify-center rounded-full text-[var(--sg-ink)] transition duration-300 hover:bg-[var(--sg-white)] sm:flex"
-                        >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke-width="1.5"
-                                stroke="currentColor"
-                                class="h-[19px] w-[19px] transition duration-300 group-hover:scale-105"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M21.75 8.25c0 6-9.75 11.25-9.75 11.25S2.25 14.25 2.25 8.25A5.25 5.25 0 0 1 12 5.58a5.25 5.25 0 0 1 9.75 2.67Z"
-                                />
-                            </svg>
-                        </a>
-
                     @endif
-
-                @else
-
-                    <a
-                        href="{{ route('login') }}"
-                        aria-label="ورود برای مشاهده علاقه‌مندی‌ها"
-                        class="group hidden h-10 w-10 items-center justify-center rounded-full text-[var(--sg-ink)] transition duration-300 hover:bg-[var(--sg-white)] sm:flex"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            class="h-[19px] w-[19px] transition duration-300 group-hover:scale-105"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M21.75 8.25c0 6-9.75 11.25-9.75 11.25S2.25 14.25 2.25 8.25A5.25 5.25 0 0 1 12 5.58a5.25 5.25 0 0 1 9.75 2.67Z"
-                            />
-                        </svg>
-                    </a>
-
                 @endauth
 
 

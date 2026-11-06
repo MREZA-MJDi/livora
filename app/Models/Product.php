@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Concerns\TracksSlugRedirects;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,6 +15,9 @@ class Product extends Model
 {
     use HasFactory;
     use SoftDeletes;
+    use TracksSlugRedirects;
+
+    protected function slugRedirectPrefix(): string { return 'product'; }
 
     protected $fillable = [
         'category_id',

@@ -531,7 +531,9 @@
 
         </div>
 
-    </nav>
+    
+        <a href="{{ route('admin.home-sections.index') }}" @class(['group flex items-center gap-3 rounded-2xl px-3 py-3 text-xs font-medium transition', 'bg-[var(--admin-accent-soft)] text-[var(--admin-accent-dark)]' => request()->routeIs('admin.home-sections.*'), 'text-[var(--admin-text-soft)] hover:bg-[var(--admin-surface)]' => !request()->routeIs('admin.home-sections.*')])><span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--admin-surface)]">⌘</span><span>سکشن‌های صفحه اصلی</span></a>
+</nav>
 
 
     {{-- =========================================================

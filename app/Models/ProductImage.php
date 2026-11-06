@@ -56,6 +56,21 @@ class ProductImage extends Model
             ->orderByPivot('sort_order');
     }
 
+    public function getCardUrlAttribute(): string
+    {
+        return $this->media?->card_url ?? $this->url;
+    }
+
+    public function getDetailUrlAttribute(): string
+    {
+        return $this->media?->detail_url ?? $this->url;
+    }
+
+    public function getThumbnailUrlAttribute(): string
+    {
+        return $this->media?->thumbnail_url ?? $this->url;
+    }
+
     public function getUrlAttribute(): string
     {
         if (

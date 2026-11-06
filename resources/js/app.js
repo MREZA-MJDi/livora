@@ -99,8 +99,12 @@ window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName
     },
     selectMedia(item) {
         this.selectedMedia = item;
-        const fileInput = this.$root.closest('form')?.querySelector(`input[type="file"][name="${this.fileField}"]`);
+        const form = this.$root.closest('form');
+        const fileInput = form?.querySelector(`input[type="file"][name="${this.fileField}"]`);
         if (fileInput) fileInput.value = '';
+        const originalName = fileInput?.dataset.originalField;
+        const originalInput = originalName ? form?.querySelector(`input[type="file"][name="${originalName}"]`) : null;
+        if (originalInput) originalInput.value = '';
         const removeInput = this.$root.querySelector(`input[name=\"${this.removeField}\"]`);
         if (removeInput) removeInput.value = '0';
                 const removeCheckbox = this.$root.closest('form')?.querySelector(`input[type="checkbox"][name="${this.removeField}"]`);
@@ -117,8 +121,12 @@ window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName
         if (removeInput) removeInput.value = '1';
         const removeCheckbox = this.$root.closest('form')?.querySelector(`input[type="checkbox"][name="${this.removeField}"]`);
         if (removeCheckbox) removeCheckbox.checked = true;
-        const fileInput = this.$root.closest('form')?.querySelector(`input[type="file"][name="${this.fileField}"]`);
+        const form = this.$root.closest('form');
+        const fileInput = form?.querySelector(`input[type="file"][name="${this.fileField}"]`);
         if (fileInput) fileInput.value = '';
+        const originalName = fileInput?.dataset.originalField;
+        const originalInput = originalName ? form?.querySelector(`input[type="file"][name="${originalName}"]`) : null;
+        if (originalInput) originalInput.value = '';
         const preview = document.getElementById(this.previewId);
         if (preview) { preview.removeAttribute('src'); preview.classList.add('hidden'); }
     },
@@ -599,7 +607,28 @@ window.richTextEditor = (uploadUrl) => ({
         input.addEventListener('change', async () => {
             if (processedInputs.has(input)) return;
             const selected = Array.from(input.files || []);
-            if (!selected.some(file => file.type.startsWith('image/'))) return;
+            const originalField = input.dataset.originalField;
+            let originalInput = null;
+            if (originalField) {
+                originalInput = form.querySelector('input[type="file"][name="' + originalField + '"]');
+                if (!originalInput) {
+                    originalInput = document.createElement('input');
+                    originalInput.type = 'file';
+                    originalInput.name = originalField;
+                    originalInput.accept = input.accept || 'image/jpeg,image/png,image/webp';
+                    originalInput.hidden = true;
+                    form.appendChild(originalInput);
+                }
+            }
+            if (!selected.some(file => file.type.startsWith('image/'))) {
+                if (originalInput) originalInput.value = '';
+                return;
+            }
+            if (originalInput) {
+                const originalTransfer = new DataTransfer();
+                originalTransfer.items.add(selected.find(file => file.type.startsWith('image/')));
+                originalInput.files = originalTransfer.files;
+            }
             if (selected.some(file => file.type.startsWith('image/') && file.size > 10 * 1024 * 1024)) {
                 input.value = '';
                 window.alert('حجم هر تصویر نباید بیشتر از ۱۰ مگابایت باشد.');

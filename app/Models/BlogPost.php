@@ -10,6 +10,10 @@ use Illuminate\Support\Facades\Storage;
 
 class BlogPost extends Model
 {
+    use \App\Models\Concerns\TracksSlugRedirects;
+
+    protected function slugRedirectPrefix(): string { return 'blog'; }
+
     protected $fillable = [
         'user_id', 'title', 'slug', 'category', 'excerpt', 'body',
         'featured_image', 'media_id', 'featured_image_alt', 'meta_title', 'meta_description',

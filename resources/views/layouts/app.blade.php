@@ -8,6 +8,11 @@
         // product/category/article metadata continues to come from each view.
         $brandName = $storeSettings?->brand_name ?: config('app.name');
         $seoTitle = $pageSeo?->meta_title ?: (trim($__env->yieldContent('title')) ?: ($siteSeo->default_title ?: $brandName));
+        $brandTitleToken = mb_strtolower(preg_replace('/[\\s\\p{Z}]+/u', '', (string) $brandName) ?? (string) $brandName);
+        $currentTitleToken = mb_strtolower(preg_replace('/[\\s\\p{Z}]+/u', '', (string) $seoTitle) ?? (string) $seoTitle);
+        if ($brandTitleToken !== '' && ! str_contains($currentTitleToken, $brandTitleToken)) {
+            $seoTitle = rtrim($seoTitle).' | '.$brandName;
+        }
         $seoDescription = $pageSeo?->meta_description ?: (trim($__env->yieldContent('description')) ?: ($siteSeo->default_description ?: 'فروشگاه اینترنتی '.$brandName));
         // Canonical and social URLs must be bound to this application's configured origin.
         // Never let an inbound Host header from another virtual host poison SillaGallery metadata.

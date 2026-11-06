@@ -3,11 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ContactSetting extends Model
 {
     protected $fillable = [
-        'brand_name',
+        'brand_name', 'brand_description',
+        'enamad_url', 'samandehi_url', 'footer_menu', 'payment_methods', 'copyright_text', 'logo_media_id',
         'logo_path',
         'phone',
         'email',
@@ -36,6 +40,26 @@ class ContactSetting extends Model
         'floating_actions_enabled',
     ];
 
+
+    public function getLogoUrlAttribute(): ?string
+    {
+        if ($this->logo_media_id && $this->logoMedia) {
+            return $this->logoMedia->url;
+        }
+
+        if (! $this->logo_path) {
+            return null;
+        }
+
+        return Str::startsWith($this->logo_path, ['http://', 'https://', '//'])
+            ? $this->logo_path
+            : Storage::disk('public')->url(ltrim($this->logo_path, '/'));
+    }
+
+    public function logoMedia(): BelongsTo
+    {
+        return $this->belongsTo(Media::class, 'logo_media_id');
+    }
 
     public function hasMapLocation(): bool
     {
@@ -100,6 +124,8 @@ class ContactSetting extends Model
     {
         return [
             'faqs' => 'array',
+            'footer_menu' => 'array',
+            'payment_methods' => 'array',
             'page_content' => 'array',
             'is_active' => 'boolean',
             'floating_actions_enabled' => 'boolean',

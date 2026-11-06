@@ -4,14 +4,24 @@ namespace Database\Seeders;
 
 use App\Models\ContactSetting;
 use App\Models\ContentPage;
+use App\Models\SeoSetting;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Seeder;
 
 class InitialStoreContentSeeder extends Seeder
 {
     public function run(): void
     {
-        ContactSetting::query()->firstOrCreate([], [
+        $settings = ContactSetting::query()->firstOrCreate([], [
             'brand_name' => 'سیلا گالری',
+            'brand_description' => 'مجموعه‌ای منتخب از مبلمان و عناصر خانه برای انتخابی آگاهانه و ماندگار.',
+            'footer_menu' => [
+                'shop' => [['label' => 'همه محصولات', 'url' => '/shop'], ['label' => 'دسته‌بندی‌ها', 'url' => '/categories'], ['label' => 'تازه‌ها', 'url' => '/shop?sort=newest'], ['label' => 'سبد خرید', 'url' => '/cart']],
+                'guide' => [['label' => 'قوانین و شرایط', 'url' => '/terms'], ['label' => 'راهنمای انتخاب', 'url' => '/buying-guide'], ['label' => 'پیگیری سفارش‌ها', 'url' => '/login']],
+                'contact' => [['label' => 'درباره ما', 'url' => '/about'], ['label' => 'وبلاگ', 'url' => '/blog'], ['label' => 'تماس با ما', 'url' => '/contact']],
+            ],
+            'payment_methods' => [],
+            'copyright_text' => 'تمام حقوق برای سیلا گالری محفوظ است.',
             'phone' => null,
             'email' => null,
             'address' => null,
@@ -55,6 +65,14 @@ class InitialStoreContentSeeder extends Seeder
                 ['question' => 'چطور ابعاد محصول را بررسی کنم؟', 'answer' => 'ابعاد درج‌شده در مشخصات محصول را با فضای نصب، مسیر عبور و محل قرارگیری کالا مقایسه کنید.'],
             ],
         ]);
+
+        SeoSetting::query()->updateOrCreate(['id' => 1], [
+            'site_name' => $settings->brand_name ?: config('app.name'),
+            'organization_name' => $settings->brand_name ?: config('app.name'),
+            'organization_description' => $settings->brand_description,
+            'organization_logo' => $settings->logo_path,
+        ]);
+        Cache::forget('seo_settings.current');
 
         ContentPage::query()->firstOrCreate(
             ['slug' => 'buying-guide'],

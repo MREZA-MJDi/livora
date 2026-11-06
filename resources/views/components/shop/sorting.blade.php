@@ -49,7 +49,7 @@
 
         <span>
             <span class="block text-[10px] uppercase tracking-[0.16em] text-[var(--sg-stone)]">
-                SORT
+                مرتب‌سازی
             </span>
 
             <span

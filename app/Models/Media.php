@@ -17,6 +17,7 @@ class Media extends Model
         'user_id',
         'disk',
         'path',
+        'variant_source_path',
         'filename',
         'original_name',
         'mime_type',
@@ -24,6 +25,7 @@ class Media extends Model
         'size',
         'alt',
         'description',
+        'thumbnail_path', 'card_path', 'detail_path',
     ];
 
     protected $casts = [
@@ -49,6 +51,18 @@ class Media extends Model
 
         return Storage::disk($this->disk ?: 'public')
             ->url(ltrim($this->path, '/'));
+    }
+
+    public function getThumbnailUrlAttribute(): string { return $this->variantUrl($this->thumbnail_path); }
+    public function getCardUrlAttribute(): string { return $this->variantUrl($this->card_path); }
+    public function getDetailUrlAttribute(): string { return $this->variantUrl($this->detail_path); }
+
+    private function variantUrl(?string $path): string
+    {
+        if (! $path) return $this->url;
+        if (Str::startsWith($path, ['http://', 'https://', '//'])) return $path;
+        $disk = Storage::disk($this->disk ?: 'public');
+        return $disk->exists(ltrim($path, '/')) ? $disk->url(ltrim($path, '/')) : $this->url;
     }
 
     /**
@@ -100,6 +114,16 @@ class Media extends Model
     public function categories(): HasMany
     {
         return $this->hasMany(Category::class);
+    }
+
+    public function categoryCards(): HasMany
+    {
+        return $this->hasMany(Category::class, 'card_media_id');
+    }
+
+    public function categoryBanners(): HasMany
+    {
+        return $this->hasMany(Category::class, 'banner_media_id');
     }
 
     public function blogPosts(): HasMany
