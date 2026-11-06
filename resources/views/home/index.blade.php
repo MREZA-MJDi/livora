@@ -34,9 +34,42 @@
                         @php($heroProduct = $section->type === 'hero' ? $section->products->first() : null)
                         @php($heroImage = $section->image_url ?: $heroProduct?->images?->first()?->detail_url)
                         <div class="{{ $isHero ? 'sila-home-hero-media' : 'min-w-0' }} min-w-0 {{ $section->type === 'cta' ? 'lg:order-1' : '' }}">
-                            @if($heroImage)
+                            @if($isHero && $section->products->isNotEmpty())
+                                <div class="sila-hero-slider" data-sila-hero-slider aria-roledescription="carousel" aria-label="منتخب سیلا گالری">
+                                    <div class="sila-hero-slider__stage">
+                                        @foreach($section->products as $slideIndex => $slideProduct)
+                                            @php($slideImage = $slideProduct->images->first()?->detail_url)
+                                            @if($slideImage)
+                                                <figure class="sila-hero-slide {{ $slideIndex === 0 ? 'is-active' : '' }}" data-sila-hero-slide aria-hidden="{{ $slideIndex === 0 ? 'false' : 'true' }}">
+                                                    <img src="{{ $slideImage }}" alt="{{ $slideProduct->name }}" class="sila-home-hero-image" loading="{{ $slideIndex === 0 ? 'eager' : 'lazy' }}" fetchpriority="{{ $slideIndex === 0 ? 'high' : 'auto' }}">
+                                                    <figcaption class="sila-hero-slide__caption">
+                                                        <span>{{ $slideProduct->category?->name ?: 'منتخب سیلا' }}</span>
+                                                        <strong>{{ $slideProduct->name }}</strong>
+                                                        <a href="{{ route('products.show', $slideProduct->slug) }}" aria-label="مشاهده {{ $slideProduct->name }}">مشاهده محصول <span aria-hidden="true">←</span></a>
+                                                    </figcaption>
+                                                </figure>
+                                            @endif
+                                        @endforeach
+                                    </div>
+                                    @if($section->products->count() > 1)
+                                        <div class="sila-hero-slider__controls">
+                                            <div class="sila-hero-slider__dots" aria-label="انتخاب اسلاید">
+                                                @foreach($section->products as $slideIndex => $slideProduct)
+                                                    @if($slideProduct->images->first()?->detail_url)
+                                                        <button type="button" data-sila-hero-dot="{{ $loop->index }}" class="{{ $slideIndex === 0 ? 'is-active' : '' }}" aria-label="رفتن به اسلاید {{ $loop->iteration }}" aria-current="{{ $slideIndex === 0 ? 'true' : 'false' }}"></button>
+                                                    @endif
+                                                @endforeach
+                                            </div>
+                                            <div class="sila-hero-slider__arrows">
+                                                <button type="button" data-sila-hero-prev aria-label="اسلاید قبلی">←</button>
+                                                <button type="button" data-sila-hero-next aria-label="اسلاید بعدی">→</button>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
+                            @elseif($heroImage)
                                 <div class="overflow-hidden rounded-[1.5rem] sm:rounded-[2rem] bg-[var(--sg-surface)]">
-                                    <img src="{{ $heroImage }}" alt="{{ $heroTitle ?: 'سیلا گالری' }}" class="sila-home-hero-image w-full object-cover" fetchpriority="{{ $section->type === 'hero' ? 'high' : 'auto' }}">
+                                    <img src="{{ $heroImage }}" alt="{{ $heroTitle ?: 'سیلا گالری' }}" class="sila-home-hero-image w-full object-cover" fetchpriority="auto">
                                 </div>
                             @endif
                         </div>
