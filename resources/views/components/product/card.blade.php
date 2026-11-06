@@ -203,7 +203,7 @@
                     </span>
 
                     <span class="text-xs text-[var(--sg-stone)] line-through">
-                        {{ \\App\\Helpers\\JalaliHelper::toPersianDigits(number_format((float) $product->compare_at_price)) }}
+                        {{ \App\Helpers\JalaliHelper::toPersianDigits(number_format((float) $product->compare_at_price)) }}
                     </span>
 
                 </div>
