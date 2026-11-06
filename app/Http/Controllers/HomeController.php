@@ -26,7 +26,7 @@ class HomeController extends Controller
         foreach ($sections as $section) {
             $payload = $section->payload ?? [];
             $limit = match ($section->type) {
-                'hero' => 6,
+                'hero' => 1,
                 'categories' => 4,
                 default => max(1, min(24, (int) ($payload['limit'] ?? 8))),
             };
@@ -72,7 +72,12 @@ class HomeController extends Controller
                 }
 
                 $section->setRelation('products', $products);
-                $usedProductIds = array_merge($usedProductIds, $products->modelKeys());
+
+                // The hero borrows one product image as editorial artwork; it must
+                // remain eligible for the dedicated featured/new-arrivals sections.
+                if ($section->type === 'products') {
+                    $usedProductIds = array_merge($usedProductIds, $products->modelKeys());
+                }
             }
 
             if ($section->type === 'categories') {
