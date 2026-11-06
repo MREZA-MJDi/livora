@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BlogPost;
 use App\Models\Category;
 use App\Models\HomeSection;
 use App\Models\Product;
@@ -21,17 +22,18 @@ class HomeController extends Controller
 
         foreach ($sections as $section) {
             $payload = $section->payload ?? [];
-            $limit = max(1, min(24, (int) ($payload['limit'] ?? 8)));
+            $limit = $section->type === 'hero' ? 6 : max(1, min(24, (int) ($payload['limit'] ?? 8)));
 
             if (in_array($section->type, ['hero', 'products'], true)) {
                 $query = Product::query()
                     ->active()
                     ->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('is_active', true))
                     ->with(['category', 'images' => fn ($imageQuery) => $imageQuery->with('media')->limit(1)])
+                    ->when($section->type === 'hero', fn ($productQuery) => $productQuery->whereHas('images'))
                     ->withCount('allVariants')
                     ->whereNotIn('products.id', $usedProductIds);
 
-                $source = $payload['product_source'] ?? 'latest';
+                $source = $section->type === 'hero' ? 'latest' : ($payload['product_source'] ?? 'latest');
                 if ($source === 'selected') {
                     $ids = array_values(array_unique(array_map('intval', $payload['product_ids'] ?? [])));
                     $products = $ids === []
@@ -46,7 +48,7 @@ class HomeController extends Controller
                     } elseif ($source === 'category' && ! empty($payload['category_id'])) {
                         $query->where('category_id', (int) $payload['category_id'])->latest();
                     } else {
-                        $query->latest('updated_at');
+                        $query->latest('created_at');
                     }
                     $products = $query->limit($limit)->get();
                 }
@@ -66,6 +68,16 @@ class HomeController extends Controller
             }
         }
 
-        return view('home.index', ['homeSections' => $sections]);
+         $blogPosts = BlogPost::query()
+            ->published()
+            ->with('media')
+            ->latest('published_at')
+            ->limit(3)
+            ->get();
+
+        return view('home.index', [
+            'homeSections' => $sections,
+            'blogPosts' => $blogPosts,
+        ]);
     }
 }
