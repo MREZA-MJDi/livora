@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ContactSetting extends Model
 {
@@ -38,6 +40,21 @@ class ContactSetting extends Model
         'floating_actions_enabled',
     ];
 
+
+    public function getLogoUrlAttribute(): ?string
+    {
+        if ($this->logo_media_id && $this->logoMedia) {
+            return $this->logoMedia->url;
+        }
+
+        if (! $this->logo_path) {
+            return null;
+        }
+
+        return Str::startsWith($this->logo_path, ['http://', 'https://', '//'])
+            ? $this->logo_path
+            : Storage::disk('public')->url(ltrim($this->logo_path, '/'));
+    }
 
     public function logoMedia(): BelongsTo
     {
