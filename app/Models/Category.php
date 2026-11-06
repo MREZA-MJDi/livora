@@ -78,7 +78,7 @@ class Category extends Model
 
     public function getHomepageImageUrlAttribute(): ?string
     {
-        return $this->card_image_url ?: $this->latestActiveProduct?->images?->first()?->url;
+        return $this->card_image_url ?: $this->latestActiveProduct?->images?->first()?->card_url;
     }
 
     private function storedImageUrl(?Media $media, ?string $path): ?string
