@@ -24,6 +24,7 @@ class Media extends Model
         'size',
         'alt',
         'description',
+        'thumbnail_path', 'card_path', 'detail_path',
     ];
 
     protected $casts = [
@@ -49,6 +50,18 @@ class Media extends Model
 
         return Storage::disk($this->disk ?: 'public')
             ->url(ltrim($this->path, '/'));
+    }
+
+    public function getThumbnailUrlAttribute(): string { return $this->variantUrl($this->thumbnail_path); }
+    public function getCardUrlAttribute(): string { return $this->variantUrl($this->card_path); }
+    public function getDetailUrlAttribute(): string { return $this->variantUrl($this->detail_path); }
+
+    private function variantUrl(?string $path): string
+    {
+        if (! $path) return $this->url;
+        if (Str::startsWith($path, ['http://', 'https://', '//'])) return $path;
+        $disk = Storage::disk($this->disk ?: 'public');
+        return $disk->exists(ltrim($path, '/')) ? $disk->url(ltrim($path, '/')) : $this->url;
     }
 
     /**
