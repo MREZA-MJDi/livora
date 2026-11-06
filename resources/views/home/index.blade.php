@@ -140,13 +140,14 @@
                                 <a href="{{ route('blog.show', $post->slug) }}" class="mt-4 inline-flex text-xs font-semibold text-[var(--sg-accent)]">ادامه مطلب ←</a>
                             </div>
                         </article>
-                    @empty
+                    @endforeach
+                    @else
                         <article class="rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-cream)] p-6 sm:col-span-2 lg:col-span-3">
                             <p class="text-sm font-semibold text-[var(--sg-ink)]">راهنمای انتخاب مبلمان</p>
                             <p class="mt-2 text-sm leading-7 text-[var(--sg-stone)]">پیش از انتخاب، ابعاد فضا، متریال و شرایط سفارش را بررسی کنید.</p>
                             <a href="{{ url('/buying-guide') }}" class="mt-4 inline-flex text-xs font-semibold text-[var(--sg-accent)]">مطالعه راهنمای خرید ←</a>
                         </article>
-                    @endforelse
+                    @endif
                 </div>
             </x-layout.container>
         </section>
