@@ -453,7 +453,10 @@
                                 <div class="group relative flex h-full flex-1 flex-col justify-end">
 
                                     {{-- Tooltip --}}
-                                    <div class="pointer-events-none absolute bottom-[calc({{ $height }}%+12px)] left-1/2 z-20 hidden -translate-x-1/2 whitespace-nowrap rounded-xl bg-[var(--admin-text)] px-3 py-2 text-[10px] text-white shadow-xl group-hover:block">
+                                    <div
+                                        class="pointer-events-none absolute left-1/2 z-20 hidden -translate-x-1/2 whitespace-nowrap rounded-xl bg-[var(--admin-text)] px-3 py-2 text-[10px] text-white shadow-xl group-hover:block"
+                                        style="bottom: calc({{ $height }}% + 12px);"
+                                    >
 
                                         {{ number_format($month['revenue']) }}
                                         تومان
