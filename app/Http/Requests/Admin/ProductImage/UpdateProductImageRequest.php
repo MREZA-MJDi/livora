@@ -25,6 +25,7 @@ class UpdateProductImageRequest extends FormRequest
                 'nullable',
                 'image',
                 'mimes:jpg,jpeg,png,webp',
+                'dimensions:min_width=400,min_height=500',
                 'max:10240',
             ],
 
