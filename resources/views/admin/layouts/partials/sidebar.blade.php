@@ -77,7 +77,7 @@
         <div class="mb-5">
 
             <p class="px-3 text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--admin-muted)]">
-                OVERVIEW
+                نمای کلی
             </p>
 
             <div class="mt-2 space-y-1">
@@ -134,12 +134,12 @@
 
 
         {{-- =====================================================
-             CATALOG
+             مدیریت فروشگاه
         ====================================================== --}}
         <div class="mb-5">
 
             <p class="px-3 text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--admin-muted)]">
-                CATALOG
+                مدیریت فروشگاه
             </p>
 
             <div class="mt-2 space-y-1">
@@ -281,12 +281,12 @@
 
 
         {{-- =====================================================
-             SALES
+             فروش و مشتریان
         ====================================================== --}}
         <div class="mb-5">
 
             <p class="px-3 text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--admin-muted)]">
-                SALES
+                فروش و مشتریان
             </p>
 
             <div class="mt-2 space-y-1">
@@ -433,7 +433,7 @@
 
 
         {{-- =====================================================
-             STORE TOOLS
+             محتوای سایت
         ====================================================== --}}
         <div class="mb-5">
 
