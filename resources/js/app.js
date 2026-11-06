@@ -919,6 +919,137 @@ window.iranShippingPicker = (regions, initialProvince = '', initialCity = '', in
 Alpine.start();
 
  
+// Live catalog filters: update results as visitors type or change an option.
+(() => {
+    let activeRequest = null;
+    const timers = new WeakMap();
+
+    const syncForms = (url) => {
+        document.querySelectorAll('form[data-live-catalog-filters]').forEach((form) => {
+            form.querySelectorAll('input, select').forEach((control) => {
+                if (!control.name || control.type === 'submit' || control.type === 'button') return;
+                const values = url.searchParams.getAll(control.name);
+                if (control.type === 'checkbox' || control.type === 'radio') control.checked = values.includes(control.value);
+                else control.value = url.searchParams.get(control.name) ?? '';
+            });
+        });
+    };
+
+    const replaceAux = (parsed, selectors) => selectors.split(',').map((value) => value.trim()).filter(Boolean).forEach((selector) => {
+        const current = document.querySelector(selector);
+        const incoming = parsed.querySelector(selector);
+        if (current && incoming) current.replaceWith(incoming);
+    });
+
+    const load = async (url, form, push = true) => {
+        const targetSelector = form?.dataset.resultsSelector || document.querySelector('form[data-live-catalog-filters]')?.dataset.resultsSelector;
+        const target = targetSelector ? document.querySelector(targetSelector) : null;
+        if (!target) return window.location.assign(url.toString());
+
+        activeRequest?.abort();
+        const controller = new AbortController();
+        activeRequest = controller;
+        document.querySelectorAll('form[data-live-catalog-filters]').forEach((item) => {
+            item.setAttribute('aria-busy', 'true');
+            item.classList.add('opacity-70');
+        });
+        target.setAttribute('aria-busy', 'true');
+        target.classList.add('opacity-60', 'pointer-events-none');
+
+        try {
+            const response = await fetch(url, {
+                credentials: 'same-origin',
+                headers: { Accept: 'text/html', 'X-Requested-With': 'XMLHttpRequest' },
+                signal: controller.signal,
+            });
+            if (!response.ok) throw new Error('Catalog request failed');
+            const parsed = new DOMParser().parseFromString(await response.text(), 'text/html');
+            const incoming = parsed.querySelector(targetSelector);
+            if (!incoming) throw new Error('Catalog results container was not found');
+
+            target.replaceWith(incoming);
+            replaceAux(parsed, form?.dataset.auxSelectors || '');
+            if (push) history.pushState({}, '', url);
+            syncForms(url);
+            document.querySelectorAll('form[data-live-catalog-filters]').forEach((item) => {
+                item.removeAttribute('aria-busy');
+                item.classList.remove('opacity-70');
+            });
+            const refreshed = document.querySelector(targetSelector);
+            refreshed?.removeAttribute('aria-busy');
+            refreshed?.classList.remove('opacity-60', 'pointer-events-none');
+        } catch (error) {
+            if (error.name !== 'AbortError') window.location.assign(url.toString());
+        } finally {
+            if (activeRequest === controller) activeRequest = null;
+        }
+    };
+
+    const fromForm = (form) => {
+        const url = new URL(form.action, location.origin);
+        for (const [key, value] of new FormData(form).entries()) {
+            if (typeof value === 'string' && value.trim() !== '') url.searchParams.append(key, value);
+        }
+        url.searchParams.delete('page');
+        return url;
+    };
+
+    const schedule = (form, delay) => {
+        const old = timers.get(form);
+        if (old) clearTimeout(old);
+        timers.set(form, setTimeout(() => {
+            timers.delete(form);
+            load(fromForm(form), form);
+        }, delay));
+    };
+
+    document.addEventListener('input', (event) => {
+        const form = event.target.closest('form[data-live-catalog-filters]');
+        if (!form || !['search', 'number'].includes(event.target.type)) return;
+        schedule(form, event.target.type === 'search' ? 420 : 550);
+    });
+
+    document.addEventListener('change', (event) => {
+        const form = event.target.closest('form[data-live-catalog-filters]');
+        if (!form) return;
+        if (['checkbox', 'radio', 'number'].includes(event.target.type) || event.target.tagName === 'SELECT') {
+            const old = timers.get(form);
+            if (old) clearTimeout(old);
+            timers.delete(form);
+            load(fromForm(form), form);
+        }
+    });
+
+    document.addEventListener('submit', (event) => {
+        const form = event.target.closest('form[data-live-catalog-filters]');
+        if (!form) return;
+        event.preventDefault();
+        const old = timers.get(form);
+        if (old) clearTimeout(old);
+        timers.delete(form);
+        load(fromForm(form), form);
+    });
+
+    document.addEventListener('click', (event) => {
+        const link = event.target.closest('a[data-live-catalog-sort]');
+        if (!link || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        const form = document.querySelector('form[data-live-catalog-filters]');
+        if (!form) return;
+        const url = new URL(link.href, location.origin);
+        if (url.origin !== location.origin) return;
+        event.preventDefault();
+        load(url, form);
+    });
+
+    window.addEventListener('popstate', () => {
+        const form = document.querySelector('form[data-live-catalog-filters]');
+        if (!form) return;
+        const url = new URL(location.href);
+        syncForms(url);
+        load(url, form, false);
+    });
+})();
+
 // Native scroll-snap product carousels: touch/trackpad work without JS,
 // while these controls add predictable one-card movement and keyboard labels.
 const initSgProductCarousels = () => {
