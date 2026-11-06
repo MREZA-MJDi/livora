@@ -348,7 +348,7 @@
             <div class="space-y-3">
                 <h4 class="text-sm font-semibold">تصویر کارت</h4>
                 @if($category->card_image_url)<img src="{{ $category->card_image_url }}" alt="" class="aspect-[4/3] w-full rounded-xl object-cover">@endif
-                <input id="card_image" type="file" name="card_image" accept="image/jpeg,image/png,image/webp" class="admin-input">
+                <input id="card_image" type="file" name="card_image" accept="image/jpeg,image/png,image/webp" data-crop-ratio="1.333333" class="admin-input">
                 <label class="flex items-center gap-2 text-xs"><input type="checkbox" name="remove_card_image" value="1"> حذف تصویر کارت اختصاصی</label>
                 @error('card_image')<p class="admin-error">{{ $message }}</p>@enderror
                 <p class="admin-help">نسبت پیشنهادی ۴:۳؛ در صورت خالی بودن، تصویر قدیمی دسته‌بندی استفاده می‌شود.</p>
@@ -356,7 +356,7 @@
             <div class="space-y-3">
                 <h4 class="text-sm font-semibold">بنر صفحه دسته‌بندی</h4>
                 @if($category->banner_image_url)<img src="{{ $category->banner_image_url }}" alt="" class="aspect-[16/7] w-full rounded-xl object-cover">@endif
-                <input id="banner_image" type="file" name="banner_image" accept="image/jpeg,image/png,image/webp" class="admin-input">
+                <input id="banner_image" type="file" name="banner_image" accept="image/jpeg,image/png,image/webp" data-crop-ratio="2.285714" class="admin-input">
                 <label class="flex items-center gap-2 text-xs"><input type="checkbox" name="remove_banner_image" value="1"> حذف بنر اختصاصی</label>
                 @error('banner_image')<p class="admin-error">{{ $message }}</p>@enderror
                 <p class="admin-help">نسبت پیشنهادی ۱۶:۷؛ اگر بنر اختصاصی ثبت نشود، تصویر کارت fallback می‌شود.</p>
