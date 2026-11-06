@@ -8,8 +8,7 @@
 @section('content')
 <div class="sila-home overflow-hidden bg-[var(--sg-cream)]">
     @php($finalCta = $homeSections->firstWhere("key", "final-cta"))
-    @foreach($homeSections as $section)
-        @if($section->key === "final-cta") @continue @endif
+    @foreach($homeSections->where("key", "!=", "final-cta") as $section)
         @php
             $payload = $section->payload ?? [];
             $ctaUrl = filled($section->cta_url)
