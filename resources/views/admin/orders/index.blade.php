@@ -125,6 +125,11 @@
             </div>
 
 
+            <label class="flex items-center gap-3 rounded-xl border border-[var(--admin-border)] px-4 py-3 text-sm text-[var(--admin-text)] xl:col-span-2">
+                <input type="checkbox" name="inventory_review" value="1" class="admin-checkbox" @checked(request()->boolean('inventory_review'))>
+                فقط سفارش‌هایی که موجودی آن‌ها نیاز به بررسی دارد
+            </label>
+
             <div class="flex items-end gap-2 xl:col-span-4">
 
                 <button
@@ -134,7 +139,7 @@
                     اعمال فیلتر
                 </button>
 
-                @if(request()->hasAny(['search', 'status', 'payment_status']))
+                @if(request()->hasAny(['search', 'status', 'payment_status', 'inventory_review']))
 
                     <a
                         href="{{ route('admin.orders.index') }}"
