@@ -59,6 +59,18 @@ class CategoryController extends Controller
         }
         unset($data['media_id']);
 
+        $cardMedia = $request->hasFile('card_image')
+            ? MediaLibrary::store($request->file('card_image'), (int) $request->user()->id, 'categories/cards', $data['image_alt'] ?? null)
+            : MediaLibrary::image($data['card_media_id'] ?? null);
+        $bannerMedia = $request->hasFile('banner_image')
+            ? MediaLibrary::store($request->file('banner_image'), (int) $request->user()->id, 'categories/banners', $data['image_alt'] ?? null)
+            : MediaLibrary::image($data['banner_media_id'] ?? null);
+        unset($data['card_media_id'], $data['banner_media_id'], $data['card_image'], $data['banner_image'], $data['remove_card_image'], $data['remove_banner_image']);
+        $data['card_image'] = $cardMedia?->path;
+        $data['card_media_id'] = $cardMedia?->id;
+        $data['banner_image'] = $bannerMedia?->path;
+        $data['banner_media_id'] = $bannerMedia?->id;
+
         DB::transaction(function () use ($data, $relatedCategoryIds, $relatedProductIds, $media): void {
             $category = Category::create($data + ['media_id' => $media?->id]);
             $category->relatedCategories()->sync(array_values(array_diff($relatedCategoryIds, [$category->id])));
@@ -110,6 +122,25 @@ class CategoryController extends Controller
         } else {
             unset($data['media_id']);
         }
+
+        foreach (['card', 'banner'] as $kind) {
+            $fileKey = $kind.'_image';
+            $mediaKey = $kind.'_media_id';
+            $removeKey = 'remove_'.$kind.'_image';
+            if ($request->boolean($removeKey)) {
+                $data[$fileKey] = null;
+                $data[$mediaKey] = null;
+            } elseif ($request->hasFile($fileKey) || ! empty($data[$mediaKey])) {
+                $selectedMedia = $request->hasFile($fileKey)
+                    ? MediaLibrary::store($request->file($fileKey), (int) $request->user()->id, 'categories/'.$kind.'s', $data['image_alt'] ?? null)
+                    : MediaLibrary::image($data[$mediaKey]);
+                $data[$fileKey] = $selectedMedia?->path;
+                $data[$mediaKey] = $selectedMedia?->id;
+            } else {
+                unset($data[$fileKey], $data[$mediaKey]);
+            }
+        }
+        unset($data['remove_card_image'], $data['remove_banner_image']);
 
         DB::transaction(function () use ($category, $data, $relatedCategoryIds, $relatedProductIds): void {
             $category->update($data);
