@@ -1,6 +1,6 @@
 @php
     $footerBrandName = $storeSettings?->brand_name ?: config('app.name');
-    $footerLogo = $storeSettings?->logo_path;
+    $footerLogo = $storeSettings?->logo_url;
     $footerLogoUrl = $footerLogo
         ? (str_starts_with($footerLogo, 'http') ? $footerLogo : \Illuminate\Support\Facades\Storage::disk('public')->url($footerLogo))
         : null;
