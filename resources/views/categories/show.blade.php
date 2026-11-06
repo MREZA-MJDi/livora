@@ -83,11 +83,13 @@
                         <div class="max-w-3xl py-3">
                             <p class="sg-eyebrow">THE COLLECTION</p>
                             <h1 class="mt-4 text-4xl font-semibold leading-[1.35] tracking-tight text-[var(--sg-ink)] sm:text-5xl lg:text-6xl">
-                                {{ $category->name }}
+                                {{ $category->banner_title ?: $category->name }}
                             </h1>
 
                             <p class="mt-5 max-w-2xl text-sm leading-8 text-[var(--sg-stone)] sm:text-base">
-                                @if(filled($category->description))
+                                @if(filled($category->banner_subtitle))
+                                    {{ $category->banner_subtitle }}
+                                @elseif(filled($category->description))
                                     {{ $category->description }}
                                 @else
                                     مجموعه محصولات {{ $category->name }} را بررسی کنید؛ مشخصات، قیمت و شرایط خرید هر محصول را با هم مقایسه کنید.
@@ -108,8 +110,8 @@
                             </div>
                         </div>
 
-                        <div class="sg-category-detail-visual relative aspect-[4/3] overflow-hidden rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-surface)]">
-                            @if($category->homepage_image_url)
+                        <div class="sg-category-detail-visual relative aspect-[16/7] overflow-hidden rounded-[2rem] border border-[var(--sg-border)] bg-[var(--sg-surface)]">
+                            @if($category->banner_image_url)
                                 <img
                                     src="{{ $category->homepage_image_url }}"
                                     alt="{{ $category->image_alt ?: $category->name }}"
@@ -328,7 +330,12 @@
             </section>
         @endif
 
-        @if($category->relatedCategories->isNotEmpty())
+        @if($category->children->isNotEmpty() || $category->relatedCategories->isNotEmpty())
+            @if($category->children->isNotEmpty())
+                <section class="border-t border-[var(--sg-border)]">
+                    <x-layout.container><div class="py-12"><h2 class="text-2xl font-semibold">زیر‌دسته‌ها</h2><div class="sg-category-grid sg-category-grid--index mt-6 grid gap-5">@foreach($category->children as $child)<x-shop.category-card :name="$child->name" :image="$child->card_image_url" :href="route('categories.show', $child->slug)" :count="$child->products_count ?? null" />@endforeach</div></div></x-layout.container>
+                </section>
+            @endif
             <section class="border-t border-[var(--sg-border)]">
                 <x-layout.container>
                     <div class="py-12">
@@ -337,7 +344,7 @@
                             @foreach($category->relatedCategories as $relatedCategory)
                                 <x-shop.category-card
                                     :name="$relatedCategory->name"
-                                    :image="$relatedCategory->image_url"
+                                     :image="$relatedCategory->card_image_url"
                                     :href="route('categories.show', $relatedCategory->slug)"
                                     :count="$relatedCategory->products_count"
                                 />
