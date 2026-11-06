@@ -2449,6 +2449,11 @@ body {
     font-weight: 650;
     transition: background-color .2s ease, border-color .2s ease, transform .2s ease;
 }
+.sg-home-hero__eyebrow[hidden],
+.sg-home-hero__subtitle[hidden],
+.sg-home-hero__cta[hidden] {
+    display: none;
+}
 .sg-home-hero__cta:hover {
     transform: translateY(-1px);
     border-color: var(--sg-accent);
