@@ -129,6 +129,9 @@
                 </div>
 
 
+                <details class="sm:col-span-2 rounded-xl border border-[var(--admin-border)] px-4 py-3">
+                    <summary class="cursor-pointer list-none text-sm font-semibold text-[var(--admin-text)]">اطلاعات تکمیلی (اختیاری) — کد و آدرس محصول</summary>
+                    <div class="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2">
                 {{-- Slug --}}
                 <div>
 
@@ -184,6 +187,10 @@
 
                 </div>
 
+
+
+                    </div>
+                </details>
 
                 {{-- Short Description --}}
                 <div class="sm:col-span-2">
