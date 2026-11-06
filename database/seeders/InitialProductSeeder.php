@@ -48,7 +48,23 @@ class InitialProductSeeder extends Seeder
 
         foreach ($products as $product) {
             $installment = $product['installment'];
-            unset($product['category'], $product['featured'], $product['new'], $product['installment']);
+            $specifications = [
+                'ابعاد' => $product['dimensions'],
+                'جنس' => $product['material'],
+                'رنگ‌بندی' => $product['colors'],
+                'زمان تحویل' => $product['delivery'],
+                'یادداشت' => 'اطلاعات این رکورد برای آماده‌سازی کاتالوگ اولیه است و باید پیش از انتشار با مشخصات واقعی محصول تطبیق داده شود.',
+            ];
+            unset(
+                $product['category'],
+                $product['featured'],
+                $product['new'],
+                $product['installment'],
+                $product['dimensions'],
+                $product['material'],
+                $product['colors'],
+                $product['delivery']
+            );
 
             $categoryKey = $product['sku'];
             $categoryKey = match (substr($categoryKey, 3, 3)) {
@@ -74,20 +90,13 @@ class InitialProductSeeder extends Seeder
                 'is_new' => in_array($product['sku'], ['SG-SOF-101', 'SG-SOF-103', 'SG-CHS-202', 'SG-MOD-301', 'SG-DIN-402', 'SG-BED-502', 'SG-TBL-602', 'SG-LGT-801'], true),
                 'meta_title' => $product['name'] . ' | سیلا گالری',
                 'meta_description' => 'مشاهده مشخصات و دریافت استعلام قیمت ' . $product['name'] . ' از سیلا گالری.',
-                'specifications' => [
-                    'ابعاد' => $product['dimensions'],
-                    'جنس' => $product['material'],
-                    'رنگ‌بندی' => $product['colors'],
-                    'زمان تحویل' => $product['delivery'],
-                    'یادداشت' => 'اطلاعات این رکورد برای آماده‌سازی کاتالوگ اولیه است و باید پیش از انتشار با مشخصات واقعی محصول تطبیق داده شود.',
-                ],
+                'specifications' => $specifications,
                 'key_features' => ['امکان بررسی تناسب با فضای خانه', 'دریافت جزئیات نهایی پیش از ثبت سفارش'],
                 'installment_enabled' => $installment !== null,
                 'installment_cash_percent' => $installment[0] ?? null,
                 'installment_remainder_method' => $installment !== null ? 'cheque' : null,
                 'installment_cheque_count' => $installment[1] ?? null,
                 'installment_interval_months' => $installment[2] ?? null,
-                'image' => null,
             ];
 
             Product::query()->firstOrCreate(['slug' => $slug], $defaults);
