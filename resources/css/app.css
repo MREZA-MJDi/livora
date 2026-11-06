@@ -2099,3 +2099,112 @@ body {
         font-size: .62rem;
     }
 }
+
+
+/* =========================================================
+   SILLA SHOP PAGINATION
+   ========================================================= */
+.sg-pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 3.5rem;
+}
+.sg-pagination__inner {
+    display: flex;
+    width: 100%;
+    max-width: 48rem;
+    flex-direction: column;
+    align-items: center;
+    gap: .85rem;
+    padding: 1rem;
+    border: 1px solid var(--sg-border);
+    border-radius: 1.25rem;
+    background: var(--sg-white);
+    box-shadow: 0 8px 24px rgb(32 29 25 / .045);
+}
+.sg-pagination__pages {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: .4rem;
+    direction: rtl;
+}
+.sg-pagination__number,
+.sg-pagination__control {
+    display: inline-flex;
+    min-width: 2.65rem;
+    min-height: 2.65rem;
+    align-items: center;
+    justify-content: center;
+    gap: .4rem;
+    border: 1px solid var(--sg-border);
+    border-radius: .8rem;
+    background: var(--sg-white);
+    padding: .55rem .75rem;
+    color: var(--sg-ink);
+    font-size: .78rem;
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+    transition: border-color .18s ease, background-color .18s ease, color .18s ease, transform .18s ease;
+}
+.sg-pagination__number:hover,
+.sg-pagination__control:hover {
+    border-color: var(--sg-ink);
+    background: var(--sg-surface);
+}
+.sg-pagination__number.is-current {
+    border-color: var(--sg-ink);
+    background: var(--sg-ink);
+    color: #fff;
+    box-shadow: 0 4px 12px rgb(32 29 25 / .14);
+}
+.sg-pagination__control {
+    min-width: 5.25rem;
+    background: var(--sg-surface);
+}
+.sg-pagination__control span {
+    font-size: 1rem;
+}
+.sg-pagination__control.is-disabled {
+    color: var(--sg-stone);
+    opacity: .45;
+    cursor: not-allowed;
+}
+.sg-pagination__ellipsis {
+    display: inline-flex;
+    min-width: 1.5rem;
+    align-items: center;
+    justify-content: center;
+    color: var(--sg-stone);
+    font-size: .85rem;
+}
+.sg-pagination__summary {
+    margin: 0;
+    color: var(--sg-stone);
+    font-size: .68rem;
+    line-height: 1.6;
+}
+@media (max-width: 639px) {
+    .sg-pagination { margin-top: 2.25rem; }
+    .sg-pagination__inner {
+        gap: .65rem;
+        padding: .75rem .5rem;
+        border-radius: 1rem;
+    }
+    .sg-pagination__pages { gap: .3rem; }
+    .sg-pagination__number,
+    .sg-pagination__control {
+        min-width: 2.35rem;
+        min-height: 2.4rem;
+        border-radius: .7rem;
+        padding: .45rem .55rem;
+        font-size: .72rem;
+    }
+    .sg-pagination__control { min-width: 4.5rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .sg-pagination__number,
+    .sg-pagination__control { transition: none; }
+}

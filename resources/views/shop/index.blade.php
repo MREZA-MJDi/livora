@@ -368,7 +368,7 @@
                                     aria-label="صفحه‌بندی محصولات"
                                 >
 
-                                    {{ $products->withQueryString()->links() }}
+                                    {{ $products->withQueryString()->onEachSide(1)->links('pagination.silla') }}
 
                                 </nav>
 
