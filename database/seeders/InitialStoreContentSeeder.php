@@ -86,5 +86,58 @@ class InitialStoreContentSeeder extends Seeder
                 'published_at' => now(),
             ]
         );
+
+        
+        // Seed the public About page without overwriting content already managed by an administrator.
+        $about = ContentPage::query()->firstOrNew(['slug' => 'about']);
+        $legacyMigrationBody = '<h1>درباره SillaGallery</h1><p>SillaGallery با تمرکز بر مبلمان و عناصر خانه، تلاش می‌کند انتخاب محصول را به تجربه‌ای روشن، دقیق و دلنشین تبدیل کند.</p><h2>نگاه ما</h2><p>ما باور داریم انتخاب خوب فقط به ظاهر محصول محدود نمی‌شود؛ کیفیت متریال، تناسب با فضا، کاربرد روزمره و دوام در طول زمان نیز اهمیت دارند.</p><h2>چیزهایی که برای ما مهم‌اند</h2><ul><li><strong>طراحی:</strong> فرم و ظاهر باید در خدمت فضای زندگی باشد.</li><li><strong>کیفیت:</strong> انتخاب متریال و ساخت خوب، ارزش محصول را در طول زمان حفظ می‌کند.</li><li><strong>شفافیت:</strong> مشخصات، قیمت، موجودی و شرایط خرید باید روشن باشند.</li><li><strong>تجربه:</strong> مسیر کشف، بررسی و سفارش باید ساده و قابل‌اعتماد باشد.</li></ul><h2>از کشف تا انتخاب</h2><p>در فروشگاه می‌توانید مجموعه‌ها را بررسی کنید، مشخصات محصولات را بخوانید و شرایط خرید را پیش از ثبت سفارش ببینید.</p><p>برای دریافت راهنمایی بیشتر از <a href="/contact">صفحه تماس با ما</a> با ما در ارتباط باشید.</p>';
+        $isLegacyMigrationContent = $about->exists
+            && $about->title === 'درباره SillaGallery'
+            && $about->body === $legacyMigrationBody;
+        $aboutWasMissingBody = ! filled($about->body) || $isLegacyMigrationContent;
+        $aboutDefaults = [
+            'title' => 'درباره سیلا گالری',
+            'excerpt' => 'سیلا گالری برای انتخاب آگاهانه‌تر مبلمان و ساختن فضایی هماهنگ با زندگی روزمره شکل گرفته است.',
+            'body' => <<<'HTML'
+<h2>خانه، بازتابی از شیوه زندگی ما</h2>
+<p>ما در سیلا گالری باور داریم انتخاب مبلمان فقط تهیه چند وسیله برای خانه نیست؛ هر انتخاب می‌تواند بر آسایش، نظم و حال‌وهوای فضایی که هر روز در آن زندگی می‌کنیم اثر بگذارد. به همین دلیل تلاش می‌کنیم محصولات و اطلاعات را روشن و قابل مقایسه ارائه کنیم تا تصمیم‌گیری با شناخت بیشتری انجام شود.</p>
+<h2>انتخاب با توجه به نیاز واقعی</h2>
+<p>ابعاد فضا، سبک استفاده، کیفیت ساخت، جنس متریال و امکان نگهداری، همگی در انتخاب یک محصول مناسب نقش دارند. ما مخاطبان را تشویق می‌کنیم پیش از خرید اندازه‌ها و مسیر ورود کالا را بررسی کنند و مشخصات هر محصول را با نیاز خانه خود بسنجند.</p>
+<h2>شفافیت در مسیر خرید</h2>
+<p>اطلاعات محصول، قیمت، وضعیت موجودی و شرایط سفارش باید تا حد امکان روشن باشد. اگر درباره ویژگی‌ها یا جزئیات خرید پرسشی وجود داشته باشد، راه ارتباط با مجموعه از طریق صفحه تماس در دسترس است. شرایط نهایی هر سفارش باید پیش از ثبت و پرداخت بررسی و تأیید شود.</p>
+<h2>نگاهی ماندگار به خانه</h2>
+<p>هدف ما کمک به انتخاب‌هایی است که در کنار زیبایی، برای استفاده روزمره نیز مناسب باشند؛ انتخاب‌هایی متناسب با فضا، سلیقه و اولویت‌های هر خانه.</p>
+HTML,
+            'featured_image' => 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1800&q=85',
+            'featured_image_alt' => 'چیدمان نشیمن مدرن با مبلمان خنثی و نور طبیعی',
+            'meta_title' => 'درباره سیلا گالری | مبلمان و سبک زندگی',
+            'meta_description' => 'با نگاه سیلا گالری به انتخاب مبلمان، کیفیت، شفافیت اطلاعات و تجربه خرید آشنا شوید.',
+            'status' => 'published',
+            'seo_index' => true,
+            'seo_follow' => true,
+            'published_at' => now(),
+        ];
+
+        if ($isLegacyMigrationContent) {
+            $about->body = $aboutDefaults['body'];
+            $about->title = $aboutDefaults['title'];
+        }
+
+        foreach ($aboutDefaults as $field => $value) {
+            if (! filled($about->getAttribute($field))) {
+                $about->setAttribute($field, $value);
+            }
+        }
+
+        if (! $about->exists) {
+            $about->user_id = null;
+        }
+
+        if ($aboutWasMissingBody) {
+            $about->status = 'published';
+            $about->published_at = $about->published_at ?: now();
+        }
+
+        $about->save();
     }
 }
