@@ -122,6 +122,19 @@ class HomeSectionCmsTest extends TestCase
             ->assertSee('data-sg-hero-data', false);
     }
 
+    public function test_homepage_seeder_preserves_admin_configured_hero_slides(): void
+    {
+        $hero = HomeSection::query()->where('key', 'hero')->firstOrFail();
+        $slides = [
+            ['title' => 'عنوان قابل حفظ', 'image_path' => 'home-sections/hero.jpg'],
+        ];
+        $hero->update(['payload' => ['slides' => $slides]]);
+
+        $this->seed(HomepageContentSeeder::class);
+
+        $this->assertSame($slides, $hero->fresh()->payload['slides']);
+    }
+
     public function test_homepage_sections_can_be_disabled_without_deleting_their_content(): void
     {
         $section = HomeSection::query()->where('key', 'trust')->firstOrFail();
