@@ -60,7 +60,11 @@ class HomeSectionController extends Controller
         $data = $this->validated($request, $homeSection);
         $data['key'] = Str::slug($data['key']);
         $data['enabled'] = $request->boolean('enabled');
-        $data['payload'] = $this->normalizePayload($data['payload'] ?? []);
+        $payload = $data['payload'] ?? [];
+        if (! array_key_exists('items', $payload) && isset($homeSection->payload['items'])) {
+            $payload['items'] = $homeSection->payload['items'];
+        }
+        $data['payload'] = $this->normalizePayload($payload);
         $this->assertProductsAreUnique($data['payload']['product_ids'] ?? [], $homeSection->id);
         $data['image_path'] = $this->storeImage($request, $homeSection->image_path);
         $homeSection->update($data);
