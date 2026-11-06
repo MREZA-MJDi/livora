@@ -29,6 +29,14 @@
         'admin.contact-messages.index' => 'پیام‌های کاربران',
         'admin.contact-messages.show' => 'مشاهده پیام',
         'admin.contact-settings.edit' => 'تنظیمات تماس',
+
+        'admin.home-sections.index' => 'مدیریت صفحه اصلی',
+        'admin.home-sections.create' => 'افزودن بخش صفحه اصلی',
+        'admin.home-sections.edit' => 'ویرایش بخش صفحه اصلی',
+        'admin.shop-banner.edit' => 'بنر صفحه فروشگاه',
+        'admin.pages.index' => 'صفحات سایت',
+        'admin.blog.index' => 'وبلاگ و مقاله‌ها',
+        'admin.checkout.preview' => 'پیش‌نمایش خرید',
     ];
 
     $pageTitle = $pageTitles[$currentRouteName]
