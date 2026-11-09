@@ -524,6 +524,50 @@ class StorefrontReadinessTest extends TestCase
             });
     }
 
+    public function test_category_products_use_bounded_pagination_and_keep_filters_in_page_links(): void
+    {
+        $category = $this->category([
+            'name' => 'دسته صفحه‌بندی',
+            'slug' => 'category-pagination',
+        ]);
+
+        for ($i = 1; $i <= 13; $i++) {
+            $this->product($category, [
+                'name' => 'محصول دسته ' . str_pad((string) $i, 2, '0', STR_PAD_LEFT),
+                'slug' => 'category-pagination-product-' . $i,
+            ]);
+        }
+
+        $this->get(route('categories.show', [
+            'category' => $category->slug,
+            'search' => 'محصول دسته',
+        ]))
+            ->assertOk()
+            ->assertViewHas('products', function ($products) {
+                return $products instanceof LengthAwarePaginator
+                    && $products->perPage() === 12
+                    && $products->total() === 13
+                    && $products->currentPage() === 1;
+            })
+            ->assertSee('page=2', false)
+            ->assertSee('search=', false);
+
+        $this->get(route('categories.show', [
+            'category' => $category->slug,
+            'search' => 'محصول دسته',
+            'page' => 2,
+        ]))
+            ->assertOk()
+            ->assertViewHas('products', function ($products) {
+                return $products instanceof LengthAwarePaginator
+                    && $products->perPage() === 12
+                    && $products->total() === 13
+                    && $products->currentPage() === 2
+                    && $products->count() === 1;
+            })
+            ->assertSee('محصول دسته 13');
+    }
+
     public function test_shop_applies_each_visible_catalogue_filter(): void
     {
         $category = $this->category();
