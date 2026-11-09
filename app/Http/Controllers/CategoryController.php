@@ -51,7 +51,8 @@ class CategoryController extends Controller
                     ->limit(1),
             'relatedCategories' => fn ($query) => $query
                 ->where('is_active', true)
-                ->withCount(['products' => fn ($productQuery) => $productQuery->active()]),
+                ->withCount(['products' => fn ($productQuery) => $productQuery->active()])
+                ->with(['media', 'cardMedia']),
             'recommendedProducts' => fn ($query) => $query
                 ->where('status', 'active')
                 ->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('is_active', true))
