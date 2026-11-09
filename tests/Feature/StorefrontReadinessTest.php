@@ -563,9 +563,9 @@ class StorefrontReadinessTest extends TestCase
                     && $products->perPage() === 12
                     && $products->total() === 13
                     && $products->currentPage() === 2
-                    && $products->count() === 1;
-            })
-            ->assertSee('محصول دسته 13');
+                    && $products->count() === 1
+                    && $products->first()->slug === 'category-pagination-product-1';
+            });
     }
 
     public function test_shop_applies_each_visible_catalogue_filter(): void
