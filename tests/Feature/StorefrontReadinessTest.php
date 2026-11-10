@@ -546,6 +546,7 @@ class StorefrontReadinessTest extends TestCase
         $this->get(route('categories.show', [
             'category' => $category->slug,
             'installment' => '1',
+            'sort' => 'oldest',
             'page' => 2,
         ]))
             ->assertOk()
