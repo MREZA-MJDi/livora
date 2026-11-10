@@ -24,11 +24,63 @@ class ProductController extends Controller
     public function index(): View
     {
         $products = Product::query()
-            ->with(['category', 'images' => fn ($query) => $query->limit(1)])
+            ->with(['category', 'images' => fn ($query) => $query->limit(1), 'variants.images'])
             ->latest()
             ->paginate(15);
 
-        return view('admin.products.index', compact('products'));
+        $homeHeroProductCount = Product::query()->where('is_home_hero', true)->count();
+
+        return view('admin.products.index', compact('products', 'homeHeroProductCount'));
+    }
+
+    public function toggleHomeHero(Product $product): RedirectResponse
+    {
+        if (! $product->is_home_hero) {
+            $hasImage = $product->images()->exists()
+                || $product->variants()->whereHas('images')->exists();
+            $hasActiveCategory = $product->category()->where('is_active', true)->exists();
+
+            if ($product->status !== 'active' || ! $hasActiveCategory || ! $hasImage) {
+                return back()->with('error', 'فقط محصول فعال با دسته‌بندی فعال و تصویر معتبر می‌تواند وارد اسلایدر شود.');
+            }
+
+            $result = DB::transaction(function () use ($product): string {
+                $lockedProduct = Product::query()->whereKey($product->id)->lockForUpdate()->firstOrFail();
+                if ($lockedProduct->is_home_hero) {
+                    return 'already-selected';
+                }
+
+                $selected = Product::query()
+                    ->where('is_home_hero', true)
+                    ->lockForUpdate()
+                    ->get(['id', 'home_hero_sort_order']);
+
+                if ($selected->count() >= 10) {
+                    return 'limit';
+                }
+
+                $nextOrder = ((int) $selected->max('home_hero_sort_order')) + 1;
+                $lockedProduct->update([
+                    'is_home_hero' => true,
+                    'home_hero_sort_order' => $nextOrder,
+                ]);
+
+                return 'selected';
+            });
+
+            if ($result === 'limit') {
+                return back()->with('error', 'حداکثر ۱۰ محصول می‌توانند در اسلایدر صفحه اصلی باشند.');
+            }
+        } else {
+            $product->update([
+                'is_home_hero' => false,
+                'home_hero_sort_order' => null,
+            ]);
+        }
+
+        return back()->with('success', $product->is_home_hero
+            ? 'محصول به اسلایدر صفحه اصلی اضافه شد.'
+            : 'محصول از اسلایدر صفحه اصلی حذف شد.');
     }
 
     public function create(ContentSeoAnalyzer $seoAnalyzer): View
