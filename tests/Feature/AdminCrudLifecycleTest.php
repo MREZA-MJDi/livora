@@ -771,7 +771,7 @@ class AdminCrudLifecycleTest extends TestCase
         Storage::disk('public')->assertExists($media->detail_path);
 
         $this->actingAs($this->admin)
-            ->get(route('admin.products.edit', $product))
+            ->get(route('admin.product-variants.edit', $variant))
             ->assertOk()
             ->assertSee('variant-image-preview')
             ->assertSee($variantImage->detail_url, false);
