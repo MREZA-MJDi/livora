@@ -18,6 +18,7 @@ class ShopController extends Controller
             ->with([
                 'category',
                 'images.media',
+                'variants.images.media',
             ])
             ->withCount(['allVariants', 'variants as available_variants_count' => fn ($variantQuery) => $variantQuery->where('stock', '>', 0)])
             ->active()
