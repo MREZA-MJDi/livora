@@ -27,6 +27,16 @@
             ? $product->allVariants->isNotEmpty()
             : $product->allVariants()->exists());
 
+    $hasAvailableVariant = isset($product->available_variants_count)
+        ? (int) $product->available_variants_count > 0
+        : ($product->relationLoaded('variants')
+            ? $product->variants->contains(fn ($variant) => (int) $variant->stock > 0)
+            : $product->variants()->where('stock', '>', 0)->exists());
+
+    $isAvailable = $hasVariants
+        ? $hasAvailableVariant
+        : (int) $product->stock > 0;
+
 @endphp
 
 <article class="product-card group relative flex h-full min-w-0 flex-col overflow-hidden rounded-[1rem] border border-[var(--sg-border)] bg-[var(--sg-white)] shadow-sm transition duration-300 hover:-translate-y-1 hover:border-[var(--sg-accent)]/40 hover:shadow-lg" aria-labelledby="product-card-title-{{ $product->id }}">
@@ -175,8 +185,8 @@
             </div>
         @endif
 
-        <p class="mt-2 text-[10px] font-medium {{ (int) $product->stock > 0 ? 'text-emerald-700' : 'text-rose-700' }}">
-            {{ (int) $product->stock > 0 ? 'موجود' : 'ناموجود' }}
+        <p class="mt-2 text-[10px] font-medium {{ $isAvailable ? 'text-emerald-700' : 'text-rose-700' }}">
+            {{ $isAvailable ? 'موجود' : 'ناموجود' }}
         </p>
 
         @if($installmentEnabled && $product->approximate_installment_amount)
