@@ -1224,8 +1224,6 @@ const initSgHomeHeroes = () => {
         const dataNode = root.querySelector('[data-sg-hero-data]');
         const dots = Array.from(root.querySelectorAll('[data-sg-hero-dot]'));
         const images = Array.from(root.querySelectorAll('[data-sg-hero-image]'));
-        const content = root.querySelector('.sg-home-hero__content');
-        const media = root.querySelector('.sg-home-hero__media');
         const eyebrow = root.querySelector('[data-sg-hero-eyebrow]');
         const title = root.querySelector('[data-sg-hero-title]');
         const subtitle = root.querySelector('[data-sg-hero-subtitle]');
