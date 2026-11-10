@@ -146,6 +146,9 @@ class UpdateProductVariantRequest extends FormRequest
 
             'color_hex.regex' => 'کد رنگ باید مانند #C8A27A باشد.',
 
+            'variant_original_image.image' => 'فایل اصلی تصویر تنوع معتبر نیست.',
+            'variant_original_image.mimes' => 'فرمت تصویر اصلی باید JPG، PNG یا WEBP باشد.',
+            'variant_original_image.max' => 'حجم تصویر اصلی نباید بیشتر از ۱۰ مگابایت باشد.',
             'variant_image.image' => 'فایل تنوع باید یک تصویر معتبر باشد.',
             'variant_image.mimes' => 'فرمت تصویر تنوع باید JPG، PNG یا WEBP باشد.',
             'variant_image.max' => 'حجم تصویر تنوع نباید بیشتر از ۱۰ مگابایت باشد.',
