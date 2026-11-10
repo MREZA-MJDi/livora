@@ -1,17 +1,17 @@
 <?php
 
-namespace App\\Http\\Controllers\\Admin;
+namespace App\Http\Controllers\Admin;
 
-use App\\Http\\Controllers\\Controller;
-use App\\Http\\Requests\\Admin\\ProductVariant\\StoreProductVariantRequest;
-use App\\Http\\Requests\\Admin\\ProductVariant\\UpdateProductVariantRequest;
-use App\\Models\\Product;
-use App\\Models\\ProductImage;
-use App\\Models\\ProductVariant;
-use Illuminate\\Http\\RedirectResponse;
-use Illuminate\\Http\\Request;
-use Illuminate\\Support\\Facades\\DB;
-use Illuminate\\View\\View;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\ProductVariant\StoreProductVariantRequest;
+use App\Http\Requests\Admin\ProductVariant\UpdateProductVariantRequest;
+use App\Models\Product;
+use App\Models\ProductImage;
+use App\Models\ProductVariant;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\View\View;
 use Throwable;
 
 class ProductVariantController extends Controller
