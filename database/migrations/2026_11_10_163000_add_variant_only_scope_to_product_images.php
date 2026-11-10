@@ -11,7 +11,16 @@ return new class extends Migration
         if (! Schema::hasColumn('product_images', 'is_variant_only')) {
             Schema::table('product_images', function (Blueprint $table) {
                 $table->boolean('is_variant_only')->default(false)->after('is_primary');
-                $table->index(['product_id', 'is_variant_only', 'sort_order'], 'product_images_gallery_scope_idx');
+            });
+        }
+
+        $indexes = collect(Schema::getIndexes('product_images'))->pluck('name')->all();
+        if (! in_array('product_images_gallery_scope_idx', $indexes, true)) {
+            Schema::table('product_images', function (Blueprint $table) {
+                $table->index(
+                    ['product_id', 'is_variant_only', 'sort_order'],
+                    'product_images_gallery_scope_idx'
+                );
             });
         }
     }
@@ -22,8 +31,14 @@ return new class extends Migration
             return;
         }
 
+        $indexes = collect(Schema::getIndexes('product_images'))->pluck('name')->all();
+        if (in_array('product_images_gallery_scope_idx', $indexes, true)) {
+            Schema::table('product_images', function (Blueprint $table) {
+                $table->dropIndex('product_images_gallery_scope_idx');
+            });
+        }
+
         Schema::table('product_images', function (Blueprint $table) {
-            $table->dropIndex('product_images_gallery_scope_idx');
             $table->dropColumn('is_variant_only');
         });
     }
