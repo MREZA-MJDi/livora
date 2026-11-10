@@ -425,6 +425,9 @@ Route::middleware(['auth', 'admin', 'admin.session.timeout'])
         |--------------------------------------------------------------------------
         */
 
+        Route::post('products/{product}/home-hero', [AdminProductController::class, 'toggleHomeHero'])
+            ->name('products.home-hero');
+
         Route::resource(
             'products',
             AdminProductController::class
