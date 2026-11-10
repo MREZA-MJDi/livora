@@ -772,7 +772,7 @@ class AdminCrudLifecycleTest extends TestCase
         $this->actingAs($this->admin)
             ->get(route('admin.product-variants.create', ['product_id' => $product->id]))
             ->assertOk()
-            ->assertSee('aspect-[7/8]', false)
+            ->assertSee('aspect-[4/3]', false)
             ->assertSee($product->images()->firstOrFail()->url);
 
         $this->actingAs($this->admin)
