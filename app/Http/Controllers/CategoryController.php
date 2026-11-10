@@ -46,7 +46,7 @@ class CategoryController extends Controller
                 ->where('status', 'active')
                 ->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('is_active', true))
                 ->withCount(['allVariants', 'variants as available_variants_count' => fn ($variantQuery) => $variantQuery->where('stock', '>', 0)])
-                ->with(['category', 'images.media']),
+                ->with(['category', 'images.media', 'variants.images.media']),
         ]);
 
         $query = $category->products()
@@ -56,6 +56,7 @@ class CategoryController extends Controller
             ->with([
                 'category',
                 'images.media',
+                'variants.images.media',
             ]);
 
         if (! empty($filters['search'])) {
