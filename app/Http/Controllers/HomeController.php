@@ -49,6 +49,7 @@ class HomeController extends Controller
                         'latestActiveProduct.images.media',
                         'latestActiveProduct.variants.images.media',
                     ])
+                    ->reorder()
                     ->orderByDesc('products_count')
                     ->orderBy('name')
                     ->limit($limit)
