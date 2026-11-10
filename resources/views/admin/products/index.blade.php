@@ -221,18 +221,26 @@
                                 $canSelectForHero = $product->status === 'active'
                                     && (bool) $product->category?->is_active
                                     && ($primaryImage || $hasVariantHeroImage);
+                                $heroSelectionDisabled = ! $product->is_home_hero
+                                    && (! $canSelectForHero || $homeHeroProductCount >= 10);
                             @endphp
-                            <form action="{{ route('admin.products.home-hero', $product) }}" method="POST">
+                            <form action="{{ route('admin.products.home-hero', $product) }}" method="POST" class="flex items-center gap-2">
                                 @csrf
-                                <button
-                                    type="submit"
-                                    @disabled(! $product->is_home_hero && ! $canSelectForHero)
-                                    class="admin-btn {{ $product->is_home_hero ? 'admin-btn-primary' : 'admin-btn-secondary' }} px-3 whitespace-nowrap"
-                                    aria-pressed="{{ $product->is_home_hero ? 'true' : 'false' }}"
-                                    title="{{ $canSelectForHero || $product->is_home_hero ? 'تغییر وضعیت نمایش در اسلایدر' : 'برای انتخاب، محصول باید فعال و دارای تصویر باشد' }}"
-                                >
-                                    {{ $product->is_home_hero ? '✓ انتخاب شده' : '☆ افزودن به اسلایدر' }}
-                                </button>
+                                <label class="inline-flex cursor-pointer items-center gap-2 whitespace-nowrap text-xs text-[var(--admin-text)]">
+                                    <input
+                                        type="checkbox"
+                                        @if($product->is_home_hero) checked @endif
+                                        @disabled($heroSelectionDisabled)
+                                        onchange="this.form.submit()"
+                                        class="h-4 w-4 rounded border-[var(--admin-border)] text-[var(--admin-accent)] focus:ring-[var(--admin-accent)]"
+                                        aria-label="نمایش {{ $product->name }} در اسلایدر صفحه اصلی"
+                                    >
+                                    <span>{{ $product->is_home_hero ? 'انتخاب شده' : 'نمایش در هیرو' }}</span>
+                                </label>
+                                @if($product->is_home_hero)
+                                    <span class="admin-badge admin-badge-success">✓</span>
+                                @endif
+                                <noscript><button type="submit" class="admin-btn admin-btn-secondary px-2">ثبت</button></noscript>
                             </form>
                         </td>
 
