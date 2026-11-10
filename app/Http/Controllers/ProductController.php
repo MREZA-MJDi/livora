@@ -12,13 +12,25 @@ class ProductController extends Controller
         $product = Product::query()
             ->with([
                 'category',
-                'images',
-                'variants.images',
+                'images.media',
+                'variants.images.media',
                 'relatedProducts' => fn ($relatedQuery) => $relatedQuery
                     ->where('status', 'active')
                     ->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('is_active', true))
-                    ->withCount('allVariants')
-                    ->with(['category', 'images' => fn ($imageQuery) => $imageQuery->limit(1)]),
+                    ->withCount([
+                        'allVariants',
+                        'variants as available_variants_count' => fn ($variantQuery) => $variantQuery->where('stock', '>', 0),
+                    ])
+                    ->with([
+                        'category',
+                        'images' => fn ($imageQuery) => $imageQuery
+                            ->with('media')
+                            ->orderByDesc('is_primary')
+                            ->orderBy('sort_order')
+                            ->orderBy('id')
+                            ->limit(1),
+                        'variants.images.media',
+                    ]),
             ])
             ->withCount('allVariants')
             ->active()
@@ -37,9 +49,18 @@ class ProductController extends Controller
                 ->whereHas('category', fn ($query) => $query->where('is_active', true))
                 ->with([
                     'category',
-                    'images' => fn ($imageQuery) => $imageQuery->limit(1),
+                    'images' => fn ($imageQuery) => $imageQuery
+                        ->with('media')
+                        ->orderByDesc('is_primary')
+                        ->orderBy('sort_order')
+                        ->orderBy('id')
+                        ->limit(1),
+                    'variants.images.media',
                 ])
-                ->withCount('allVariants')
+                ->withCount([
+                    'allVariants',
+                    'variants as available_variants_count' => fn ($variantQuery) => $variantQuery->where('stock', '>', 0),
+                ])
                 ->where('id', '!=', $product->id)
                 ->where('category_id', $product->category_id)
                 ->latest()
