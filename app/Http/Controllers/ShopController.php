@@ -17,7 +17,12 @@ class ShopController extends Controller
         $query = Product::query()
             ->with([
                 'category',
-                'images.media',
+                'images' => fn ($imageQuery) => $imageQuery
+                    ->with('media')
+                    ->orderByDesc('is_primary')
+                    ->orderBy('sort_order')
+                    ->orderBy('id')
+                    ->limit(1),
                 'variants.images.media',
             ])
             ->withCount(['allVariants', 'variants as available_variants_count' => fn ($variantQuery) => $variantQuery->where('stock', '>', 0)])
