@@ -1650,21 +1650,21 @@ class StorefrontReadinessTest extends TestCase
             'slug' => 'paginated-category-products',
         ]);
 
-        $variantImageProduct = $this->productWithVariantImage($category, 1);
-
-        for ($index = 2; $index <= 14; $index++) {
+        for ($index = 1; $index <= 13; $index++) {
             $this->product($category, [
                 'name' => 'محصول صفحه‌بندی '.$index,
                 'slug' => 'paginated-product-'.$index,
             ]);
         }
 
+        $variantImageProduct = $this->productWithVariantImage($category, 1);
+
         $this->get(route('categories.show', $category->slug))
             ->assertOk()
             ->assertSee($variantImageProduct->name)
             ->assertSee('https://images.example.test/query/variant-1.webp')
             ->assertSee('page=2', false)
-            ->assertDontSee('محصول صفحه‌بندی 14');
+            ->assertDontSee('محصول صفحه‌بندی 1');
     }
 
     public function test_admin_product_catalog_uses_compact_cards_and_preserves_search_pagination(): void
