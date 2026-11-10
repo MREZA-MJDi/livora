@@ -551,7 +551,7 @@
                                     <x-shop.quantity
                                         name="quantity"
                                         min="1"
-                                        :max="{{ $variantGroups->isNotEmpty() ? 99 : max(1, $product->stock) }}"
+                                        :max="$variantGroups->isNotEmpty() ? 99 : max(1, $product->stock)"
                                     />
 
                                 </div>
