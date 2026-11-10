@@ -104,19 +104,25 @@ class Category extends Model
             return null;
         }
 
-        if ($image = $product->images?->first()?->card_url) {
-            return $image;
+        if ($product->relationLoaded('images')) {
+            if ($image = $product->getRelation('images')->first()?->card_url) {
+                return $image;
+            }
         }
 
         if (! $product->relationLoaded('variants')) {
             return null;
         }
 
-        $variant = $product->variants->first(
-            fn ($item) => (int) $item->stock > 0 && $item->images->isNotEmpty()
-        ) ?? $product->variants->first(fn ($item) => $item->images->isNotEmpty());
+        $variants = $product->getRelation('variants');
+        $hasLoadedImages = fn ($variant) => $variant->relationLoaded('images')
+            && $variant->getRelation('images')->isNotEmpty();
 
-        return $variant?->images?->first()?->card_url;
+        $variant = $variants->first(
+            fn ($item) => (int) $item->stock > 0 && $hasLoadedImages($item)
+        ) ?? $variants->first($hasLoadedImages);
+
+        return $variant?->getRelation('images')?->first()?->card_url;
     }
 
     private function storedImageUrl(?Media $media, ?string $path): ?string
