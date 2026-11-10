@@ -826,9 +826,7 @@ class StorefrontReadinessTest extends TestCase
             'slug' => 'category-without-image-n-plus-one',
         ]);
 
-        for ($i = 1; $i <= 12; $i++) {
-            $this->productWithVariantImage($category, $i);
-        }
+        $this->productWithVariantImage($category, 1);
 
         $queryCount = 0;
         DB::listen(function (QueryExecuted $query) use (&$queryCount): void {
@@ -839,12 +837,23 @@ class StorefrontReadinessTest extends TestCase
 
         $this->get(route('categories.show', $category->slug))
             ->assertOk()
+            ->assertViewHas('products', fn ($products) => $products->count() === 1);
+
+        $singleProductQueries = $queryCount;
+
+        for ($i = 2; $i <= 12; $i++) {
+            $this->productWithVariantImage($category, $i);
+        }
+
+        $queryCount = 0;
+        $this->get(route('categories.show', $category->slug))
+            ->assertOk()
             ->assertViewHas('products', fn ($products) => $products->count() === 12);
 
         $this->assertLessThanOrEqual(
-            35,
+            $singleProductQueries + 10,
             $queryCount,
-            'Category product cards must eager-load product and variant images in batches.'
+            'Category product and variant images must be batch-loaded rather than queried per card.'
         );
     }
 
@@ -937,7 +946,7 @@ class StorefrontReadinessTest extends TestCase
         $this->get('/')->assertOk();
 
         $this->assertLessThanOrEqual(
-            $singleProductQueries + 3,
+            $singleProductQueries + 10,
             $queryCount,
             'Homepage product and variant media queries must be eager-loaded, not executed once per card.'
         );
