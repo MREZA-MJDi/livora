@@ -132,7 +132,7 @@
     <section class="admin-card overflow-hidden">
         <div class="border-b border-[var(--admin-border)] bg-[var(--admin-surface-soft)] px-5 py-4 sm:px-6">
             <p class="text-xs font-semibold text-[var(--admin-accent)]">قیمت این گزینه</p>
-            <h3 class="mt-1 text-base font-bold text-[var(--admin-text)]">قیمت نهایی را وارد کن</h3>
+            <h3 class="mt-1 text-base font-bold text-[var(--admin-text)]">میزان تغییر قیمت را وارد کن</h3>
             <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">این مبلغ، تغییر قیمت این گزینه نسبت به قیمت پایه محصول است؛ در انتخاب چند ویژگی، تغییر قیمت گزینه‌ها با هم جمع می‌شود.</p>
         </div>
         <div class="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2 sm:p-6">
