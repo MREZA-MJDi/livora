@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductVariant;
+use App\Models\HomeSection;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -729,6 +730,34 @@ class AdminCrudLifecycleTest extends TestCase
             'status' => 'shipped',
             'payment_status' => 'pending',
         ]);
+    }
+
+    public function test_home_section_hero_upload_uses_the_shared_media_library(): void
+    {
+        $this->actingAs($this->admin)
+            ->post(route('admin.home-sections.store'), [
+                'key' => 'hero-media-pipeline-test',
+                'type' => 'hero',
+                'enabled' => '1',
+                'title' => 'بنر تست مسیر مدیا',
+                'payload' => [
+                    'limit' => 6,
+                    'product_source' => 'latest',
+                    'slides' => [],
+                ],
+                'image' => UploadedFile::fake()->image('hero-media-pipeline.jpg', 1600, 1000),
+            ])
+            ->assertRedirect(route('admin.home-sections.index'));
+
+        $section = HomeSection::query()->where('key', 'hero-media-pipeline-test')->firstOrFail();
+
+        $this->assertNotEmpty($section->image_path);
+        $media = Media::query()->where('path', $section->image_path)->firstOrFail();
+
+        $this->assertSame($this->admin->id, $media->user_id);
+        $this->assertSame('public', $media->disk);
+        $this->assertSame('image/jpeg', $media->mime_type);
+        Storage::disk('public')->assertExists($section->image_path);
     }
 
     public function test_home_section_editor_offers_real_sources_and_floating_slide_preview(): void
