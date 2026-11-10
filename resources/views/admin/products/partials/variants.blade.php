@@ -78,7 +78,7 @@
                                 <span class="font-semibold text-[var(--admin-text)]">
                                     {{ number_format(max(0, (float) $product->price + (float) $variant->price_adjustment)) }}
                                 </span>
-                                <span class="text-xs text-[var(--admin-muted)]">تومان · قیمت نهایی</span>
+                                <span class="text-xs text-[var(--admin-muted)]">تومان · قیمت این گزینه به‌تنهایی</span>
                             </td>
 
                             <td>
