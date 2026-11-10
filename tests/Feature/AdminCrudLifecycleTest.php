@@ -93,7 +93,7 @@ class AdminCrudLifecycleTest extends TestCase
 
         $this->actingAs($this->admin)
             ->delete(route('admin.products.destroy', $product))
-            ->assertRedirect(route('admin.products.edit', Product::query()->where('slug', 'sofa-media-removal')->value('id')));
+            ->assertRedirect(route('admin.products.index'));
 
         $this->assertSoftDeleted('products', ['id' => $product->id]);
     }
@@ -112,7 +112,7 @@ class AdminCrudLifecycleTest extends TestCase
                 'banner_image' => UploadedFile::fake()->image('banner-before-remove.jpg', 1200, 500),
                 'banner_image_alt' => 'بنر محصول برای تست حذف',
             ]))
-            ->assertRedirect(route('admin.products.edit', Product::query()->where('slug', 'media-library-sofa')->value('id')));
+            ->assertRedirect(route('admin.products.edit', Product::query()->where('slug', 'sofa-media-removal')->value('id')));
 
         $product = Product::query()->where('slug', 'sofa-media-removal')->firstOrFail();
         $primary = $product->images()->firstOrFail();
@@ -204,7 +204,7 @@ class AdminCrudLifecycleTest extends TestCase
                 'media_id' => $media->id,
                 'status' => 'active',
             ]))
-            ->assertRedirect(route('admin.products.index'));
+            ->assertRedirect(route('admin.products.edit', Product::query()->where('slug', 'media-library-sofa')->value('id')));
 
         $product = Product::query()->where('slug', 'media-library-sofa')->firstOrFail();
         $image = $product->images()->firstOrFail();
