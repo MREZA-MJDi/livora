@@ -99,28 +99,16 @@
         }
     }
 
-    $galleryImageIndexes = $product->images
-        ->values()
-        ->mapWithKeys(
-            fn ($image, $index) => [
-                (int) $image->id => (int) $index,
-            ]
-        )
-        ->all();
-
     $variantImageMap = $product->variants
-        ->mapWithKeys(
-            fn ($variant) => [
-                (string) $variant->id => $variant->images
-                    ->map(
-                        fn ($image) =>
-                            $galleryImageIndexes[$image->id] ?? null
-                    )
-                    ->filter(fn ($index) => $index !== null)
-                    ->values()
-                    ->all(),
-            ]
-        )
+        ->mapWithKeys(fn ($variant) => [
+            (string) $variant->id => $variant->images
+                ->map(fn ($image) => [
+                    'url' => $image->detail_url,
+                    'alt' => $image->alt ?: $product->name,
+                ])
+                ->values()
+                ->all(),
+        ])
         ->all();
 
 
