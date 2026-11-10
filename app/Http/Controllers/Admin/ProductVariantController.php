@@ -178,7 +178,7 @@ class ProductVariantController extends Controller
         try {
             $cropPath = $croppedFile->store('products/crops', 'public');
             if (! $cropPath) {
-                throw new \\RuntimeException('Variant image crop could not be stored.');
+                throw new \RuntimeException('Variant image crop could not be stored.');
             }
 
             $createdMedia->update(['variant_source_path' => $cropPath]);
