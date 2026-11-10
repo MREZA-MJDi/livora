@@ -64,13 +64,13 @@
             <div>
                 <label for="type" class="admin-label">نوع ویژگی</label>
                 <input id="type" name="type" class="admin-input" maxlength="255"
-                       value="{{ old('type', $productVariant->type ?? 'اندازه') }}" placeholder="مثلاً اندازه" required>
+                       value="{{ old('type', $productVariant->type ?? ($defaultType ?? 'اندازه')) }}" placeholder="مثلاً اندازه" required>
                 @error('type')<p class="mt-2 text-xs text-[var(--admin-danger)]">{{ $message }}</p>@enderror
             </div>
             <div>
                 <label for="name" class="admin-label">عنوان ویژگی</label>
                 <input id="name" name="name" class="admin-input" maxlength="255"
-                       value="{{ old('name', $productVariant->name ?? 'اندازه مبل') }}" placeholder="مثلاً اندازه مبل" required>
+                       value="{{ old('name', $productVariant->name ?? ($defaultName ?? 'اندازه مبل')) }}" placeholder="مثلاً اندازه مبل" required>
                 @error('name')<p class="mt-2 text-xs text-[var(--admin-danger)]">{{ $message }}</p>@enderror
             </div>
             <div class="sm:col-span-2">
@@ -161,8 +161,15 @@
     <div class="sticky bottom-3 z-20 flex flex-col-reverse gap-3 rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-white)]/95 p-3 shadow-xl backdrop-blur sm:flex-row sm:items-center sm:justify-between">
         <a href="{{ $currentProductId ? route('admin.products.edit', $currentProductId) : route('admin.products.index') }}"
            class="admin-btn admin-btn-secondary text-center">انصراف</a>
-        <button type="submit" class="admin-btn admin-btn-primary min-h-11 px-7">
-            {{ $editing ? 'ذخیره تغییرات تنوع' : 'ثبت تنوع محصول' }}
-        </button>
+        <div class="flex flex-col gap-2 sm:flex-row">
+            @unless($editing)
+                <button type="submit" name="continue" value="1" class="admin-btn admin-btn-secondary min-h-11 px-5">
+                    ثبت و افزودن گزینه بعدی
+                </button>
+            @endunless
+            <button type="submit" class="admin-btn admin-btn-primary min-h-11 px-7">
+                {{ $editing ? 'ذخیره تغییرات تنوع' : 'ثبت تنوع محصول' }}
+            </button>
+        </div>
     </div>
 </div>
