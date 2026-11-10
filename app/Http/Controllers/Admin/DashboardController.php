@@ -221,7 +221,13 @@ class DashboardController extends Controller
     {
         return OrderItem::query()
             ->with([
-                'product.images' => fn ($imageQuery) => $imageQuery->with('media')->orderByDesc('is_primary')->orderBy('sort_order')->orderBy('id')->limit(1),
+                'product.images' => fn ($imageQuery) => $imageQuery
+                    ->with('media')
+                    ->orderByDesc('is_primary')
+                    ->orderBy('sort_order')
+                    ->orderBy('id')
+                    ->limit(1),
+                'product.variants.images.media',
             ])
             ->whereHas(
                 'order',
@@ -243,8 +249,25 @@ class DashboardController extends Controller
                     'name' => $item->product_name,
                     'quantity' => (int) $item->sold_quantity,
                     'revenue' => (float) $item->revenue,
-                    'image' => $item->product?->images?->first()?->url,
+                    'image' => $this->topProductImage($item->product),
                 ];
             });
+    }
+
+    private function topProductImage(?Product $product): ?string
+    {
+        if (! $product) {
+            return null;
+        }
+
+        if ($image = $product->images?->first()?->card_url) {
+            return $image;
+        }
+
+        $variant = $product->variants->first(
+            fn ($item) => (int) $item->stock > 0 && $item->images->isNotEmpty()
+        ) ?? $product->variants->first(fn ($item) => $item->images->isNotEmpty());
+
+        return $variant?->images?->first()?->card_url;
     }
 }
