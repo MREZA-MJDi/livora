@@ -191,6 +191,7 @@ class ProductVariantController extends Controller
                 'alt' => $alt,
                 'sort_order' => 0,
                 'is_primary' => false,
+                'is_variant_only' => true,
             ]);
         } catch (Throwable $exception) {
             $this->cleanupVariantMedia($createdMedia);
