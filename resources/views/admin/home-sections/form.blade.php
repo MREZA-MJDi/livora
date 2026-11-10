@@ -44,7 +44,13 @@
             <fieldset :disabled="sectionType !== 'hero'" class="space-y-4">
             <template x-for="(slide, index) in slides" :key="slide.uid">
                 <article class="space-y-4 rounded-2xl bg-[var(--admin-surface)] p-4">
-                    <div class="flex items-center justify-between gap-3"><strong x-text="'اسلاید ' + (index + 1)"></strong><button type="button" class="admin-btn admin-btn-danger" @click="removeSlide(index)" :disabled="slides.length === 1">حذف اسلاید</button></div>
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                        <strong x-text="'اسلاید ' + (index + 1)"></strong>
+                        <div class="flex flex-wrap gap-2">
+                            <button type="button" class="admin-btn admin-btn-secondary" @click="previewIndex = index; previewOpen = true">پیش‌نمایش شناور</button>
+                            <button type="button" class="admin-btn admin-btn-danger" @click="removeSlide(index)" :disabled="slides.length === 1">حذف اسلاید</button>
+                        </div>
+                    </div>
                     <div class="grid gap-4 lg:grid-cols-2">
                         <div class="space-y-3">
                             <label class="block"><span class="admin-label">تصویر اسلاید</span><input type="file" accept="image/jpeg,image/png,image/webp" :name="'slide_images[' + index + ']'" data-crop-ratio="1.5" class="admin-input" @change="previewFile($event, slide)"><small class="admin-help">تصویر در قاب ۳:۲ برش می‌خورد؛ می‌توانید در پنجره برش، کادر را جابه‌جا و بزرگ‌نمایی کنید.</small></label>
@@ -120,10 +126,59 @@
         @if($errors->any())<div class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{{ $errors->first() }}</div>@endif
         <div class="flex flex-wrap gap-3"><button class="admin-btn admin-btn-primary" type="submit">ذخیره سکشن</button><a href="{{ route('admin.home-sections.index') }}" class="admin-btn admin-btn-secondary">انصراف</a></div>
     </form>
+
+    <div
+        x-show="previewOpen"
+        x-cloak
+        x-transition.opacity
+        class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/70 p-3 backdrop-blur-sm sm:p-6"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="home-section-preview-title"
+        @click.self="previewOpen = false"
+        @keydown.escape.window="previewOpen = false"
+    >
+        <section class="relative w-full max-w-5xl overflow-hidden rounded-3xl border border-white/15 bg-white shadow-2xl">
+            <header class="flex items-center justify-between gap-3 border-b border-slate-200 px-5 py-4">
+                <div>
+                    <p class="text-[10px] font-semibold tracking-[.18em] text-amber-700">LIVE PREVIEW</p>
+                    <h2 id="home-section-preview-title" class="mt-1 text-base font-bold text-slate-900">پیش‌نمایش اسلاید صفحه اصلی</h2>
+                </div>
+                <button type="button" class="admin-btn admin-btn-secondary" @click="previewOpen = false">بستن</button>
+            </header>
+            <div class="grid gap-5 p-4 sm:p-6 lg:grid-cols-2" dir="ltr">
+                <div class="flex min-w-0 flex-col justify-center text-right" dir="rtl">
+                    <p class="text-xs font-semibold text-amber-700" x-text="slides[previewIndex]?.eyebrow || 'متن بالای عنوان'"></p>
+                    <h3 class="mt-3 text-2xl font-bold leading-tight text-slate-950 sm:text-4xl" x-text="slides[previewIndex]?.title || 'عنوان اسلاید'"></h3>
+                    <p class="mt-4 text-sm leading-8 text-slate-600" x-text="slides[previewIndex]?.subtitle || 'توضیحات اسلاید در این قسمت نمایش داده می‌شود.'"></p>
+                    <span class="mt-6 inline-flex w-fit rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white" x-text="slides[previewIndex]?.cta_label || 'متن دکمه'"></span>
+                </div>
+                <div class="aspect-[3/2] overflow-hidden rounded-2xl bg-slate-100">
+                    <img
+                        :src="slides[previewIndex]?.preview || slides[previewIndex]?.image_url || ''"
+                        :style="'object-position:' + (slides[previewIndex]?.object_position || '50% 50%')"
+                        class="h-full w-full object-cover"
+                        alt="پیش‌نمایش تصویر اسلاید"
+                        x-show="slides[previewIndex]?.preview || slides[previewIndex]?.image_url"
+                    >
+                    <div class="flex h-full items-center justify-center text-sm text-slate-400" x-show="!(slides[previewIndex]?.preview || slides[previewIndex]?.image_url)">هنوز تصویری انتخاب نشده است</div>
+                </div>
+            </div>
+            <footer class="flex flex-wrap justify-between gap-2 border-t border-slate-200 px-5 py-3">
+                <span class="text-xs text-slate-500" x-text="'اسلاید ' + (previewIndex + 1) + ' از ' + slides.length"></span>
+                <div class="flex gap-2">
+                    <button type="button" class="admin-btn admin-btn-secondary" @click="previewIndex = Math.max(0, previewIndex - 1)" :disabled="previewIndex === 0">قبلی</button>
+                    <button type="button" class="admin-btn admin-btn-secondary" @click="previewIndex = Math.min(slides.length - 1, previewIndex + 1)" :disabled="previewIndex >= slides.length - 1">بعدی</button>
+                </div>
+            </footer>
+        </section>
+    </div>
 </div>
 <script>
 function homeSectionEditor(initialSlides) {
     return {
+        previewOpen: false,
+        previewIndex: 0,
         sectionType: @js(old('type', $section->type)),
         trustItems: @js(old('payload.items', data_get($section->payload, 'items', []))),
         slides: (Array.isArray(initialSlides) && initialSlides.length ? initialSlides : [{}]).map((slide, index) => ({ uid: 'saved-' + index, eyebrow: '', title: '', subtitle: '', cta_label: '', cta_url: '/shop', image_path: '', image_url: null, object_position: '50% 50%', preview: null, ...slide })),
