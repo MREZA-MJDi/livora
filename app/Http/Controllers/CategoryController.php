@@ -38,12 +38,13 @@ class CategoryController extends Controller
             'media', 'cardMedia', 'bannerMedia',
             'children' => fn ($query) => $query->where('is_active', true)
                 ->withCount(['products' => fn ($productQuery) => $productQuery->active()])
-                ->with(['cardMedia', 'latestActiveProduct.images.media',]),
+                ->with(['cardMedia', 'latestActiveProduct.images.media', 'latestActiveProduct.variants.images.media']),
             'latestActiveProduct.images.media',
             'latestActiveProduct.variants.images.media',
             'relatedCategories' => fn ($query) => $query
                 ->where('is_active', true)
-                ->withCount(['products' => fn ($productQuery) => $productQuery->active()]),
+                ->withCount(['products' => fn ($productQuery) => $productQuery->active()])
+                ->with(['latestActiveProduct.images.media', 'latestActiveProduct.variants.images.media']),
             'recommendedProducts' => fn ($query) => $query
                 ->where('status', 'active')
                 ->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('is_active', true))
