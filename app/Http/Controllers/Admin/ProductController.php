@@ -78,6 +78,8 @@ class ProductController extends Controller
             ]);
         }
 
+        $product->refresh();
+
         return back()->with('success', $product->is_home_hero
             ? 'محصول به اسلایدر صفحه اصلی اضافه شد.'
             : 'محصول از اسلایدر صفحه اصلی حذف شد.');
