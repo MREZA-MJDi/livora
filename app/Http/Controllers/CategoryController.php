@@ -18,7 +18,7 @@ class CategoryController extends Controller
             ->with([
                 'media', 'cardMedia',
                 'latestActiveProduct.images.media',
-                'latestActiveProduct.variants.images.media',
+                'latestActiveProduct.variants' => fn ($query) => $this->constrainCardVariantImage($query),
             ])
             ->orderBy('sort_order')
             ->paginate(12)
@@ -57,7 +57,7 @@ class CategoryController extends Controller
                         ->orderBy('sort_order')
                         ->orderBy('id')
                         ->limit(1),
-                    'variants.images.media',
+                    'variants' => fn ($variantQuery) => $this->constrainCardVariantImage($variantQuery),
                 ]),
         ]);
 
@@ -83,7 +83,6 @@ class CategoryController extends Controller
                     ->where('name', 'like', "%{$search}%")
                     ->orWhere('sku', 'like', "%{$search}%")
                     ->orWhere('short_description', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%")
                     ->orWhereHas('variants', fn ($variantQuery) => $variantQuery
                         ->where('type', 'like', "%{$search}%")
                         ->orWhere('name', 'like', "%{$search}%")
@@ -137,4 +136,23 @@ class CategoryController extends Controller
             'products' => $products,
         ]);
     }
+    /**
+     * Product cards need at most one image-bearing active variant, not every
+     * variant and every gallery image. Aggregate counts remain independent.
+     */
+    private function constrainCardVariantImage($query): void
+    {
+        $query->whereHas('images')
+            ->orderByDesc('stock')
+            ->orderBy('id')
+            ->limit(1)
+            ->with([
+                'images' => fn ($imageQuery) => $imageQuery
+                    ->orderBy('sort_order')
+                    ->orderBy('id')
+                    ->limit(1)
+                    ->with('media'),
+            ]);
+    }
+
 }
