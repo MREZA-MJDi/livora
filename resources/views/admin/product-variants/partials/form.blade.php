@@ -5,7 +5,7 @@
     $basePrice = (float) ($currentProduct->price ?? 0);
     $initialAdjustment = (float) old('price_adjustment', $productVariant->price_adjustment ?? 0);
     $initialFinalPrice = max(0, $basePrice + $initialAdjustment);
-    $selectedImageIds = collect(old('image_ids', $productVariant?->images?->pluck('id')->all() ?? []))
+    $selectedImageIds = collect(old('image_ids', ($productVariant ?? null)?->images?->pluck('id')->all() ?? []))
         ->map(fn ($id) => (int) $id)->all();
 @endphp
 
@@ -156,7 +156,7 @@
     </section>
 
     <div class="sticky bottom-3 z-20 flex flex-col-reverse gap-3 rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-white)]/95 p-3 shadow-xl backdrop-blur sm:flex-row sm:items-center sm:justify-between">
-        <a href="{{ $editing ? route('admin.products.edit', $productVariant->product_id) : route('admin.products.edit', $currentProductId ?: '') }}"
+        <a href="{{ $currentProductId ? route('admin.products.edit', $currentProductId) : route('admin.products.index') }}"
            class="admin-btn admin-btn-secondary text-center">انصراف</a>
         <button type="submit" class="admin-btn admin-btn-primary min-h-11 px-7">
             {{ $editing ? 'ذخیره تغییرات تنوع' : 'ثبت تنوع محصول' }}
