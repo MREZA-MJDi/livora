@@ -24,12 +24,12 @@
             return new Intl.NumberFormat('fa-IR').format(Math.max(0, Number(value) || 0));
         },
         syncPrice() {
-            this.adjustment = Number(this.finalPrice || 0) - Number(this.basePrice || 0);
+            this.finalPrice = Math.max(0, Number(this.basePrice || 0) + Number(this.adjustment || 0));
         },
         setProduct(select) {
             const option = select.options[select.selectedIndex];
             this.basePrice = Number(option?.dataset.price || 0);
-            if (!this.priceTouched) this.finalPrice = this.basePrice;
+            if (!this.priceTouched) this.adjustment = 0;
             this.syncPrice();
         }
      }">
@@ -112,7 +112,7 @@
                 <div class="flex items-center gap-3">
                     <input type="color" x-model="pickerColor" @input="colorHex = pickerColor"
                            class="h-11 w-14 cursor-pointer rounded-lg border border-[var(--admin-border)] bg-white p-1">
-                    <input id="color_hex" name="color_hex" x-model="colorHex"
+                    <input id="color_hex" name="color_hex" x-model="colorHex" :disabled="attributeType !== 'رنگ'"
                            class="admin-input text-left" dir="ltr" placeholder="#C8A27A"
                            maxlength="20">
                 </div>
@@ -138,8 +138,8 @@
         <div class="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2 sm:p-6">
             <div>
                 <label for="final_price" class="admin-label">مبلغ افزوده / کاهشی نسبت به قیمت پایه (تومان)</label>
-                <input id="final_price" type="number" min="0" step="1" class="admin-input"
-                       x-model.number="finalPrice" @input="priceTouched = true; syncPrice()" required>
+                <input id="final_price" type="number" step="1" class="admin-input"
+                       x-model.number="adjustment" @input="priceTouched = true; syncPrice()" required>
                 <p class="mt-1.5 text-xs text-[var(--admin-muted)]">قیمت پایه محصول: <span x-text="formatMoney(basePrice)"></span> تومان</p>
             </div>
             <div class="flex flex-col justify-center rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface-soft)] p-4">
