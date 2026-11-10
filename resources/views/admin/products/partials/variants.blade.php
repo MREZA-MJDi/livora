@@ -113,6 +113,28 @@
                                     >
                                         ویرایش
                                     </a>
+                                    <div x-data="{ confirmOpen: false }">
+                                        <button type="button" @click="confirmOpen = true" class="admin-btn admin-btn-danger px-3">حذف</button>
+                                        <div x-show="confirmOpen" x-cloak x-transition.opacity
+                                             class="fixed inset-0 z-[470] flex items-center justify-center bg-black/55 p-4"
+                                             @click.self="confirmOpen = false" @keydown.escape.window="confirmOpen = false">
+                                            <section class="w-full max-w-sm rounded-3xl border border-[var(--admin-border)] bg-[var(--admin-white)] p-6 shadow-2xl"
+                                                     role="dialog" aria-modal="true">
+                                                <h3 class="text-base font-bold text-[var(--admin-text)]">حذف این تنوع؟</h3>
+                                                <p class="mt-2 text-sm leading-7 text-[var(--admin-muted)]">
+                                                    گزینه «{{ $variant->value }}» حذف می‌شود. سفارش‌های ثبت‌شده قبلی تغییر نمی‌کنند.
+                                                </p>
+                                                <div class="mt-5 flex gap-2">
+                                                    <button type="button" @click="confirmOpen = false" class="admin-btn admin-btn-secondary flex-1">انصراف</button>
+                                                    <form action="{{ route('admin.product-variants.destroy', $variant) }}" method="POST" class="flex-1">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="admin-btn admin-btn-danger w-full">تأیید حذف</button>
+                                                    </form>
+                                                </div>
+                                            </section>
+                                        </div>
+                                    </div>
 
                                 </div>
 
