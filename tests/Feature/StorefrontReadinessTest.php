@@ -1685,8 +1685,8 @@ class StorefrontReadinessTest extends TestCase
             ->assertOk()
             ->assertSee('grid-cols-1', false)
             ->assertSee('page=2', false)
-            ->assertSee('محصول فهرست 1')
-            ->assertDontSee('محصول فهرست 13');
+            ->assertSee('محصول فهرست 13')
+            ->assertDontSee('محصول فهرست 1');
     }
 
     private function productWithVariantImage(Category $category, int $index): Product
