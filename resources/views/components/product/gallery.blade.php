@@ -34,6 +34,7 @@
         active: 0,
         zoom: false,
         selectedVariantId: null,
+        productName: @js($productName),
         baseImages: @js($baseImages),
         variantImageMap: @js($variantImageMap),
         images: [],
@@ -91,7 +92,7 @@
                         x-transition:enter-start="opacity-0 scale-[1.01]"
                         x-transition:enter-end="opacity-100 scale-100"
                         :src="image.url"
-                        :alt="image.alt || @js($productName)"
+                        :alt="image.alt || productName"
                         :loading="index === 0 ? 'eager' : 'lazy'"
                         decoding="async"
                         class="product-gallery-image absolute inset-0 h-full w-full object-contain"
@@ -169,7 +170,7 @@
                     ? 'ring-2 ring-[var(--sg-ink)] ring-offset-2 ring-offset-[var(--sg-cream)]'
                     : 'opacity-60 hover:opacity-100'"
             >
-                <img :src="image.url" :alt="image.alt || @js($productName)" loading="lazy" decoding="async"
+                <img :src="image.url" :alt="image.alt || productName" loading="lazy" decoding="async"
                      class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
             </button>
         </template>
