@@ -49,7 +49,10 @@ class ProductVariantController extends Controller
             ? ProductImage::query()->where('product_id', $selectedProductId)->orderBy('sort_order')->orderBy('id')->get()
             : collect();
 
-        return view('admin.product-variants.create', compact('products', 'selectedProductId', 'selectedProductImages'));
+        $defaultType = $request->query('type', 'اندازه');
+        $defaultName = $request->query('name', 'اندازه مبل');
+
+        return view('admin.product-variants.create', compact('products', 'selectedProductId', 'selectedProductImages', 'defaultType', 'defaultName'));
     }
 
     public function store(StoreProductVariantRequest $request): RedirectResponse
@@ -69,6 +72,16 @@ class ProductVariantController extends Controller
             report($exception);
 
             return back()->withInput()->with('error', 'تنوع ذخیره نشد. لطفاً دوباره تلاش کنید؛ هیچ تغییری ثبت نشده است.');
+        }
+
+        if ($request->boolean('continue')) {
+            return redirect()
+                ->route('admin.product-variants.create', [
+                    'product_id' => $variant->product_id,
+                    'type' => $variant->type,
+                    'name' => $variant->name,
+                ])
+                ->with('success', 'این گزینه ذخیره شد؛ حالا مقدار بعدی را وارد کن.');
         }
 
         return redirect()
