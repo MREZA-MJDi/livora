@@ -78,8 +78,20 @@ class Category extends Model
 
     public function getHomepageImageUrlAttribute(): ?string
     {
-        if ($image = $this->card_image_url) {
-            return $image;
+        $cardImage = $this->storedImageUrl(
+            $this->relationLoaded('cardMedia') ? $this->getRelation('cardMedia') : null,
+            $this->card_image
+        );
+        if ($cardImage) {
+            return $cardImage;
+        }
+
+        $defaultImage = $this->storedImageUrl(
+            $this->relationLoaded('media') ? $this->getRelation('media') : null,
+            $this->image
+        );
+        if ($defaultImage) {
+            return $defaultImage;
         }
 
         // Accessors must not trigger hidden relation queries while rendering cards.
