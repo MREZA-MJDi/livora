@@ -10,7 +10,7 @@
         <p class="admin-subtitle mt-2">مثلاً برای مبل آریا، اندازه «سه نفره» را با قیمت و موجودی خودش اضافه کن.</p>
     </div>
 
-    <form action="{{ route('admin.product-variants.store') }}" method="POST">
+    <form action="{{ route('admin.product-variants.store') }}" method="POST" enctype="multipart/form-data">
         @include('admin.product-variants.partials.form', [
             'products' => $products,
             'selectedProductId' => $selectedProductId ?? null,
