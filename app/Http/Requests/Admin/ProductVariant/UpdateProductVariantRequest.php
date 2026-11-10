@@ -54,6 +54,9 @@ class UpdateProductVariantRequest extends FormRequest
                 'regex:/^#[0-9A-Fa-f]{3,8}$/',
             ],
 
+            'variant_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'dimensions:min_width=400,min_height=500', 'max:10240'],
+            'variant_original_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'dimensions:min_width=400,min_height=500', 'max:10240'],
+
             'image_ids' => [
                 'nullable',
                 'array',
@@ -143,6 +146,10 @@ class UpdateProductVariantRequest extends FormRequest
 
             'color_hex.regex' => 'کد رنگ باید مانند #C8A27A باشد.',
 
+            'variant_image.image' => 'فایل تنوع باید یک تصویر معتبر باشد.',
+            'variant_image.mimes' => 'فرمت تصویر تنوع باید JPG، PNG یا WEBP باشد.',
+            'variant_image.max' => 'حجم تصویر تنوع نباید بیشتر از ۱۰ مگابایت باشد.',
+            'variant_image.dimensions' => 'ابعاد تصویر پس از برش باید حداقل ۴۰۰ در ۵۰۰ پیکسل باشد.',
             'image_ids.array' => 'تصاویر انتخاب‌شده نامعتبر هستند.',
             'image_ids.max' => 'حداکثر ۳۰ تصویر می‌توان برای یک تنوع انتخاب کرد.',
             'image_ids.*.exists' => 'یکی از تصاویر انتخاب‌شده متعلق به این محصول نیست.',
