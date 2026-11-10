@@ -14,7 +14,7 @@
         <a href="{{ route('admin.products.create') }}" class="admin-btn admin-btn-primary">+ افزودن محصول</a>
     </div>
 
-    <form method="GET" action="{{ route('admin.products.index') }}" class="mb-5 flex flex-col gap-2 rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card)] p-3 sm:flex-row">
+    <form method="GET" action="{{ route('admin.products.index') }}" class="mb-5 flex flex-col gap-2 rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-white)] p-3 sm:flex-row">
         <label for="product-search" class="sr-only">جستجوی محصول</label>
         <input id="product-search" name="search" value="{{ request('search') }}" type="search" maxlength="120" placeholder="جستجو بر اساس نام یا SKU..." class="admin-input min-w-0 flex-1">
         <div class="flex gap-2">
@@ -42,7 +42,7 @@
                     $heroSelectionDisabled = ! $product->is_home_hero
                         && (! $canSelectForHero || $homeHeroProductCount >= 10);
                 @endphp
-                <article class="min-w-0 overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card)] shadow-sm">
+                <article class="min-w-0 overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-white)] shadow-sm">
                     <div class="flex min-w-0 gap-3 p-3">
                         <a href="{{ route('admin.products.show', $product) }}" class="h-24 w-20 shrink-0 overflow-hidden rounded-xl bg-[var(--admin-surface)]">
                             @if($primaryImage)
@@ -96,7 +96,7 @@
             <nav class="mt-6" aria-label="صفحه‌بندی محصولات">{{ $products->withQueryString()->onEachSide(1)->links() }}</nav>
         @endif
     @else
-        <div class="admin-empty rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card)] p-10 text-center">
+        <div class="admin-empty rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-white)] p-10 text-center">
             <h3 class="text-sm font-semibold text-[var(--admin-text)]">{{ request()->filled('search') ? 'محصولی با این جستجو پیدا نشد.' : 'هنوز محصولی ثبت نشده است.' }}</h3>
             <p class="mt-2 text-xs text-[var(--admin-muted)]">عبارت جستجو را تغییر دهید یا اولین محصول را ایجاد کنید.</p>
             <a href="{{ route('admin.products.create') }}" class="admin-btn admin-btn-primary mt-5">افزودن محصول</a>
