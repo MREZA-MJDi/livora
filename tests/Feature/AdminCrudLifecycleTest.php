@@ -731,6 +731,18 @@ class AdminCrudLifecycleTest extends TestCase
         ]);
     }
 
+    public function test_home_section_editor_offers_real_sources_and_floating_slide_preview(): void
+    {
+        $this->actingAs($this->admin)
+            ->get(route('admin.home-sections.create'))
+            ->assertOk()
+            ->assertSee('پرفروش‌ترین محصولات')
+            ->assertSee('محصولات ویژه')
+            ->assertSee('پیش‌نمایش شناور')
+            ->assertSee('LIVE PREVIEW')
+            ->assertSee('payload[product_source]');
+    }
+
     public function test_variant_cover_upload_is_cropped_and_kept_out_of_the_base_product_gallery(): void
     {
         $category = $this->createCategory('variant-cover-scope-category');
