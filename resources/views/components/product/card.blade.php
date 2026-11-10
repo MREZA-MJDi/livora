@@ -5,6 +5,18 @@
 @php
     $image = $product->images?->first()?->card_url;
 
+    if (blank($image)) {
+        $imageVariant = $product->relationLoaded('variants')
+            ? $product->variants->first(fn ($variant) => (int) $variant->stock > 0 && $variant->images->isNotEmpty())
+            : $product->variants()
+                ->where('stock', '>', 0)
+                ->with('images.media')
+                ->get()
+                ->first(fn ($variant) => $variant->images->isNotEmpty());
+
+        $image = $imageVariant?->images?->first()?->card_url;
+    }
+
     $hasDiscount =
         $product->compare_at_price !== null
         && (float) $product->compare_at_price > (float) $product->price;
