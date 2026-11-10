@@ -2375,7 +2375,6 @@ body {
 .storefront-content .sg-category-index-tile__media {
     aspect-ratio: 4 / 3;
     overflow: hidden;
-    border-radius: inherit;
 }
 
 .storefront-content .sg-category-index-tile__media > img {
