@@ -62,8 +62,8 @@
         images: @js(
             $resolvedImages->map(function ($image) use ($productName) {
                 return [
-                    'url' => $image->url,
-                    'alt' => $image->alt_text ?? $productName,
+                    'url' => $image->detail_url,
+                    'alt' => $image->alt ?: $productName,
                 ];
             })->values()
         ),
@@ -104,11 +104,9 @@
 
             if (indexes.length) {
                 this.active = Number(indexes[0]) || 0;
-            } else if (
-                ['color', 'colour', 'رنگ'].includes(
-                    String(detail.type ?? '').toLowerCase()
-                )
-            ) {
+            } else {
+                // Every selected option owns its gallery state. If it has no
+                // dedicated image, deterministically fall back to the product cover.
                 this.active = 0;
             }
         },
@@ -154,8 +152,8 @@
                         x-transition:enter="transition duration-500"
                         x-transition:enter-start="opacity-0 scale-[1.02]"
                         x-transition:enter-end="opacity-100 scale-100"
-                        src="{{ $image->url }}"
-                        alt="{{ $image->alt_text ?? $productName }}"
+                        src="{{ $image->detail_url }}"
+                        alt="{{ $image->alt ?: $productName }}"
                         @if($index !== 0)
                         loading="lazy"
                         @endif
