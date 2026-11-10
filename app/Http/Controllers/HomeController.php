@@ -23,7 +23,7 @@ class HomeController extends Controller
             ->reject(fn (HomeSection $section) => $section->key === 'final-cta')
             ->values();
 
-        $usedProductIds = [];
+        $hasProductSection = false;
 
         foreach ($sections as $section) {
             $payload = $section->payload ?? [];
@@ -34,9 +34,12 @@ class HomeController extends Controller
             };
 
             if (in_array($section->type, ['hero', 'products'], true)) {
-                $products = $productResolver->resolve($section, $usedProductIds);
+                $products = $productResolver->resolve($section);
                 $section->setRelation('products', $products);
-                $usedProductIds = array_merge($usedProductIds, $products->modelKeys());
+
+                if ($section->type === 'products' && $products->isNotEmpty()) {
+                    $hasProductSection = true;
+                }
             }
 
             if ($section->type === 'categories') {
@@ -56,6 +59,27 @@ class HomeController extends Controller
                     ->get();
 
                 $section->setRelation('categories', $categories);
+            }
+        }
+
+        if (! $hasProductSection) {
+            $latestSection = new HomeSection([
+                'key' => 'latest-products-fallback',
+                'type' => 'products',
+                'enabled' => true,
+                'sort_order' => 60,
+                'eyebrow' => 'تازه‌های فروشگاه',
+                'title' => 'جدیدترین محصولات',
+                'subtitle' => 'آخرین محصولات فعال ثبت‌شده در کاتالوگ فروشگاه.',
+                'cta_label' => 'مشاهده همه محصولات',
+                'cta_url' => '/shop',
+                'payload' => ['product_source' => 'latest', 'limit' => 8],
+            ]);
+
+            $latestProducts = $productResolver->resolve($latestSection);
+            if ($latestProducts->isNotEmpty()) {
+                $latestSection->setRelation('products', $latestProducts);
+                $sections->push($latestSection);
             }
         }
 
