@@ -9,6 +9,7 @@ use App\Models\Address;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\ProductVariant;
+use App\Models\HomeSection;
 use App\Services\Inventory\OrderInventoryService;
 use App\Models\Category;
 use App\Models\Product;
@@ -521,6 +522,107 @@ class StorefrontReadinessTest extends TestCase
                 return $categories instanceof LengthAwarePaginator
                     && $categories->perPage() === 12
                     && $categories->total() === 13;
+            });
+    }
+
+    public function test_category_product_listing_uses_server_side_pagination_and_keeps_filters(): void
+    {
+        $category = $this->category([
+            'name' => 'دسته صفحه‌بندی محصولات',
+            'slug' => 'category-products-pagination',
+        ]);
+        $products = [];
+
+        for ($i = 1; $i <= 13; $i++) {
+            $products[] = $this->product($category, [
+                'name' => 'محصول دسته‌بندی ' . str_pad((string) $i, 2, '0', STR_PAD_LEFT),
+                'slug' => 'category-page-product-' . $i,
+                'installment_enabled' => true,
+            ]);
+        }
+
+        $this->get(route('categories.show', [
+            'category' => $category->slug,
+            'installment' => '1',
+            'page' => 2,
+        ]))
+            ->assertOk()
+            ->assertViewHas('products', function ($paginator) {
+                return $paginator instanceof LengthAwarePaginator
+                    && $paginator->perPage() === 12
+                    && $paginator->total() === 13
+                    && $paginator->currentPage() === 2;
+            })
+            ->assertSee($products[12]->name)
+            ->assertDontSee($products[0]->name)
+            ->assertSee('installment=1', false);
+    }
+
+    public function test_homepage_sections_never_fall_back_to_products_that_do_not_match_their_title(): void
+    {
+        $category = $this->category();
+        $installmentProduct = $this->product($category, [
+            'name' => 'محصول واقعی اقساطی صفحه اصلی',
+            'slug' => 'homepage-real-installment',
+            'installment_enabled' => true,
+        ]);
+        $unrelatedProduct = $this->product($category, [
+            'name' => 'محصول غیر اقساطی و غیر ویژه',
+            'slug' => 'homepage-unrelated-product',
+        ]);
+
+        $variant = ProductVariant::query()->create([
+            'product_id' => $installmentProduct->id,
+            'type' => 'color',
+            'name' => 'رنگ',
+            'value' => 'کرم',
+            'sku' => 'HOME-REAL-INSTALLMENT-CREAM',
+            'price_adjustment' => 0,
+            'stock' => 3,
+            'is_active' => true,
+        ]);
+        $variantImage = ProductImage::query()->create([
+            'product_id' => $installmentProduct->id,
+            'path' => 'https://images.example.test/homepage/variant-cover.webp',
+            'alt' => 'تصویر وریانت محصول اقساطی',
+            'sort_order' => 0,
+            'is_primary' => false,
+            'is_variant_only' => true,
+        ]);
+        $variant->images()->attach($variantImage->id);
+
+        HomeSection::query()->create([
+            'key' => 'homepage-installments',
+            'type' => 'products',
+            'enabled' => true,
+            'sort_order' => 10,
+            'title' => 'محصولات اقساطی واقعی',
+            'payload' => ['product_source' => 'installments', 'limit' => 8],
+        ]);
+        HomeSection::query()->create([
+            'key' => 'featured',
+            'type' => 'products',
+            'enabled' => true,
+            'sort_order' => 20,
+            'title' => 'محصولات ویژه واقعی',
+            'payload' => ['product_source' => 'latest', 'limit' => 8],
+        ]);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee($installmentProduct->name)
+            ->assertSee('https://images.example.test/homepage/variant-cover.webp', false)
+            ->assertDontSee($unrelatedProduct->name)
+            ->assertViewHas('homeSections', function ($sections) use ($installmentProduct) {
+                $installments = $sections->firstWhere('key', 'homepage-installments');
+                $featured = $sections->firstWhere('key', 'featured');
+                $product = $installments?->products?->first();
+
+                return $installments?->products?->modelKeys() === [$installmentProduct->id]
+                    && $featured?->products?->isEmpty()
+                    && $product?->relationLoaded('variants')
+                    && $product->variants->first()?->relationLoaded('images')
+                    && $product->variants->first()?->images->first()?->relationLoaded('media');
             });
     }
 
