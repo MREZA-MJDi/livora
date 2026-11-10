@@ -8,14 +8,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('products', function (Blueprint $table) {
-            if (! Schema::hasColumn('products', 'is_home_hero')) {
-                $table->boolean('is_home_hero')->default(false)->after('is_new');
-            }
-            if (! Schema::hasColumn('products', 'home_hero_sort_order')) {
-                $table->unsignedSmallInteger('home_hero_sort_order')->nullable()->after('is_home_hero');
-            }
-        });
+        $hasHeroFlag = Schema::hasColumn('products', 'is_home_hero');
+        $hasHeroOrder = Schema::hasColumn('products', 'home_hero_sort_order');
+
+        if (! $hasHeroFlag || ! $hasHeroOrder) {
+            Schema::table('products', function (Blueprint $table) use ($hasHeroFlag, $hasHeroOrder) {
+                if (! $hasHeroFlag) {
+                    $table->boolean('is_home_hero')->default(false)->after('is_new');
+                }
+                if (! $hasHeroOrder) {
+                    $table->unsignedSmallInteger('home_hero_sort_order')->nullable()->after('is_home_hero');
+                }
+            });
+        }
 
         $indexes = collect(Schema::getIndexes('products'))->pluck('name')->all();
         if (! in_array('products_home_hero_order_idx', $indexes, true)) {
@@ -34,13 +39,16 @@ return new class extends Migration
             });
         }
 
-        Schema::table('products', function (Blueprint $table) {
-            if (Schema::hasColumn('products', 'home_hero_sort_order')) {
-                $table->dropColumn('home_hero_sort_order');
-            }
-            if (Schema::hasColumn('products', 'is_home_hero')) {
-                $table->dropColumn('is_home_hero');
-            }
-        });
+        $hasHeroFlag = Schema::hasColumn('products', 'is_home_hero');
+        $hasHeroOrder = Schema::hasColumn('products', 'home_hero_sort_order');
+
+        if ($hasHeroFlag || $hasHeroOrder) {
+            Schema::table('products', function (Blueprint $table) use ($hasHeroFlag, $hasHeroOrder) {
+                $columns = [];
+                if ($hasHeroOrder) $columns[] = 'home_hero_sort_order';
+                if ($hasHeroFlag) $columns[] = 'is_home_hero';
+                if ($columns !== []) $table->dropColumn($columns);
+            });
+        }
     }
 };
