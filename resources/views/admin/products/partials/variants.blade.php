@@ -72,23 +72,10 @@
                             </td>
 
                             <td>
-                                @php
-                                    $priceAdjustment = (float) $variant->price_adjustment;
-                                @endphp
-
-                                @if($priceAdjustment > 0)
-                                    +{{ number_format($priceAdjustment) }}
-                                    <span class="text-xs text-[var(--admin-muted)]">
-                                        تومان
-                                    </span>
-                                @elseif($priceAdjustment < 0)
-                                    {{ number_format($priceAdjustment) }}
-                                    <span class="text-xs text-[var(--admin-muted)]">
-                                        تومان
-                                    </span>
-                                @else
-                                    بدون تغییر
-                                @endif
+                                <span class="font-semibold text-[var(--admin-text)]">
+                                    {{ number_format(max(0, (float) $product->price + (float) $variant->price_adjustment)) }}
+                                </span>
+                                <span class="text-xs text-[var(--admin-muted)]">تومان · قیمت نهایی</span>
                             </td>
 
                             <td>
