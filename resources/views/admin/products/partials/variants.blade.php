@@ -50,6 +50,12 @@
                         <tr>
 
                             <td>
+                                @if($variant->images->isNotEmpty())
+                                    <img src="{{ $variant->images->first()->thumbnail_url }}"
+                                         alt="{{ $variant->images->first()->alt ?: $variant->value }}"
+                                         class="mb-2 h-14 w-12 rounded-lg border border-[var(--admin-border)] object-cover"
+                                         loading="lazy">
+                                @endif
                                 <div class="text-[11px] font-medium text-[var(--admin-muted)]">{{ $variant->type }}</div>
                                 <div class="mt-1 font-semibold text-[var(--admin-text)]">
                                     {{ $variant->name ?? 'تنوع محصول' }}
