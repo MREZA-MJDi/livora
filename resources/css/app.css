@@ -2525,6 +2525,35 @@ body {
     font-weight: 450;
     line-height: 2.05;
 }
+
+.sg-home-hero__price {
+    margin-top: .8rem;
+    color: var(--sg-accent);
+    font-size: 1.15rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+.sg-home-hero__price[hidden] {
+    display: none;
+}
+
+@keyframes sg-home-hero-rise {
+    from {
+        opacity: 0;
+        transform: translateY(22px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.sg-home-hero.is-animating .sg-home-hero__content,
+.sg-home-hero.is-animating .sg-home-hero__media {
+    animation: sg-home-hero-rise .58s cubic-bezier(.2, .75, .25, 1) both;
+}
+.sg-home-hero.is-animating .sg-home-hero__media {
+    animation-delay: .04s;
+}
 .sg-home-hero__proof {
     display: flex;
     flex-wrap: wrap;
@@ -2658,7 +2687,10 @@ body {
 @media (prefers-reduced-motion: reduce) {
     .sg-home-hero__dot,
     .sg-home-hero__image,
-    .sg-home-hero__cta {
+    .sg-home-hero__cta,
+    .sg-home-hero__content,
+    .sg-home-hero__media {
         transition: none;
+        animation: none !important;
     }
 }
