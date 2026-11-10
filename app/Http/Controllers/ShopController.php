@@ -19,7 +19,7 @@ class ShopController extends Controller
                 'category',
                 'images.media',
             ])
-            ->withCount('allVariants')
+            ->withCount(['allVariants', 'variants as available_variants_count' => fn ($variantQuery) => $variantQuery->where('stock', '>', 0)])
             ->active()
             ->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('is_active', true));
 
@@ -39,7 +39,12 @@ class ShopController extends Controller
                     ->where('name', 'like', "%{$search}%")
                     ->orWhere('sku', 'like', "%{$search}%")
                     ->orWhere('short_description', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhereHas('variants', fn ($variantQuery) => $variantQuery
+                        ->where('type', 'like', "%{$search}%")
+                        ->orWhere('name', 'like', "%{$search}%")
+                        ->orWhere('value', 'like', "%{$search}%")
+                        ->orWhere('sku', 'like', "%{$search}%"));
             });
         }
 
