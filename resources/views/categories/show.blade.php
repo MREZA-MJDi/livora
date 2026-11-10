@@ -239,7 +239,7 @@
                         </div>
 
                         <div class="mt-14">
-                            {{ $products->withQueryString()->links() }}
+                            {{ $products->withQueryString()->onEachSide(1)->links('pagination.silla') }}
                         </div>
 
                     @else
