@@ -76,7 +76,7 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
                 'banner_image' => UploadedFile::fake()->image('sofa-banner.jpg', 1200, 500),
                 'banner_image_alt' => 'بنر اختصاصی معرفی مبل',
             ])
-            ->assertRedirect(route('admin.products.index'));
+            ->assertRedirect(route('admin.products.edit', Product::query()->where('slug', 'sofa-with-banner')->value('id')));
 
         $product = Product::query()->where('slug', 'sofa-with-banner')->firstOrFail();
 
