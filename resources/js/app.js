@@ -989,6 +989,9 @@ Alpine.start();
             if (!incoming) throw new Error('Catalog results container was not found');
 
             target.replaceWith(incoming);
+            // New card nodes arrive through AJAX; attach image load/error handlers
+            // again so skeletons cannot cover already-loaded images indefinitely.
+            initCardImageSkeletons();
             replaceAux(parsed, form?.dataset.auxSelectors || '');
             if (historyMode === 'push') history.pushState({}, '', url);
             else if (historyMode === 'replace') history.replaceState({}, '', url);
