@@ -116,7 +116,19 @@ class ProductVariantController extends Controller
         $productVariant->load('images');
         $products = Product::query()->orderBy('name')->get(['id', 'name', 'price']);
         $selectedProductId = (int) $productVariant->product_id;
-        $selectedProductImages = ProductImage::query()->where('product_id', $selectedProductId)->orderBy('sort_order')->orderBy('id')->get();
+
+        // Keep currently assigned gallery order at the top of the checkbox list.
+        // The submitted checkbox order becomes the pivot sort order on save.
+        $assignedImages = $productVariant->images;
+        $assignedImageIds = $assignedImages->modelKeys();
+        $remainingImages = ProductImage::query()
+            ->where('product_id', $selectedProductId)
+            ->when($assignedImageIds !== [], fn ($query) => $query->whereNotIn('id', $assignedImageIds))
+            ->orderByDesc('is_primary')
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get();
+        $selectedProductImages = $assignedImages->concat($remainingImages)->values();
 
         return view('admin.product-variants.edit', compact('productVariant', 'products', 'selectedProductId', 'selectedProductImages'));
     }
