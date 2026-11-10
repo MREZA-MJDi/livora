@@ -1642,6 +1642,53 @@ class StorefrontReadinessTest extends TestCase
         }
     }
 
+
+    public function test_category_product_listing_is_paginated_and_keeps_variant_card_images(): void
+    {
+        $category = $this->category([
+            'name' => 'دسته‌بندی صفحه‌بندی',
+            'slug' => 'paginated-category-products',
+        ]);
+
+        $variantImageProduct = $this->productWithVariantImage($category, 1);
+
+        for ($index = 2; $index <= 14; $index++) {
+            $this->product($category, [
+                'name' => 'محصول صفحه‌بندی '.$index,
+                'slug' => 'paginated-product-'.$index,
+            ]);
+        }
+
+        $this->get(route('categories.show', $category->slug))
+            ->assertOk()
+            ->assertSee($variantImageProduct->name)
+            ->assertSee('https://images.example.test/query/variant-1.webp')
+            ->assertSee('page=2', false)
+            ->assertDontSee('محصول صفحه‌بندی 14');
+    }
+
+    public function test_admin_product_catalog_uses_compact_cards_and_preserves_search_pagination(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $category = $this->category();
+
+        for ($index = 1; $index <= 13; $index++) {
+            $this->product($category, [
+                'name' => 'محصول فهرست '.$index,
+                'slug' => 'admin-catalog-product-'.$index,
+                'sku' => 'ADMIN-CATALOG-'.$index,
+            ]);
+        }
+
+        $this->actingAs($admin)
+            ->get(route('admin.products.index', ['search' => 'فهرست']))
+            ->assertOk()
+            ->assertSee('grid-cols-1', false)
+            ->assertSee('page=2', false)
+            ->assertSee('محصول فهرست 1')
+            ->assertDontSee('محصول فهرست 13');
+    }
+
     private function productWithVariantImage(Category $category, int $index): Product
     {
         $product = $this->product($category, [
