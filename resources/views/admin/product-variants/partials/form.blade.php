@@ -16,6 +16,9 @@
         basePrice: {{ $basePrice }},
         adjustment: {{ $initialAdjustment }},
         finalPrice: {{ $initialFinalPrice }},
+        attributeType: @js(old('type', $productVariant->type ?? ($defaultType ?? 'اندازه'))),
+        colorHex: @js(old('color_hex', $productVariant->color_hex ?? '')),
+        pickerColor: @js(old('color_hex', $productVariant->color_hex ?? '#C8A27A')),
         priceTouched: false,
         formatMoney(value) {
             return new Intl.NumberFormat('fa-IR').format(Math.max(0, Number(value) || 0));
@@ -62,28 +65,40 @@
         </div>
         <div class="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2 sm:p-6">
             <div>
-                <label for="type" class="admin-label">نوع ویژگی</label>
-                <input id="type" name="type" class="admin-input" maxlength="255"
-                       value="{{ old('type', $productVariant->type ?? ($defaultType ?? 'اندازه')) }}" placeholder="مثلاً اندازه" required>
+                <label for="type" class="admin-label">نوع تنوع</label>
+                <select id="type" name="type" class="admin-select" x-model="attributeType" required>
+                    @foreach(['رنگ', 'جنس', 'اندازه', 'مدل', 'نوع پارچه', 'سایر'] as $typeOption)
+                        <option value="{{ $typeOption }}">{{ $typeOption }}</option>
+                    @endforeach
+                    @php
+                        $storedType = old('type', $productVariant->type ?? ($defaultType ?? 'اندازه'));
+                        $standardTypes = ['رنگ', 'جنس', 'اندازه', 'مدل', 'نوع پارچه', 'سایر'];
+                    @endphp
+                    @if(!in_array($storedType, $standardTypes, true))
+                        <option value="{{ $storedType }}" selected>{{ $storedType }} (موجود)</option>
+                    @endif
+                </select>
+                <p class="mt-1.5 text-xs text-[var(--admin-muted)]">گزینه‌های هم‌نوع در صفحه محصول زیر یک عنوان گروه‌بندی می‌شوند؛ برای همه رنگ‌ها همین نوع را انتخاب کن.</p>
                 @error('type')<p class="mt-2 text-xs text-[var(--admin-danger)]">{{ $message }}</p>@enderror
             </div>
             <div>
-                <label for="name" class="admin-label">عنوان ویژگی</label>
+                <label for="name" class="admin-label">عنوانی که به مشتری نمایش داده می‌شود</label>
                 <input id="name" name="name" class="admin-input" maxlength="255"
-                       value="{{ old('name', $productVariant->name ?? ($defaultName ?? 'اندازه مبل')) }}" placeholder="مثلاً اندازه مبل" required>
+                       value="{{ old('name', $productVariant->name ?? ($defaultName ?? 'اندازه مبل')) }}" placeholder="مثلاً رنگ بدنه" required>
+                <p class="mt-1.5 text-xs text-[var(--admin-muted)]">برای تمام گزینه‌های یک گروه، عنوان یکسان وارد کن؛ مثلاً «رنگ بدنه».</p>
                 @error('name')<p class="mt-2 text-xs text-[var(--admin-danger)]">{{ $message }}</p>@enderror
             </div>
             <div class="sm:col-span-2">
-                <label for="value" class="admin-label">گزینه‌ای که مشتری می‌بیند</label>
+                <label for="value" class="admin-label">مقدار این تنوع</label>
                 <input id="value" name="value" class="admin-input" maxlength="255"
-                       value="{{ old('value', $productVariant->value ?? '') }}" placeholder="مثلاً سه نفره" required>
-                <p class="mt-1.5 text-xs text-[var(--admin-muted)]">این عنوان دقیقاً در صفحه محصول به مشتری نمایش داده می‌شود.</p>
+                       value="{{ old('value', $productVariant->value ?? '') }}" placeholder="مثلاً گردویی، مخمل، سه‌نفره" required>
+                <p class="mt-1.5 text-xs text-[var(--admin-muted)]">مثلاً برای نوع «جنس»، مقدار «چوب راش»؛ برای نوع «رنگ»، مقدار «گردویی».</p>
                 @error('value')<p class="mt-2 text-xs text-[var(--admin-danger)]">{{ $message }}</p>@enderror
             </div>
             <div>
-                <label for="sku" class="admin-label">کد کالا (اختیاری)</label>
+                <label for="sku" class="admin-label">کد اختصاصی این گزینه (اختیاری)</label>
                 <input id="sku" name="sku" class="admin-input text-left" dir="ltr"
-                       value="{{ old('sku', $productVariant->sku ?? '') }}" placeholder="SOFA-3-SEAT">
+                       value="{{ old('sku', $productVariant->sku ?? '') }}" placeholder="SOFA-WALNUT-3">
                 @error('sku')<p class="mt-2 text-xs text-[var(--admin-danger)]">{{ $message }}</p>@enderror
             </div>
             <div>
@@ -92,12 +107,20 @@
                        value="{{ old('stock', $productVariant->stock ?? 0) }}" required>
                 @error('stock')<p class="mt-2 text-xs text-[var(--admin-danger)]">{{ $message }}</p>@enderror
             </div>
-            <div>
-                <label for="color_hex" class="admin-label">کد رنگ (فقط در صورت نیاز)</label>
-                <input id="color_hex" name="color_hex" class="admin-input text-left" dir="ltr"
-                       value="{{ old('color_hex', $productVariant->color_hex ?? '') }}" placeholder="#C8A27A">
+            <div x-show="attributeType === 'رنگ'" x-cloak>
+                <label for="color_hex" class="admin-label">رنگ نمایشی</label>
+                <div class="flex items-center gap-3">
+                    <input type="color" x-model="pickerColor" @input="colorHex = pickerColor"
+                           class="h-11 w-14 cursor-pointer rounded-lg border border-[var(--admin-border)] bg-white p-1">
+                    <input id="color_hex" name="color_hex" x-model="colorHex"
+                           class="admin-input text-left" dir="ltr" placeholder="#C8A27A"
+                           maxlength="20">
+                </div>
+                <p class="mt-1.5 text-xs text-[var(--admin-muted)]">رنگ را انتخاب کن یا کد HEX را وارد کن تا به شکل نمونه‌رنگ در سایت نمایش داده شود.</p>
                 @error('color_hex')<p class="mt-2 text-xs text-[var(--admin-danger)]">{{ $message }}</p>@enderror
             </div>
+            <input type="hidden" name="color_hex" value="" :disabled="attributeType === 'رنگ'">
+
             <div class="flex items-center gap-3 rounded-xl border border-[var(--admin-border)] px-4 py-3">
                 <input id="is_active" name="is_active" type="checkbox" value="1" class="h-4 w-4"
                        @checked(old('is_active', $productVariant->is_active ?? true))>
@@ -110,19 +133,19 @@
         <div class="border-b border-[var(--admin-border)] bg-[var(--admin-surface-soft)] px-5 py-4 sm:px-6">
             <p class="text-xs font-semibold text-[var(--admin-accent)]">قیمت این گزینه</p>
             <h3 class="mt-1 text-base font-bold text-[var(--admin-text)]">قیمت نهایی را وارد کن</h3>
-            <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">به‌جای محاسبه اختلاف قیمت، مبلغی را که مشتری باید پرداخت کند وارد کن.</p>
+            <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">این مبلغ، تغییر قیمت این گزینه نسبت به قیمت پایه محصول است؛ در انتخاب چند ویژگی، تغییر قیمت گزینه‌ها با هم جمع می‌شود.</p>
         </div>
         <div class="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2 sm:p-6">
             <div>
-                <label for="final_price" class="admin-label">قیمت فروش این گزینه (تومان)</label>
+                <label for="final_price" class="admin-label">مبلغ افزوده / کاهشی نسبت به قیمت پایه (تومان)</label>
                 <input id="final_price" type="number" min="0" step="1" class="admin-input"
                        x-model.number="finalPrice" @input="priceTouched = true; syncPrice()" required>
                 <p class="mt-1.5 text-xs text-[var(--admin-muted)]">قیمت پایه محصول: <span x-text="formatMoney(basePrice)"></span> تومان</p>
             </div>
             <div class="flex flex-col justify-center rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface-soft)] p-4">
-                <span class="text-xs text-[var(--admin-muted)]">قیمت نهایی برای مشتری</span>
+                <span class="text-xs text-[var(--admin-muted)]">قیمت تخمینی این گزینه</span>
                 <strong class="mt-2 text-xl text-[var(--admin-text)]" x-text="formatMoney(finalPrice) + ' تومان'"></strong>
-                <span class="mt-1 text-xs text-[var(--admin-muted)]">این مبلغ در سبد خرید هم ثبت می‌شود.</span>
+                <span class="mt-1 text-xs text-[var(--admin-muted)]">مبلغ نهایی پس از جمع‌شدن تغییر قیمت تمام ویژگی‌های انتخابی در سبد خرید محاسبه می‌شود.</span>
             </div>
             <input type="hidden" name="price_adjustment" :value="adjustment">
             @error('price_adjustment')<p class="text-xs text-[var(--admin-danger)]">{{ $message }}</p>@enderror
