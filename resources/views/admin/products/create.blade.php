@@ -19,6 +19,11 @@
         </p>
     </div>
 
+    <div class="mb-6 rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface-soft)] p-4 text-sm leading-7 text-[var(--admin-text-soft)]">
+        <strong class="block text-[var(--admin-text)]">مسیر درست ثبت محصول</strong>
+        ابتدا اطلاعات اصلی و قیمت پایه را ذخیره کن. بعد از ایجاد محصول، در صفحه ویرایش همان محصول می‌توانی رنگ، جنس، اندازه و مدل را همراه با موجودی، تغییر قیمت و تصاویر اختصاصی تعریف کنی.
+    </div>
+
     <form
         action="{{ route('admin.products.store') }}"
         method="POST"

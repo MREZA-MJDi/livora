@@ -74,7 +74,7 @@ class CartController extends Controller
                 $validated['product_variant_id'] ?? null
             );
 
-            $requiredTypes = $product->allVariants()
+            $requiredTypes = $product->variants()
                 ->select('type')
                 ->distinct()
                 ->pluck('type')

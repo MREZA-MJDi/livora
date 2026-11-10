@@ -73,8 +73,10 @@ class ProductController extends Controller
         }
 
         try {
-            DB::transaction(function () use ($request, $data, $relatedProductIds, $mediaId, $imageFile, $originalImageFile, $imagePath, $variantSourcePath, $bannerMedia): void {
+            $createdProductId = null;
+            DB::transaction(function () use ($request, $data, $relatedProductIds, $mediaId, $imageFile, $originalImageFile, $imagePath, $variantSourcePath, $bannerMedia, &$createdProductId): void {
                 $product = Product::create($data);
+                $createdProductId = $product->id;
                 $product->relatedProducts()->sync(array_values(array_diff($relatedProductIds, [$product->id])));
 
                 if ($bannerMedia) {
@@ -116,7 +118,7 @@ class ProductController extends Controller
             throw $exception;
         }
 
-        return redirect()->route('admin.products.index')->with('success', 'محصول با موفقیت ایجاد شد.');
+        return redirect()->route('admin.products.edit', $createdProductId)->with('success', 'محصول با موفقیت ایجاد شد. حالا می‌توانی تنوع‌های رنگ، جنس و اندازه را ثبت کنی.');
     }
 
     public function show(Product $product): View
@@ -127,7 +129,7 @@ class ProductController extends Controller
 
     public function edit(Product $product, ContentSeoAnalyzer $seoAnalyzer): View
     {
-        $product->load(['images.media', 'relatedProducts:id,name']);
+        $product->load(['images.media', 'allVariants', 'relatedProducts:id,name']);
         $categories = Category::query()->orderBy('name')->get();
 
         return view('admin.products.edit', [

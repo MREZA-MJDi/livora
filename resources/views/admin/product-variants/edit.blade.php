@@ -4,36 +4,17 @@
 @section('page_title', 'ویرایش تنوع محصول')
 
 @section('content')
-
-    <div class="mb-8">
-
-        <div class="mb-2 text-xs font-medium text-[var(--admin-accent)]">
-            CATALOG / PRODUCT VARIANTS / EDIT
-        </div>
-
-        <h2 class="admin-title">
-            ویرایش تنوع محصول
-        </h2>
-
-        <p class="admin-subtitle mt-2">
-            اطلاعات تنوع «{{ $productVariant->name }}» را ویرایش کنید.
-        </p>
-
+    <div class="mx-auto mb-6 w-full max-w-5xl">
+        <div class="mb-2 text-xs font-medium text-[var(--admin-accent)]">محصولات / تنوع‌ها / ویرایش</div>
+        <h2 class="admin-title">ویرایش گزینه محصول</h2>
+        <p class="admin-subtitle mt-2">مشخصات، قیمت، موجودی و تصاویر این گزینه را به‌روزرسانی کن.</p>
     </div>
 
-
-    <form
-        action="{{ route('admin.product-variants.update', $productVariant) }}"
-        method="POST"
-    >
-
+    <form action="{{ route('admin.product-variants.update', $productVariant) }}" method="POST">
         @method('PUT')
-
         @include('admin.product-variants.partials.form', [
             'products' => $products,
             'productVariant' => $productVariant,
         ])
-
     </form>
-
 @endsection

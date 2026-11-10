@@ -29,4 +29,8 @@
         @include('admin.products.partials.form')
     </form>
 
+    <div class="mt-8">
+        @include('admin.products.partials.variants', ['product' => $product])
+    </div>
+
 @endsection

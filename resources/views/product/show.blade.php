@@ -223,8 +223,10 @@
     <div
         class="bg-[var(--sg-cream)] pb-28 lg:pb-0"
         x-data="{
-        quantity: {{ max(1, min((int) $product->stock, 1)) }}
+        quantity: {{ max(1, min((int) $product->stock, 1)) }},
+        hasSelectedVariant: false
     }"
+        @product-variant-selected.window="hasSelectedVariant = true"
     >
 
         {{-- =========================================================
@@ -414,7 +416,9 @@
 
                         {{-- Compact installment summary. Full cheque schedule stays optional. --}}
                         @if($installmentEnabled)
-                            <section class="product-installment-summary mt-5 rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-3 sm:p-4" aria-label="خلاصه خرید اقساطی">
+                            <section x-show="!hasSelectedVariant"
+                                  x-cloak
+                                  class="product-installment-summary mt-5 rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-3 sm:p-4" aria-label="خلاصه خرید اقساطی">
                                 <div class="flex flex-wrap items-center justify-between gap-2">
                                     <div class="flex items-center gap-2">
                                         <span class="product-installment-summary__icon" aria-hidden="true">٪</span>
@@ -539,7 +543,7 @@
 
                                         <p class="mt-1 text-[11px] text-[var(--sg-stone)]">
                                             موجودی:
-                                            {{ number_format($product->stock) }}
+                                            {{ $variantGroups->isNotEmpty() ? 'پس از انتخاب ویژگی‌ها بررسی می‌شود' : number_format($product->stock) }}
                                         </p>
 
                                     </div>
@@ -547,7 +551,7 @@
                                     <x-shop.quantity
                                         name="quantity"
                                         min="1"
-                                        :max="max(1, $product->stock)"
+                                        :max="$variantGroups->isNotEmpty() ? 99 : max(1, $product->stock)"
                                     />
 
                                 </div>
@@ -596,7 +600,7 @@
                                 </p>
 
                                 <p class="mt-2 text-xs font-medium">
-                                    {{ $product->stock > 0 ? 'موجود' : 'ناموجود' }}
+                                    {{ $variantGroups->isNotEmpty() ? 'وابسته به گزینه انتخابی' : ($product->stock > 0 ? 'موجود' : 'ناموجود') }}
                                 </p>
 
                             </div>

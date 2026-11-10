@@ -12,6 +12,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use Throwable;
 
 class ProductVariantController extends Controller
 {
@@ -34,7 +35,7 @@ class ProductVariantController extends Controller
         }
 
         $variants = $query->paginate(20)->withQueryString();
-        $products = Product::query()->orderBy('name')->get(['id', 'name']);
+        $products = Product::query()->orderBy('name')->get(['id', 'name', 'price']);
         $types = ProductVariant::query()->select('type')->distinct()->orderBy('type')->pluck('type');
 
         return view('admin.product-variants.index', compact('variants', 'products', 'types'));
@@ -42,13 +43,16 @@ class ProductVariantController extends Controller
 
     public function create(Request $request): View
     {
-        $products = Product::query()->orderBy('name')->get(['id', 'name']);
+        $products = Product::query()->orderBy('name')->get(['id', 'name', 'price']);
         $selectedProductId = $request->filled('product_id') ? $request->integer('product_id') : null;
         $selectedProductImages = $selectedProductId
             ? ProductImage::query()->where('product_id', $selectedProductId)->orderBy('sort_order')->orderBy('id')->get()
             : collect();
 
-        return view('admin.product-variants.create', compact('products', 'selectedProductId', 'selectedProductImages'));
+        $defaultType = $request->query('type', 'اندازه');
+        $defaultName = $request->query('name', 'اندازه مبل');
+
+        return view('admin.product-variants.create', compact('products', 'selectedProductId', 'selectedProductImages', 'defaultType', 'defaultName'));
     }
 
     public function store(StoreProductVariantRequest $request): RedirectResponse
@@ -57,15 +61,31 @@ class ProductVariantController extends Controller
         $imageIds = $data['image_ids'] ?? [];
         unset($data['image_ids']);
 
-        $productVariant = DB::transaction(function () use ($data, $imageIds): ProductVariant {
-            $variant = ProductVariant::create($data);
-            $variant->images()->sync($imageIds);
+        try {
+            $variant = DB::transaction(function () use ($data, $imageIds): ProductVariant {
+                $variant = ProductVariant::create($data);
+                $variant->images()->sync($imageIds);
 
-            return $variant;
-        });
+                return $variant;
+            });
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return back()->withInput()->with('error', 'تنوع ذخیره نشد. لطفاً دوباره تلاش کنید؛ هیچ تغییری ثبت نشده است.');
+        }
+
+        if ($request->boolean('continue')) {
+            return redirect()
+                ->route('admin.product-variants.create', [
+                    'product_id' => $variant->product_id,
+                    'type' => $variant->type,
+                    'name' => $variant->name,
+                ])
+                ->with('success', 'این گزینه ذخیره شد؛ حالا مقدار بعدی را وارد کن.');
+        }
 
         return redirect()
-            ->route('admin.product-variants.index', ['product_id' => $productVariant->product_id])
+            ->route('admin.products.edit', $variant->product_id)
             ->with('success', 'تنوع محصول با موفقیت ایجاد شد.');
     }
 
@@ -79,7 +99,7 @@ class ProductVariantController extends Controller
     public function edit(ProductVariant $productVariant): View
     {
         $productVariant->load('images');
-        $products = Product::query()->orderBy('name')->get(['id', 'name']);
+        $products = Product::query()->orderBy('name')->get(['id', 'name', 'price']);
         $selectedProductId = (int) $productVariant->product_id;
         $selectedProductImages = ProductImage::query()->where('product_id', $selectedProductId)->orderBy('sort_order')->orderBy('id')->get();
 
@@ -92,23 +112,36 @@ class ProductVariantController extends Controller
         $imageIds = $data['image_ids'] ?? [];
         unset($data['image_ids']);
 
-        DB::transaction(function () use ($data, $imageIds, $productVariant): void {
-            $productVariant->update($data);
-            $productVariant->images()->sync($imageIds);
-        });
+        try {
+            DB::transaction(function () use ($data, $imageIds, $productVariant): void {
+                $productVariant->update($data);
+                $productVariant->images()->sync($imageIds);
+            });
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return back()->withInput()->with('error', 'تغییرات ذخیره نشد. لطفاً دوباره تلاش کنید؛ اطلاعات قبلی حفظ شده است.');
+        }
 
         return redirect()
-            ->route('admin.product-variants.index', ['product_id' => $productVariant->product_id])
+            ->route('admin.products.edit', $productVariant->product_id)
             ->with('success', 'تنوع محصول با موفقیت بروزرسانی شد.');
     }
 
     public function destroy(ProductVariant $productVariant): RedirectResponse
     {
         $productId = $productVariant->product_id;
-        $productVariant->delete();
+
+        try {
+            $productVariant->delete();
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return back()->with('error', 'حذف تنوع انجام نشد. لطفاً دوباره تلاش کنید.');
+        }
 
         return redirect()
-            ->route('admin.product-variants.index', ['product_id' => $productId])
+            ->route('admin.products.edit', $productId)
             ->with('success', 'تنوع محصول با موفقیت حذف شد.');
     }
 }

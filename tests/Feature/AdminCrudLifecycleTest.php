@@ -46,7 +46,7 @@ class AdminCrudLifecycleTest extends TestCase
                 'sku' => 'SG-LIFECYCLE-001',
                 'image' => UploadedFile::fake()->image('sofa-old.jpg', 800, 1000),
             ]))
-            ->assertRedirect(route('admin.products.index'));
+            ->assertRedirect(route('admin.products.edit', Product::query()->where('slug', 'leather-sofa-lifecycle')->value('id')));
 
         $product = Product::query()->where('slug', 'leather-sofa-lifecycle')->firstOrFail();
         $oldImage = $product->images()->firstOrFail();
@@ -112,7 +112,7 @@ class AdminCrudLifecycleTest extends TestCase
                 'banner_image' => UploadedFile::fake()->image('banner-before-remove.jpg', 1200, 500),
                 'banner_image_alt' => 'بنر محصول برای تست حذف',
             ]))
-            ->assertRedirect(route('admin.products.index'));
+            ->assertRedirect(route('admin.products.edit', Product::query()->where('slug', 'sofa-media-removal')->value('id')));
 
         $product = Product::query()->where('slug', 'sofa-media-removal')->firstOrFail();
         $primary = $product->images()->firstOrFail();
@@ -204,7 +204,7 @@ class AdminCrudLifecycleTest extends TestCase
                 'media_id' => $media->id,
                 'status' => 'active',
             ]))
-            ->assertRedirect(route('admin.products.index'));
+            ->assertRedirect(route('admin.products.edit', Product::query()->where('slug', 'media-library-sofa')->value('id')));
 
         $product = Product::query()->where('slug', 'media-library-sofa')->firstOrFail();
         $image = $product->images()->firstOrFail();
@@ -452,7 +452,7 @@ class AdminCrudLifecycleTest extends TestCase
                 'is_active' => '1',
                 'image_ids' => [$image->id],
             ])
-            ->assertRedirect(route('admin.product-variants.index', ['product_id' => $product->id]));
+            ->assertRedirect(route('admin.products.edit', $product));
 
         $variant = ProductVariant::query()->where('sku', 'SG-TABLE-BLACK')->firstOrFail();
         $this->assertDatabaseHas('product_variant_images', [
@@ -480,7 +480,7 @@ class AdminCrudLifecycleTest extends TestCase
                 'is_active' => '1',
                 'image_ids' => [$image->id],
             ])
-            ->assertRedirect(route('admin.product-variants.index', ['product_id' => $product->id]));
+            ->assertRedirect(route('admin.products.edit', $product));
 
         $variant->refresh();
         $this->assertSame('grey', $variant->value);
@@ -491,7 +491,7 @@ class AdminCrudLifecycleTest extends TestCase
 
         $this->actingAs($this->admin)
             ->delete(route('admin.product-variants.destroy', $variant))
-            ->assertRedirect(route('admin.product-variants.index', ['product_id' => $product->id]));
+            ->assertRedirect(route('admin.products.edit', $product));
 
         $this->actingAs($this->admin)
             ->delete(route('admin.product-images.destroy', $image))
@@ -772,7 +772,7 @@ class AdminCrudLifecycleTest extends TestCase
         $this->actingAs($this->admin)
             ->get(route('admin.product-variants.create', ['product_id' => $product->id]))
             ->assertOk()
-            ->assertSee('aspect-[7/8]', false)
+            ->assertSee('aspect-[4/3]', false)
             ->assertSee($product->images()->firstOrFail()->url);
 
         $this->actingAs($this->admin)
