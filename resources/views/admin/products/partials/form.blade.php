@@ -412,7 +412,7 @@
                 </p>
             </div>
 
-            <div class="admin-image-preview mb-5 aspect-[4/5] bg-[var(--admin-white)]">
+            <div class="admin-image-preview mx-auto mb-5 aspect-[4/5] w-full max-w-72 bg-[var(--admin-white)]">
 
                 <img
                     id="product-image-preview"
