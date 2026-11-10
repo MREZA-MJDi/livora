@@ -7,6 +7,7 @@
     $initialFinalPrice = max(0, $basePrice + $initialAdjustment);
     $selectedImageIds = collect(old('image_ids', ($productVariant ?? null)?->images?->pluck('id')->all() ?? []))
         ->map(fn ($id) => (int) $id)->all();
+    $variantCover = ($productVariant ?? null)?->images?->first();
 @endphp
 
 @csrf
@@ -158,7 +159,42 @@
             <h3 class="mt-1 text-base font-bold text-[var(--admin-text)]">تصاویر مخصوص این گزینه</h3>
             <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">تصاویر را از عکس‌های همین محصول انتخاب کن. با انتخاب این گزینه توسط مشتری، این تصاویر نمایش داده می‌شوند.</p>
         </div>
-        <div class="p-5 sm:p-6">
+        <div class="space-y-5 p-5 sm:p-6">
+            <div class="grid gap-4 sm:grid-cols-[160px_minmax(0,1fr)] sm:items-start">
+                <div class="overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface-soft)]">
+                    <img id="variant-image-preview"
+                         src="{{ $variantCover?->detail_url ?? '' }}"
+                         alt="{{ $variantCover?->alt ?: 'پیش‌نمایش تصویر تنوع' }}"
+                         class="aspect-[4/5] w-full object-cover {{ $variantCover ? '' : 'hidden' }}">
+                    @unless($variantCover)
+                        <div class="flex aspect-[4/5] items-center justify-center px-3 text-center text-xs text-[var(--admin-muted)]">
+                            پیش‌نمایش تصویر این گزینه
+                        </div>
+                    @endunless
+                </div>
+                <div class="min-w-0">
+                    <label for="variant_image" class="admin-label">تصویر اصلی این گزینه</label>
+                    <input id="variant_image" name="variant_image" type="file"
+                           accept="image/jpeg,image/png,image/webp"
+                           data-crop-ratio="0.8"
+                           data-original-field="variant_original_image"
+                           data-preview-target="variant-image-preview"
+                           class="admin-input p-2">
+                    <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">
+                        یک تصویر اختصاصی برای این گزینه بارگذاری کن. ابزار برش با نسبت کارت محصول باز می‌شود و پیش‌نمایش دقیق تصویر ذخیره‌شده را نشان می‌دهد.
+                    </p>
+                    <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">
+                        اگر تصویر جدیدی انتخاب نکنی، تصاویر انتخاب‌شده از گالری عمومی محصول حفظ می‌شوند.
+                    </p>
+                    @error('variant_image')<p class="mt-2 text-xs text-[var(--admin-danger)]">{{ $message }}</p>@enderror
+                    @error('variant_original_image')<p class="mt-2 text-xs text-[var(--admin-danger)]">{{ $message }}</p>@enderror
+                </div>
+            </div>
+
+            <div class="border-t border-[var(--admin-border)] pt-5">
+                <h4 class="text-sm font-semibold text-[var(--admin-text)]">سایر تصاویر مرتبط با این گزینه</h4>
+                <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">می‌توانی چند تصویر دیگر از گالری همین محصول هم انتخاب کنی؛ ترتیب آن‌ها در گالری گزینه حفظ می‌شود.</p>
+            </div>
             @if(($selectedProductImages ?? collect())->isNotEmpty())
                 <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
                     @foreach($selectedProductImages as $image)
