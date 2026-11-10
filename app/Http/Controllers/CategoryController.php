@@ -17,7 +17,7 @@ class CategoryController extends Controller
             ])
             ->with([
                 'media', 'cardMedia',
-                'latestActiveProduct.images.media',
+                'latestActiveProduct.images' => fn ($imageQuery) => $imageQuery->orderByDesc('is_primary')->orderBy('sort_order')->limit(1)->with('media'),
                 'latestActiveProduct.variants' => fn ($query) => $this->constrainCardVariantImage($query),
             ])
             ->orderBy('sort_order')
@@ -39,14 +39,14 @@ class CategoryController extends Controller
             'children' => fn ($query) => $query->where('is_active', true)
                 ->orderBy('sort_order')->orderBy('id')->limit(8)
                 ->withCount(['products' => fn ($productQuery) => $productQuery->active()])
-                ->with(['media', 'cardMedia', 'latestActiveProduct.images.media', 'latestActiveProduct.variants' => fn ($variantQuery) => $this->constrainCardVariantImage($variantQuery)]),
-            'latestActiveProduct.images.media',
+                ->with(['media', 'cardMedia', 'latestActiveProduct.images' => fn ($imageQuery) => $imageQuery->orderByDesc('is_primary')->orderBy('sort_order')->limit(1)->with('media'), 'latestActiveProduct.variants' => fn ($variantQuery) => $this->constrainCardVariantImage($variantQuery)]),
+            'latestActiveProduct.images' => fn ($imageQuery) => $imageQuery->orderByDesc('is_primary')->orderBy('sort_order')->limit(1)->with('media'),
             'latestActiveProduct.variants' => fn ($variantQuery) => $this->constrainCardVariantImage($variantQuery),
             'relatedCategories' => fn ($query) => $query
                 ->where('is_active', true)
                 ->orderBy('sort_order')->orderBy('id')->limit(8)
                 ->withCount(['products' => fn ($productQuery) => $productQuery->active()])
-                ->with(['media', 'cardMedia', 'latestActiveProduct.images.media', 'latestActiveProduct.variants' => fn ($variantQuery) => $this->constrainCardVariantImage($variantQuery)]),
+                ->with(['media', 'cardMedia', 'latestActiveProduct.images' => fn ($imageQuery) => $imageQuery->orderByDesc('is_primary')->orderBy('sort_order')->limit(1)->with('media'), 'latestActiveProduct.variants' => fn ($variantQuery) => $this->constrainCardVariantImage($variantQuery)]),
             'recommendedProducts' => fn ($query) => $query
                 ->where('status', 'active')
                 ->orderByPivot('sort_order')->limit(8)
