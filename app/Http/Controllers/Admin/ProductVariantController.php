@@ -8,6 +8,11 @@ use App\Http\Requests\Admin\ProductVariant\UpdateProductVariantRequest;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductVariant;
+use App\Models\Media;
+use App\Support\MediaLibrary;
+use App\Services\Media\ProductImageVariantGenerator;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -58,20 +63,30 @@ class ProductVariantController extends Controller
     public function store(StoreProductVariantRequest $request): RedirectResponse
     {
         $data = $request->validated();
-        $imageIds = $data['image_ids'] ?? [];
-        unset($data['image_ids']);
+        $imageIds = array_values(array_unique($data['image_ids'] ?? []));
+        $variantImage = $data['variant_image'] ?? null;
+        $originalImage = $data['variant_original_image'] ?? $variantImage;
+        unset($data['image_ids'], $data['variant_image'], $data['variant_original_image']);
 
+        $createdMedia = null;
         try {
-            $variant = DB::transaction(function () use ($data, $imageIds): ProductVariant {
+            $variant = DB::transaction(function () use ($request, $data, &$imageIds, $variantImage, $originalImage, &$createdMedia): ProductVariant {
                 $variant = ProductVariant::create($data);
-                $variant->images()->sync($imageIds);
+
+                if ($variantImage instanceof UploadedFile) {
+                    $image = $this->createVariantProductImage($request, $variant, $variantImage, $originalImage, $createdMedia);
+                    array_unshift($imageIds, $image->id);
+                }
+
+                $variant->images()->sync($this->orderedImageSync($imageIds));
 
                 return $variant;
             });
         } catch (Throwable $exception) {
             report($exception);
+            $this->cleanupVariantMedia($createdMedia);
 
-            return back()->withInput()->with('error', 'تنوع ذخیره نشد. لطفاً دوباره تلاش کنید؛ هیچ تغییری ثبت نشده است.');
+            return back()->withInput()->with('error', 'تنوع یا تصویر آن ذخیره نشد. فایل‌های قبلی حفظ شدند؛ لطفاً دوباره تلاش کنید.');
         }
 
         if ($request->boolean('continue')) {
@@ -109,23 +124,110 @@ class ProductVariantController extends Controller
     public function update(UpdateProductVariantRequest $request, ProductVariant $productVariant): RedirectResponse
     {
         $data = $request->validated();
-        $imageIds = $data['image_ids'] ?? [];
-        unset($data['image_ids']);
+        $imageIds = array_values(array_unique($data['image_ids'] ?? []));
+        $variantImage = $data['variant_image'] ?? null;
+        $originalImage = $data['variant_original_image'] ?? $variantImage;
+        unset($data['image_ids'], $data['variant_image'], $data['variant_original_image']);
 
+        $createdMedia = null;
         try {
-            DB::transaction(function () use ($data, $imageIds, $productVariant): void {
+            DB::transaction(function () use ($request, $data, &$imageIds, $variantImage, $originalImage, $productVariant, &$createdMedia): void {
                 $productVariant->update($data);
-                $productVariant->images()->sync($imageIds);
+
+                if ($variantImage instanceof UploadedFile) {
+                    $image = $this->createVariantProductImage($request, $productVariant, $variantImage, $originalImage, $createdMedia);
+                    array_unshift($imageIds, $image->id);
+                }
+
+                $productVariant->images()->sync($this->orderedImageSync($imageIds));
             });
         } catch (Throwable $exception) {
             report($exception);
+            $this->cleanupVariantMedia($createdMedia);
 
-            return back()->withInput()->with('error', 'تغییرات ذخیره نشد. لطفاً دوباره تلاش کنید؛ اطلاعات قبلی حفظ شده است.');
+            return back()->withInput()->with('error', 'تغییرات یا تصویر جدید ذخیره نشد. اطلاعات و تصاویر قبلی حفظ شدند.');
         }
 
         return redirect()
             ->route('admin.products.edit', $productVariant->product_id)
             ->with('success', 'تنوع محصول با موفقیت بروزرسانی شد.');
+    }
+
+    /**
+     * Create a normal product image for the uploaded variant cover, then link it
+     * to the variant. Keeping it in product_images preserves the existing gallery
+     * and media pipeline while the pivot makes the image variant-specific.
+     */
+    private function createVariantProductImage(
+        Request $request,
+        ProductVariant $variant,
+        UploadedFile $croppedFile,
+        ?UploadedFile $originalFile,
+        ?Media &$createdMedia
+    ): ProductImage {
+        $product = $variant->product;
+        $alt = trim($product->name.' - '.$variant->type.': '.$variant->value);
+
+        $createdMedia = MediaLibrary::store(
+            $originalFile ?: $croppedFile,
+            (int) $request->user()->id,
+            'products/originals',
+            $alt
+        );
+
+        try {
+            $cropPath = $croppedFile->store('products/crops', 'public');
+            if (! $cropPath) {
+                throw new \\RuntimeException('Variant image crop could not be stored.');
+            }
+
+            $createdMedia->update(['variant_source_path' => $cropPath]);
+            $createdMedia = app(ProductImageVariantGenerator::class)->generate($createdMedia->refresh());
+
+            return ProductImage::create([
+                'product_id' => $variant->product_id,
+                'media_id' => $createdMedia->id,
+                'path' => $createdMedia->path,
+                'alt' => $alt,
+                'sort_order' => 0,
+                'is_primary' => false,
+            ]);
+        } catch (Throwable $exception) {
+            $this->cleanupVariantMedia($createdMedia);
+            $createdMedia = null;
+            throw $exception;
+        }
+    }
+
+    /**
+     * Keep the order chosen in the admin form deterministic.
+     */
+    private function orderedImageSync(array $imageIds): array
+    {
+        $sync = [];
+        foreach (array_values(array_unique(array_map('intval', $imageIds))) as $position => $imageId) {
+            if ($imageId > 0) {
+                $sync[$imageId] = ['sort_order' => $position];
+            }
+        }
+
+        return $sync;
+    }
+
+    private function cleanupVariantMedia(?Media $media): void
+    {
+        if (! $media) {
+            return;
+        }
+
+        $disk = Storage::disk($media->disk ?: 'public');
+        foreach (['path', 'variant_source_path', 'thumbnail_path', 'card_path', 'detail_path'] as $column) {
+            if (filled($media->{$column})) {
+                $disk->delete($media->{$column});
+            }
+        }
+
+        $media->delete();
     }
 
     public function destroy(ProductVariant $productVariant): RedirectResponse
