@@ -150,11 +150,9 @@ class CategoryController extends Controller
             ->orderBy('id')
             ->limit(1)
             ->with([
-                'images' => fn ($imageQuery) => $imageQuery
-                    ->orderBy('sort_order')
-                    ->orderBy('id')
-                    ->limit(1)
-                    ->with('media'),
+                // ProductVariant::images is a pivot relation whose model
+                // already defines deterministic pivot and image ordering.
+                'images' => fn ($imageQuery) => $imageQuery->limit(1)->with('media'),
             ]);
     }
 
