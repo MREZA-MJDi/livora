@@ -34,6 +34,8 @@
         active: 0,
         zoom: false,
         selectedVariantId: null,
+        selectedVariantImages: {},
+        selectedVariantOrder: [],
         productName: @js($productName),
         baseImages: @js($baseImages),
         variantImageMap: @js($variantImageMap),
@@ -62,11 +64,21 @@
             if (!id) return;
 
             this.selectedVariantId = String(id);
+            const type = String(event?.detail?.type || 'default');
             const variantImages = this.variantImageMap[this.selectedVariantId] || [];
 
-            // A variant gallery replaces the base gallery as one atomic set.
-            // If no dedicated photos exist, fall back to the product's default set.
-            this.images = variantImages.length ? variantImages : this.baseImages;
+            // Keep each selected attribute's gallery independently. This lets a
+            // size selection without photos preserve the chosen color gallery.
+            this.selectedVariantImages[type] = variantImages;
+            this.selectedVariantOrder = this.selectedVariantOrder.filter(item => item !== type);
+            this.selectedVariantOrder.push(type);
+
+            const preferredType = [...this.selectedVariantOrder].reverse()
+                .find(item => (this.selectedVariantImages[item] || []).length > 0);
+
+            this.images = preferredType
+                ? this.selectedVariantImages[preferredType]
+                : this.baseImages;
             this.active = 0;
         },
 
