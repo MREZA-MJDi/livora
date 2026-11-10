@@ -1664,7 +1664,7 @@ class StorefrontReadinessTest extends TestCase
             ->assertSee($variantImageProduct->name)
             ->assertSee('https://images.example.test/query/variant-1.webp')
             ->assertSee('page=2', false)
-            ->assertDontSee('محصول صفحه‌بندی 1');
+            ->assertDontSee('محصول صفحه‌بندی 1</h3>', false);
     }
 
     public function test_admin_product_catalog_uses_compact_cards_and_preserves_search_pagination(): void
@@ -1686,7 +1686,7 @@ class StorefrontReadinessTest extends TestCase
             ->assertSee('grid-cols-1', false)
             ->assertSee('page=2', false)
             ->assertSee('محصول فهرست 13')
-            ->assertDontSee('محصول فهرست 1');
+            ->assertDontSee('محصول فهرست 1</a>', false);
     }
 
     private function productWithVariantImage(Category $category, int $index): Product
