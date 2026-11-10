@@ -55,7 +55,7 @@ class UpdateProductVariantRequest extends FormRequest
             ],
 
             'variant_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'dimensions:min_width=400,min_height=500', 'max:10240'],
-            'variant_original_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'dimensions:min_width=400,min_height=500', 'max:10240'],
+            'variant_original_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
 
             'image_ids' => [
                 'nullable',
