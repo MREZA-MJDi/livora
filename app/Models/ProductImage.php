@@ -20,6 +20,7 @@ class ProductImage extends Model
         'alt',
         'sort_order',
         'is_primary',
+        'is_variant_only',
     ];
 
     protected $appends = [
