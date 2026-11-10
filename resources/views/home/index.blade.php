@@ -41,7 +41,7 @@
                         : null;
                     $image = $path
                         ? (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') ? $path : \Illuminate\Support\Facades\Storage::disk('public')->url($path))
-                        : $legacyImage;
+                        : ($index === 0 && filled($section->image_path) ? $section->image_url : $legacyImage);
                     return [...$slide, 'image_url' => $image, 'object_position' => $slide['object_position'] ?? '50% 50%'];
                 });
                 $heroSlideData = $heroSlides->map(function ($slide) {
