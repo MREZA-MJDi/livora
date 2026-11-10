@@ -24,6 +24,7 @@ class ProductImageController extends Controller
     public function index(Request $request): View
     {
         $query = ProductImage::query()
+            ->where('is_variant_only', false)
             ->with('product')
             ->orderBy('product_id')
             ->orderBy('sort_order')
