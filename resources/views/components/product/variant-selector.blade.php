@@ -112,7 +112,7 @@
                     value="{{ $optionId }}"
                     data-label="{{ $optionLabel }}"
                     x-model="selected"
-                    @change="window.dispatchEvent(new CustomEvent('product-variant-selected', { detail: { id: {{ $optionId }}, type: @js($name), label: @js($optionLabel) } }))"
+                    @change="window.dispatchEvent(new CustomEvent('product-variant-selected', { detail: { id: {{ $optionId }}, type: @js($name), label: @js($optionLabel), priceAdjustment: {{ (float) $option->price_adjustment }} } }))"
                     class="sr-only"
                     @disabled($isUnavailable)
                     @if($isUnavailable)
