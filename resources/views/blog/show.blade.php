@@ -37,7 +37,7 @@
         </nav>
         <article class="mx-auto max-w-5xl overflow-hidden rounded-[1.75rem] border border-[var(--sg-border)] bg-[var(--sg-white)] shadow-[0_20px_70px_rgba(35,29,23,.06)]">
             @if($post->featured_image_url)
-                <figure class="max-h-[620px] overflow-hidden bg-[var(--sg-surface)]"><img src="{{ $post->featured_image_url }}" alt="{{ $post->featured_image_alt ?: $post->title }}" class="max-h-[620px] w-full object-cover" fetchpriority="high"></figure>
+                <figure class="mx-auto aspect-[16/10] w-full max-w-5xl overflow-hidden bg-[var(--sg-surface)]"><img src="{{ $post->featured_image_url }}" alt="{{ $post->featured_image_alt ?: $post->title }}" class="h-full w-full object-cover" fetchpriority="high"></figure>
             @endif
             <header class="border-b border-[var(--sg-border)] px-6 py-8 sm:px-10 sm:py-12 lg:px-16">
                 <p class="sg-eyebrow">{{ $post->category ?: 'SILLAGALLERY JOURNAL' }}</p>
