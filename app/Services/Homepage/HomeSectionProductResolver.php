@@ -15,7 +15,6 @@ class HomeSectionProductResolver
      *
      * A titled section must never silently fall back to unrelated products.
      *
-     * @param  array<int, int>  $excludedProductIds
      * @return Collection<int, Product>
      */
     public function resolve(HomeSection $section): Collection
