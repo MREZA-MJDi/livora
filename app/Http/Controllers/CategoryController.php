@@ -38,13 +38,13 @@ class CategoryController extends Controller
             'media', 'cardMedia', 'bannerMedia',
             'children' => fn ($query) => $query->where('is_active', true)
                 ->withCount(['products' => fn ($productQuery) => $productQuery->active()])
-                ->with(['media', 'cardMedia', 'latestActiveProduct.images.media', 'latestActiveProduct.variants.images.media']),
+                ->with(['media', 'cardMedia', 'latestActiveProduct.images.media', 'latestActiveProduct.variants' => fn ($variantQuery) => $this->constrainCardVariantImage($variantQuery)]),
             'latestActiveProduct.images.media',
-            'latestActiveProduct.variants.images.media',
+            'latestActiveProduct.variants' => fn ($variantQuery) => $this->constrainCardVariantImage($variantQuery),
             'relatedCategories' => fn ($query) => $query
                 ->where('is_active', true)
                 ->withCount(['products' => fn ($productQuery) => $productQuery->active()])
-                ->with(['media', 'cardMedia', 'latestActiveProduct.images.media', 'latestActiveProduct.variants.images.media']),
+                ->with(['media', 'cardMedia', 'latestActiveProduct.images.media', 'latestActiveProduct.variants' => fn ($variantQuery) => $this->constrainCardVariantImage($variantQuery)]),
             'recommendedProducts' => fn ($query) => $query
                 ->where('status', 'active')
                 ->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('is_active', true))
@@ -73,7 +73,7 @@ class CategoryController extends Controller
                     ->orderBy('sort_order')
                     ->orderBy('id')
                     ->limit(1),
-                'variants.images.media',
+                'variants' => fn ($variantQuery) => $this->constrainCardVariantImage($variantQuery),
             ]);
 
         if (! empty($filters['search'])) {
