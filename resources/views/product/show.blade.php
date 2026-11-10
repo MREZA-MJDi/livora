@@ -543,7 +543,7 @@
 
                                         <p class="mt-1 text-[11px] text-[var(--sg-stone)]">
                                             موجودی:
-                                            {{ number_format($product->stock) }}
+                                            {{ $variantGroups->isNotEmpty() ? 'پس از انتخاب ویژگی‌ها بررسی می‌شود' : number_format($product->stock) }}
                                         </p>
 
                                     </div>
@@ -551,7 +551,7 @@
                                     <x-shop.quantity
                                         name="quantity"
                                         min="1"
-                                        :max="max(1, $product->stock)"
+                                        :max="{{ $variantGroups->isNotEmpty() ? 99 : max(1, $product->stock) }}"
                                     />
 
                                 </div>
@@ -600,7 +600,7 @@
                                 </p>
 
                                 <p class="mt-2 text-xs font-medium">
-                                    {{ $product->stock > 0 ? 'موجود' : 'ناموجود' }}
+                                    {{ $variantGroups->isNotEmpty() ? 'وابسته به گزینه انتخابی' : ($product->stock > 0 ? 'موجود' : 'ناموجود') }}
                                 </p>
 
                             </div>
