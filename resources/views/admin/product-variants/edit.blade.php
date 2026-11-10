@@ -10,7 +10,7 @@
         <p class="admin-subtitle mt-2">مشخصات، قیمت، موجودی و تصاویر این گزینه را به‌روزرسانی کن.</p>
     </div>
 
-    <form action="{{ route('admin.product-variants.update', $productVariant) }}" method="POST">
+    <form action="{{ route('admin.product-variants.update', $productVariant) }}" method="POST" enctype="multipart/form-data">
         @method('PUT')
         @include('admin.product-variants.partials.form', [
             'products' => $products,
