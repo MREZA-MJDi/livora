@@ -1217,16 +1217,19 @@ document.addEventListener('submit', async (event) => {
 });
 
 
-/* Homepage hero slide controls: content and image stay in sync. */
+/* Homepage hero slider: synchronized copy/image transitions and accessible autoplay. */
 const initSgHomeHeroes = () => {
     document.querySelectorAll('[data-sg-home-hero]').forEach((root) => {
         if (root.dataset.heroReady === '1') return;
         const dataNode = root.querySelector('[data-sg-hero-data]');
         const dots = Array.from(root.querySelectorAll('[data-sg-hero-dot]'));
         const images = Array.from(root.querySelectorAll('[data-sg-hero-image]'));
+        const content = root.querySelector('.sg-home-hero__content');
+        const media = root.querySelector('.sg-home-hero__media');
         const eyebrow = root.querySelector('[data-sg-hero-eyebrow]');
         const title = root.querySelector('[data-sg-hero-title]');
         const subtitle = root.querySelector('[data-sg-hero-subtitle]');
+        const price = root.querySelector('[data-sg-hero-price]');
         const cta = root.querySelector('[data-sg-hero-cta]');
         if (!dataNode || !dots.length) return;
 
@@ -1239,9 +1242,18 @@ const initSgHomeHeroes = () => {
         if (!Array.isArray(slides) || !slides.length) return;
         root.dataset.heroReady = '1';
 
+        let currentIndex = 0;
+        let autoplayTimer = null;
+
+        const stopAutoplay = () => {
+            if (autoplayTimer) window.clearInterval(autoplayTimer);
+            autoplayTimer = null;
+        };
+
         const show = (index) => {
-            const active = Math.max(0, Math.min(slides.length - 1, index));
-            const slide = slides[active] || {};
+            currentIndex = (index + slides.length) % slides.length;
+            const slide = slides[currentIndex] || {};
+
             if (eyebrow) {
                 eyebrow.textContent = slide.eyebrow || '';
                 eyebrow.hidden = !slide.eyebrow;
@@ -1250,6 +1262,10 @@ const initSgHomeHeroes = () => {
             if (subtitle) {
                 subtitle.textContent = slide.subtitle || '';
                 subtitle.hidden = !slide.subtitle;
+            }
+            if (price) {
+                price.textContent = slide.price_label || '';
+                price.hidden = !slide.price_label;
             }
             if (cta) {
                 cta.textContent = slide.cta_label || '';
@@ -1262,18 +1278,38 @@ const initSgHomeHeroes = () => {
                     cta.append(arrow);
                 }
             }
+
             dots.forEach((dot, dotIndex) => {
-                const selected = dotIndex === active;
+                const selected = dotIndex === currentIndex;
                 dot.classList.toggle('is-active', selected);
                 dot.setAttribute('aria-pressed', selected ? 'true' : 'false');
             });
             images.forEach((image) => {
-                image.classList.toggle('is-active', Number(image.dataset.sgHeroImage) === active);
+                image.classList.toggle('is-active', Number(image.dataset.sgHeroImage) === currentIndex);
             });
+
+            root.classList.remove('is-animating');
+            void root.offsetWidth;
+            root.classList.add('is-animating');
+            window.setTimeout(() => root.classList.remove('is-animating'), 650);
         };
 
-        dots.forEach((dot, index) => dot.addEventListener('click', () => show(index)));
+        const startAutoplay = () => {
+            stopAutoplay();
+            if (slides.length < 2 || window.matchMedia('(prefers-reduced-motion: reduce)').matches || document.hidden) return;
+            autoplayTimer = window.setInterval(() => show(currentIndex + 1), 4000);
+        };
+
+        dots.forEach((dot, index) => dot.addEventListener('click', () => {
+            show(index);
+            startAutoplay();
+        }));
+        root.addEventListener('mouseenter', stopAutoplay);
+        root.addEventListener('mouseleave', startAutoplay);
+        document.addEventListener('visibilitychange', startAutoplay);
+
         show(0);
+        startAutoplay();
     });
 };
 
