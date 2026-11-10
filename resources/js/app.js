@@ -722,14 +722,21 @@ const initCardImageSkeletons = () => {
         image.dataset.skeletonReady = '1';
         const media = image.closest('[data-card-media]');
         if (!media) return;
+        const fallback = media.querySelector('[data-card-image-fallback]');
 
         const markLoaded = () => {
             if (image.naturalWidth > 0) {
                 media.classList.add('is-loaded');
                 media.classList.remove('is-error');
+                image.classList.remove('hidden');
+                fallback?.classList.add('hidden');
+                fallback?.classList.remove('flex');
             } else {
                 media.classList.add('is-error');
                 media.classList.remove('is-loaded');
+                image.classList.add('hidden');
+                fallback?.classList.remove('hidden');
+                fallback?.classList.add('flex');
             }
         };
 
