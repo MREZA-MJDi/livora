@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BlogPost;
 use App\Models\Category;
 use App\Models\HomeSection;
+use App\Models\Product;
 use App\Services\Homepage\HomeSectionProductResolver;
 use Illuminate\Contracts\View\View;
 
@@ -83,6 +84,19 @@ class HomeController extends Controller
             }
         }
 
+        $heroProducts = Product::query()
+            ->active()
+            ->where('is_home_hero', true)
+            ->whereHas('category', fn ($query) => $query->where('is_active', true))
+            ->where(function ($query) {
+                $query->whereHas('images')->orWhereHas('variants.images');
+            })
+            ->with(['images.media', 'variants.images.media'])
+            ->orderBy('home_hero_sort_order')
+            ->orderBy('id')
+            ->limit(10)
+            ->get();
+
         $blogPosts = BlogPost::query()
             ->published()
             ->with('media')
@@ -92,6 +106,7 @@ class HomeController extends Controller
 
         return view('home.index', [
             'homeSections' => $sections,
+            'heroProducts' => $heroProducts,
             'blogPosts' => $blogPosts,
             'finalCta' => $finalCta,
         ]);

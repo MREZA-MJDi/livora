@@ -29,6 +29,95 @@ class StorefrontReadinessTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_admin_can_select_up_to_ten_image_products_for_the_homepage_hero(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $category = $this->category();
+        $product = $this->product($category, [
+            'name' => 'محصول منتخب هیرو',
+            'slug' => 'homepage-hero-selected-product',
+        ]);
+
+        ProductImage::query()->create([
+            'product_id' => $product->id,
+            'path' => 'https://images.example.test/homepage/hero-product.webp',
+            'alt' => $product->name,
+            'sort_order' => 0,
+            'is_primary' => true,
+        ]);
+
+        $this->actingAs($admin)
+            ->post(route('admin.products.home-hero', $product))
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('products', [
+            'id' => $product->id,
+            'is_home_hero' => true,
+            'home_hero_sort_order' => 1,
+        ]);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('محصول منتخب هیرو')
+            ->assertSee('https://images.example.test/homepage/hero-product.webp')
+            ->assertSee('مشاهده محصول');
+
+        $withoutImage = $this->product($category, [
+            'name' => 'محصول بدون تصویر برای هیرو',
+            'slug' => 'homepage-hero-product-without-image',
+        ]);
+
+        $this->actingAs($admin)
+            ->from(route('admin.products.index'))
+            ->post(route('admin.products.home-hero', $withoutImage))
+            ->assertRedirect(route('admin.products.index'))
+            ->assertSessionHas('error');
+
+        $this->assertDatabaseHas('products', [
+            'id' => $withoutImage->id,
+            'is_home_hero' => false,
+        ]);
+    }
+
+    public function test_homepage_hero_selection_is_limited_to_ten_products(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $category = $this->category();
+
+        for ($index = 1; $index <= 10; $index++) {
+            $this->product($category, [
+                'name' => 'Hero selected '.$index,
+                'slug' => 'hero-selected-'.$index,
+                'is_home_hero' => true,
+                'home_hero_sort_order' => $index,
+            ]);
+        }
+
+        $eleventh = $this->product($category, [
+            'name' => 'Hero eleventh product',
+            'slug' => 'hero-eleventh-product',
+        ]);
+        ProductImage::query()->create([
+            'product_id' => $eleventh->id,
+            'path' => 'https://images.example.test/homepage/eleventh.webp',
+            'alt' => $eleventh->name,
+            'sort_order' => 0,
+            'is_primary' => true,
+        ]);
+
+        $this->actingAs($admin)
+            ->from(route('admin.products.index'))
+            ->post(route('admin.products.home-hero', $eleventh))
+            ->assertRedirect(route('admin.products.index'))
+            ->assertSessionHas('error');
+
+        $this->assertDatabaseHas('products', [
+            'id' => $eleventh->id,
+            'is_home_hero' => false,
+        ]);
+        $this->assertSame(10, Product::query()->where('is_home_hero', true)->count());
+    }
+
     public function test_public_pages_render_without_catalogue_records(): void
     {
         foreach ([

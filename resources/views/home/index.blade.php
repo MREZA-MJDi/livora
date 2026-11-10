@@ -18,7 +18,27 @@
         @if($section->type === 'hero')
             @php
                 $heroProduct = $section->products->first();
+                $selectedHeroProducts = $heroProducts ?? collect();
                 $heroSlides = collect($payload['slides'] ?? []);
+                if ($selectedHeroProducts->isNotEmpty()) {
+                    $heroSlides = $selectedHeroProducts->map(function ($product) {
+                        $primaryImage = $product->images->first();
+                        $variantImage = $product->variants->first(
+                            fn ($variant) => $variant->images->isNotEmpty()
+                        )?->images?->first();
+
+                        return [
+                            'eyebrow' => 'محصول منتخب فروشگاه',
+                            'title' => $product->name,
+                            'subtitle' => $product->short_description,
+                            'cta_label' => 'مشاهده محصول',
+                            'cta_url' => route('product.show', $product->slug),
+                            'image_url' => $primaryImage?->detail_url ?: $variantImage?->detail_url,
+                            'price_label' => number_format((float) $product->price).' تومان',
+                            'object_position' => '50% 50%',
+                        ];
+                    })->values();
+                }
                 $hasConfiguredSlides = $heroSlides->isNotEmpty();
                 if (! $hasConfiguredSlides) {
                     $heroSlides = collect([[
@@ -39,9 +59,11 @@
                     $legacyImage = ! $hasConfiguredSlides && $index === 0
                         ? ($section->image_url ?: ($heroProduct?->images?->first()?->detail_url ?: $heroVariantImage))
                         : null;
-                    $image = $path
-                        ? (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') ? $path : \Illuminate\Support\Facades\Storage::disk('public')->url($path))
-                        : ($index === 0 && filled($section->image_path) ? $section->image_url : $legacyImage);
+                    $image = filled($slide['image_url'] ?? null)
+                        ? $slide['image_url']
+                        : ($path
+                            ? (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') ? $path : \Illuminate\Support\Facades\Storage::disk('public')->url($path))
+                            : ($index === 0 && filled($section->image_path) ? $section->image_url : $legacyImage));
                     return [...$slide, 'image_url' => $image, 'object_position' => $slide['object_position'] ?? '50% 50%'];
                 });
                 $heroSlideData = $heroSlides->map(function ($slide) {
@@ -50,6 +72,7 @@
                         'title' => $slide['title'] ?? '',
                         'subtitle' => $slide['subtitle'] ?? '',
                         'cta_label' => $slide['cta_label'] ?? '',
+                        'price_label' => $slide['price_label'] ?? '',
                         'cta_url' => filled($slide['cta_url'] ?? null)
                             ? (str_starts_with($slide['cta_url'], 'http') ? $slide['cta_url'] : url($slide['cta_url']))
                             : route('shop.index'),
@@ -70,6 +93,7 @@
                                 <p class="sg-home-hero__eyebrow" data-sg-hero-eyebrow>{{ $heroSlides[0]['eyebrow'] ?? '' }}</p>
                                 <h1 class="sg-home-hero__title" data-sg-hero-title>{{ $heroSlides[0]['title'] ?? $section->title }}</h1>
                                 <p class="sg-home-hero__subtitle" data-sg-hero-subtitle>{{ $heroSlides[0]['subtitle'] ?? $section->subtitle }}</p>
+                                <p class="sg-home-hero__price" data-sg-hero-price @if(blank($heroSlides[0]['price_label'] ?? null)) hidden @endif>{{ $heroSlides[0]['price_label'] ?? '' }}</p>
                                 @if(filled($heroSlides[0]['cta_label'] ?? null))
                                     <a class="sg-home-hero__cta" data-sg-hero-cta href="{{ filled($heroSlides[0]['cta_url'] ?? null) ? (str_starts_with($heroSlides[0]['cta_url'], 'http') ? $heroSlides[0]['cta_url'] : url($heroSlides[0]['cta_url'])) : route('shop.index') }}">{{ $heroSlides[0]['cta_label'] }} <span aria-hidden="true">←</span></a>
                                 @else
