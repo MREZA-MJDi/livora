@@ -73,7 +73,7 @@ class ProductController extends Controller
         }
 
         try {
-             $createdProductId = null;
+            $createdProductId = null;
             DB::transaction(function () use ($request, $data, $relatedProductIds, $mediaId, $imageFile, $originalImageFile, $imagePath, $variantSourcePath, $bannerMedia, &$createdProductId): void {
                 $product = Product::create($data);
                 $createdProductId = $product->id;
