@@ -167,7 +167,7 @@
                          alt="{{ $variantCover?->alt ?: 'پیش‌نمایش تصویر تنوع' }}"
                          class="aspect-[4/5] w-full object-cover {{ $variantCover ? '' : 'hidden' }}">
                     @unless($variantCover)
-                        <div class="flex aspect-[4/5] items-center justify-center px-3 text-center text-xs text-[var(--admin-muted)]">
+                        <div id="variant-image-placeholder" class="flex aspect-[4/5] items-center justify-center px-3 text-center text-xs text-[var(--admin-muted)]">
                             پیش‌نمایش تصویر این گزینه
                         </div>
                     @endunless
@@ -179,6 +179,7 @@
                            data-crop-ratio="0.8"
                            data-original-field="variant_original_image"
                            data-preview-target="variant-image-preview"
+                           data-preview-placeholder="variant-image-placeholder"
                            class="admin-input p-2">
                     <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">
                         یک تصویر اختصاصی برای این گزینه بارگذاری کن. ابزار برش با نسبت کارت محصول باز می‌شود و پیش‌نمایش دقیق تصویر ذخیره‌شده را نشان می‌دهد.
