@@ -821,6 +821,7 @@ class AdminCrudLifecycleTest extends TestCase
             ->assertSee('aspect-[4/5]', false)
             ->assertSee('data-crop-ratio="0.8"', false)
             ->assertSee('data-preview-target="variant-image-preview"', false)
+            ->assertSee('aspect-[4/3]', false)
             ->assertSee($product->images()->firstOrFail()->url);
 
         $this->actingAs($this->admin)
