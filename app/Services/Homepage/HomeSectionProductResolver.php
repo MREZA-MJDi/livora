@@ -76,14 +76,6 @@ class HomeSectionProductResolver
             default => $query->latest('created_at')->latest('id'),
         };
 
-        if ($section->type === 'hero') {
-            $query->where(function (Builder $imageQuery): void {
-                $imageQuery
-                    ->whereHas('images')
-                    ->orWhereHas('variants.images');
-            });
-        }
-
         $products = $query
             ->limit($limit)
             ->get();
