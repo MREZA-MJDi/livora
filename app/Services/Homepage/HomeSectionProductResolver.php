@@ -18,7 +18,7 @@ class HomeSectionProductResolver
      * @param  array<int, int>  $excludedProductIds
      * @return Collection<int, Product>
      */
-    public function resolve(HomeSection $section, array $excludedProductIds = []): Collection
+    public function resolve(HomeSection $section): Collection
     {
         $payload = $section->payload ?? [];
         $limit = $section->type === 'hero'
@@ -49,7 +49,6 @@ class HomeSectionProductResolver
                 ->whereHas('product', fn (Builder $productQuery) => $productQuery
                     ->active()
                     ->whereHas('category', fn (Builder $categoryQuery) => $categoryQuery->where('is_active', true)))
-                ->when($excludedProductIds !== [], fn (Builder $query) => $query->whereNotIn('product_id', $excludedProductIds))
                 ->select('product_id')
                 ->groupBy('product_id')
                 ->orderByRaw('SUM(quantity) DESC')
@@ -64,7 +63,7 @@ class HomeSectionProductResolver
             }
         }
 
-        $query = $this->baseQuery($excludedProductIds);
+        $query = $this->baseQuery();
 
         match ($source) {
             'featured' => $query->where('is_featured', true),
@@ -89,12 +88,11 @@ class HomeSectionProductResolver
         return $products;
     }
 
-    private function baseQuery(array $excludedProductIds): Builder
+    private function baseQuery(): Builder
     {
         return Product::query()
             ->active()
             ->whereHas('category', fn (Builder $categoryQuery) => $categoryQuery->where('is_active', true))
-            ->when($excludedProductIds !== [], fn (Builder $query) => $query->whereNotIn('products.id', $excludedProductIds))
             ->with([
                 'category',
                 'images' => fn ($imageQuery) => $imageQuery
