@@ -102,19 +102,16 @@
                     x-data="{ searchValue: @js((string) request('search', '')) }"
                     @submit.prevent="
                         const value = searchValue.trim();
-                        const url = new URL(window.location.href);
-
-                        url.pathname = @js(parse_url(route('shop.index'), PHP_URL_PATH));
-                        url.searchParams.delete('search');
-                        url.searchParams.delete('page');
+                        // A global search starts from a clean catalog URL. Do not
+                        // inherit stale category/price/sort params from the page
+                        // where the overlay happened to be opened.
+                        const url = new URL(@js(route('shop.index')), window.location.origin);
 
                         if (value) {
                             url.searchParams.set('search', value);
                         }
 
-                        window.location.assign(
-                            url.pathname + (url.search ? url.search : '')
-                        );
+                        window.location.assign(url.toString());
                     "
                 >
 
