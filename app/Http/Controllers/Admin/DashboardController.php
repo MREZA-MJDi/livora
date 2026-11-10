@@ -264,10 +264,17 @@ class DashboardController extends Controller
             return $image;
         }
 
-        $variant = $product->variants->first(
-            fn ($item) => (int) $item->stock > 0 && $item->images->isNotEmpty()
-        ) ?? $product->variants->first(fn ($item) => $item->images->isNotEmpty());
+        if (! $product->relationLoaded('variants')) {
+            return null;
+        }
 
-        return $variant?->images?->first()?->card_url;
+        $hasLoadedImages = fn ($variant) => $variant->relationLoaded('images')
+            && $variant->getRelation('images')->isNotEmpty();
+
+        $variant = $product->getRelation('variants')->first(
+            fn ($item) => (int) $item->stock > 0 && $hasLoadedImages($item)
+        ) ?? $product->getRelation('variants')->first($hasLoadedImages);
+
+        return $variant?->getRelation('images')?->first()?->card_url;
     }
 }
