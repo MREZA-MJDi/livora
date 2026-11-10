@@ -127,7 +127,7 @@ class ProductController extends Controller
 
     public function edit(Product $product, ContentSeoAnalyzer $seoAnalyzer): View
     {
-        $product->load(['images.media', 'relatedProducts:id,name']);
+        $product->load(['images.media', 'allVariants', 'relatedProducts:id,name']);
         $categories = Category::query()->orderBy('name')->get();
 
         return view('admin.products.edit', [
