@@ -19,10 +19,14 @@
     $baseImages = $resolvedImages->map(fn ($image) => [
         'url' => $image->detail_url,
         'alt' => $image->alt ?: $productName,
-    ])->values();
+    ])->filter(fn ($image) => filled($image['url']))
+        ->values();
 
     $variantImageMap = collect($variantImageMap)
-        ->map(fn ($variantImages) => collect($variantImages)->values()->all())
+        ->map(fn ($variantImages) => collect($variantImages)
+            ->filter(fn ($image) => filled($image['url'] ?? null))
+            ->values()
+            ->all())
         ->all();
 
     $hasVariantImages = collect($variantImageMap)->contains(fn ($items) => count($items) > 0);
