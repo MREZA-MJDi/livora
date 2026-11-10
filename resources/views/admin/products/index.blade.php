@@ -20,6 +20,7 @@
             <p class="admin-subtitle mt-2">
                 مدیریت محصولات، قیمت، موجودی و وضعیت انتشار
             </p>
+            <p class="mt-2 text-xs text-[var(--admin-muted)]">انتخاب‌شده برای اسلایدر صفحه اصلی: <strong>{{ $homeHeroProductCount }}/10</strong></p>
         </div>
 
         <a
@@ -57,6 +58,7 @@
                     <th>موجودی</th>
                     <th>وضعیت</th>
                     <th>ویژگی‌ها</th>
+                    <th>اسلایدر صفحه اصلی</th>
                     <th>عملیات</th>
                 </tr>
                 </thead>
@@ -214,6 +216,27 @@
                         </td>
 
                         <td>
+                            @php
+                                $hasVariantHeroImage = $product->variants->contains(fn ($variant) => $variant->images->isNotEmpty());
+                                $canSelectForHero = $product->status === 'active'
+                                    && (bool) $product->category?->is_active
+                                    && ($primaryImage || $hasVariantHeroImage);
+                            @endphp
+                            <form action="{{ route('admin.products.home-hero', $product) }}" method="POST">
+                                @csrf
+                                <button
+                                    type="submit"
+                                    @disabled(! $product->is_home_hero && ! $canSelectForHero)
+                                    class="admin-btn {{ $product->is_home_hero ? 'admin-btn-primary' : 'admin-btn-secondary' }} px-3 whitespace-nowrap"
+                                    aria-pressed="{{ $product->is_home_hero ? 'true' : 'false' }}"
+                                    title="{{ $canSelectForHero || $product->is_home_hero ? 'تغییر وضعیت نمایش در اسلایدر' : 'برای انتخاب، محصول باید فعال و دارای تصویر باشد' }}"
+                                >
+                                    {{ $product->is_home_hero ? '✓ انتخاب شده' : '☆ افزودن به اسلایدر' }}
+                                </button>
+                            </form>
+                        </td>
+
+                        <td>
                             <div class="flex items-center justify-end gap-2">
 
                                 <a
@@ -255,7 +278,7 @@
                 @empty
 
                     <tr>
-                        <td colspan="9">
+                        <td colspan="10">
                             <div class="admin-empty">
 
                                 <div class="admin-empty-icon">
