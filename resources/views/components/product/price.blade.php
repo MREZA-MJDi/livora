@@ -23,9 +23,13 @@
         basePrice: {{ $price }},
         currentPrice: {{ $price }},
         selectedAdjustments: {},
+        hasSelectedVariant: false,
+        cashPercent: {{ $cashPercent }},
+        chequeCount: {{ $chequeCount }},
         updateVariantPrice(event) {
             const detail = event?.detail ?? {};
             if (!detail.type) return;
+            this.hasSelectedVariant = true;
             this.selectedAdjustments[detail.type] = Number(detail.priceAdjustment || 0);
             this.currentPrice = Math.max(0, this.basePrice + Object.values(this.selectedAdjustments).reduce((sum, value) => sum + value, 0));
         },
@@ -34,11 +38,11 @@
     @product-variant-selected.window="updateVariantPrice($event)"
 >
     @if ($hasDiscount)
-        <div class="product-price__discount">{{ $discountPercent }}٪ تخفیف</div>
+        <div class="product-price__discount" x-show="!hasSelectedVariant">{{ $discountPercent }}٪ تخفیف</div>
     @endif
     <div class="product-price__main">
         @if ($hasDiscount)
-            <span class="product-price__compare">{{ number_format($compareAtPrice) }} <span>تومان</span></span>
+            <span class="product-price__compare" x-show="!hasSelectedVariant">{{ number_format($compareAtPrice) }} <span>تومان</span></span>
         @endif
         <div class="product-price__current">
             <strong x-text="money(currentPrice)">{{ number_format($price) }}</strong>
@@ -54,12 +58,12 @@
             <div class="product-price__installment-content">
                 <div class="product-price__installment-row">
                     <span>پرداخت اولیه</span>
-                    <strong>{{ number_format($cashAmount) }} تومان</strong>
+                    <strong x-text="money(currentPrice * cashPercent / 100) + ' تومان'">{{ number_format($cashAmount) }} تومان</strong>
                 </div>
                 @if ($chequeCount > 0 && $chequeAmount)
                     <div class="product-price__installment-row">
                         <span>{{ $chequeCount }} فقره چک</span>
-                        <strong>هر چک {{ number_format($chequeAmount) }} تومان</strong>
+                        <strong x-text="'هر چک ' + money((currentPrice * (1 - cashPercent / 100)) / chequeCount) + ' تومان'">هر چک {{ number_format($chequeAmount) }} تومان</strong>
                     </div>
                 @endif
             </div>
