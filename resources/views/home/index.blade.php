@@ -33,8 +33,11 @@
                 }
                 $heroSlides = $heroSlides->values()->map(function ($slide, $index) use ($section, $heroProduct, $hasConfiguredSlides) {
                     $path = $slide['image_path'] ?? null;
+                    $heroVariantImage = $heroProduct?->variants?->first(
+                        fn ($variant) => $variant->images->isNotEmpty()
+                    )?->images?->first()?->detail_url;
                     $legacyImage = ! $hasConfiguredSlides && $index === 0
-                        ? ($section->image_url ?: $heroProduct?->images?->first()?->detail_url)
+                        ? ($section->image_url ?: ($heroProduct?->images?->first()?->detail_url ?: $heroVariantImage))
                         : null;
                     $image = $path
                         ? (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') ? $path : \Illuminate\Support\Facades\Storage::disk('public')->url($path))
