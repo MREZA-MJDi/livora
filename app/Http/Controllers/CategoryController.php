@@ -37,16 +37,19 @@ class CategoryController extends Controller
         $category->load([
             'media', 'cardMedia', 'bannerMedia',
             'children' => fn ($query) => $query->where('is_active', true)
+                ->orderBy('sort_order')->orderBy('id')->limit(8)
                 ->withCount(['products' => fn ($productQuery) => $productQuery->active()])
                 ->with(['media', 'cardMedia', 'latestActiveProduct.images.media', 'latestActiveProduct.variants' => fn ($variantQuery) => $this->constrainCardVariantImage($variantQuery)]),
             'latestActiveProduct.images.media',
             'latestActiveProduct.variants' => fn ($variantQuery) => $this->constrainCardVariantImage($variantQuery),
             'relatedCategories' => fn ($query) => $query
                 ->where('is_active', true)
+                ->orderBy('sort_order')->orderBy('id')->limit(8)
                 ->withCount(['products' => fn ($productQuery) => $productQuery->active()])
                 ->with(['media', 'cardMedia', 'latestActiveProduct.images.media', 'latestActiveProduct.variants' => fn ($variantQuery) => $this->constrainCardVariantImage($variantQuery)]),
             'recommendedProducts' => fn ($query) => $query
                 ->where('status', 'active')
+                ->orderByPivot('sort_order')->limit(8)
                 ->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('is_active', true))
                 ->withCount(['allVariants', 'variants as available_variants_count' => fn ($variantQuery) => $variantQuery->where('stock', '>', 0)])
                 ->with([
