@@ -12,12 +12,14 @@
             </p>
         </div>
 
-        <a
-            href="{{ route('admin.product-variants.create', ['product_id' => $product->id]) }}"
-            class="admin-btn admin-btn-secondary"
-        >
-            افزودن تنوع
-        </a>
+        <div class="flex flex-wrap gap-2">
+            <a href="{{ route('admin.product-variants.create', ['product_id' => $product->id, 'type' => 'رنگ', 'name' => 'رنگ']) }}"
+               class="admin-btn admin-btn-secondary">افزودن رنگ</a>
+            <a href="{{ route('admin.product-variants.create', ['product_id' => $product->id, 'type' => 'جنس', 'name' => 'جنس']) }}"
+               class="admin-btn admin-btn-secondary">افزودن جنس</a>
+            <a href="{{ route('admin.product-variants.create', ['product_id' => $product->id, 'type' => 'اندازه', 'name' => 'اندازه']) }}"
+               class="admin-btn admin-btn-primary">افزودن اندازه / مدل</a>
+        </div>
 
     </div>
 
@@ -32,7 +34,7 @@
 
                     <thead>
                     <tr>
-                        <th>عنوان</th>
+                        <th>نوع / گزینه</th>
                         <th>SKU</th>
                         <th>قیمت</th>
                         <th>موجودی</th>
@@ -48,7 +50,8 @@
                         <tr>
 
                             <td>
-                                <div class="font-semibold text-[var(--admin-text)]">
+                                <div class="text-[11px] font-medium text-[var(--admin-muted)]">{{ $variant->type }}</div>
+                                <div class="mt-1 font-semibold text-[var(--admin-text)]">
                                     {{ $variant->name ?? 'تنوع محصول' }}
                                 </div>
 
