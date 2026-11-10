@@ -7,6 +7,7 @@
 @if($flashMessage || $hasValidationErrors)
     <div class="pointer-events-none fixed inset-x-4 top-4 z-[450] flex justify-center sm:inset-x-auto sm:left-5 sm:right-auto sm:w-full sm:max-w-md"
          x-data="{ visible: true, detailsOpen: {{ $hasValidationErrors ? 'true' : 'false' }} }"
+         x-init="if (!detailsOpen && @js($flashType !== 'error' && !$hasValidationErrors)) setTimeout(() => visible = false, 5500)"
          x-show="visible" x-transition.opacity>
         <div class="pointer-events-auto w-full overflow-hidden rounded-2xl border bg-[var(--admin-white)] shadow-2xl
             {{ $flashType === 'success' ? 'border-emerald-300' : (($flashType === 'error' || $hasValidationErrors) ? 'border-red-300' : 'border-[var(--admin-border)]') }}"
@@ -37,7 +38,7 @@
         </div>
 
         @if($hasValidationErrors)
-            <div x-show="detailsOpen" x-cloak x-transition.opacity class="fixed inset-0 z-[460] flex items-center justify-center bg-black/50 p-4"
+            <div x-show="detailsOpen" x-cloak x-transition.opacity class="pointer-events-auto fixed inset-0 z-[460] flex items-center justify-center bg-black/50 p-4"
                  @keydown.escape.window="detailsOpen = false">
                 <section class="w-full max-w-lg rounded-3xl border border-[var(--admin-border)] bg-[var(--admin-white)] p-5 shadow-2xl sm:p-6"
                          role="dialog" aria-modal="true" aria-labelledby="admin-validation-title">
