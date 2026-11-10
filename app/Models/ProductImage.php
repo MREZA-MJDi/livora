@@ -20,6 +20,7 @@ class ProductImage extends Model
         'alt',
         'sort_order',
         'is_primary',
+        'is_variant_only',
     ];
 
     protected $appends = [
@@ -31,6 +32,7 @@ class ProductImage extends Model
         return [
             'sort_order' => 'integer',
             'is_primary' => 'boolean',
+            'is_variant_only' => 'boolean',
         ];
     }
 

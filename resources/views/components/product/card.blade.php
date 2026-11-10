@@ -5,6 +5,18 @@
 @php
     $image = $product->images?->first()?->card_url;
 
+    if (blank($image)) {
+        $imageVariant = $product->relationLoaded('variants')
+            ? $product->variants->first(fn ($variant) => (int) $variant->stock > 0 && $variant->images->isNotEmpty())
+            : $product->variants()
+                ->where('stock', '>', 0)
+                ->with('images.media')
+                ->get()
+                ->first(fn ($variant) => $variant->images->isNotEmpty());
+
+        $image = $imageVariant?->images?->first()?->card_url;
+    }
+
     $hasDiscount =
         $product->compare_at_price !== null
         && (float) $product->compare_at_price > (float) $product->price;
@@ -26,6 +38,16 @@
         : ($product->relationLoaded('allVariants')
             ? $product->allVariants->isNotEmpty()
             : $product->allVariants()->exists());
+
+    $hasAvailableVariant = isset($product->available_variants_count)
+        ? (int) $product->available_variants_count > 0
+        : ($product->relationLoaded('variants')
+            ? $product->variants->contains(fn ($variant) => (int) $variant->stock > 0)
+            : $product->variants()->where('stock', '>', 0)->exists());
+
+    $isAvailable = $hasVariants
+        ? $hasAvailableVariant
+        : (int) $product->stock > 0;
 
 @endphp
 
@@ -175,8 +197,8 @@
             </div>
         @endif
 
-        <p class="mt-2 text-[10px] font-medium {{ (int) $product->stock > 0 ? 'text-emerald-700' : 'text-rose-700' }}">
-            {{ (int) $product->stock > 0 ? 'موجود' : 'ناموجود' }}
+        <p class="mt-2 text-[10px] font-medium {{ $isAvailable ? 'text-emerald-700' : 'text-rose-700' }}">
+            {{ $isAvailable ? 'موجود' : 'ناموجود' }}
         </p>
 
         @if($installmentEnabled && $product->approximate_installment_amount)

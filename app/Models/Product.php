@@ -106,6 +106,7 @@ class Product extends Model
     public function images(): HasMany
     {
         return $this->hasMany(ProductImage::class)
+            ->where('is_variant_only', false)
             ->orderByDesc('is_primary')
             ->orderBy('sort_order')
             ->orderBy('id');

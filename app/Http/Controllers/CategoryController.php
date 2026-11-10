@@ -17,12 +17,7 @@ class CategoryController extends Controller
             ])
             ->with([
                 'media', 'cardMedia',
-                'latestActiveProduct.images' => fn ($imageQuery) => $imageQuery
-                    ->with('media')
-                    ->orderByDesc('is_primary')
-                    ->orderBy('sort_order')
-                    ->orderBy('id')
-                    ->limit(1),
+                'latestActiveProduct.images.media',
             ])
             ->orderBy('sort_order')
             ->paginate(12)
@@ -42,30 +37,40 @@ class CategoryController extends Controller
             'media', 'cardMedia', 'bannerMedia',
             'children' => fn ($query) => $query->where('is_active', true)
                 ->withCount(['products' => fn ($productQuery) => $productQuery->active()])
-                ->with(['cardMedia', 'latestActiveProduct.images' => fn ($imageQuery) => $imageQuery->with('media')->orderByDesc('is_primary')->orderBy('sort_order')->limit(1)]),
-            'latestActiveProduct.images' => fn ($imageQuery) => $imageQuery
-                    ->with('media')
-                    ->orderByDesc('is_primary')
-                    ->orderBy('sort_order')
-                    ->orderBy('id')
-                    ->limit(1),
+                ->with(['cardMedia', 'latestActiveProduct.images.media',]),
+            'latestActiveProduct.images.media',
             'relatedCategories' => fn ($query) => $query
                 ->where('is_active', true)
                 ->withCount(['products' => fn ($productQuery) => $productQuery->active()]),
             'recommendedProducts' => fn ($query) => $query
                 ->where('status', 'active')
                 ->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('is_active', true))
-                ->withCount('allVariants')
-                ->with(['category', 'images' => fn ($imageQuery) => $imageQuery->with('media')->orderByDesc('is_primary')->orderBy('sort_order')->orderBy('id')->limit(1)]),
+                ->withCount(['allVariants', 'variants as available_variants_count' => fn ($variantQuery) => $variantQuery->where('stock', '>', 0)])
+                ->with([
+                    'category',
+                    'images' => fn ($imageQuery) => $imageQuery
+                        ->with('media')
+                        ->orderByDesc('is_primary')
+                        ->orderBy('sort_order')
+                        ->orderBy('id')
+                        ->limit(1),
+                    'variants.images.media',
+                ]),
         ]);
 
         $query = $category->products()
-            ->withCount('allVariants')
+            ->withCount(['allVariants', 'variants as available_variants_count' => fn ($variantQuery) => $variantQuery->where('stock', '>', 0)])
             ->active()
             ->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('is_active', true))
             ->with([
                 'category',
-                'images' => fn ($imageQuery) => $imageQuery->with('media')->orderByDesc('is_primary')->orderBy('sort_order')->orderBy('id')->limit(1),
+                'images' => fn ($imageQuery) => $imageQuery
+                    ->with('media')
+                    ->orderByDesc('is_primary')
+                    ->orderBy('sort_order')
+                    ->orderBy('id')
+                    ->limit(1),
+                'variants.images.media',
             ]);
 
         if (! empty($filters['search'])) {
@@ -75,7 +80,12 @@ class CategoryController extends Controller
                     ->where('name', 'like', "%{$search}%")
                     ->orWhere('sku', 'like', "%{$search}%")
                     ->orWhere('short_description', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhereHas('variants', fn ($variantQuery) => $variantQuery
+                        ->where('type', 'like', "%{$search}%")
+                        ->orWhere('name', 'like', "%{$search}%")
+                        ->orWhere('value', 'like', "%{$search}%")
+                        ->orWhere('sku', 'like', "%{$search}%"));
             });
         }
 

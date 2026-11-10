@@ -24,6 +24,7 @@ class ProductImageController extends Controller
     public function index(Request $request): View
     {
         $query = ProductImage::query()
+            ->where('is_variant_only', false)
             ->with('product')
             ->orderBy('product_id')
             ->orderBy('sort_order')
@@ -71,6 +72,7 @@ class ProductImageController extends Controller
         DB::transaction(function () use (&$data): void {
                 $hasExistingImage = ProductImage::query()
                     ->where('product_id', $data['product_id'])
+                    ->where('is_variant_only', false)
                     ->exists();
 
                 $data['is_primary'] = $data['is_primary'] || ! $hasExistingImage;
@@ -78,6 +80,7 @@ class ProductImageController extends Controller
                 if ($data['is_primary']) {
                     ProductImage::query()
                         ->where('product_id', $data['product_id'])
+                        ->where('is_variant_only', false)
                         ->update(['is_primary' => false]);
                 }
 
@@ -136,6 +139,7 @@ class ProductImageController extends Controller
                 if ($data['is_primary']) {
                     ProductImage::query()
                         ->where('product_id', $newProductId)
+                        ->where('is_variant_only', false)
                         ->where('id', '!=', $productImage->id)
                         ->update(['is_primary' => false]);
                 }
@@ -151,12 +155,14 @@ class ProductImageController extends Controller
                 foreach (array_unique([$oldProductId, $newProductId]) as $affectedProductId) {
                     $hasPrimary = ProductImage::query()
                         ->where('product_id', $affectedProductId)
+                        ->where('is_variant_only', false)
                         ->where('is_primary', true)
                         ->exists();
 
                     if (! $hasPrimary) {
                         $replacement = ProductImage::query()
                             ->where('product_id', $affectedProductId)
+                            ->where('is_variant_only', false)
                             ->orderBy('sort_order')
                             ->orderBy('id')
                             ->first();
@@ -184,6 +190,7 @@ class ProductImageController extends Controller
             if ($wasPrimary) {
                 $replacement = ProductImage::query()
                     ->where('product_id', $productId)
+                    ->where('is_variant_only', false)
                     ->orderBy('sort_order')
                     ->orderBy('id')
                     ->first();

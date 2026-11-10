@@ -731,6 +731,52 @@ class AdminCrudLifecycleTest extends TestCase
         ]);
     }
 
+    public function test_variant_cover_upload_is_cropped_and_kept_out_of_the_base_product_gallery(): void
+    {
+        $category = $this->createCategory('variant-cover-scope-category');
+        $product = Product::query()->create($this->productPayload($category, [
+            'name' => 'مبل با رنگ مستقل',
+            'slug' => 'sofa-variant-cover-scope',
+            'sku' => 'SG-VARIANT-COVER-001',
+        ]));
+
+        $this->actingAs($this->admin)
+            ->post(route('admin.product-variants.store'), [
+                'product_id' => $product->id,
+                'type' => 'رنگ',
+                'name' => 'رنگ بدنه',
+                'value' => 'قرمز',
+                'sku' => 'SG-VARIANT-COVER-RED',
+                'price_adjustment' => '0',
+                'stock' => '4',
+                'is_active' => '1',
+                'variant_image' => UploadedFile::fake()->image('sofa-red.jpg', 800, 1000),
+            ])
+            ->assertRedirect(route('admin.products.edit', $product));
+
+        $variant = ProductVariant::query()
+            ->where('product_id', $product->id)
+            ->where('value', 'قرمز')
+            ->firstOrFail();
+        $variantImage = $variant->images()->firstOrFail();
+
+        $this->assertTrue($variantImage->is_variant_only);
+        $this->assertSame(1, $variant->images()->count());
+        $this->assertSame(0, $product->images()->count());
+        $this->assertNotNull($variantImage->media_id);
+
+        $media = Media::query()->findOrFail($variantImage->media_id);
+        $this->assertNotEmpty($media->detail_path);
+        Storage::disk('public')->assertExists($media->path);
+        Storage::disk('public')->assertExists($media->detail_path);
+
+        $this->actingAs($this->admin)
+            ->get(route('admin.product-variants.edit', $variant))
+            ->assertOk()
+            ->assertSee('variant-image-preview')
+            ->assertSee($variantImage->detail_url, false);
+    }
+
     public function test_admin_image_upload_previews_match_the_public_card_aspect_ratios(): void
     {
         $category = $this->createCategory('image-preview-ratio-category');
@@ -772,6 +818,9 @@ class AdminCrudLifecycleTest extends TestCase
         $this->actingAs($this->admin)
             ->get(route('admin.product-variants.create', ['product_id' => $product->id]))
             ->assertOk()
+            ->assertSee('aspect-[4/5]', false)
+            ->assertSee('data-crop-ratio="0.8"', false)
+            ->assertSee('data-preview-target="variant-image-preview"', false)
             ->assertSee('aspect-[4/3]', false)
             ->assertSee($product->images()->firstOrFail()->url);
 
