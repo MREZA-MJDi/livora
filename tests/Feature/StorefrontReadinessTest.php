@@ -603,7 +603,7 @@ class StorefrontReadinessTest extends TestCase
             'payload' => ['product_source' => 'installments', 'limit' => 8],
         ]);
         HomeSection::query()->create([
-            'key' => 'featured',
+            'key' => 'homepage-featured-source',
             'type' => 'products',
             'enabled' => true,
             'sort_order' => 20,
@@ -618,7 +618,7 @@ class StorefrontReadinessTest extends TestCase
             ->assertDontSee($unrelatedProduct->name)
             ->assertViewHas('homeSections', function ($sections) use ($installmentProduct) {
                 $installments = $sections->firstWhere('key', 'homepage-installments');
-                $featured = $sections->firstWhere('key', 'featured');
+                $featured = $sections->firstWhere('key', 'homepage-featured-source');
                 $product = $installments?->products?->first();
 
                 return $installments?->products?->modelKeys() === [$installmentProduct->id]
