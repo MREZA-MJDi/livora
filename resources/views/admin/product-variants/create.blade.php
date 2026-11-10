@@ -14,6 +14,8 @@
         @include('admin.product-variants.partials.form', [
             'products' => $products,
             'selectedProductId' => $selectedProductId ?? null,
+            'defaultType' => $defaultType ?? 'اندازه',
+            'defaultName' => $defaultName ?? 'اندازه مبل',
         ])
     </form>
 @endsection
