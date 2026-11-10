@@ -38,7 +38,7 @@
         <div class="p-5 sm:p-6">
             <label for="product_id" class="admin-label">محصول اصلی</label>
             <select id="product_id" name="product_id" class="admin-select" required
-                    @change="setProduct($event.target)">
+                    @change="setProduct($event.target)" @disabled($editing)>
                 <option value="">انتخاب محصول</option>
                 @foreach($products as $product)
                     <option value="{{ $product->id }}" data-price="{{ (float) $product->price }}"
@@ -47,6 +47,7 @@
                     </option>
                 @endforeach
             </select>
+            @if($editing)<input type="hidden" name="product_id" value="{{ $currentProductId }}">@endif
             @error('product_id')<p class="mt-2 text-xs text-[var(--admin-danger)]">{{ $message }}</p>@enderror
         </div>
     </section>
