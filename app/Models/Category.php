@@ -78,7 +78,33 @@ class Category extends Model
 
     public function getHomepageImageUrlAttribute(): ?string
     {
-        return $this->card_image_url ?: $this->latestActiveProduct?->images?->first()?->card_url;
+        if ($image = $this->card_image_url) {
+            return $image;
+        }
+
+        // Accessors must not trigger hidden relation queries while rendering cards.
+        if (! $this->relationLoaded('latestActiveProduct')) {
+            return null;
+        }
+
+        $product = $this->getRelation('latestActiveProduct');
+        if (! $product) {
+            return null;
+        }
+
+        if ($image = $product->images?->first()?->card_url) {
+            return $image;
+        }
+
+        if (! $product->relationLoaded('variants')) {
+            return null;
+        }
+
+        $variant = $product->variants->first(
+            fn ($item) => (int) $item->stock > 0 && $item->images->isNotEmpty()
+        ) ?? $product->variants->first(fn ($item) => $item->images->isNotEmpty());
+
+        return $variant?->images?->first()?->card_url;
     }
 
     private function storedImageUrl(?Media $media, ?string $path): ?string
