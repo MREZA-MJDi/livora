@@ -16,11 +16,14 @@
         : collect();
 
     if (blank($image)) {
-        $imageVariant = $variants->first(
-            fn ($variant) => (int) $variant->stock > 0 && $variant->images->isNotEmpty()
-        ) ?? $variants->first(fn ($variant) => $variant->images->isNotEmpty());
+        $hasLoadedImages = fn ($variant) => $variant->relationLoaded('images')
+            && $variant->getRelation('images')->isNotEmpty();
 
-        $image = $imageVariant?->images?->first()?->card_url;
+        $imageVariant = $variants->first(
+            fn ($variant) => (int) $variant->stock > 0 && $hasLoadedImages($variant)
+        ) ?? $variants->first($hasLoadedImages);
+
+        $image = $imageVariant?->getRelation('images')?->first()?->card_url;
     }
 
     $hasDiscount =
