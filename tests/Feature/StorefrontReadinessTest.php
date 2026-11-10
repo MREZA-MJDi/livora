@@ -818,6 +818,35 @@ class StorefrontReadinessTest extends TestCase
             });
     }
 
+    public function test_category_product_cards_do_not_issue_one_variant_image_query_per_product(): void
+    {
+        $category = $this->category([
+            'name' => 'دسته بدون N+1',
+            'slug' => 'category-without-image-n-plus-one',
+        ]);
+
+        for ($i = 1; $i <= 12; $i++) {
+            $this->productWithVariantImage($category, $i);
+        }
+
+        $queryCount = 0;
+        DB::listen(function (QueryExecuted $query) use (&$queryCount): void {
+            if (preg_match('/^\s*select\b/i', $query->sql)) {
+                $queryCount++;
+            }
+        });
+
+        $this->get(route('categories.show', $category->slug))
+            ->assertOk()
+            ->assertViewHas('products', fn ($products) => $products->count() === 12);
+
+        $this->assertLessThanOrEqual(
+            35,
+            $queryCount,
+            'Category product cards must eager-load product and variant images in batches.'
+        );
+    }
+
     public function test_homepage_popular_and_featured_sections_use_their_real_product_sources(): void
     {
         $category = $this->category();
