@@ -32,6 +32,8 @@ class Product extends Model
         'status',
         'is_featured',
         'is_new',
+        'is_home_hero',
+        'home_hero_sort_order',
         'meta_title',
         'meta_description',
         'focus_keyword',
@@ -76,6 +78,8 @@ class Product extends Model
 
             'is_featured' => 'boolean',
             'is_new' => 'boolean',
+            'is_home_hero' => 'boolean',
+            'home_hero_sort_order' => 'integer',
             'seo_index' => 'boolean',
             'seo_follow' => 'boolean',
             'content_sections' => 'array',
