@@ -239,7 +239,7 @@
                         </div>
 
                         <div class="mt-14">
-                            {{ $products->withQueryString()->links() }}
+                            {{ $products->withQueryString()->onEachSide(1)->links('pagination.silla') }}
                         </div>
 
                     @else
@@ -335,7 +335,7 @@
         @if($category->children->isNotEmpty() || $category->relatedCategories->isNotEmpty())
             @if($category->children->isNotEmpty())
                 <section class="border-t border-[var(--sg-border)]">
-                    <x-layout.container><div class="py-12"><h2 class="text-2xl font-semibold">زیر‌دسته‌ها</h2><div class="sg-category-grid sg-category-grid--index mt-6 grid gap-5">@foreach($category->children as $child)<x-shop.category-card :name="$child->name" :image="$child->card_image_url" :href="route('categories.show', $child->slug)" :count="$child->products_count ?? null" />@endforeach</div></div></x-layout.container>
+                    <x-layout.container><div class="py-12"><h2 class="text-2xl font-semibold">زیر‌دسته‌ها</h2><div class="sg-category-grid sg-category-grid--index mt-6 grid gap-5">@foreach($category->children as $child)<x-shop.category-card :name="$child->name" :image="$child->homepage_image_url" :href="route('categories.show', $child->slug)" :count="$child->products_count ?? null" />@endforeach</div></div></x-layout.container>
                 </section>
             @endif
             <section class="border-t border-[var(--sg-border)]">
@@ -346,7 +346,7 @@
                             @foreach($category->relatedCategories as $relatedCategory)
                                 <x-shop.category-card
                                     :name="$relatedCategory->name"
-                                     :image="$relatedCategory->card_image_url"
+                                     :image="$relatedCategory->homepage_image_url"
                                     :href="route('categories.show', $relatedCategory->slug)"
                                     :count="$relatedCategory->products_count"
                                 />

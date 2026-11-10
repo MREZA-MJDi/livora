@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -28,8 +29,8 @@ class HomeSectionController extends Controller
     {
         return view('admin.home-sections.form', [
             'section' => new HomeSection(['enabled' => true, 'type' => 'products', 'payload' => ['product_source' => 'latest', 'limit' => 8]]),
-            'categories' => Category::query()->active()->get(['id', 'name']),
-            'products' => Product::query()->active()->orderBy('name')->get(['id', 'name']),
+            'categories' => Category::query()->active()->limit(200)->get(['id', 'name']),
+            'products' => $this->productOptions(),
         ]);
     }
 
@@ -55,8 +56,8 @@ class HomeSectionController extends Controller
     {
         return view('admin.home-sections.form', [
             'section' => $homeSection,
-            'categories' => Category::query()->active()->get(['id', 'name']),
-            'products' => Product::query()->active()->orderBy('name')->get(['id', 'name']),
+            'categories' => Category::query()->active()->limit(200)->get(['id', 'name']),
+            'products' => $this->productOptions($homeSection),
         ]);
     }
 
@@ -125,7 +126,7 @@ class HomeSectionController extends Controller
             'slide_images' => ['nullable', 'array', 'max:4'],
             'slide_images.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
             'payload' => ['nullable', 'array'],
-            'payload.product_source' => ['nullable', Rule::in(['latest', 'new', 'installments', 'selected', 'category'])],
+            'payload.product_source' => ['nullable', Rule::in(['latest', 'new', 'featured', 'popular', 'installments', 'selected', 'category'])],
             'payload.product_ids' => ['nullable', 'array', 'max:30'],
             'payload.product_ids.*' => ['integer', 'distinct', 'exists:products,id'],
             'payload.category_id' => ['nullable', 'integer', 'exists:categories,id'],
@@ -218,6 +219,38 @@ class HomeSectionController extends Controller
                 'payload.product_ids' => 'هر محصول فقط می‌تواند در یک سکشن دستی صفحه اصلی انتخاب شود.',
             ]);
         }
+    }
+
+    /**
+     * Keep the section editor responsive while retaining every saved selection.
+     *
+     * @return Collection<int, Product>
+     */
+    private function productOptions(?HomeSection $section = null): Collection
+    {
+        $selectedIds = array_values(array_unique(array_map(
+            'intval',
+            data_get($section?->payload, 'product_ids', [])
+        )));
+
+        $selected = $selectedIds === []
+            ? collect()
+            : Product::query()
+                ->whereIn('id', $selectedIds)
+                ->orderBy('name')
+                ->get(['id', 'name']);
+
+        $remainingLimit = max(0, 200 - $selected->count());
+        $remaining = $remainingLimit === 0
+            ? collect()
+            : Product::query()
+                ->active()
+                ->when($selectedIds !== [], fn ($query) => $query->whereNotIn('id', $selectedIds))
+                ->orderBy('name')
+                ->limit($remainingLimit)
+                ->get(['id', 'name']);
+
+        return $selected->concat($remaining)->unique('id')->values();
     }
 
     private function storeImage(Request $request, ?string $existing): ?string

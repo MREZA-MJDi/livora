@@ -9,12 +9,15 @@ use App\Models\Address;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\ProductVariant;
+use App\Models\HomeSection;
 use App\Services\Inventory\OrderInventoryService;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Database\Events\QueryExecuted;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
@@ -524,6 +527,108 @@ class StorefrontReadinessTest extends TestCase
             });
     }
 
+    public function test_category_product_listing_uses_server_side_pagination_and_keeps_filters(): void
+    {
+        $category = $this->category([
+            'name' => 'دسته صفحه‌بندی محصولات',
+            'slug' => 'category-products-pagination',
+        ]);
+        $products = [];
+
+        for ($i = 1; $i <= 13; $i++) {
+            $products[] = $this->product($category, [
+                'name' => 'محصول دسته‌بندی ' . str_pad((string) $i, 2, '0', STR_PAD_LEFT),
+                'slug' => 'category-page-product-' . $i,
+                'installment_enabled' => true,
+            ]);
+        }
+
+        $this->get(route('categories.show', [
+            'category' => $category->slug,
+            'installment' => '1',
+            'sort' => 'oldest',
+            'page' => 2,
+        ]))
+            ->assertOk()
+            ->assertViewHas('products', function ($paginator) {
+                return $paginator instanceof LengthAwarePaginator
+                    && $paginator->perPage() === 12
+                    && $paginator->total() === 13
+                    && $paginator->currentPage() === 2;
+            })
+            ->assertSee($products[12]->name)
+            ->assertDontSee($products[0]->name)
+            ->assertSee('installment=1', false);
+    }
+
+    public function test_homepage_sections_never_fall_back_to_products_that_do_not_match_their_title(): void
+    {
+        $category = $this->category();
+        $installmentProduct = $this->product($category, [
+            'name' => 'محصول واقعی اقساطی صفحه اصلی',
+            'slug' => 'homepage-real-installment',
+            'installment_enabled' => true,
+        ]);
+        $unrelatedProduct = $this->product($category, [
+            'name' => 'محصول غیر اقساطی و غیر ویژه',
+            'slug' => 'homepage-unrelated-product',
+        ]);
+
+        $variant = ProductVariant::query()->create([
+            'product_id' => $installmentProduct->id,
+            'type' => 'color',
+            'name' => 'رنگ',
+            'value' => 'کرم',
+            'sku' => 'HOME-REAL-INSTALLMENT-CREAM',
+            'price_adjustment' => 0,
+            'stock' => 3,
+            'is_active' => true,
+        ]);
+        $variantImage = ProductImage::query()->create([
+            'product_id' => $installmentProduct->id,
+            'path' => 'https://images.example.test/homepage/variant-cover.webp',
+            'alt' => 'تصویر وریانت محصول اقساطی',
+            'sort_order' => 0,
+            'is_primary' => false,
+            'is_variant_only' => true,
+        ]);
+        $variant->images()->attach($variantImage->id);
+
+        HomeSection::query()->create([
+            'key' => 'homepage-installments',
+            'type' => 'products',
+            'enabled' => true,
+            'sort_order' => 10,
+            'title' => 'محصولات اقساطی واقعی',
+            'payload' => ['product_source' => 'installments', 'limit' => 8],
+        ]);
+        HomeSection::query()->create([
+            'key' => 'homepage-featured-source',
+            'type' => 'products',
+            'enabled' => true,
+            'sort_order' => 20,
+            'title' => 'محصولات ویژه واقعی',
+            'payload' => ['product_source' => 'featured', 'limit' => 8],
+        ]);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee($installmentProduct->name)
+            ->assertSee('https://images.example.test/homepage/variant-cover.webp', false)
+            ->assertDontSee($unrelatedProduct->name)
+            ->assertViewHas('homeSections', function ($sections) use ($installmentProduct) {
+                $installments = $sections->firstWhere('key', 'homepage-installments');
+                $featured = $sections->firstWhere('key', 'homepage-featured-source');
+                $product = $installments?->products?->first();
+
+                return $installments?->products?->pluck('id')->all() === [$installmentProduct->id]
+                    && $featured?->products?->isEmpty()
+                    && $product?->relationLoaded('variants')
+                    && $product->variants->first()?->relationLoaded('images')
+                    && $product->variants->first()?->images->first()?->relationLoaded('media');
+            });
+    }
+
     public function test_shop_applies_each_visible_catalogue_filter(): void
     {
         $category = $this->category();
@@ -712,6 +817,185 @@ class StorefrontReadinessTest extends TestCase
                 return $products->count() === 3
                     && $products->every(fn ($product) => $product->images->count() === 1);
             });
+    }
+
+    public function test_category_product_cards_do_not_issue_one_variant_image_query_per_product(): void
+    {
+        $category = $this->category([
+            'name' => 'دسته بدون N+1',
+            'slug' => 'category-without-image-n-plus-one',
+        ]);
+
+        $this->productWithVariantImage($category, 1);
+
+        $queryCount = 0;
+        DB::listen(function (QueryExecuted $query) use (&$queryCount): void {
+            if (preg_match('/^\s*select\b/i', $query->sql)) {
+                $queryCount++;
+            }
+        });
+
+        $this->get(route('categories.show', $category->slug))
+            ->assertOk()
+            ->assertViewHas('products', fn ($products) => $products->count() === 1);
+
+        $singleProductQueries = $queryCount;
+
+        for ($i = 2; $i <= 12; $i++) {
+            $this->productWithVariantImage($category, $i);
+        }
+
+        $queryCount = 0;
+        $this->get(route('categories.show', $category->slug))
+            ->assertOk()
+            ->assertViewHas('products', fn ($products) => $products->count() === 12);
+
+        $this->assertLessThanOrEqual(
+            $singleProductQueries + 10,
+            $queryCount,
+            'Category product and variant images must be batch-loaded rather than queried per card.'
+        );
+    }
+
+    public function test_homepage_popular_and_featured_sections_use_their_real_product_sources(): void
+    {
+        $category = $this->category();
+        $bestSeller = $this->product($category, [
+            'name' => 'محصول پرفروش واقعی',
+            'slug' => 'homepage-best-seller-real',
+        ]);
+        $runnerUp = $this->product($category, [
+            'name' => 'محصول رتبه دوم فروش',
+            'slug' => 'homepage-runner-up',
+        ]);
+        $featured = $this->product($category, [
+            'name' => 'محصول ویژه واقعی',
+            'slug' => 'homepage-featured-real',
+            'is_featured' => true,
+        ]);
+
+        foreach ([[$bestSeller, 8], [$runnerUp, 3]] as [$product, $quantity]) {
+            $order = $this->inventoryOrder();
+            OrderItem::query()->create([
+                'order_id' => $order->id,
+                'product_id' => $product->id,
+                'product_name' => $product->name,
+                'sku' => $product->sku,
+                'quantity' => $quantity,
+                'unit_price' => 1000,
+                'total' => 1000 * $quantity,
+            ]);
+        }
+
+        HomeSection::query()->create([
+            'key' => 'best-selling',
+            'type' => 'products',
+            'enabled' => true,
+            'sort_order' => 10,
+            'title' => 'پرفروش‌ترین‌ها',
+            'payload' => ['product_source' => 'popular', 'limit' => 8],
+        ]);
+        HomeSection::query()->create([
+            'key' => 'featured-products',
+            'type' => 'products',
+            'enabled' => true,
+            'sort_order' => 20,
+            'title' => 'محصولات ویژه',
+            'payload' => ['product_source' => 'featured', 'limit' => 8],
+        ]);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertViewHas('homeSections', function ($sections) use ($bestSeller, $runnerUp, $featured) {
+                return $sections->firstWhere('key', 'best-selling')?->products?->pluck('id')->all()
+                        === [$bestSeller->id, $runnerUp->id]
+                    && $sections->firstWhere('key', 'featured-products')?->products?->pluck('id')->all()
+                        === [$featured->id];
+            });
+    }
+
+    public function test_homepage_variant_media_queries_stay_bounded_as_product_count_grows(): void
+    {
+        $category = $this->category();
+        $this->productWithVariantImage($category, 1);
+
+        HomeSection::query()->create([
+            'key' => 'query-count-products',
+            'type' => 'products',
+            'enabled' => true,
+            'sort_order' => 10,
+            'title' => 'محصولات تست تعداد کوئری',
+            'payload' => ['product_source' => 'latest', 'limit' => 24],
+        ]);
+
+        $queryCount = 0;
+        DB::listen(function (QueryExecuted $query) use (&$queryCount): void {
+            if (preg_match('/^\s*select\b/i', $query->sql)) {
+                $queryCount++;
+            }
+        });
+
+        $this->get('/')->assertOk();
+        $singleProductQueries = $queryCount;
+
+        for ($i = 2; $i <= 12; $i++) {
+            $this->productWithVariantImage($category, $i);
+        }
+
+        $queryCount = 0;
+        $this->get('/')->assertOk();
+
+        $this->assertLessThanOrEqual(
+            $singleProductQueries + 10,
+            $queryCount,
+            'Homepage product and variant media queries must be eager-loaded, not executed once per card.'
+        );
+    }
+
+    public function test_dashboard_top_product_media_queries_stay_bounded_as_sales_grow(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $category = $this->category();
+
+        $recordSale = function (int $index, int $quantity = 1) use ($category): void {
+            $product = $this->productWithVariantImage($category, $index);
+            $order = $this->inventoryOrder();
+
+            OrderItem::query()->create([
+                'order_id' => $order->id,
+                'product_id' => $product->id,
+                'product_name' => $product->name,
+                'sku' => $product->sku,
+                'quantity' => $quantity,
+                'unit_price' => 1000,
+                'total' => 1000 * $quantity,
+            ]);
+        };
+
+        $recordSale(1, 5);
+
+        $queryCount = 0;
+        DB::listen(function (QueryExecuted $query) use (&$queryCount): void {
+            if (preg_match('/^\s*select\b/i', $query->sql)) {
+                $queryCount++;
+            }
+        });
+
+        $this->actingAs($admin)->get(route('admin.dashboard'))->assertOk();
+        $singleProductQueries = $queryCount;
+
+        for ($i = 2; $i <= 5; $i++) {
+            $recordSale($i, 6 - $i);
+        }
+
+        $queryCount = 0;
+        $this->actingAs($admin)->get(route('admin.dashboard'))->assertOk();
+
+        $this->assertLessThanOrEqual(
+            $singleProductQueries + 3,
+            $queryCount,
+            'Dashboard top-product images and variant galleries must not add one query per sold product.'
+        );
     }
 
     public function test_dashboard_uses_correct_paid_revenue_aggregates_for_current_and_previous_month(): void
@@ -1267,6 +1551,39 @@ class StorefrontReadinessTest extends TestCase
                 ->assertDontSee('>Telegram</a>', false)
                 ->assertDontSee('>Instagram</a>', false);
         }
+    }
+
+    private function productWithVariantImage(Category $category, int $index): Product
+    {
+        $product = $this->product($category, [
+            'name' => 'محصول تصویر وریانت ' . $index,
+            'slug' => 'variant-image-query-product-' . $index,
+            'sku' => 'LIV-QUERY-VARIANT-' . $index,
+        ]);
+
+        $variant = ProductVariant::query()->create([
+            'product_id' => $product->id,
+            'type' => 'color',
+            'name' => 'رنگ',
+            'value' => 'رنگ ' . $index,
+            'sku' => 'LIV-QUERY-VARIANT-SKU-' . $index,
+            'price_adjustment' => 0,
+            'stock' => 4,
+            'is_active' => true,
+        ]);
+
+        $image = ProductImage::query()->create([
+            'product_id' => $product->id,
+            'path' => "https://images.example.test/query/variant-{$index}.webp",
+            'alt' => $product->name,
+            'sort_order' => 0,
+            'is_primary' => false,
+            'is_variant_only' => true,
+        ]);
+
+        $variant->images()->attach($image->id);
+
+        return $product;
     }
 
     private function inventoryOrder(): Order

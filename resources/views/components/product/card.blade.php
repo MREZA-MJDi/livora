@@ -3,18 +3,27 @@
 ])
 
 @php
-    $image = $product->images?->first()?->card_url;
+    // Card rendering is intentionally read-only: controllers must eager-load
+    // card images and variant availability so Blade never causes N+1 queries.
+    $images = $product->relationLoaded('images')
+        ? $product->getRelation('images')
+        : collect();
+
+    $image = $images->first()?->card_url;
+
+    $variants = $product->relationLoaded('variants')
+        ? $product->getRelation('variants')
+        : collect();
 
     if (blank($image)) {
-        $imageVariant = $product->relationLoaded('variants')
-            ? $product->variants->first(fn ($variant) => (int) $variant->stock > 0 && $variant->images->isNotEmpty())
-            : $product->variants()
-                ->where('stock', '>', 0)
-                ->with('images.media')
-                ->get()
-                ->first(fn ($variant) => $variant->images->isNotEmpty());
+        $hasLoadedImages = fn ($variant) => $variant->relationLoaded('images')
+            && $variant->getRelation('images')->isNotEmpty();
 
-        $image = $imageVariant?->images?->first()?->card_url;
+        $imageVariant = $variants->first(
+            fn ($variant) => (int) $variant->stock > 0 && $hasLoadedImages($variant)
+        ) ?? $variants->first($hasLoadedImages);
+
+        $image = $imageVariant?->getRelation('images')?->first()?->card_url;
     }
 
     $hasDiscount =
@@ -30,20 +39,16 @@
         )
         : 0;
 
-    $installmentEnabled =
-        (bool) $product->installment_enabled;
+    $installmentEnabled = (bool) $product->installment_enabled;
 
     $hasVariants = isset($product->all_variants_count)
         ? (int) $product->all_variants_count > 0
         : ($product->relationLoaded('allVariants')
-            ? $product->allVariants->isNotEmpty()
-            : $product->allVariants()->exists());
+            && $product->getRelation('allVariants')->isNotEmpty());
 
     $hasAvailableVariant = isset($product->available_variants_count)
         ? (int) $product->available_variants_count > 0
-        : ($product->relationLoaded('variants')
-            ? $product->variants->contains(fn ($variant) => (int) $variant->stock > 0)
-            : $product->variants()->where('stock', '>', 0)->exists());
+        : $variants->contains(fn ($variant) => (int) $variant->stock > 0);
 
     $isAvailable = $hasVariants
         ? $hasAvailableVariant

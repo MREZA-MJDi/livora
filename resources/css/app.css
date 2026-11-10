@@ -2375,7 +2375,6 @@ body {
 .storefront-content .sg-category-index-tile__media {
     aspect-ratio: 4 / 3;
     overflow: hidden;
-    border-radius: inherit;
 }
 
 .storefront-content .sg-category-index-tile__media > img {
@@ -2580,7 +2579,7 @@ body {
     width: 100%;
     aspect-ratio: 3 / 2;
     overflow: hidden;
-    border-radius: 1.15rem;
+    border-radius: 1.5rem;
     background: var(--sg-surface);
 }
 .sg-home-hero__image {
@@ -2621,7 +2620,6 @@ body {
         order: initial;
         aspect-ratio: 4 / 3;
         border: 1px solid var(--sg-border);
-        border-radius: 1.5rem;
         box-shadow: 0 24px 70px rgb(32 29 25 / .10);
     }
     .sg-home-hero__dots {

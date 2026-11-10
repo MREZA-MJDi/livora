@@ -126,7 +126,7 @@
 
                         @if($categories->hasPages())
                             <div class="mt-10 sm:mt-12">
-                                {{ $categories->withQueryString()->links() }}
+                                {{ $categories->withQueryString()->onEachSide(1)->links('pagination.silla') }}
                             </div>
                         @endif
                     @else

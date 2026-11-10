@@ -221,7 +221,13 @@ class DashboardController extends Controller
     {
         return OrderItem::query()
             ->with([
-                'product.images' => fn ($imageQuery) => $imageQuery->with('media')->orderByDesc('is_primary')->orderBy('sort_order')->orderBy('id')->limit(1),
+                'product.images' => fn ($imageQuery) => $imageQuery
+                    ->with('media')
+                    ->orderByDesc('is_primary')
+                    ->orderBy('sort_order')
+                    ->orderBy('id')
+                    ->limit(1),
+                'product.variants.images.media',
             ])
             ->whereHas(
                 'order',
@@ -243,8 +249,32 @@ class DashboardController extends Controller
                     'name' => $item->product_name,
                     'quantity' => (int) $item->sold_quantity,
                     'revenue' => (float) $item->revenue,
-                    'image' => $item->product?->images?->first()?->url,
+                    'image' => $this->topProductImage($item->product),
                 ];
             });
+    }
+
+    private function topProductImage(?Product $product): ?string
+    {
+        if (! $product) {
+            return null;
+        }
+
+        if ($image = $product->images?->first()?->card_url) {
+            return $image;
+        }
+
+        if (! $product->relationLoaded('variants')) {
+            return null;
+        }
+
+        $hasLoadedImages = fn ($variant) => $variant->relationLoaded('images')
+            && $variant->getRelation('images')->isNotEmpty();
+
+        $variant = $product->getRelation('variants')->first(
+            fn ($item) => (int) $item->stock > 0 && $hasLoadedImages($item)
+        ) ?? $product->getRelation('variants')->first($hasLoadedImages);
+
+        return $variant?->getRelation('images')?->first()?->card_url;
     }
 }

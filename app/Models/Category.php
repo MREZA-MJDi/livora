@@ -78,7 +78,51 @@ class Category extends Model
 
     public function getHomepageImageUrlAttribute(): ?string
     {
-        return $this->card_image_url ?: $this->latestActiveProduct?->images?->first()?->card_url;
+        $cardImage = $this->storedImageUrl(
+            $this->relationLoaded('cardMedia') ? $this->getRelation('cardMedia') : null,
+            $this->card_image
+        );
+        if ($cardImage) {
+            return $cardImage;
+        }
+
+        $defaultImage = $this->storedImageUrl(
+            $this->relationLoaded('media') ? $this->getRelation('media') : null,
+            $this->image
+        );
+        if ($defaultImage) {
+            return $defaultImage;
+        }
+
+        // Accessors must not trigger hidden relation queries while rendering cards.
+        if (! $this->relationLoaded('latestActiveProduct')) {
+            return null;
+        }
+
+        $product = $this->getRelation('latestActiveProduct');
+        if (! $product) {
+            return null;
+        }
+
+        if ($product->relationLoaded('images')) {
+            if ($image = $product->getRelation('images')->first()?->card_url) {
+                return $image;
+            }
+        }
+
+        if (! $product->relationLoaded('variants')) {
+            return null;
+        }
+
+        $variants = $product->getRelation('variants');
+        $hasLoadedImages = fn ($variant) => $variant->relationLoaded('images')
+            && $variant->getRelation('images')->isNotEmpty();
+
+        $variant = $variants->first(
+            fn ($item) => (int) $item->stock > 0 && $hasLoadedImages($item)
+        ) ?? $variants->first($hasLoadedImages);
+
+        return $variant?->getRelation('images')?->first()?->card_url;
     }
 
     private function storedImageUrl(?Media $media, ?string $path): ?string
