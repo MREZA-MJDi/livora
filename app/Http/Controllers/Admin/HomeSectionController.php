@@ -125,7 +125,7 @@ class HomeSectionController extends Controller
             'slide_images' => ['nullable', 'array', 'max:4'],
             'slide_images.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
             'payload' => ['nullable', 'array'],
-            'payload.product_source' => ['nullable', Rule::in(['latest', 'new', 'installments', 'selected', 'category'])],
+            'payload.product_source' => ['nullable', Rule::in(['latest', 'new', 'featured', 'popular', 'installments', 'selected', 'category'])],
             'payload.product_ids' => ['nullable', 'array', 'max:30'],
             'payload.product_ids.*' => ['integer', 'distinct', 'exists:products,id'],
             'payload.category_id' => ['nullable', 'integer', 'exists:categories,id'],
