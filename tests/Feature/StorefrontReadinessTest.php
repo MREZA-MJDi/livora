@@ -608,7 +608,7 @@ class StorefrontReadinessTest extends TestCase
             'enabled' => true,
             'sort_order' => 20,
             'title' => 'محصولات ویژه واقعی',
-            'payload' => ['product_source' => 'latest', 'limit' => 8],
+            'payload' => ['product_source' => 'featured', 'limit' => 8],
         ]);
 
         $this->get('/')
@@ -621,7 +621,7 @@ class StorefrontReadinessTest extends TestCase
                 $featured = $sections->firstWhere('key', 'homepage-featured-source');
                 $product = $installments?->products?->first();
 
-                return $installments?->products?->modelKeys() === [$installmentProduct->id]
+                return $installments?->products?->pluck('id')->all() === [$installmentProduct->id]
                     && $featured?->products?->isEmpty()
                     && $product?->relationLoaded('variants')
                     && $product->variants->first()?->relationLoaded('images')
@@ -907,9 +907,9 @@ class StorefrontReadinessTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertViewHas('homeSections', function ($sections) use ($bestSeller, $runnerUp, $featured) {
-                return $sections->firstWhere('key', 'best-selling')?->products?->modelKeys()
+                return $sections->firstWhere('key', 'best-selling')?->products?->pluck('id')->all()
                         === [$bestSeller->id, $runnerUp->id]
-                    && $sections->firstWhere('key', 'featured-products')?->products?->modelKeys()
+                    && $sections->firstWhere('key', 'featured-products')?->products?->pluck('id')->all()
                         === [$featured->id];
             });
     }
