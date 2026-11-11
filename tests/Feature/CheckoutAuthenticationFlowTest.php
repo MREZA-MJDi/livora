@@ -25,7 +25,8 @@ class CheckoutAuthenticationFlowTest extends TestCase
             'role' => 'customer',
         ]);
 
-        $this->get(route('checkout.index'))
+        $this->withCookie(config('session.cookie'), $guestSessionId)
+            ->get(route('checkout.index'))
             ->assertRedirect(route('login'));
 
         $product = $this->createProduct();
