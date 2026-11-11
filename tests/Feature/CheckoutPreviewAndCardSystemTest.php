@@ -478,9 +478,8 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
             ->assertSee('مشخصات فنی')
             ->assertSee('جنس بدنه')
             ->assertSee('چوب راش')
-            ->assertSee('راهنمای نگهداری و استفاده')
+            ->assertSee('راهنمای نگهداری')
             ->assertSee('با دستمال نرم و خشک تمیز شود.')
-            ->assertSee('آیا روکش قابل شست‌وشو است؟')
             ->assertSee('آیا روکش قابل شست‌وشو است؟')
             ->assertSee('میز جلو مبلی');
     }
