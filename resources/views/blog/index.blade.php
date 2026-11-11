@@ -53,11 +53,17 @@
                                 <div class="pointer-events-none absolute inset-x-0 bottom-0 p-6 text-white sm:p-9">
                                     <div class="mb-4 flex flex-wrap items-center gap-3 text-xs text-white/75">
                                         <span class="rounded-full border border-white/35 bg-black/15 px-3 py-1.5">روایت منتخب</span>
-                                        @if($post->category)<span>{{ $post->category }}</span>@endif
-                                        @if($post->published_at)<time datetime="{{ $post->published_at->toAtomString() }}">{{ $post->published_at->format('Y/m/d') }}</time>@endif
+                                        @if ($post->category)
+                                            <span>{{ $post->category }}</span>
+                                        @endif
+                                        @if ($post->published_at)
+                                            <time datetime="{{ $post->published_at->toAtomString() }}">{{ $post->published_at->format('Y/m/d') }}</time>
+                                        @endif
                                     </div>
                                     <h2 class="max-w-2xl text-2xl font-semibold leading-10 sm:text-4xl sm:leading-[1.45]">{{ $post->title }}</h2>
-                                    @if($post->excerpt)<p class="mt-3 max-w-xl line-clamp-2 text-sm leading-7 text-white/80">{{ $post->excerpt }}</p>@endif
+                                    @if ($post->excerpt)
+                                        <p class="mt-3 max-w-xl line-clamp-2 text-sm leading-7 text-white/80">{{ $post->excerpt }}</p>
+                                    @endif
                                     <span class="mt-6 inline-flex items-center gap-2 text-sm font-semibold">ورق زدن این روایت <span aria-hidden="true">←</span></span>
                                 </div>
                             </article>
@@ -92,13 +98,17 @@
                                 </a>
                                 <div class="flex flex-1 flex-col p-5 sm:p-6">
                                     <div class="flex flex-wrap items-center justify-between gap-3 text-xs text-[var(--sg-stone)]">
-                                        @if($post->published_at)<time datetime="{{ $post->published_at->toAtomString() }}">{{ $post->published_at->format('Y/m/d') }}</time>@endif
+                                        @if ($post->published_at)
+                                            <time datetime="{{ $post->published_at->toAtomString() }}">{{ $post->published_at->format('Y/m/d') }}</time>
+                                        @endif
                                         @if($post->tags->isNotEmpty())
                                             <span class="truncate">{{ $post->tags->take(2)->pluck('name')->implode(' · ') }}</span>
                                         @endif
                                     </div>
                                     <h2 class="mt-3 text-lg font-semibold leading-8 text-[var(--sg-ink)] sm:text-xl"><a href="{{ route('blog.show', $post->slug) }}" class="transition group-hover:text-[var(--sg-accent)]">{{ $post->title }}</a></h2>
-                                    @if($post->excerpt)<p class="mt-2 line-clamp-2 text-sm leading-7 text-[var(--sg-stone)]">{{ $post->excerpt }}</p>@endif
+                                    @if ($post->excerpt)
+                                        <p class="mt-2 line-clamp-2 text-sm leading-7 text-[var(--sg-stone)]">{{ $post->excerpt }}</p>
+                                    @endif
                                     <a href="{{ route('blog.show', $post->slug) }}" class="mt-auto inline-flex w-fit items-center gap-2 pt-5 text-sm font-semibold text-[var(--sg-ink)]">مطالعه مقاله <span aria-hidden="true">←</span></a>
                                 </div>
                             </article>
