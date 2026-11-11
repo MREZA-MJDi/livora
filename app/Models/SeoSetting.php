@@ -80,6 +80,8 @@ class SeoSetting extends Model
         if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
             return $path;
         }
-        return Storage::disk('public')->url($path);
+        $path = ltrim($path, '/');
+
+        return Storage::disk('public')->exists($path) ? Storage::disk('public')->url($path) : null;
     }
 }

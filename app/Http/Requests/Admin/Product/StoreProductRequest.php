@@ -322,7 +322,7 @@ class StoreProductRequest extends FormRequest
             'faq_items' => ['nullable', 'array', 'max:20'],
             'faq_items.*.question' => ['required', 'string', 'max:255'],
             'faq_items.*.answer' => ['required', 'string', 'max:2000'],
-            'related_product_ids' => ['nullable', 'array', 'max:60'],
+            'related_product_ids' => ['nullable', 'array', 'max:30'],
             'related_product_ids.*' => ['integer', 'distinct', 'exists:products,id'],
         ];
     }

@@ -1,4 +1,4 @@
-@php($editing = isset($page))
+@php($editing = isset($page) && $page->exists)
 @csrf
 
 <div class="grid gap-6 xl:grid-cols-3">
@@ -60,9 +60,11 @@
         </section>
         <section class="admin-card space-y-4 p-6">
             <h2 class="text-base font-bold">تصویر شاخص</h2>
-            @if($editing && $page->featured_image_url)<img src="{{ $page->featured_image_url }}" alt="{{ $page->featured_image_alt ?: $page->title }}" class="aspect-video w-full rounded-2xl object-cover">@endif
-            <div class="aspect-video overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]"><img id="page-featured-image-preview" src="{{ $page->featured_image_url ?? '' }}" alt="{{ $page->featured_image_alt ?? $page->title ?? '' }}" class="{{ isset($page) && $page->featured_image_url ? '' : 'hidden' }} h-full w-full object-contain"></div>
-            <input name="featured_image" type="file" accept="image/jpeg,image/png,image/webp" class="admin-input p-2">
+            <div class="aspect-video overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]">
+                <img id="page-featured-image-preview" @if(filled($page->featured_image_url)) src="{{ $page->featured_image_url }}" @endif alt="{{ $page->featured_image_alt ?? $page->title ?? '' }}" class="{{ filled($page->featured_image_url) ? '' : 'hidden' }} h-full w-full object-contain">
+                <div id="page-featured-image-placeholder" class="{{ filled($page->featured_image_url) ? 'hidden' : 'flex' }} aspect-video items-center justify-center px-4 text-center text-xs text-[var(--admin-muted)]">تصویر شاخص هنوز انتخاب نشده است</div>
+            </div>
+            <input name="featured_image" type="file" accept="image/jpeg,image/png,image/webp" data-crop-ratio="1.7777778" data-preview-target="page-featured-image-preview" data-preview-placeholder="page-featured-image-placeholder" class="admin-input p-2">
             @include('admin.media.partials.picker', ['mediaPickerField' => 'featured_image', 'mediaPickerId' => old('media_id', $page->media_id ?? null), 'mediaPickerUrl' => $page->featured_image_url ?? null, 'mediaPickerName' => $page->title ?? '', 'mediaPickerPreviewId' => 'page-featured-image-preview', 'mediaPickerRemoveName' => 'remove_featured_image'])
             <p class="admin-help">JPG، PNG یا WEBP؛ حداکثر ۱۰ مگابایت.</p>
             <label class="admin-label" for="featured_image_alt">متن جایگزین تصویر</label>

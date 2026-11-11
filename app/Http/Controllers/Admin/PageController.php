@@ -24,7 +24,7 @@ class PageController extends Controller
 
     public function index(Request $request): View
     {
-        $pages = ContentPage::query()
+        $pages = ContentPage::query()->with('media')
             ->when($request->filled('q'), function ($query) use ($request): void {
                 $term = trim((string) $request->input('q'));
                 $query->where(fn ($sub) => $sub
@@ -41,6 +41,7 @@ class PageController extends Controller
     public function create(): View
     {
         return view('admin.pages.create', [
+            'page' => new ContentPage(),
             'bodyHtml' => HtmlSanitizer::sanitize((string) old('body', '')),
         ]);
     }
@@ -68,6 +69,8 @@ class PageController extends Controller
 
     public function edit(ContentPage $page): View
     {
+        $page->load('media');
+
         return view('admin.pages.edit', [
             'page' => $page,
             'bodyHtml' => HtmlSanitizer::sanitize((string) old('body', $page->body)),

@@ -3,6 +3,95 @@ import Alpine from 'alpinejs';
 
 window.Alpine = Alpine;
 
+window.adminCatalogueLookup = (endpoint, initialSelection = [], multiple = false, maxSelections = 30, extraParams = {}) => ({
+    endpoint,
+    multiple,
+    maxSelections,
+    extraParams,
+    selected: Array.isArray(initialSelection) ? initialSelection : (initialSelection ? [initialSelection] : []),
+    term: '',
+    results: [],
+    loading: false,
+    status: 'برای جستجو حداقل دو حرف وارد کنید.',
+    controller: null,
+    async search() {
+        const term = this.term.trim();
+        this.controller?.abort();
+        this.controller = null;
+        this.results = [];
+        this.loading = false;
+
+        if (term.length < 2) {
+            this.status = 'برای جستجو حداقل دو حرف وارد کنید.';
+            return;
+        }
+
+        const controller = new AbortController();
+        this.controller = controller;
+        this.loading = true;
+        this.status = 'در حال جستجو…';
+
+        try {
+            const url = new URL(this.endpoint, window.location.origin);
+            url.searchParams.set('q', term);
+            Object.entries(this.extraParams || {}).forEach(([key, value]) => {
+                if (value !== null && value !== undefined && value !== '') {
+                    url.searchParams.set(key, String(value));
+                }
+            });
+
+            const response = await fetch(url, {
+                headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                credentials: 'same-origin',
+                signal: controller.signal,
+            });
+            if (!response.ok) throw new Error('lookup_failed');
+
+            const payload = await response.json();
+            if (this.controller !== controller || this.term.trim() !== term) return;
+
+            const selectedIds = new Set(this.selected.map((item) => String(item.id)));
+            this.results = (payload.data || []).filter((item) => !selectedIds.has(String(item.id)));
+            this.status = this.results.length
+                ? `${this.results.length} نتیجه نمایش داده شد.${payload.has_more ? ' برای نتایج بیشتر جستجو را دقیق‌تر کنید.' : ''}`
+                : 'موردی با این عبارت پیدا نشد.';
+        } catch (error) {
+            if (error.name !== 'AbortError' && this.controller === controller) {
+                this.status = 'جستجو انجام نشد؛ دوباره تلاش کنید.';
+            }
+        } finally {
+            if (this.controller === controller) {
+                this.loading = false;
+                this.controller = null;
+            }
+        }
+    },
+    choose(item) {
+        if (this.multiple) {
+            if (this.selected.some((selected) => String(selected.id) === String(item.id))) return;
+            if (this.selected.length >= this.maxSelections) {
+                this.status = `حداکثر ${this.maxSelections} مورد قابل انتخاب است.`;
+                return;
+            }
+            this.selected.push(item);
+        } else {
+            this.selected = [item];
+        }
+
+        this.results = [];
+        this.term = '';
+        this.status = this.multiple
+            ? `${this.selected.length} مورد انتخاب شده است.`
+            : 'مورد انتخاب شد.';
+    },
+    remove(id) {
+        this.selected = this.selected.filter((item) => String(item.id) !== String(id));
+        this.status = this.multiple
+            ? `${this.selected.length} مورد انتخاب شده است.`
+            : 'انتخاب حذف شد.';
+    },
+});
+
 window.seoRoutePicker = (endpoint) => ({
     endpoint,
     open: false,
@@ -50,6 +139,7 @@ window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName
     lastPage: 1,
     total: 0,
     errorMessage: '',
+    requestController: null,
     previewId,
     fileField,
     removeField,
@@ -114,26 +204,42 @@ window.mediaPicker = (endpoint, initialId = null, initialUrl = null, initialName
         await this.loadMedia(1);
     },
     async loadMedia(page = 1) {
+        this.requestController?.abort();
+
+        const controller = new AbortController();
+        const searchTerm = this.search.trim();
+        this.requestController = controller;
         this.loading = true;
+
         try {
             const url = new URL(this.endpoint, window.location.origin);
             url.searchParams.set('page', String(page));
-            if (this.search.trim()) url.searchParams.set('q', this.search.trim());
+            if (searchTerm) url.searchParams.set('q', searchTerm);
+
             const response = await fetch(url, {
                 headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
                 credentials: 'same-origin',
+                signal: controller.signal,
             });
             if (!response.ok) throw new Error('بارگذاری کتابخانه رسانه ناموفق بود.');
+
             const payload = await response.json();
+            if (this.requestController !== controller || this.search.trim() !== searchTerm) return;
+
             this.errorMessage = '';
             this.items = Array.isArray(payload.data) ? payload.data : [];
             this.page = payload.meta?.current_page || 1;
             this.lastPage = payload.meta?.last_page || 1;
             this.total = payload.meta?.total || 0;
         } catch (error) {
-            this.errorMessage = error.message || 'بارگذاری رسانه ناموفق بود.';
+            if (error.name !== 'AbortError' && this.requestController === controller) {
+                this.errorMessage = error.message || 'بارگذاری رسانه ناموفق بود.';
+            }
         } finally {
-            this.loading = false;
+            if (this.requestController === controller) {
+                this.loading = false;
+                this.requestController = null;
+            }
         }
     },
     selectMedia(item) {

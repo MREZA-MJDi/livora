@@ -32,14 +32,17 @@ class CategoryController extends Controller
     public function create(ContentSeoAnalyzer $seoAnalyzer): View
     {
         $category = new Category();
+        $relatedCategoryIds = $this->boundedIds(old('related_category_ids', []));
+        $relatedProductIds = $this->boundedIds(old('related_product_ids', []));
+        $parentId = (int) old('parent_id', 0);
+        $selectedParentCategory = $parentId > 0 ? Category::query()->find($parentId) : null;
 
         return view('admin.categories.create', [
             'category' => $category,
             'seoAnalysis' => $seoAnalyzer->analyze($category),
-            'availableRelatedCategories' => Category::query()->active()->whereNull('parent_id')->orderBy('name')->limit(100)->get(['id', 'name']),
-            'availableRelatedProducts' => Product::query()->active()->orderBy('name')->limit(200)->get(['id', 'name']),
-            'selectedRelatedCategoryIds' => [],
-            'selectedRelatedProductIds' => [],
+            'selectedParentCategory' => $selectedParentCategory,
+            'selectedRelatedCategoryOptions' => $this->categoryOptions($relatedCategoryIds),
+            'selectedRelatedProductOptions' => $this->productOptions($relatedProductIds),
         ]);
     }
 
@@ -91,15 +94,17 @@ class CategoryController extends Controller
 
     public function edit(Category $category, ContentSeoAnalyzer $seoAnalyzer): View
     {
-        $category->load(['relatedCategories:id,name', 'recommendedProducts:id,name']);
+        $relatedCategoryIds = $this->boundedIds(old('related_category_ids', $category->relatedCategories()->limit(30)->pluck('categories.id')->all()));
+        $relatedProductIds = $this->boundedIds(old('related_product_ids', $category->recommendedProducts()->limit(30)->pluck('products.id')->all()));
+        $parentId = (int) old('parent_id', $category->parent_id);
+        $selectedParentCategory = $parentId > 0 ? Category::query()->find($parentId) : null;
 
         return view('admin.categories.edit', [
             'category' => $category,
             'seoAnalysis' => $seoAnalyzer->analyze($category),
-            'availableRelatedCategories' => Category::query()->active()->whereNull('parent_id')->where('id', '!=', $category->id)->orderBy('name')->limit(100)->get(['id', 'name']),
-            'availableRelatedProducts' => Product::query()->active()->orderBy('name')->limit(200)->get(['id', 'name']),
-            'selectedRelatedCategoryIds' => $category->relatedCategories->pluck('id')->map(fn ($id) => (int) $id)->all(),
-            'selectedRelatedProductIds' => $category->recommendedProducts->pluck('id')->map(fn ($id) => (int) $id)->all(),
+            'selectedParentCategory' => $selectedParentCategory,
+            'selectedRelatedCategoryOptions' => $this->categoryOptions($relatedCategoryIds),
+            'selectedRelatedProductOptions' => $this->productOptions($relatedProductIds),
         ]);
     }
 
@@ -180,4 +185,52 @@ class CategoryController extends Controller
             Storage::disk('public')->delete($path);
         }
     }
+    private function boundedIds(mixed $ids): array
+    {
+        return collect(is_array($ids) ? $ids : [])
+            ->map(fn ($id) => (int) $id)
+            ->filter(fn ($id) => $id > 0)
+            ->unique()
+            ->take(30)
+            ->values()
+            ->all();
+    }
+
+    private function categoryOptions(array $ids): array
+    {
+        if ($ids === []) {
+            return [];
+        }
+
+        return Category::query()
+            ->whereIn('id', $ids)
+            ->get(['id', 'name', 'is_active'])
+            ->map(fn (Category $category): array => [
+                'id' => $category->id,
+                'label' => $category->name,
+                'meta' => $category->is_active ? null : 'غیرفعال',
+            ])
+            ->values()
+            ->all();
+    }
+
+    private function productOptions(array $ids): array
+    {
+        if ($ids === []) {
+            return [];
+        }
+
+        return Product::query()
+            ->whereIn('id', $ids)
+            ->get(['id', 'name', 'sku'])
+            ->map(fn (Product $product): array => [
+                'id' => $product->id,
+                'label' => $product->name,
+                'meta' => $product->sku,
+            ])
+            ->values()
+            ->all();
+    }
+
+
 }

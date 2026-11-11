@@ -110,8 +110,6 @@ class InitialStoreContentSeeder extends Seeder
 <h2>نگاهی ماندگار به خانه</h2>
 <p>هدف ما کمک به انتخاب‌هایی است که در کنار زیبایی، برای استفاده روزمره نیز مناسب باشند؛ انتخاب‌هایی متناسب با فضا، سلیقه و اولویت‌های هر خانه.</p>
 HTML,
-            'featured_image' => 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1800&q=85',
-            'featured_image_alt' => 'چیدمان نشیمن مدرن با مبلمان خنثی و نور طبیعی',
             'meta_title' => 'درباره سیلا گالری | مبلمان و سبک زندگی',
             'meta_description' => 'با نگاه سیلا گالری به انتخاب مبلمان، کیفیت، شفافیت اطلاعات و تجربه خرید آشنا شوید.',
             'status' => 'published',

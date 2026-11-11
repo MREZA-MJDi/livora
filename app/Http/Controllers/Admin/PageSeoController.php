@@ -14,7 +14,7 @@ class PageSeoController extends Controller
     public function index(): View
     {
         return view('admin.seo.pages', [
-            'pages' => SeoPageSetting::query()->orderBy('id')->get(),
+            'pages' => SeoPageSetting::query()->orderBy('id')->limit(30)->get(),
         ]);
     }
 
@@ -28,7 +28,7 @@ class PageSeoController extends Controller
             'pages.*.og_image' => ['nullable', 'url', 'max:2048'],
         ]);
 
-        $settings = SeoPageSetting::query()->get()->keyBy('id');
+        $settings = SeoPageSetting::query()->limit(30)->get()->keyBy('id');
         foreach ($validated['pages'] as $id => $data) {
             $page = $settings->get((int) $id);
             if (! $page) {

@@ -10,7 +10,7 @@ class PageController extends Controller
 {
     public function show(string $slug): View
     {
-        $page = ContentPage::published()->where('slug', $slug)->firstOrFail();
+        $page = ContentPage::published()->with('media')->where('slug', $slug)->firstOrFail();
         $settings = SeoSetting::current();
 
         return view('pages.show', [

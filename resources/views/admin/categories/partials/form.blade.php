@@ -1,7 +1,8 @@
 @csrf
 
 @php
-    $editing = isset($category);
+    $editing = isset($category) && $category->exists;
+    $initialParentSelection = $selectedParentCategory ? [['id' => $selectedParentCategory->id, 'label' => $selectedParentCategory->name, 'meta' => $selectedParentCategory->is_active ? null : 'غیرفعال']] : [];
 @endphp
 
 <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
@@ -210,7 +211,7 @@
 
                 <img
                     id="category-image-preview"
-                    src="{{ $categoryImageUrl ?: '' }}"
+                    @if(filled($categoryImageUrl)) src="{{ $categoryImageUrl }}" @endif
                     alt="{{ $category->name ?? 'تصویر دسته‌بندی' }}"
                     class="admin-image {{ $categoryImageUrl ? '' : 'hidden' }}"
                 >
@@ -348,19 +349,26 @@
     <div class="admin-card space-y-5 p-6">
         <div><h3 class="text-base font-bold text-[var(--admin-text)]">ساختار دسته‌بندی و تصاویر صفحه</h3><p class="admin-help mt-1">تصویر کارت و بنر صفحه دسته‌بندی مستقل هستند. تصویر قدیمی فقط به‌عنوان fallback حفظ می‌شود.</p></div>
         <div>
-            <label class="admin-label" for="parent_id">دسته‌بندی والد (برای زیر‌دسته)</label>
-            <select id="parent_id" name="parent_id" class="admin-input">
-                <option value="">دسته اصلی</option>
-                @foreach(($availableRelatedCategories ?? collect()) as $parentCategory)
-                    <option value="{{ $parentCategory->id }}" @selected((string) old('parent_id', $category->parent_id ?? '') === (string) $parentCategory->id)>{{ $parentCategory->name }}</option>
-                @endforeach
-            </select>
+            <label class="admin-label" for="parent-category-search">دسته‌بندی والد (برای زیر‌دسته)</label>
+            <div x-data="adminCatalogueLookup(@js(route('admin.catalogue.lookups.categories')), @js($initialParentSelection), false, 1, { active_only: true, parent_only: true, exclude_id: {{ (int) ($category->id ?? 0) }} })" class="space-y-2">
+                <input type="hidden" name="parent_id" :value="selected[0]?.id || ''">
+                <input id="parent-category-search" type="search" class="admin-input" x-model="term" x-on:input.debounce.300ms="search()" minlength="2" maxlength="80" autocomplete="off" placeholder="نام دسته‌بندی والد را جستجو کنید">
+                <div x-show="results.length" x-cloak class="max-h-48 space-y-1 overflow-y-auto rounded-xl border border-[var(--admin-border)] bg-white p-2" role="listbox" aria-label="دسته‌بندی‌های والد">
+                    <template x-for="item in results" :key="item.id">
+                        <button type="button" class="w-full rounded-lg px-3 py-2 text-right text-sm hover:bg-[var(--admin-surface)]" @click="choose(item)" role="option"><span x-text="item.label"></span></button>
+                    </template>
+                </div>
+                <template x-for="item in selected" :key="item.id">
+                    <div class="flex items-center justify-between rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm"><span x-text="item.label"></span><button type="button" class="text-red-600" @click="remove(item.id)" aria-label="حذف دسته‌بندی والد">×</button></div>
+                </template>
+                <p class="admin-help" role="status" aria-live="polite" x-text="status"></p>
+            </div>
             @error('parent_id')<p class="admin-error">{{ $message }}</p>@enderror
         </div>
         <div class="grid gap-5 lg:grid-cols-2">
             <div class="space-y-3">
                 <h4 class="text-sm font-semibold">تصویر کارت</h4>
-                <div class="overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]"><img id="category-card-image-preview" src="{{ $category->card_image_url ?: '' }}" alt="پیش‌نمایش تصویر کارت دسته‌بندی" class="{{ $category->card_image_url ? '' : 'hidden' }} aspect-[4/3] w-full object-cover"><div id="category-card-image-placeholder" class="{{ $category->card_image_url ? 'hidden' : 'flex' }} aspect-[4/3] items-center justify-center text-xs text-[var(--admin-muted)]">پیش‌نمایش تصویر کارت</div></div>
+                <div class="overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]"><img id="category-card-image-preview" @if(filled($category->card_image_url)) src="{{ $category->card_image_url }}" @endif alt="پیش‌نمایش تصویر کارت دسته‌بندی" class="{{ $category->card_image_url ? '' : 'hidden' }} aspect-[4/3] w-full object-cover"><div id="category-card-image-placeholder" class="{{ $category->card_image_url ? 'hidden' : 'flex' }} aspect-[4/3] items-center justify-center text-xs text-[var(--admin-muted)]">پیش‌نمایش تصویر کارت</div></div>
                 <input id="card_image" type="file" name="card_image" accept="image/jpeg,image/png,image/webp" data-crop-ratio="1.333333" data-preview-target="category-card-image-preview" data-preview-placeholder="category-card-image-placeholder" class="admin-input">
                 <label class="flex items-center gap-2 text-xs"><input type="checkbox" name="remove_card_image" value="1"> حذف تصویر کارت اختصاصی</label>
                 @error('card_image')<p class="admin-error">{{ $message }}</p>@enderror
@@ -368,7 +376,7 @@
             </div>
             <div class="space-y-3">
                 <h4 class="text-sm font-semibold">بنر صفحه دسته‌بندی</h4>
-                <div class="overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]"><img id="category-banner-image-preview" src="{{ $category->banner_image_url ?: '' }}" alt="پیش‌نمایش بنر دسته‌بندی" class="{{ $category->banner_image_url ? '' : 'hidden' }} aspect-[16/7] w-full object-cover"><div id="category-banner-image-placeholder" class="{{ $category->banner_image_url ? 'hidden' : 'flex' }} aspect-[16/7] items-center justify-center text-xs text-[var(--admin-muted)]">پیش‌نمایش بنر دسته‌بندی</div></div>
+                <div class="overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]"><img id="category-banner-image-preview" @if(filled($category->banner_image_url)) src="{{ $category->banner_image_url }}" @endif alt="پیش‌نمایش بنر دسته‌بندی" class="{{ $category->banner_image_url ? '' : 'hidden' }} aspect-[16/7] w-full object-cover"><div id="category-banner-image-placeholder" class="{{ $category->banner_image_url ? 'hidden' : 'flex' }} aspect-[16/7] items-center justify-center text-xs text-[var(--admin-muted)]">پیش‌نمایش بنر دسته‌بندی</div></div>
                 <input id="banner_image" type="file" name="banner_image" accept="image/jpeg,image/png,image/webp" data-crop-ratio="2.285714" data-preview-target="category-banner-image-preview" data-preview-placeholder="category-banner-image-placeholder" class="admin-input">
                 <label class="flex items-center gap-2 text-xs"><input type="checkbox" name="remove_banner_image" value="1"> حذف بنر اختصاصی</label>
                 @error('banner_image')<p class="admin-error">{{ $message }}</p>@enderror
@@ -385,11 +393,9 @@
         'sections' => $category->content_sections ?? [],
         'comparisonRows' => $category->comparison_rows ?? [],
         'faqItems' => $category->faq_items ?? [],
-        'availableRelatedCategories' => $availableRelatedCategories ?? collect(),
-        'availableRelatedProducts' => $availableRelatedProducts ?? collect(),
-        'selectedRelatedCategoryIds' => $selectedRelatedCategoryIds ?? [],
-        'selectedRelatedProductIds' => $selectedRelatedProductIds ?? [],
-        'includeComparison' => true,
+        'selectedRelatedCategoryOptions' => $selectedRelatedCategoryOptions ?? [],
+        'selectedRelatedProductOptions' => $selectedRelatedProductOptions ?? [],
+                        'includeComparison' => true,
         'includeRelatedCategories' => true,
         'includeRelatedProducts' => true,
     ])

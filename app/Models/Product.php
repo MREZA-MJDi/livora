@@ -165,7 +165,9 @@ class Product extends Model
             return $this->banner_image;
         }
 
-        return Storage::disk('public')->url($this->banner_image);
+        $path = ltrim($this->banner_image, '/');
+
+        return Storage::disk('public')->exists($path) ? Storage::disk('public')->url($path) : null;
     }
 
     public function primaryImage(): ?ProductImage

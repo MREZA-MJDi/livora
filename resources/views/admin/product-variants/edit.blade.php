@@ -13,7 +13,7 @@
     <form action="{{ route('admin.product-variants.update', $productVariant) }}" method="POST" enctype="multipart/form-data">
         @method('PUT')
         @include('admin.product-variants.partials.form', [
-            'products' => $products,
+            'selectedProduct' => $selectedProduct,
             'productVariant' => $productVariant,
         ])
     </form>

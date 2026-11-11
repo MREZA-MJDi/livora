@@ -24,7 +24,7 @@ class ProductVariantController extends Controller
     public function index(Request $request): View
     {
         $query = ProductVariant::query()
-            ->with(['product', 'images'])
+            ->with(['product', 'images.media'])
             ->orderBy('type')
             ->orderBy('name')
             ->orderBy('value');
@@ -40,24 +40,25 @@ class ProductVariantController extends Controller
         }
 
         $variants = $query->paginate(20)->withQueryString();
-        $products = Product::query()->orderBy('name')->get(['id', 'name', 'price']);
-        $types = ProductVariant::query()->select('type')->distinct()->orderBy('type')->pluck('type');
+        $selectedProduct = $request->filled('product_id') ? Product::query()->find($request->integer('product_id')) : null;
+        $types = ProductVariant::query()->select('type')->distinct()->orderBy('type')->limit(20)->pluck('type');
 
-        return view('admin.product-variants.index', compact('variants', 'products', 'types'));
+        return view('admin.product-variants.index', compact('variants', 'selectedProduct', 'types'));
     }
 
     public function create(Request $request): View
     {
-        $products = Product::query()->orderBy('name')->get(['id', 'name', 'price']);
-        $selectedProductId = $request->filled('product_id') ? $request->integer('product_id') : null;
-        $selectedProductImages = $selectedProductId
-            ? ProductImage::query()->where('product_id', $selectedProductId)->orderBy('sort_order')->orderBy('id')->get()
+        $productVariant = new ProductVariant();
+        $selectedProductId = (int) old('product_id', $request->integer('product_id'));
+        $selectedProduct = $selectedProductId > 0 ? Product::query()->find($selectedProductId) : null;
+        $selectedProductImages = $selectedProductId > 0
+            ? ProductImage::query()->where('product_id', $selectedProductId)->where('is_variant_only', false)->with('media')->orderBy('sort_order')->orderBy('id')->limit(40)->get()
             : collect();
 
         $defaultType = $request->query('type', 'اندازه');
         $defaultName = $request->query('name', 'اندازه مبل');
 
-        return view('admin.product-variants.create', compact('products', 'selectedProductId', 'selectedProductImages', 'defaultType', 'defaultName'));
+        return view('admin.product-variants.create', compact('productVariant', 'selectedProduct', 'selectedProductId', 'selectedProductImages', 'defaultType', 'defaultName'));
     }
 
     public function store(StoreProductVariantRequest $request): RedirectResponse
@@ -113,24 +114,30 @@ class ProductVariantController extends Controller
 
     public function edit(ProductVariant $productVariant): View
     {
-        $productVariant->load('images');
-        $products = Product::query()->orderBy('name')->get(['id', 'name', 'price']);
-        $selectedProductId = (int) $productVariant->product_id;
+        $productVariant->load(['product', 'images.media']);
+        $selectedProductId = (int) old('product_id', $productVariant->product_id);
+        $selectedProduct = $selectedProductId > 0 ? Product::query()->find($selectedProductId) : $productVariant->product;
 
-        // Keep currently assigned gallery order at the top of the checkbox list.
-        // The submitted checkbox order becomes the pivot sort order on save.
-        $assignedImages = $productVariant->images;
+        // Keep the assigned gallery first, then load at most enough additional
+        // product images to keep the editor bounded.
+        $assignedImages = $productVariant->images->take(40);
         $assignedImageIds = $assignedImages->modelKeys();
-        $remainingImages = ProductImage::query()
-            ->where('product_id', $selectedProductId)
-            ->when($assignedImageIds !== [], fn ($query) => $query->whereNotIn('id', $assignedImageIds))
-            ->orderByDesc('is_primary')
-            ->orderBy('sort_order')
-            ->orderBy('id')
-            ->get();
+        $remainingLimit = max(0, 40 - $assignedImages->count());
+        $remainingImages = $remainingLimit > 0
+            ? ProductImage::query()
+                ->where('product_id', $selectedProductId)
+                ->where('is_variant_only', false)
+                ->whereNotIn('id', $assignedImageIds ?: [0])
+                ->with('media')
+                ->orderByDesc('is_primary')
+                ->orderBy('sort_order')
+                ->orderBy('id')
+                ->limit($remainingLimit)
+                ->get()
+            : collect();
         $selectedProductImages = $assignedImages->concat($remainingImages)->values();
 
-        return view('admin.product-variants.edit', compact('productVariant', 'products', 'selectedProductId', 'selectedProductImages'));
+        return view('admin.product-variants.edit', compact('productVariant', 'selectedProduct', 'selectedProductId', 'selectedProductImages'));
     }
 
     public function update(UpdateProductVariantRequest $request, ProductVariant $productVariant): RedirectResponse

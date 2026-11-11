@@ -12,7 +12,7 @@ class BlogController extends Controller
     public function index(): View
     {
         $posts = BlogPost::published()
-            ->with('tags')
+            ->with(['tags', 'media'])
             ->latest('published_at')
             ->paginate(12);
 
@@ -48,7 +48,7 @@ class BlogController extends Controller
 
     public function show(string $slug): View
     {
-        $post = BlogPost::published()->with(['tags', 'author'])->where('slug', $slug)->firstOrFail();
+        $post = BlogPost::published()->with(['tags', 'author', 'media'])->where('slug', $slug)->firstOrFail();
         $robots = SeoSetting::current()->robotsFor($post->seo_index, $post->seo_follow);
 
         return view('blog.show', compact('post', 'robots'));

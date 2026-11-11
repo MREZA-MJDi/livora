@@ -25,7 +25,7 @@ class ProductImageController extends Controller
     {
         $query = ProductImage::query()
             ->where('is_variant_only', false)
-            ->with('product')
+            ->with(['product', 'media'])
             ->orderBy('product_id')
             ->orderBy('sort_order')
             ->orderByDesc('created_at');
@@ -35,17 +35,20 @@ class ProductImageController extends Controller
         }
 
         $images = $query->paginate(20)->withQueryString();
-        $products = Product::query()->orderBy('name')->get(['id', 'name']);
+        $selectedProduct = $request->filled('product_id')
+            ? Product::query()->find($request->integer('product_id'))
+            : null;
 
-        return view('admin.product-images.index', compact('images', 'products'));
+        return view('admin.product-images.index', compact('images', 'selectedProduct'));
     }
 
     public function create(Request $request): View
     {
-        $products = Product::query()->orderBy('name')->get(['id', 'name']);
-        $selectedProductId = $request->filled('product_id') ? $request->integer('product_id') : null;
+        $selectedProductId = (int) old('product_id', $request->integer('product_id'));
+        $selectedProduct = $selectedProductId > 0 ? Product::query()->find($selectedProductId) : null;
+        $productImage = new ProductImage();
 
-        return view('admin.product-images.create', compact('products', 'selectedProductId'));
+        return view('admin.product-images.create', compact('productImage', 'selectedProduct', 'selectedProductId'));
     }
 
     public function store(StoreProductImageRequest $request): RedirectResponse
@@ -94,16 +97,18 @@ class ProductImageController extends Controller
 
     public function show(ProductImage $productImage): View
     {
-        $productImage->load('product');
+        $productImage->load(['product', 'media']);
 
         return view('admin.product-images.show', compact('productImage'));
     }
 
     public function edit(ProductImage $productImage): View
     {
-        $products = Product::query()->orderBy('name')->get(['id', 'name']);
+        $productImage->load(['product', 'media']);
+        $selectedProductId = (int) old('product_id', $productImage->product_id);
+        $selectedProduct = $selectedProductId > 0 ? Product::query()->find($selectedProductId) : $productImage->product;
 
-        return view('admin.product-images.edit', compact('productImage', 'products'));
+        return view('admin.product-images.edit', compact('productImage', 'selectedProduct'));
     }
 
     public function update(UpdateProductImageRequest $request, ProductImage $productImage): RedirectResponse

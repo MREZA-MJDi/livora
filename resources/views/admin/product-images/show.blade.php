@@ -64,11 +64,11 @@
 
                 <div class="admin-image-preview overflow-hidden">
 
-                    <img
-                        src="{{ $productImage->url }}"
-                        alt="{{ $productImage->alt ?: $productImage->product?->name }}"
-                        class="mx-auto block max-h-[700px] w-full object-contain"
-                    >
+                    @if(filled($productImage->url))
+                        <img src="{{ $productImage->url }}" alt="{{ $productImage->alt ?: $productImage->product?->name }}" class="mx-auto block max-h-[700px] w-full object-contain">
+                    @else
+                        <div class="flex min-h-64 items-center justify-center text-xs text-[var(--admin-muted)]">فایل تصویر در دسترس نیست</div>
+                    @endif
 
                 </div>
 

@@ -20,7 +20,7 @@ class InitialDataStorefrontSmokeTest extends TestCase
 
         $product = Product::query()->active()->firstOrFail();
         $category = Category::query()->active()->firstOrFail();
-        $article = BlogPost::query()->published()->whereNotNull('featured_image')->firstOrFail();
+        $article = BlogPost::query()->published()->firstOrFail();
         $about = ContentPage::query()->published()->where('slug', 'about')->firstOrFail();
 
         $urls = [
@@ -37,13 +37,14 @@ class InitialDataStorefrontSmokeTest extends TestCase
 
         $this->get(route('about'))
             ->assertOk()
-            ->assertSee($about->featured_image)
-            ->assertSee('خانه، بازتابی از شیوه زندگی ما');
+            ->assertSee($about->title)
+            ->assertSee('خانه، بازتابی از شیوه زندگی ما')
+            ->assertDontSee('images.unsplash.com');
 
         $this->get(route('blog.index'))
             ->assertOk()
-            ->assertSee($article->featured_image)
-            ->assertSee($article->title);
+            ->assertSee($article->title)
+            ->assertDontSee('images.unsplash.com');
 
         foreach ($urls as $url) {
             $this->get($url)->assertOk();
