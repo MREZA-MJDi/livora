@@ -17,8 +17,10 @@ use Illuminate\View\View;
 
 class AuthController extends Controller
 {
-    public function showLogin(): View
+    public function showLogin(Request $request): View
     {
+        $this->preserveCheckoutIntended($request);
+
         return view('auth.login');
     }
 
@@ -80,9 +82,21 @@ class AuthController extends Controller
         return $this->redirectAfterAuthentication($request);
     }
 
-    public function showRegister(): View
+    public function showRegister(Request $request): View
     {
+        $this->preserveCheckoutIntended($request);
+
         return view('auth.register');
+    }
+
+    /**
+     * Keep guests on the checkout journey when they choose login or signup.
+     */
+    protected function preserveCheckoutIntended(Request $request): void
+    {
+        if ($request->query('redirect') === 'checkout') {
+            $request->session()->put('url.intended', route('checkout.index'));
+        }
     }
 
     public function register(

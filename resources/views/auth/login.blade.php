@@ -147,7 +147,7 @@
                             </p>
 
                             <a
-                                href="{{ route('register') }}"
+                                href="{{ request()->query('redirect') === 'checkout' ? route('register', ['redirect' => 'checkout']) : route('register') }}"
                                 class="mt-2 inline-block text-sm font-medium text-[var(--sg-accent)]"
                             >
                                 ایجاد حساب جدید
