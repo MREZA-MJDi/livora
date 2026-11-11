@@ -418,7 +418,7 @@
                     id="product-image-preview"
                     src="{{ $productImageUrl ?: '' }}"
                     alt="{{ $primaryImage?->alt ?: ($product->name ?? 'تصویر محصول') }}"
-                    class="admin-image product-primary-preview {{ $productImageUrl ? '' : 'hidden' }}"
+                    class="product-primary-preview h-auto max-h-[32rem] w-auto max-w-full object-contain {{ $productImageUrl ? '' : 'hidden' }}"
                 >
 
                 <div
@@ -478,7 +478,7 @@
                 <div class="min-w-0 flex-1">
                     <p class="truncate text-sm font-semibold" x-text="selectedMedia?.name"></p>
                     <p class="text-xs text-[var(--admin-muted)]">پیش‌نمایش نهایی در قاب فروشگاه، بالای همین بخش نمایش داده می‌شود.</p>
-                    <button type="button" class="admin-btn admin-btn-secondary mt-2" @click="cropSelected()">تنظیم برش برای نمایش در فروشگاه</button>
+                    
                 </div>
                 <button type="button" class="admin-btn admin-btn-secondary" @click="clearSelection()">لغو انتخاب</button>
             </div>
