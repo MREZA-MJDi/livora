@@ -428,6 +428,7 @@
                                     @endif
 
                                     @if($visibleSpecs->isNotEmpty())
+                                        <h3 class="text-xs font-bold">مشخصات فنی</h3>
                                         <dl class="grid grid-cols-1 gap-2 sm:grid-cols-2">
                                             @foreach($visibleSpecs as $specification)
                                                 <div class="flex items-start justify-between gap-3 rounded-xl bg-[var(--sg-surface)] px-3 py-2.5 text-[11px]">
