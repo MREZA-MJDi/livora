@@ -21,8 +21,9 @@ class HomeController extends Controller
             ->get();
 
         $finalCta = $sections->firstWhere('key', 'final-cta');
+        $blogSection = HomeSection::query()->where('key', 'homepage-journal')->first();
         $sections = $sections
-            ->reject(fn (HomeSection $section) => $section->key === 'final-cta')
+            ->reject(fn (HomeSection $section) => in_array($section->key, ['final-cta', 'homepage-journal'], true))
             ->values();
 
         $hasProductSection = false;
@@ -102,13 +103,30 @@ class HomeController extends Controller
             ->published()
             ->with('media')
             ->latest('published_at')
-            ->limit(3)
+            ->limit(max(1, min(6, (int) data_get($blogSection?->payload, 'limit', 3))))
             ->get();
+
+        if ($blogSection && ! $blogSection->enabled) {
+            $blogSection = null;
+        } elseif (! $blogSection) {
+            $blogSection = new HomeSection([
+                'key' => 'homepage-journal',
+                'type' => 'editorial',
+                'enabled' => true,
+                'eyebrow' => 'مجله سیلا',
+                'title' => 'ایده‌هایی برای خانه‌ای دلنشین‌تر',
+                'subtitle' => 'راهنماها و نوشته‌های تازه برای انتخاب آگاهانه‌تر.',
+                'cta_label' => 'همه نوشته‌ها',
+                'cta_url' => '/blog',
+                'payload' => ['limit' => 3],
+            ]);
+        }
 
         return view('home.index', [
             'homeSections' => $sections,
             'heroProducts' => $heroProducts,
             'blogPosts' => $blogPosts,
+            'blogSection' => $blogSection,
             'finalCta' => $finalCta,
         ]);
     }
