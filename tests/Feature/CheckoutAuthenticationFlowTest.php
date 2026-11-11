@@ -25,15 +25,15 @@ class CheckoutAuthenticationFlowTest extends TestCase
             'role' => 'customer',
         ]);
 
-        $this->get(route('cart.index'))->assertOk();
-        $guestCart = Cart::query()
-            ->whereNull('user_id')
-            ->where('status', 'active')
-            ->firstOrFail();
-        $this->addGuestCartItem($guestCart);
-
         $this->get(route('checkout.index'))
             ->assertRedirect(route('login'));
+
+        $guestCart = Cart::query()->create([
+            'user_id' => null,
+            'session_id' => $this->app['session']->getId(),
+            'status' => 'active',
+        ]);
+        $this->addGuestCartItem($guestCart);
 
         $this->post(route('login.store'), [
             'email' => $customer->email,
