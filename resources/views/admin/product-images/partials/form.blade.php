@@ -1,5 +1,5 @@
 @php
-    $editing = isset($productImage);
+    $editing = isset($productImage) && $productImage->exists;
 @endphp
 
 @csrf
@@ -25,33 +25,19 @@
                 محصول
             </label>
 
-            <select
-                id="product_id"
-                name="product_id"
-                class="admin-select"
-                required
-            >
-                <option value="">
-                    انتخاب محصول
-                </option>
-
-                @foreach($products as $product)
-
-                    <option
-                        value="{{ $product->id }}"
-                        @selected(
-                        old(
-                    'product_id',
-                    $productImage->product_id ?? $selectedProductId ?? ''
-                    ) == $product->id
-                    )
-                    >
-                    {{ $product->name }}
-                    </option>
-
-                @endforeach
-
-            </select>
+            <div x-data="adminCatalogueLookup(@js(route('admin.catalogue.lookups.products')), @js($selectedProduct ? [['id' => $selectedProduct->id, 'label' => $selectedProduct->name, 'meta' => $selectedProduct->sku]] : []), false)" class="space-y-2">
+                <input type="hidden" name="product_id" :value="selected[0]?.id || ''">
+                <input type="search" class="admin-input" x-model="term" x-on:input.debounce.300ms="search()" minlength="2" maxlength="80" autocomplete="off" placeholder="نام محصول یا SKU را جستجو کنید">
+                <div x-show="results.length" x-cloak class="max-h-56 space-y-1 overflow-y-auto rounded-xl border border-[var(--admin-border)] bg-white p-2" role="listbox" aria-label="نتایج محصولات">
+                    <template x-for="item in results" :key="item.id">
+                        <button type="button" class="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-right text-sm hover:bg-[var(--admin-surface)]" @click="choose(item)" role="option"><span x-text="item.label"></span><small class="text-[var(--admin-muted)]" dir="ltr" x-text="item.meta || ''"></small></button>
+                    </template>
+                </div>
+                <template x-for="item in selected" :key="item.id">
+                    <div class="flex items-center justify-between rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm"><span x-text="item.label"></span><button type="button" class="text-red-600" @click="remove(item.id)" aria-label="حذف محصول انتخاب‌شده">×</button></div>
+                </template>
+                <p class="admin-help" role="status" aria-live="polite" x-text="status"></p>
+            </div>
 
             @error('product_id')
             <p class="mt-2 text-xs text-[var(--admin-danger)]">
@@ -76,31 +62,17 @@
             </div>
 
 
-            @if($editing && $productImage->url)
-
-                <div class="admin-image-preview mb-5 flex min-h-64 items-center justify-center p-3">
-
-                    <img
-                        src="{{ $productImage->url }}"
-                        alt="{{ $productImage->alt ?: 'Product image' }}"
-                        class="h-auto max-h-[32rem] w-auto max-w-full object-contain"
-                    >
-
-                </div>
-
-            @endif
-
-
             <label for="image" class="admin-label">
                 {{ $editing ? 'تصویر جدید' : 'تصویر محصول' }}
             </label>
 
-            <div class="admin-image-preview mb-5 aspect-[4/5] max-w-xl">
-                <img id="product-gallery-image-preview" src="{{ $productImage->url ?? '' }}" alt="{{ $productImage->alt ?? 'تصویر محصول' }}" class="h-auto max-h-[32rem] w-auto max-w-full object-contain {{ $editing ? '' : 'hidden' }}">
+            <div class="admin-image-preview mb-5 flex min-h-64 items-center justify-center p-3">
+                <img id="product-gallery-image-preview" @if(filled($productImage->url ?? null)) src="{{ $productImage->url }}" @endif alt="{{ $productImage->alt ?? 'تصویر محصول' }}" class="h-auto max-h-[32rem] w-auto max-w-full object-contain {{ filled($productImage->url ?? null) ? '' : 'hidden' }}">
+                <div id="product-gallery-image-placeholder" class="{{ filled($productImage->url ?? null) ? 'hidden' : 'flex' }} h-full items-center justify-center rounded-xl border border-dashed border-[var(--admin-border)] text-xs text-[var(--admin-muted)]">تصویر گالری هنوز انتخاب نشده است</div>
             </div>
             <input
                 id="image"
-                name="image" data-preserve-original="1" data-preview-target="product-gallery-image-preview"
+                name="image" data-preserve-original="1" data-preview-target="product-gallery-image-preview" data-preview-placeholder="product-gallery-image-placeholder"
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
                 class="admin-input p-2"

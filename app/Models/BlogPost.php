@@ -53,6 +53,18 @@ class BlogPost extends Model
 
     public function getFeaturedImageUrlAttribute(): ?string
     {
+        $media = $this->relationLoaded('media') ? $this->getRelation('media') : null;
+        if ($media) {
+            if (str_starts_with($media->path, 'http://') || str_starts_with($media->path, 'https://')) {
+                return $media->url;
+            }
+
+            $disk = Storage::disk($media->disk ?: 'public');
+            if ($disk->exists(ltrim($media->path, '/'))) {
+                return $media->url;
+            }
+        }
+
         $path = $this->featured_image;
         if (! $path) {
             return null;
@@ -60,18 +72,28 @@ class BlogPost extends Model
         if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
             return $path;
         }
-        return Storage::disk('public')->url($path);
+
+        $path = ltrim($path, '/');
+
+        return Storage::disk('public')->exists($path)
+            ? Storage::disk('public')->url($path)
+            : null;
     }
 
     public function getOgImageUrlAttribute(): ?string
     {
-        $path = $this->og_image ?: $this->featured_image;
-        if (! $path) {
-            return null;
+        if (! filled($this->og_image)) {
+            return $this->featured_image_url;
         }
-        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
-            return $path;
+
+        if (str_starts_with($this->og_image, 'http://') || str_starts_with($this->og_image, 'https://')) {
+            return $this->og_image;
         }
-        return Storage::disk('public')->url($path);
+
+        $path = ltrim($this->og_image, '/');
+
+        return Storage::disk('public')->exists($path)
+            ? Storage::disk('public')->url($path)
+            : null;
     }
 }

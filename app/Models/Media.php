@@ -49,8 +49,10 @@ class Media extends Model
             return $this->path;
         }
 
-        return Storage::disk($this->disk ?: 'public')
-            ->url(ltrim($this->path, '/'));
+        $disk = Storage::disk($this->disk ?: 'public');
+        $path = ltrim($this->path, '/');
+
+        return $disk->exists($path) ? $disk->url($path) : '';
     }
 
     public function getThumbnailUrlAttribute(): string { return $this->variantUrl($this->thumbnail_path); }

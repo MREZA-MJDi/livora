@@ -31,7 +31,7 @@
         @method('PUT')
 
         @include('admin.product-images.partials.form', [
-            'products' => $products,
+            'selectedProduct' => $selectedProduct,
             'productImage' => $productImage,
         ])
 

@@ -20,7 +20,7 @@
                 $heroProduct = $section->products->first();
                 $selectedHeroProducts = $heroProducts ?? collect();
                 $heroSlides = collect($payload['slides'] ?? []);
-                if ($selectedHeroProducts->isNotEmpty()) {
+                if ($heroSlides->isEmpty() && $selectedHeroProducts->isNotEmpty()) {
                     $heroSlides = $selectedHeroProducts->map(function ($product) {
                         $primaryImage = $product->images->first();
                         $variantImage = $product->variants->first(
@@ -62,7 +62,7 @@
                     $image = filled($slide['image_url'] ?? null)
                         ? $slide['image_url']
                         : ($path
-                            ? (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') ? $path : \Illuminate\Support\Facades\Storage::disk('public')->url($path))
+                            ? \App\Models\HomeSection::publicImageUrl($path)
                             : ($index === 0 && filled($section->image_path) ? $section->image_url : $legacyImage));
                     return [...$slide, 'image_url' => $image, 'object_position' => $slide['object_position'] ?? '50% 50%'];
                 });
@@ -99,11 +99,6 @@
                                 @else
                                     <a class="sg-home-hero__cta" data-sg-hero-cta href="{{ route('shop.index') }}" hidden></a>
                                 @endif
-                                <div class="sg-home-hero__proof" aria-label="اطلاعات خرید">
-                                    <span>بررسی مشخصات پیش از خرید</span>
-                                    <span>قیمت و موجودی قابل مشاهده</span>
-                                    <span>امکان ارتباط برای پرسش درباره سفارش</span>
-                                </div>
                             </div>
                         </div>
                         <div class="sg-home-hero__media">

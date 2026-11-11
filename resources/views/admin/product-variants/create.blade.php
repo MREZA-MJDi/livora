@@ -12,7 +12,7 @@
 
     <form action="{{ route('admin.product-variants.store') }}" method="POST" enctype="multipart/form-data">
         @include('admin.product-variants.partials.form', [
-            'products' => $products,
+            'selectedProduct' => $selectedProduct,
             'selectedProductId' => $selectedProductId ?? null,
             'defaultType' => $defaultType ?? 'اندازه',
             'defaultName' => $defaultName ?? 'اندازه مبل',

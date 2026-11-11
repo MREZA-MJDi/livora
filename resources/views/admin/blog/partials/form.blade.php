@@ -1,5 +1,5 @@
 @php
-    $editing = isset($post);
+    $editing = isset($post) && $post->exists;
     $publishedAtGregorian = old(
         'published_at',
         $editing && $post->published_at ? $post->published_at->format('Y-m-d\TH:i') : ''
@@ -104,8 +104,11 @@
         </section>
         <section class="admin-card space-y-4 p-6">
             <h2 class="text-base font-bold">تصویر شاخص</h2>
-            <div class="mx-auto aspect-[16/10] w-full max-w-2xl overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]"><img id="blog-featured-image-preview" src="{{ $post->featured_image_url ?? '' }}" alt="{{ $post->featured_image_alt ?? $post->title ?? '' }}" class="{{ isset($post) && $post->featured_image_url ? '' : 'hidden' }} h-full w-full object-cover"></div>
-            <input id="featured_image" name="featured_image" type="file" accept="image/jpeg,image/png,image/webp" data-crop-ratio="1.6" data-preview-target="blog-featured-image-preview" class="admin-input p-2"><p class="admin-help">JPG، PNG یا WEBP — حداکثر ۱۰ مگابایت</p>
+            <div class="aspect-video overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]">
+                <img id="blog-featured-image-preview" @if(filled($post->featured_image_url)) src="{{ $post->featured_image_url }}" @endif alt="{{ $post->featured_image_alt ?? $post->title ?? '' }}" class="{{ filled($post->featured_image_url) ? '' : 'hidden' }} h-full w-full object-contain">
+                <div id="blog-featured-image-placeholder" class="{{ filled($post->featured_image_url) ? 'hidden' : 'flex' }} aspect-video items-center justify-center px-4 text-center text-xs text-[var(--admin-muted)]">تصویر شاخص هنوز انتخاب نشده است</div>
+            </div>
+            <input id="featured_image" name="featured_image" type="file" accept="image/jpeg,image/png,image/webp" data-crop-ratio="1.7777778" data-preview-target="blog-featured-image-preview" data-preview-placeholder="blog-featured-image-placeholder" class="admin-input p-2"><p class="admin-help">JPG، PNG یا WEBP — حداکثر ۱۰ مگابایت</p>
             @include('admin.media.partials.picker', ['mediaPickerField' => 'featured_image', 'mediaPickerId' => old('media_id', $post->media_id ?? null), 'mediaPickerUrl' => $post->featured_image_url ?? null, 'mediaPickerName' => $post->title ?? '', 'mediaPickerPreviewId' => 'blog-featured-image-preview', 'mediaPickerRemoveName' => 'remove_featured_image'])
             <div><label class="admin-label" for="featured_image_alt">Alt تصویر</label><input id="featured_image_alt" name="featured_image_alt" class="admin-input" maxlength="255" value="{{ old('featured_image_alt', $post->featured_image_alt ?? '') }}"></div>
             @error('featured_image')<p class="admin-error">{{ $message }}</p>@enderror

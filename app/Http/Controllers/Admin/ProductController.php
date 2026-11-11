@@ -74,7 +74,7 @@ class ProductController extends Controller
                 $selected = Product::query()
                     ->where('is_home_hero', true)
                     ->lockForUpdate()
-                    ->get(['id', 'home_hero_sort_order']);
+                    ->limit(10)->get(['id', 'home_hero_sort_order']);
 
                 if ($selected->count() >= 10) {
                     return 'limit';
@@ -108,16 +108,17 @@ class ProductController extends Controller
 
     public function create(ContentSeoAnalyzer $seoAnalyzer): View
     {
-        $categories = Category::query()->orderBy('name')->get();
         $product = new Product();
         $product->setRelation('images', collect());
+        $selectedCategoryId = (int) old('category_id', 0);
+        $selectedCategory = $selectedCategoryId > 0 ? Category::query()->find($selectedCategoryId) : null;
+        $relatedProductIds = $this->boundedIds(old('related_product_ids', []));
 
         return view('admin.products.create', [
-            'categories' => $categories,
             'product' => $product,
+            'selectedCategory' => $selectedCategory,
             'seoAnalysis' => $seoAnalyzer->analyze($product),
-            'availableRelatedProducts' => Product::query()->active()->orderBy('name')->limit(200)->get(['id', 'name']),
-            'selectedRelatedProductIds' => [],
+            'selectedRelatedProductOptions' => $this->productOptions($relatedProductIds),
         ]);
     }
 
@@ -210,15 +211,16 @@ class ProductController extends Controller
 
     public function edit(Product $product, ContentSeoAnalyzer $seoAnalyzer): View
     {
-        $product->load(['images.media', 'allVariants.images.media', 'relatedProducts:id,name']);
-        $categories = Category::query()->orderBy('name')->get();
+        $product->load(['images.media', 'allVariants.images.media']);
+        $selectedCategoryId = (int) old('category_id', $product->category_id);
+        $selectedCategory = $selectedCategoryId > 0 ? Category::query()->find($selectedCategoryId) : null;
+        $relatedProductIds = $this->boundedIds(old('related_product_ids', $product->relatedProducts()->limit(30)->pluck('products.id')->all()));
 
         return view('admin.products.edit', [
             'product' => $product,
-            'categories' => $categories,
+            'selectedCategory' => $selectedCategory,
             'seoAnalysis' => $seoAnalyzer->analyze($product),
-            'availableRelatedProducts' => Product::query()->active()->where('id', '!=', $product->id)->orderBy('name')->limit(200)->get(['id', 'name']),
-            'selectedRelatedProductIds' => $product->relatedProducts->pluck('id')->map(fn ($id) => (int) $id)->all(),
+            'selectedRelatedProductOptions' => $this->productOptions($relatedProductIds),
         ]);
     }
 
@@ -363,4 +365,34 @@ class ProductController extends Controller
             Storage::disk('public')->delete($path);
         }
     }
+    private function boundedIds(mixed $ids): array
+    {
+        return collect(is_array($ids) ? $ids : [])
+            ->map(fn ($id) => (int) $id)
+            ->filter(fn ($id) => $id > 0)
+            ->unique()
+            ->take(30)
+            ->values()
+            ->all();
+    }
+
+    private function productOptions(array $ids): array
+    {
+        if ($ids === []) {
+            return [];
+        }
+
+        return Product::query()
+            ->whereIn('id', $ids)
+            ->get(['id', 'name', 'sku', 'status'])
+            ->map(fn (Product $product): array => [
+                'id' => $product->id,
+                'label' => $product->name,
+                'meta' => trim(($product->sku ?: '') . ($product->status === 'active' ? '' : ' • غیرفعال')),
+            ])
+            ->values()
+            ->all();
+    }
+
+
 }

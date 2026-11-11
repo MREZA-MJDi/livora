@@ -5,10 +5,8 @@
     'careGuide' => '',
     'comparisonRows' => [],
     'faqItems' => [],
-    'availableRelatedCategories' => collect(),
-    'availableRelatedProducts' => collect(),
-    'selectedRelatedCategoryIds' => [],
-    'selectedRelatedProductIds' => [],
+    'selectedRelatedCategoryOptions' => [],
+    'selectedRelatedProductOptions' => [],
     'includeKeyFeatures' => false,
     'includeSpecifications' => false,
     'includeCareGuide' => false,
@@ -24,8 +22,8 @@
     $careGuide = old('care_guide', $careGuide);
     $comparisonRows = old('comparison_rows', $comparisonRows);
     $faqItems = old('faq_items', $faqItems);
-    $selectedRelatedCategoryIds = array_map('intval', old('related_category_ids', $selectedRelatedCategoryIds));
-    $selectedRelatedProductIds = array_map('intval', old('related_product_ids', $selectedRelatedProductIds));
+    $selectedRelatedCategoryIds = array_map('intval', old('related_category_ids', collect($selectedRelatedCategoryOptions)->pluck('id')->all()));
+    $selectedRelatedProductIds = array_map('intval', old('related_product_ids', collect($selectedRelatedProductOptions)->pluck('id')->all()));
 @endphp
 
 <div class="admin-card space-y-7 p-6">
@@ -132,10 +130,16 @@
     @if($includeRelatedCategories)
         <section class="space-y-4 border-t border-[var(--admin-border)] pt-6">
             <div><h3 class="text-sm font-bold">دسته‌بندی‌های مرتبط</h3><p class="admin-help">برای ساخت مسیرهای داخلی مرتبط، دسته‌های فعال را انتخاب کنید.</p></div>
-            <div class="grid gap-2 sm:grid-cols-2">
-                @foreach($availableRelatedCategories as $relatedCategory)
-                    <label class="flex items-center gap-2 rounded-xl border border-[var(--admin-border)] p-3 text-xs"><input type="checkbox" class="admin-checkbox" name="related_category_ids[]" value="{{ $relatedCategory->id }}" @checked(in_array((int) $relatedCategory->id, $selectedRelatedCategoryIds, true))><span>{{ $relatedCategory->name }}</span></label>
-                @endforeach
+            <div x-data="adminCatalogueLookup(@js(route('admin.catalogue.lookups.categories')), @js($selectedRelatedCategoryOptions ?? []), true, 30, { active_only: true, parent_only: true })" class="space-y-2">
+                <template x-for="item in selected" :key="item.id"><input type="hidden" name="related_category_ids[]" :value="item.id"></template>
+                <input type="search" class="admin-input" x-model="term" x-on:input.debounce.300ms="search()" minlength="2" maxlength="80" autocomplete="off" placeholder="جستجوی دسته‌بندی مرتبط">
+                <div x-show="results.length" x-cloak class="max-h-48 space-y-1 overflow-y-auto rounded-xl border border-[var(--admin-border)] bg-white p-2" role="listbox" aria-label="دسته‌بندی‌های مرتبط">
+                    <template x-for="item in results" :key="item.id"><button type="button" class="w-full rounded-lg px-3 py-2 text-right text-sm hover:bg-[var(--admin-surface)]" @click="choose(item)" role="option"><span x-text="item.label"></span></button></template>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <template x-for="item in selected" :key="item.id"><span class="inline-flex items-center gap-2 rounded-full border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-1.5 text-xs"><span x-text="item.label"></span><button type="button" class="text-red-600" @click="remove(item.id)" aria-label="حذف دسته‌بندی مرتبط">×</button></span></template>
+                </div>
+                <p class="admin-help" role="status" aria-live="polite" x-text="status"></p>
             </div>
         </section>
     @endif
@@ -143,10 +147,16 @@
     @if($includeRelatedProducts)
         <section class="space-y-4 border-t border-[var(--admin-border)] pt-6">
             <div><h3 class="text-sm font-bold">محصولات مرتبط</h3><p class="admin-help">محصولات مکمل یا جایگزین را برای نمایش در صفحه انتخاب کنید.</p></div>
-            <div class="grid max-h-80 gap-2 overflow-y-auto sm:grid-cols-2">
-                @foreach($availableRelatedProducts as $relatedProduct)
-                    <label class="flex items-center gap-2 rounded-xl border border-[var(--admin-border)] p-3 text-xs"><input type="checkbox" class="admin-checkbox" name="related_product_ids[]" value="{{ $relatedProduct->id }}" @checked(in_array((int) $relatedProduct->id, $selectedRelatedProductIds, true))><span>{{ $relatedProduct->name }}</span></label>
-                @endforeach
+            <div x-data="adminCatalogueLookup(@js(route('admin.catalogue.lookups.products')), @js($selectedRelatedProductOptions ?? []), true, 30, { active_only: true })" class="space-y-2">
+                <template x-for="item in selected" :key="item.id"><input type="hidden" name="related_product_ids[]" :value="item.id"></template>
+                <input type="search" class="admin-input" x-model="term" x-on:input.debounce.300ms="search()" minlength="2" maxlength="80" autocomplete="off" placeholder="جستجوی محصول مرتبط بر اساس نام یا SKU">
+                <div x-show="results.length" x-cloak class="max-h-56 space-y-1 overflow-y-auto rounded-xl border border-[var(--admin-border)] bg-white p-2" role="listbox" aria-label="محصولات مرتبط">
+                    <template x-for="item in results" :key="item.id"><button type="button" class="w-full rounded-lg px-3 py-2 text-right text-sm hover:bg-[var(--admin-surface)]" @click="choose(item)" role="option"><span x-text="item.label"></span><small class="mr-2 text-[var(--admin-muted)]" dir="ltr" x-text="item.meta || ''"></small></button></template>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <template x-for="item in selected" :key="item.id"><span class="inline-flex items-center gap-2 rounded-full border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-1.5 text-xs"><span x-text="item.label"></span><button type="button" class="text-red-600" @click="remove(item.id)" aria-label="حذف محصول مرتبط">×</button></span></template>
+                </div>
+                <p class="admin-help" role="status" aria-live="polite" x-text="status"></p>
             </div>
         </section>
     @endif

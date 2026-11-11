@@ -89,7 +89,7 @@ class UpdateCategoryRequest extends FormRequest
             'faq_items.*.answer' => ['required', 'string', 'max:2000'],
             'related_category_ids' => ['nullable', 'array', 'max:30'],
             'related_category_ids.*' => ['integer', 'distinct', 'exists:categories,id'],
-            'related_product_ids' => ['nullable', 'array', 'max:60'],
+            'related_product_ids' => ['nullable', 'array', 'max:30'],
             'related_product_ids.*' => ['integer', 'distinct', 'exists:products,id'],
             'canonical_url' => ['nullable', 'url', 'max:2048'],
             'og_image' => ['nullable', 'url', 'max:2048'],

@@ -16,7 +16,7 @@ class ContactSettingController extends Controller
 {
     public function edit(): View
     {
-        $settings = ContactSetting::query()->with('logoMedia')->firstOrNew(['id' => 1]);
+        $settings = ContactSetting::query()->with('logoMedia')->first() ?? new ContactSetting();
 
         return view('admin.contact-settings.edit', [
             'settings' => $settings,

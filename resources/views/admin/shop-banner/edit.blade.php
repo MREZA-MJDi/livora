@@ -34,13 +34,16 @@
 
             <div>
                 <label for="banner_image" class="admin-label">آپلود تصویر و تنظیم کادر</label>
-                <div class="overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)]"><img id="shop-banner-image-preview" src="{{ $settings->banner_image_url ?: '' }}" alt="{{ $settings->banner_image_alt ?: 'پیش‌نمایش بنر فروشگاه' }}" class="{{ $settings->banner_image_url ? '' : 'hidden' }} aspect-[12/5] w-full object-cover"></div>
+                <div class="overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)]">
+                    <img id="shop-banner-image-preview" @if(filled($settings->banner_image_url)) src="{{ $settings->banner_image_url }}" @endif alt="{{ $settings->banner_image_alt ?: 'پیش‌نمایش بنر فروشگاه' }}" class="{{ filled($settings->banner_image_url) ? '' : 'hidden' }} aspect-[12/5] w-full object-cover">
+                    <div id="shop-banner-image-placeholder" class="{{ filled($settings->banner_image_url) ? 'hidden' : 'flex' }} aspect-[12/5] items-center justify-center text-xs text-[var(--admin-muted)]">هنوز بنری انتخاب نشده است</div>
+                </div>
                 <input
                     id="banner_image"
                     name="banner_image"
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
-                    data-crop-ratio="2.4" data-preview-target="shop-banner-image-preview"
+                    data-crop-ratio="2.4" data-preview-target="shop-banner-image-preview" data-preview-placeholder="shop-banner-image-placeholder"
                     class="admin-input"
                 >
                 @include('admin.media.partials.picker', ['mediaPickerField' => 'banner_image', 'mediaPickerId' => old('media_id', $settings->media_id), 'mediaPickerUrl' => $settings->banner_image_url, 'mediaPickerName' => 'بنر فروشگاه', 'mediaPickerPreviewId' => 'shop-banner-image-preview', 'mediaPickerRemoveName' => 'remove_banner'])

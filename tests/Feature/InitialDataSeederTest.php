@@ -23,12 +23,12 @@ class InitialDataSeederTest extends TestCase
         $this->assertDatabaseHas('content_pages', [
             'slug' => 'about',
             'status' => 'published',
-            'featured_image' => 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1800&q=85',
+            'featured_image' => null,
         ]);
         $this->assertDatabaseHas('blog_posts', [
             'slug' => 'choosing-sofa-for-living-room',
             'status' => 'published',
-            'featured_image' => 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=80',
+            'featured_image' => null,
         ]);
         $this->assertDatabaseCount('blog_tags', 4);
 

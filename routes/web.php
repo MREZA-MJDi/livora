@@ -34,6 +34,7 @@ use App\Http\Controllers\Admin\ProductImageController as AdminProductImageContro
 use App\Http\Controllers\Admin\ProductVariantController as AdminProductVariantController;
 use App\Http\Controllers\Admin\ShopBannerController as AdminShopBannerController;
 use App\Http\Controllers\Admin\HomeSectionController as AdminHomeSectionController;
+use App\Http\Controllers\Admin\CatalogueLookupController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -390,6 +391,8 @@ Route::middleware(['auth', 'admin', 'admin.session.timeout'])
             ->middleware('throttle:30,1')
             ->name('session.heartbeat');
 
+        Route::get('/catalogue/lookups/products', [CatalogueLookupController::class, 'products'])->middleware('throttle:60,1')->name('catalogue.lookups.products');
+        Route::get('/catalogue/lookups/categories', [CatalogueLookupController::class, 'categories'])->middleware('throttle:60,1')->name('catalogue.lookups.categories');
         Route::get('/home-sections', [AdminHomeSectionController::class, 'index'])->name('home-sections.index');
         Route::get('/home-sections/create', [AdminHomeSectionController::class, 'create'])->name('home-sections.create');
         Route::post('/home-sections', [AdminHomeSectionController::class, 'store'])->name('home-sections.store');

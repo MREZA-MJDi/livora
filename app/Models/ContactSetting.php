@@ -43,7 +43,7 @@ class ContactSetting extends Model
 
     public function getLogoUrlAttribute(): ?string
     {
-        if ($this->logo_media_id && $this->logoMedia) {
+        if ($this->logo_media_id && $this->logoMedia && filled($this->logoMedia->url)) {
             return $this->logoMedia->url;
         }
 
@@ -51,9 +51,13 @@ class ContactSetting extends Model
             return null;
         }
 
-        return Str::startsWith($this->logo_path, ['http://', 'https://', '//'])
-            ? $this->logo_path
-            : Storage::disk('public')->url(ltrim($this->logo_path, '/'));
+        if (Str::startsWith($this->logo_path, ['http://', 'https://', '//'])) {
+            return $this->logo_path;
+        }
+
+        $path = ltrim($this->logo_path, '/');
+
+        return Storage::disk('public')->exists($path) ? Storage::disk('public')->url($path) : null;
     }
 
     public function logoMedia(): BelongsTo

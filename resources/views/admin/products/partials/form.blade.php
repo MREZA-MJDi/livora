@@ -1,5 +1,6 @@
 @php
-    $editing = isset($product);
+    $editing = isset($product) && $product->exists;
+    $initialCategorySelection = $selectedCategory ? [['id' => $selectedCategory->id, 'label' => $selectedCategory->name, 'meta' => $selectedCategory->is_active ? null : 'غیرفعال']] : [];
 
     $installmentEnabled = (bool) old(
         'installment_enabled',
@@ -75,25 +76,19 @@
                         دسته‌بندی
                     </label>
 
-                    <select
-                        id="category_id"
-                        name="category_id"
-                        class="admin-select"
-                        required
-                    >
-                        <option value="">
-                            انتخاب دسته‌بندی
-                        </option>
-
-                        @foreach($categories as $category)
-                            <option
-                                value="{{ $category->id }}"
-                                @selected(old('category_id', $product->category_id ?? '') == $category->id)
-                            >
-                            {{ $category->name }}{{ $category->is_active ? '' : ' — غیرفعال و غیرقابل نمایش در فروشگاه' }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <div x-data="adminCatalogueLookup(@js(route('admin.catalogue.lookups.categories')), @js($initialCategorySelection), false)" class="space-y-2">
+                        <input type="hidden" name="category_id" :value="selected[0]?.id || ''">
+                        <input id="category_id" type="search" class="admin-input" x-model="term" x-on:input.debounce.300ms="search()" minlength="2" maxlength="80" autocomplete="off" placeholder="نام دسته‌بندی را جستجو کنید" aria-required="true">
+                        <div x-show="results.length" x-cloak class="max-h-56 space-y-1 overflow-y-auto rounded-xl border border-[var(--admin-border)] bg-white p-2" role="listbox" aria-label="نتایج دسته‌بندی">
+                            <template x-for="item in results" :key="item.id">
+                                <button type="button" class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-right text-sm hover:bg-[var(--admin-surface)]" @click="choose(item)" role="option"><span x-text="item.label"></span><small class="text-[var(--admin-muted)]" x-text="item.meta || ''"></small></button>
+                            </template>
+                        </div>
+                        <template x-for="item in selected" :key="item.id">
+                            <div class="flex items-center justify-between rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm"><span x-text="item.label"></span><button type="button" class="text-red-600" @click="remove(item.id)" aria-label="حذف دسته‌بندی انتخاب‌شده">×</button></div>
+                        </template>
+                        <p class="admin-help" role="status" aria-live="polite" x-text="status"></p>
+                    </div>
 
                     @error('category_id')
                     <p class="mt-2 text-xs text-[var(--admin-danger)]">
@@ -416,7 +411,7 @@
 
                 <img
                     id="product-image-preview"
-                    src="{{ $productImageUrl ?: '' }}"
+                    @if(filled($productImageUrl)) src="{{ $productImageUrl }}" @endif
                     alt="{{ $primaryImage?->alt ?: ($product->name ?? 'تصویر محصول') }}"
                     class="product-primary-preview h-auto max-h-[32rem] w-auto max-w-full object-contain {{ $productImageUrl ? '' : 'hidden' }}"
                 >
@@ -523,6 +518,9 @@
             @enderror
 
         </div>
+
+section>
+
 
         <details class="xl:col-span-2 overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-white)]">
             <summary class="cursor-pointer list-none px-5 py-4 text-sm font-semibold text-[var(--admin-text)]">
@@ -1305,9 +1303,8 @@
         'specifications' => $product->specifications ?? [],
         'careGuide' => $product->care_guide ?? '',
         'faqItems' => $product->faq_items ?? [],
-        'availableRelatedProducts' => $availableRelatedProducts ?? collect(),
-        'selectedRelatedProductIds' => $selectedRelatedProductIds ?? [],
-        'includeKeyFeatures' => true,
+        'selectedRelatedProductOptions' => $selectedRelatedProductOptions ?? [],
+                'includeKeyFeatures' => true,
         'includeSpecifications' => true,
         'includeCareGuide' => true,
         'includeRelatedProducts' => true,

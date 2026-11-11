@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class HomeSection extends Model
 {
@@ -22,14 +23,23 @@ class HomeSection extends Model
 
     public function getImageUrlAttribute(): ?string
     {
-        if (! $this->image_path) {
+        return self::publicImageUrl($this->image_path);
+    }
+
+    public static function publicImageUrl(?string $path): ?string
+    {
+        if (! filled($path)) {
             return null;
         }
 
-        if (str_starts_with($this->image_path, 'http://') || str_starts_with($this->image_path, 'https://')) {
-            return $this->image_path;
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            return $path;
         }
 
-        return \Illuminate\Support\Facades\Storage::disk('public')->url($this->image_path);
+        $path = ltrim($path, '/');
+
+        return Storage::disk('public')->exists($path)
+            ? Storage::disk('public')->url($path)
+            : null;
     }
 }

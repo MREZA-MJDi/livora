@@ -1,7 +1,8 @@
 @php
-    $editing = isset($productVariant);
+    $editing = isset($productVariant) && $productVariant->exists;
     $currentProductId = old('product_id', $productVariant->product_id ?? $selectedProductId ?? '');
-    $currentProduct = $products->firstWhere('id', (int) $currentProductId);
+    $currentProduct = $selectedProduct ?? null;
+    $initialSelectedProduct = $currentProduct ? ['id' => $currentProduct->id, 'label' => $currentProduct->name, 'meta' => $currentProduct->sku, 'price' => (float) $currentProduct->price] : null;
     $basePrice = (float) ($currentProduct->price ?? 0);
     $initialAdjustment = (float) old('price_adjustment', $productVariant->price_adjustment ?? 0);
     $initialFinalPrice = max(0, $basePrice + $initialAdjustment);
@@ -13,7 +14,10 @@
 @csrf
 
 <div class="mx-auto w-full max-w-5xl space-y-5"
+     x-on:catalogue-product-selected="setProduct($event.detail.product)"
      x-data="{
+        initialProductId: {{ (int) $currentProductId }},
+        selectedProductId: {{ (int) $currentProductId }},
         basePrice: {{ $basePrice }},
         adjustment: {{ $initialAdjustment }},
         finalPrice: {{ $initialFinalPrice }},
@@ -27,15 +31,12 @@
         syncAdjustment() {
             this.adjustment = Number(this.finalPrice || 0) - Number(this.basePrice || 0);
         },
-        setProduct(select) {
-            const option = select.options[select.selectedIndex];
-            this.basePrice = Number(option?.dataset.price || 0);
-            if (!this.priceTouched) {
-                this.finalPrice = this.basePrice;
-                this.adjustment = 0;
-            } else {
-                this.syncAdjustment();
-            }
+        setProduct(product) {
+            this.selectedProductId = Number(product?.id || 0);
+            this.basePrice = Number(product?.price || 0);
+            this.$root.querySelectorAll('input[name="image_ids[]"]').forEach((input) => { input.checked = false; });
+            if (!this.priceTouched) this.adjustment = 0;
+            this.syncPrice();
         }
      }">
 
@@ -47,17 +48,33 @@
         </div>
         <div class="p-5 sm:p-6">
             <label for="product_id" class="admin-label">محصول اصلی</label>
-            <select id="product_id" name="product_id" class="admin-select" required
-                    @change="setProduct($event.target)" @disabled($editing)>
-                <option value="">انتخاب محصول</option>
-                @foreach($products as $product)
-                    <option value="{{ $product->id }}" data-price="{{ (float) $product->price }}"
-                        @selected((int) $currentProductId === (int) $product->id)>
-                        {{ $product->name }} — قیمت پایه: {{ number_format((float) $product->price) }} تومان
-                    </option>
-                @endforeach
-            </select>
-            @if($editing)<input type="hidden" name="product_id" value="{{ $currentProductId }}">@endif
+            @if($editing)
+                <input type="hidden" name="product_id" value="{{ $currentProductId }}">
+                <div class="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-4 py-3 text-sm">
+                    {{ $selectedProduct?->name ?? 'محصول ثبت‌شده در دسترس نیست' }}
+                    @if($selectedProduct)<span class="mt-1 block text-xs text-[var(--admin-muted)]">قیمت پایه: {{ number_format((float) $selectedProduct->price) }} تومان</span>@endif
+                </div>
+            @else
+                <div x-data="adminCatalogueLookup(@js(route('admin.catalogue.lookups.products')), @js($initialSelectedProduct ? [$initialSelectedProduct] : []), false)">
+                    <input type="hidden" name="product_id" :value="selected[0]?.id || ''">
+                    <input type="search" class="admin-input" x-model="term" x-on:input.debounce.300ms="search()" minlength="2" maxlength="80" autocomplete="off" placeholder="نام محصول یا SKU را جستجو کنید">
+                    <div x-show="results.length" x-cloak class="mt-2 max-h-56 space-y-1 overflow-y-auto rounded-xl border border-[var(--admin-border)] bg-white p-2" role="listbox" aria-label="نتایج محصولات">
+                        <template x-for="item in results" :key="item.id">
+                            <button type="button" class="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-right text-sm hover:bg-[var(--admin-surface)]" @click="choose(item); $dispatch('catalogue-product-selected', { product: item })" role="option">
+                                <span><span x-text="item.label"></span><small class="mt-1 block text-[var(--admin-muted)]" x-text="'قیمت پایه: ' + new Intl.NumberFormat('fa-IR').format(item.price || 0) + ' تومان'"></small></span>
+                                <small class="text-[var(--admin-muted)]" dir="ltr" x-text="item.meta || ''"></small>
+                            </button>
+                        </template>
+                    </div>
+                    <template x-for="item in selected" :key="item.id">
+                        <div class="mt-2 flex items-center justify-between rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-4 py-3 text-sm">
+                            <span><span x-text="item.label"></span><small class="mt-1 block text-xs text-[var(--admin-muted)]" x-text="'قیمت پایه: ' + new Intl.NumberFormat('fa-IR').format(item.price || 0) + ' تومان'"></small></span>
+                            <button type="button" class="text-red-600" @click="remove(item.id); $dispatch('catalogue-product-selected', { product: null })" aria-label="حذف محصول انتخاب‌شده">×</button>
+                        </div>
+                    </template>
+                    <p class="admin-help mt-2" role="status" aria-live="polite" x-text="status"></p>
+                </div>
+            @endif
             @error('product_id')<p class="mt-2 text-xs text-[var(--admin-danger)]">{{ $message }}</p>@enderror
         </div>
     </section>
@@ -167,10 +184,10 @@
             <div class="grid gap-4 sm:grid-cols-[160px_minmax(0,1fr)] sm:items-start">
                 <div class="overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface-soft)]">
                     <img id="variant-image-preview"
-                         src="{{ $variantCover?->url ?? '' }}"
+                         @if(filled($variantCover?->detail_url)) src="{{ $variantCover->url }}" @endif
                          alt="{{ $variantCover?->alt ?: 'پیش‌نمایش تصویر تنوع' }}"
-                         class="h-auto max-h-72 w-auto max-w-full object-contain {{ $variantCover ? '' : 'hidden' }}">
-                    @unless($variantCover)
+                         class="h-auto max-h-72 w-auto max-w-full object-contain {{ filled($variantCover?->detail_url) ? '' : 'hidden' }}">
+                    @unless(filled($variantCover?->detail_url))
                         <div id="variant-image-placeholder" class="flex aspect-[4/5] items-center justify-center px-3 text-center text-xs text-[var(--admin-muted)]">
                             پیش‌نمایش تصویر این گزینه
                         </div>
@@ -195,6 +212,7 @@
                 </div>
             </div>
 
+            <div x-show="Number(selectedProductId) > 0 && Number(selectedProductId) === Number(initialProductId)" x-cloak>
             <div class="border-t border-[var(--admin-border)] pt-5">
                 <h4 class="text-sm font-semibold text-[var(--admin-text)]">سایر تصاویر مرتبط با این گزینه</h4>
                 <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">می‌توانی چند تصویر دیگر از گالری همین محصول هم انتخاب کنی؛ ترتیب آن‌ها در گالری گزینه حفظ می‌شود.</p>
@@ -205,7 +223,11 @@
                         <label class="group relative cursor-pointer overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface-soft)] has-[:checked]:border-[var(--admin-accent)] has-[:checked]:ring-2 has-[:checked]:ring-[var(--admin-accent)]">
                             <input type="checkbox" name="image_ids[]" value="{{ $image->id }}" class="absolute right-3 top-3 z-10 h-4 w-4"
                                    @checked(in_array((int) $image->id, $selectedImageIds, true))>
-                            <img src="{{ $image->url }}" alt="{{ $image->alt ?: 'تصویر محصول' }}" loading="lazy" class="aspect-[4/3] w-full object-cover">
+                            @if(filled($image->url))
+                                <img src="{{ $image->url }}" alt="{{ $image->alt ?: 'تصویر محصول' }}" loading="lazy" class="aspect-[4/3] w-full object-cover">
+                            @else
+                                <div class="flex aspect-[4/3] items-center justify-center px-2 text-center text-xs text-[var(--admin-muted)]">فایل تصویر در دسترس نیست</div>
+                            @endif
                             <span class="block truncate px-3 py-2 text-xs text-[var(--admin-muted)]">تصویر {{ $loop->iteration }}</span>
                         </label>
                     @endforeach
@@ -218,7 +240,10 @@
                     <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">اول محصول را ذخیره کن و از بخش تصاویر محصول، عکس‌ها را اضافه کن؛ بعداً می‌توانی آن‌ها را به این گزینه وصل کنی.</p>
                 </div>
             @endif
-        </div>
+
+            </div>
+            <p x-show="!Number(selectedProductId)" x-cloak class="rounded-xl border border-dashed border-[var(--admin-border)] px-4 py-5 text-center text-xs text-[var(--admin-muted)]">ابتدا محصول را جستجو و انتخاب کنید.</p>
+            <p x-show="Number(selectedProductId) > 0 && Number(selectedProductId) !== Number(initialProductId)" x-cloak class="rounded-xl border border-dashed border-[var(--admin-border)] px-4 py-5 text-center text-xs text-[var(--admin-muted)]">برای جلوگیری از اتصال تصاویر محصول قبلی، ابتدا تنوع را ذخیره کنید؛ سپس گالری محصول جدید را انتخاب کنید.</p>        </div>
     </section>
 
     <div class="sticky bottom-3 z-20 flex flex-col-reverse gap-3 rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-white)]/95 p-3 shadow-xl backdrop-blur sm:flex-row sm:items-center sm:justify-between">

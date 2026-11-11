@@ -30,7 +30,7 @@
                 <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                     <template x-for="item in items" :key="item.id">
                         <button type="button" @click="selectMedia(item)" class="overflow-hidden rounded-xl border p-2 text-right transition hover:border-[var(--admin-accent)]" :class="selectedMedia?.id === item.id ? 'border-[var(--admin-accent)] bg-[var(--admin-accent-soft)]' : 'border-[var(--admin-border)]'">
-                            <span class="flex aspect-square items-center justify-center overflow-hidden rounded-lg bg-[var(--admin-surface)]"><img :src="item.url" :alt="item.alt || item.name" class="h-full w-full object-contain"></span>
+                            <span class="flex aspect-square items-center justify-center overflow-hidden rounded-lg bg-[var(--admin-surface)]"><template x-if="item.url"><img :src="item.url" :alt="item.alt || item.name" class="h-full w-full object-contain"></template><template x-if="!item.url"><span class="px-2 text-center text-xs text-amber-700">فایل ناموجود</span></template></span>
                             <span class="mt-2 block truncate text-xs font-medium" x-text="item.name"></span>
                             <span class="block text-[10px] text-[var(--admin-muted)]" x-text="item.size"></span>
                         </button>

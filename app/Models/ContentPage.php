@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
 
 class ContentPage extends Model
@@ -27,7 +28,7 @@ class ContentPage extends Model
         ];
     }
 
-    public function media()
+    public function media(): BelongsTo
     {
         return $this->belongsTo(Media::class);
     }
@@ -41,12 +42,28 @@ class ContentPage extends Model
 
     public function getFeaturedImageUrlAttribute(): ?string
     {
+        $media = $this->relationLoaded('media') ? $this->getRelation('media') : null;
+        if ($media) {
+            if (str_starts_with($media->path, 'http://') || str_starts_with($media->path, 'https://')) {
+                return $media->url;
+            }
+
+            $disk = Storage::disk($media->disk ?: 'public');
+            if ($disk->exists(ltrim($media->path, '/'))) {
+                return $media->url;
+            }
+        }
+
         return $this->publicImageUrl($this->featured_image);
     }
 
     public function getOgImageUrlAttribute(): ?string
     {
-        return $this->publicImageUrl($this->og_image ?: $this->featured_image);
+        if (! filled($this->og_image)) {
+            return $this->featured_image_url;
+        }
+
+        return $this->publicImageUrl($this->og_image);
     }
 
     private function publicImageUrl(?string $path): ?string
@@ -59,6 +76,10 @@ class ContentPage extends Model
             return $path;
         }
 
-        return Storage::disk('public')->url($path);
+        $path = ltrim($path, '/');
+
+        return Storage::disk('public')->exists($path)
+            ? Storage::disk('public')->url($path)
+            : null;
     }
 }

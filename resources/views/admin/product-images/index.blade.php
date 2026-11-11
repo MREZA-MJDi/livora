@@ -58,25 +58,19 @@
                     فیلتر بر اساس محصول
                 </label>
 
-                <select
-                    id="product_id"
-                    name="product_id"
-                    class="admin-select"
-                >
-                    <option value="">
-                        همه محصولات
-                    </option>
-
-                    @foreach($products as $product)
-                        <option
-                            value="{{ $product->id }}"
-                            @selected((string) request('product_id') === (string) $product->id)
-                        >
-                        {{ $product->name }}
-                        </option>
-                    @endforeach
-
-                </select>
+                <div x-data="adminCatalogueLookup(@js(route('admin.catalogue.lookups.products')), @js($selectedProduct ? [['id' => $selectedProduct->id, 'label' => $selectedProduct->name, 'meta' => $selectedProduct->sku]] : []), false)" class="space-y-2">
+                    <input type="hidden" name="product_id" :value="selected[0]?.id || ''">
+                    <input type="search" class="admin-input" x-model="term" x-on:input.debounce.300ms="search()" minlength="2" maxlength="80" autocomplete="off" placeholder="جستجوی نام محصول یا SKU">
+                    <div x-show="results.length" x-cloak class="max-h-56 space-y-1 overflow-y-auto rounded-xl border border-[var(--admin-border)] bg-white p-2" role="listbox" aria-label="نتایج محصولات">
+                        <template x-for="item in results" :key="item.id">
+                            <button type="button" class="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-right text-sm hover:bg-[var(--admin-surface)]" @click="choose(item)" role="option"><span x-text="item.label"></span><small class="text-[var(--admin-muted)]" dir="ltr" x-text="item.meta || ''"></small></button>
+                        </template>
+                    </div>
+                    <template x-for="item in selected" :key="item.id">
+                        <div class="flex items-center justify-between rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm"><span x-text="item.label"></span><button type="button" class="text-red-600" @click="remove(item.id)" aria-label="حذف فیلتر محصول">×</button></div>
+                    </template>
+                    <p class="admin-help" role="status" aria-live="polite" x-text="status"></p>
+                </div>
             </div>
 
             <div class="flex items-end">
@@ -141,11 +135,11 @@
 
                             <div class="admin-image-thumb">
 
-                                <img
-                                    src="{{ $image->url }}"
-                                    alt="{{ $image->alt ?: $image->product?->name }}"
-                                    class="admin-image"
-                                >
+                                @if(filled($image->url))
+                                    <img src="{{ $image->url }}" alt="{{ $image->alt ?: $image->product?->name }}" class="admin-image" loading="lazy">
+                                @else
+                                    <div class="flex aspect-square items-center justify-center rounded-xl bg-[var(--admin-surface)] px-2 text-center text-xs text-[var(--admin-muted)]">فایل تصویر در دسترس نیست</div>
+                                @endif
 
                             </div>
 

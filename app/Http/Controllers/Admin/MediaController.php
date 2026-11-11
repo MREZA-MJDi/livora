@@ -154,6 +154,17 @@ class MediaController extends Controller
 
     public function destroy(Media $media): RedirectResponse
     {
+        // Home sections are capped at 40 and each Hero payload at 4 slides.
+        // Inspect this small bounded set in PHP to keep JSON containment
+        // behavior consistent across SQLite and MariaDB.
+        $heroSlideUsages = HomeSection::query()
+            ->where('type', 'hero')
+            ->limit(40)
+            ->get(['payload'])
+            ->sum(fn (HomeSection $section) => collect(data_get($section->payload, 'slides', []))
+                ->filter(fn ($slide) => ($slide['image_path'] ?? null) === $media->path)
+                ->count());
+
         $usages = [
             'تصاویر محصولات' => $media->productImages()->count(),
             'بنر محصولات' => $media->productBanners()->count(),
@@ -166,6 +177,7 @@ class MediaController extends Controller
             'تصویر پیش‌فرض Open Graph' => $media->seoSettings()->count(),
             'لوگوی برند' => ContactSetting::query()->where('logo_media_id', $media->id)->count(),
             'تصویر سکشن صفحه اصلی' => HomeSection::query()->where('image_path', $media->path)->count(),
+            'تصاویر اسلایدهای صفحه اصلی' => $heroSlideUsages,
         ];
         $usedBy = collect($usages)->filter()->map(fn ($count, $label) => $label.' ('.$count.')')->values();
 

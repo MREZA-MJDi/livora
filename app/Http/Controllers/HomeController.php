@@ -17,6 +17,7 @@ class HomeController extends Controller
             ->where('enabled', true)
             ->orderBy('sort_order')
             ->orderBy('id')
+            ->limit(40)
             ->get();
 
         $finalCta = $sections->firstWhere('key', 'final-cta');

@@ -11,7 +11,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -21,21 +20,30 @@ class HomeSectionController extends Controller
     public function index(): View
     {
         return view('admin.home-sections.index', [
-            'sections' => HomeSection::query()->orderBy('sort_order')->orderBy('id')->get(),
+            'sections' => HomeSection::query()->orderBy('sort_order')->orderBy('id')->limit(40)->get(),
         ]);
     }
 
     public function create(): View
     {
+        $section = new HomeSection([
+            'enabled' => true,
+            'type' => 'products',
+            'payload' => ['product_source' => 'latest', 'limit' => 8],
+        ]);
+
         return view('admin.home-sections.form', [
-            'section' => new HomeSection(['enabled' => true, 'type' => 'products', 'payload' => ['product_source' => 'latest', 'limit' => 8]]),
-            'categories' => Category::query()->active()->limit(200)->get(['id', 'name']),
-            'products' => $this->productOptions(),
+            'section' => $section,
+            ...$this->selectedLookupOptions($section),
         ]);
     }
 
     public function store(Request $request): RedirectResponse
     {
+        if (HomeSection::query()->count() >= 40) {
+            return back()->withErrors(['section' => 'حداکثر ۴۰ سکشن برای صفحه اصلی قابل تعریف است.'])->withInput();
+        }
+
         $data = $this->validated($request);
         $data['key'] = Str::slug($data['key']);
         $data['sort_order'] = (HomeSection::max('sort_order') ?? 0) + 10;
@@ -56,8 +64,7 @@ class HomeSectionController extends Controller
     {
         return view('admin.home-sections.form', [
             'section' => $homeSection,
-            'categories' => Category::query()->active()->limit(200)->get(['id', 'name']),
-            'products' => $this->productOptions($homeSection),
+            ...$this->selectedLookupOptions($homeSection),
         ]);
     }
 
@@ -85,7 +92,7 @@ class HomeSectionController extends Controller
     public function reorder(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'order' => ['required', 'array', 'min:1'],
+            'order' => ['required', 'array', 'min:1', 'max:40'],
             'order.*' => ['required', 'integer', 'distinct', 'exists:home_sections,id'],
         ]);
 
@@ -138,6 +145,7 @@ class HomeSectionController extends Controller
             'payload.slides.*.eyebrow' => ['nullable', 'string', 'max:160'],
             'payload.slides.*.title' => ['nullable', 'string', 'max:255'],
             'payload.slides.*.subtitle' => ['nullable', 'string', 'max:1500'],
+            'payload.slides.*.price_label' => ['nullable', 'string', 'max:120'],
             'payload.slides.*.cta_label' => ['nullable', 'string', 'max:120'],
             'payload.slides.*.cta_url' => ['nullable', 'string', 'max:2048'],
             'payload.slides.*.image_path' => ['nullable', 'string', 'max:2048'],
@@ -163,6 +171,7 @@ class HomeSectionController extends Controller
                     'eyebrow' => trim((string) ($slide['eyebrow'] ?? '')),
                     'title' => trim((string) ($slide['title'] ?? '')),
                     'subtitle' => trim((string) ($slide['subtitle'] ?? '')),
+                    'price_label' => trim((string) ($slide['price_label'] ?? '')),
                     'cta_label' => trim((string) ($slide['cta_label'] ?? '')),
                     'cta_url' => trim((string) ($slide['cta_url'] ?? '')),
                     'image_path' => $slide['image_path'] ?? null,
@@ -209,12 +218,16 @@ class HomeSectionController extends Controller
             return;
         }
 
-        $used = HomeSection::query()->when($ignoreId, fn ($query) => $query->where('id', '!=', $ignoreId))->get(['id', 'payload'])
-            ->flatMap(fn (HomeSection $item) => $item->payload['product_ids'] ?? [])
-            ->map(fn ($id) => (int) $id)->unique();
+        $hasDuplicate = HomeSection::query()
+            ->when($ignoreId, fn ($query) => $query->where('id', '!=', $ignoreId))
+            ->where(function ($query) use ($productIds): void {
+                foreach (array_unique(array_map('intval', $productIds)) as $productId) {
+                    $query->orWhereJsonContains('payload->product_ids', $productId);
+                }
+            })
+            ->exists();
 
-        $duplicates = $used->intersect(array_map('intval', $productIds));
-        if ($duplicates->isNotEmpty()) {
+        if ($hasDuplicate) {
             throw ValidationException::withMessages([
                 'payload.product_ids' => 'هر محصول فقط می‌تواند در یک سکشن دستی صفحه اصلی انتخاب شود.',
             ]);
@@ -222,35 +235,37 @@ class HomeSectionController extends Controller
     }
 
     /**
-     * Keep the section editor responsive while retaining every saved selection.
+     * Load only the values already selected in this form. Search results are fetched
+     * on demand through HomeSectionLookupController.
      *
-     * @return Collection<int, Product>
+     * @return array{selectedCategory: ?Category, selectedProducts: \\Illuminate\\Support\\Collection}
      */
-    private function productOptions(?HomeSection $section = null): Collection
+    private function selectedLookupOptions(HomeSection $section): array
     {
-        $selectedIds = array_values(array_unique(array_map(
-            'intval',
-            data_get($section?->payload, 'product_ids', [])
-        )));
+        $oldPayload = session()->get('_old_input.payload', []);
+        $categoryId = data_get($oldPayload, 'category_id', data_get($section->payload, 'category_id'));
+        $productIds = data_get($oldPayload, 'product_ids', data_get($section->payload, 'product_ids', []));
+        $productIds = collect(is_array($productIds) ? $productIds : [])
+            ->map(fn ($id) => (int) $id)
+            ->filter(fn ($id) => $id > 0)
+            ->unique()
+            ->take(30)
+            ->values();
 
-        $selected = $selectedIds === []
+        $selectedCategory = filled($categoryId)
+            ? Category::query()->whereKey((int) $categoryId)->first(['id', 'name'])
+            : null;
+
+        $productsById = $productIds->isEmpty()
             ? collect()
-            : Product::query()
-                ->whereIn('id', $selectedIds)
-                ->orderBy('name')
-                ->get(['id', 'name']);
+            : Product::query()->whereIn('id', $productIds)->get(['id', 'name', 'sku'])->keyBy('id');
 
-        $remainingLimit = max(0, 200 - $selected->count());
-        $remaining = $remainingLimit === 0
-            ? collect()
-            : Product::query()
-                ->active()
-                ->when($selectedIds !== [], fn ($query) => $query->whereNotIn('id', $selectedIds))
-                ->orderBy('name')
-                ->limit($remainingLimit)
-                ->get(['id', 'name']);
+        $selectedProducts = $productIds
+            ->map(fn ($id) => $productsById->get($id))
+            ->filter()
+            ->values();
 
-        return $selected->concat($remaining)->unique('id')->values();
+        return compact('selectedCategory', 'selectedProducts');
     }
 
     private function storeImage(Request $request, ?string $existing): ?string

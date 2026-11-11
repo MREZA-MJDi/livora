@@ -760,15 +760,18 @@ class AdminCrudLifecycleTest extends TestCase
         Storage::disk('public')->assertExists($section->image_path);
     }
 
-    public function test_home_section_editor_offers_real_sources_and_floating_slide_preview(): void
+    public function test_home_section_editor_offers_real_sources_and_storefront_matched_preview(): void
     {
         $this->actingAs($this->admin)
             ->get(route('admin.home-sections.create'))
             ->assertOk()
             ->assertSee('پرفروش‌ترین محصولات')
             ->assertSee('محصولات ویژه')
-            ->assertSee('پیش‌نمایش شناور')
-            ->assertSee('LIVE PREVIEW')
+            ->assertSee('پیش‌نمایش اسلاید جاری')
+            ->assertSee('sg-home-hero__layout', false)
+            ->assertSee('data-preview-target="home-section-image-preview"', false)
+            ->assertDontSee('src=""', false)
+            ->assertDontSee('LIVE PREVIEW')
             ->assertSee('payload[product_source]');
     }
 
@@ -840,21 +843,24 @@ class AdminCrudLifecycleTest extends TestCase
             ->assertOk()
             ->assertSee('aspect-[4/3]', false)
             ->assertSee('data-crop-ratio="1.3333333"', false)
-            ->assertSee('data-preview-target="category-image-preview"', false);
+            ->assertSee('data-preview-target="category-image-preview"', false)
+            ->assertDontSee('src=""', false);
 
         $this->actingAs($this->admin)
             ->get(route('admin.products.create'))
             ->assertOk()
             ->assertSee('data-preserve-original="1"', false)
             ->assertSee('data-preview-target="product-image-preview"', false)
-            ->assertDontSee('data-crop-ratio="0.8"', false);
+            ->assertDontSee('data-crop-ratio="0.8"', false)
+            ->assertDontSee('src=""', false);
 
         $this->actingAs($this->admin)
             ->get(route('admin.product-images.create', ['product_id' => $product->id]))
             ->assertOk()
             ->assertSee('data-preserve-original="1"', false)
             ->assertSee('data-preview-target="product-gallery-image-preview"', false)
-            ->assertDontSee('data-crop-ratio="0.8"', false);
+            ->assertDontSee('data-crop-ratio="0.8"', false)
+            ->assertDontSee('src=""', false);
 
         $this->actingAs($this->admin)
             ->get(route('admin.product-variants.create', ['product_id' => $product->id]))
@@ -863,14 +869,39 @@ class AdminCrudLifecycleTest extends TestCase
             ->assertSee('data-preview-target="variant-image-preview"', false)
             ->assertDontSee('data-crop-ratio="0.8"', false)
             ->assertSee('aspect-[4/3]', false)
-            ->assertSee($product->images()->firstOrFail()->url);
+            ->assertSee($product->images()->firstOrFail()->url)
+            ->assertDontSee('src=""', false);
 
         $this->actingAs($this->admin)
             ->get(route('admin.shop-banner.edit'))
             ->assertOk()
             ->assertSee('aspect-[12/5]', false)
             ->assertSee('data-crop-ratio="2.4"', false)
-            ->assertSee('data-preview-target="shop-banner-image-preview"', false);
+            ->assertSee('data-preview-target="shop-banner-image-preview"', false)
+            ->assertDontSee('src=""', false);
+
+        $this->actingAs($this->admin)
+            ->get(route('admin.blog.create'))
+            ->assertOk()
+            ->assertSee('data-crop-ratio="1.7777778"', false)
+            ->assertSee('data-preview-target="blog-featured-image-preview"', false)
+            ->assertSee('blog-featured-image-placeholder', false)
+            ->assertDontSee('src=""', false);
+
+        $this->actingAs($this->admin)
+            ->get(route('admin.pages.create'))
+            ->assertOk()
+            ->assertSee('data-crop-ratio="1.7777778"', false)
+            ->assertSee('data-preview-target="page-featured-image-preview"', false)
+            ->assertSee('page-featured-image-placeholder', false)
+            ->assertDontSee('src=""', false);
+
+        $this->actingAs($this->admin)
+            ->get(route('admin.contact-settings.edit'))
+            ->assertOk()
+            ->assertSee('data-preview-target="brand-logo-preview"', false)
+            ->assertSee('brand-logo-placeholder', false)
+            ->assertDontSee('src=""', false);
     }
 
     private function createCategory(string $slug): Category

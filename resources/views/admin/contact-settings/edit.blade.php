@@ -4,6 +4,13 @@
 @section('page_title', 'مدیریت تماس با ما')
 
 @section('content')
+@php
+    $logoPreviewUrl = $settings->logo_path
+        ? (\Illuminate\Support\Str::startsWith($settings->logo_path, ['http://', 'https://', '//'])
+            ? $settings->logo_path
+            : \Illuminate\Support\Facades\Storage::disk('public')->url(ltrim($settings->logo_path, '/')))
+        : $settings->logoMedia?->url;
+@endphp
 <div class="mx-auto max-w-5xl space-y-6">
     <header>
         <p class="mb-2 text-xs font-medium text-[var(--admin-accent)]">CONTENT / CONTACT</p>
@@ -15,7 +22,7 @@
         <div class="admin-card border border-emerald-200 p-4 text-sm text-emerald-700">{{ session('success') }}</div>
     @endif
 
-    <form method="POST" action="{{ route('admin.contact-settings.update') }}" class="space-y-6">
+    <form method="POST" action="{{ route('admin.contact-settings.update') }}" enctype="multipart/form-data" class="space-y-6">
         @csrf
         @method('PUT')
 
@@ -28,9 +35,12 @@
                 <div><label class="admin-label" for="brand_name">نام برند</label><input id="brand_name" name="brand_name" class="admin-input" maxlength="120" value="{{ old('brand_name', $settings->brand_name ?? config('app.name')) }}">@error('brand_name')<p class="admin-error">{{ $message }}</p>@enderror</div>
                 <div class="sm:col-span-2">
                     <label class="admin-label" for="logo_image">لوگوی اصلی برند</label>
-                    <input id="logo_image" name="logo_image" type="file" accept="image/jpeg,image/png,image/webp" data-crop-ratio="1" class="admin-input p-2">
-                    <div class="mt-3"><img id="brand-logo-preview" src="{{ $settings->logoMedia?->url ?: ($settings->logo_path ? (str_starts_with($settings->logo_path, 'http') ? $settings->logo_path : \Illuminate\Support\Facades\Storage::disk('public')->url($settings->logo_path)) : '') }}" alt="{{ $settings->brand_name }}" class="{{ $settings->logo_path ? '' : 'hidden' }} h-20 max-w-48 rounded-xl object-contain"></div>
-                    @include('admin.media.partials.picker', ['mediaPickerField' => 'logo_image', 'mediaPickerId' => old('logo_media_id', $settings->logo_media_id), 'mediaPickerUrl' => $settings->logoMedia?->url, 'mediaPickerName' => $settings->logoMedia?->original_name ?? 'Brand logo', 'mediaPickerPreviewId' => 'brand-logo-preview', 'mediaPickerInputName' => 'logo_media_id', 'mediaPickerRemoveName' => 'remove_logo'])
+                    <input id="logo_image" name="logo_image" type="file" accept="image/jpeg,image/png,image/webp" data-crop-ratio="1" data-preview-target="brand-logo-preview" data-preview-placeholder="brand-logo-placeholder" class="admin-input p-2">
+                    <div class="mt-3 flex min-h-24 items-center justify-center rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-3">
+                        <img id="brand-logo-preview" @if(filled($logoPreviewUrl)) src="{{ $logoPreviewUrl }}" @endif alt="{{ $settings->brand_name }}" class="{{ filled($logoPreviewUrl) ? '' : 'hidden' }} h-20 max-w-48 rounded-xl object-contain">
+                        <span id="brand-logo-placeholder" class="{{ filled($logoPreviewUrl) ? 'hidden' : '' }} text-xs text-[var(--admin-muted)]">لوگوی برند هنوز انتخاب نشده است</span>
+                    </div>
+                    @include('admin.media.partials.picker', ['mediaPickerField' => 'logo_image', 'mediaPickerId' => old('logo_media_id', $settings->logo_media_id), 'mediaPickerUrl' => $logoPreviewUrl, 'mediaPickerName' => $settings->logoMedia?->original_name ?? 'Brand logo', 'mediaPickerPreviewId' => 'brand-logo-preview', 'mediaPickerInputName' => 'logo_media_id', 'mediaPickerRemoveName' => 'remove_logo'])
                     @error('logo_image')<p class="admin-error">{{ $message }}</p>@enderror
                 </div>
                 @foreach(['whatsapp_url' => 'واتساپ', 'telegram_url' => 'تلگرام', 'instagram_url' => 'اینستاگرام', 'eitaa_url' => 'ایتا', 'bale_url' => 'بله'] as $field => $label)
@@ -75,7 +85,17 @@
                 <template x-for="(item, index) in payments" :key="'payment-' + index">
                     <div class="grid gap-2 sm:grid-cols-[1fr_1.3fr_1.3fr_auto]">
                         <input class="admin-input" :name="'payment_methods[' + index + '][label]'" x-model="item.label" placeholder="عنوان">
-                        <input class="admin-input" dir="ltr" :name="'payment_methods[' + index + '][image]'" x-model="item.image" placeholder="URL تصویر نشان">
+                        <div class="space-y-2">
+                            <input class="admin-input" dir="ltr" :name="'payment_methods[' + index + '][image]'" x-model="item.image" @input="item.image_error = false" placeholder="URL تصویر نشان">
+                            <div class="flex min-h-12 items-center gap-3 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] p-2">
+                                <template x-if="item.image && !item.image_error">
+                                    <img :src="item.image" :alt="item.label || 'پیش‌نمایش نشان پرداخت'" class="h-8 max-w-24 object-contain" x-on:error="item.image_error = true" x-on:load="item.image_error = false">
+                                </template>
+                                <span x-show="!item.image" class="text-xs text-[var(--admin-muted)]">نشانی تصویر ثبت نشده است</span>
+                                <span x-show="item.image && item.image_error" class="text-xs text-amber-700">بارگذاری تصویر ناموفق بود</span>
+                                <span class="text-xs text-[var(--admin-muted)]" x-text="item.label || 'پیش‌نمایش نشان'"></span>
+                            </div>
+                        </div>
                         <input class="admin-input" dir="ltr" :name="'payment_methods[' + index + '][url]'" x-model="item.url" placeholder="لینک مقصد (اختیاری)">
                         <button type="button" class="admin-btn admin-btn-danger" @click="payments.splice(index, 1)">حذف</button>
                     </div>

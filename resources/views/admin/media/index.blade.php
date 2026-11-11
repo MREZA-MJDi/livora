@@ -111,7 +111,7 @@
                         {{-- Preview --}}
                         <div class="aspect-square overflow-hidden bg-[var(--admin-bg)]">
 
-                            @if($item->is_image)
+                            @if($item->is_image && filled($item->url))
 
                                 <img
                                     src="{{ $item->url }}"
@@ -119,6 +119,10 @@
                                     class="h-full w-full object-contain p-2"
                                     loading="lazy"
                                 >
+
+                            @elseif($item->is_image)
+
+                                <div class="flex h-full items-center justify-center p-4 text-center text-xs text-amber-700">فایل تصویر در فضای ذخیره‌سازی موجود نیست.</div>
 
                             @else
 
@@ -208,14 +212,18 @@
                             {{-- Actions --}}
                             <div class="flex items-center gap-2">
 
-                                <a
-                                    href="{{ $item->url }}"
-                                    target="_blank"
-                                    rel="noopener"
-                                    class="flex-1 rounded-xl border border-[var(--admin-border)] px-3 py-2 text-center text-[10px] font-medium text-[var(--admin-text)] transition hover:bg-[var(--admin-bg)]"
-                                >
-                                    مشاهده
-                                </a>
+                                @if(filled($item->url))
+                                    <a
+                                        href="{{ $item->url }}"
+                                        target="_blank"
+                                        rel="noopener"
+                                        class="flex-1 rounded-xl border border-[var(--admin-border)] px-3 py-2 text-center text-[10px] font-medium text-[var(--admin-text)] transition hover:bg-[var(--admin-bg)]"
+                                    >
+                                        مشاهده
+                                    </a>
+                                @else
+                                    <span class="flex-1 rounded-xl border border-[var(--admin-border)] px-3 py-2 text-center text-[10px] text-[var(--admin-muted)]">فایل ناموجود</span>
+                                @endif
 
 
                                 <form

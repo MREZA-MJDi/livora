@@ -10,6 +10,8 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 class CmsOperationsTest extends TestCase
@@ -24,6 +26,7 @@ class CmsOperationsTest extends TestCase
 
     public function test_admin_can_manage_contact_details_and_faqs_render_on_public_contact_page(): void
     {
+        Storage::fake('public');
         $admin = User::factory()->create(['role' => 'admin']);
 
         $this->actingAs($admin)
@@ -46,6 +49,7 @@ class CmsOperationsTest extends TestCase
                 'support_description' => 'راهنمایی پیش از خرید',
                 'online_description' => 'از فرم تماس پیام بفرستید',
                 'is_active' => '1',
+                'logo_image' => UploadedFile::fake()->image('brand-logo.png', 400, 400),
                 'faqs' => [
                     ['question' => 'چطور سفارش ثبت کنم؟', 'answer' => 'محصول را به سبد خرید اضافه کنید.'],
                 ],
@@ -57,7 +61,9 @@ class CmsOperationsTest extends TestCase
             ])
             ->assertRedirect(route('admin.contact-settings.edit'));
 
-        $settings = ContactSetting::query()->firstOrFail();
+        $settings = ContactSetting::query()->with('logoMedia')->firstOrFail();
+        $logoUrl = $settings->logo_url;
+        $this->assertNotEmpty($logoUrl);
         $this->assertSame('support@sillashop.com', $settings->email);
         $this->assertSame('چطور سفارش ثبت کنم؟', $settings->faqs[0]['question']);
 
@@ -68,6 +74,15 @@ class CmsOperationsTest extends TestCase
         ]);
 
         Cache::forget('seo_settings.current');
+
+        $this->actingAs($admin)
+            ->get(route('admin.contact-settings.edit'))
+            ->assertOk()
+            ->assertSee($logoUrl, false);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee($logoUrl, false);
 
         $this->get('/contact')
             ->assertOk()

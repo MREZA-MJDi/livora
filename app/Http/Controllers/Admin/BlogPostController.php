@@ -21,7 +21,7 @@ class BlogPostController extends Controller
     public function index(Request $request): View
     {
         $posts = BlogPost::query()
-            ->with('author')
+            ->with(['author', 'media'])
             ->withCount('tags')
             ->when($request->filled('q'), function ($query) use ($request): void {
                 $term = trim((string) $request->input('q'));
@@ -40,6 +40,7 @@ class BlogPostController extends Controller
     public function create(): View
     {
         return view('admin.blog.create', [
+            'post' => new BlogPost(),
             'bodyHtml' => HtmlSanitizer::sanitize((string) old('body', '')),
         ]);
     }
@@ -75,7 +76,7 @@ class BlogPostController extends Controller
 
     public function edit(BlogPost $blog): View
     {
-        $blog->load('tags');
+        $blog->load(['tags', 'media']);
 
         return view('admin.blog.edit', [
             'post' => $blog,
