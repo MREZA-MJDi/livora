@@ -59,7 +59,7 @@
 <article class="product-card group relative flex h-full min-w-0 flex-col overflow-hidden rounded-[1rem] border border-[var(--sg-border)] bg-[var(--sg-white)] shadow-sm transition duration-300 hover:-translate-y-1 hover:border-[var(--sg-accent)]/40 hover:shadow-lg" aria-labelledby="product-card-title-{{ $product->id }}">
 
     {{-- Image --}}
-    <div class="relative overflow-hidden bg-[var(--sg-surface)]" data-card-media>
+    <div class="relative overflow-hidden bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white via-[var(--sg-surface)] to-[var(--sg-cream)]" data-card-media>
 
         <a
             href="{{ route('product.show', $product->slug) }}"
@@ -75,7 +75,7 @@
                     loading="lazy"
                     decoding="async"
                     data-card-image
-                    class="product-card-image h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.045]"
+                    class="product-card-image h-full w-full object-contain p-3 sm:p-4 transition duration-500 ease-out group-hover:scale-[1.025]"
                 >
                 <span data-card-image-fallback class="hidden h-full w-full items-center justify-center text-xs tracking-[0.2em] text-[var(--sg-stone)]" aria-hidden="true">سیلا گالری</span>
 
