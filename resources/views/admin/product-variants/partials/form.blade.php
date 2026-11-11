@@ -24,14 +24,18 @@
         formatMoney(value) {
             return new Intl.NumberFormat('fa-IR').format(Math.max(0, Number(value) || 0));
         },
-        syncPrice() {
-            this.finalPrice = Math.max(0, Number(this.basePrice || 0) + Number(this.adjustment || 0));
+        syncAdjustment() {
+            this.adjustment = Number(this.finalPrice || 0) - Number(this.basePrice || 0);
         },
         setProduct(select) {
             const option = select.options[select.selectedIndex];
             this.basePrice = Number(option?.dataset.price || 0);
-            if (!this.priceTouched) this.adjustment = 0;
-            this.syncPrice();
+            if (!this.priceTouched) {
+                this.finalPrice = this.basePrice;
+                this.adjustment = 0;
+            } else {
+                this.syncAdjustment();
+            }
         }
      }">
 
@@ -133,15 +137,15 @@
     <section class="admin-card overflow-hidden">
         <div class="border-b border-[var(--admin-border)] bg-[var(--admin-surface-soft)] px-5 py-4 sm:px-6">
             <p class="text-xs font-semibold text-[var(--admin-accent)]">قیمت این گزینه</p>
-            <h3 class="mt-1 text-base font-bold text-[var(--admin-text)]">میزان تغییر قیمت را وارد کن</h3>
-            <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">این مبلغ، تغییر قیمت این گزینه نسبت به قیمت پایه محصول است؛ در انتخاب چند ویژگی، تغییر قیمت گزینه‌ها با هم جمع می‌شود.</p>
+            <h3 class="mt-1 text-base font-bold text-[var(--admin-text)]">قیمت نهایی محصول با انتخاب این گزینه</h3>
+            <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">قیمت کامل را وارد کن؛ سیستم اختلاف آن با قیمت پایه را خودش محاسبه می‌کند. اگر چند گروه ویژگی انتخاب شوند، اختلاف قیمت هر گروه با هم جمع می‌شود.</p>
         </div>
         <div class="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2 sm:p-6">
             <div>
-                <label for="final_price" class="admin-label">مبلغ افزوده / کاهشی نسبت به قیمت پایه (تومان)</label>
-                <input id="final_price" type="number" step="1" class="admin-input"
-                       x-model.number="adjustment" @input="priceTouched = true; syncPrice()" required>
-                <p class="mt-1.5 text-xs text-[var(--admin-muted)]">قیمت پایه محصول: <span x-text="formatMoney(basePrice)"></span> تومان</p>
+                <label for="final_price" class="admin-label">قیمت نهایی با این گزینه (تومان)</label>
+                <input id="final_price" type="number" min="0" step="1" class="admin-input"
+                       x-model.number="finalPrice" @input="priceTouched = true; syncAdjustment()" required>
+                <p class="mt-1.5 text-xs text-[var(--admin-muted)]">قیمت پایه محصول: <span x-text="formatMoney(basePrice)"></span> تومان؛ اختلاف قیمت به‌صورت خودکار محاسبه می‌شود.</p>
             </div>
             <div class="flex flex-col justify-center rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface-soft)] p-4">
                 <span class="text-xs text-[var(--admin-muted)]">قیمت تخمینی این گزینه</span>
