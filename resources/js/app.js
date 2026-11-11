@@ -678,6 +678,9 @@ window.richTextEditor = (uploadUrl) => ({
                     previewImage.src = previewUrl;
                     preview.hidden = false;
                     preview.querySelector('.sg-recrop').hidden = true;
+                    previewImage.style.aspectRatio = 'auto';
+                    previewImage.style.objectFit = 'contain';
+                    previewImage.style.maxHeight = '12rem';
                     preview.querySelector('span').textContent = 'فایل اصلی بدون تغییر آماده ذخیره است.';
                     syncBoundPreview(original);
                 }
