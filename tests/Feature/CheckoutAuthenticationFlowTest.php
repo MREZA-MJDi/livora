@@ -24,11 +24,15 @@ class CheckoutAuthenticationFlowTest extends TestCase
             'role' => 'customer',
         ]);
 
+        $this->get(route('cart.index'))->assertOk();
+        $guestCart = Cart::query()
+            ->whereNull('user_id')
+            ->where('status', 'active')
+            ->firstOrFail();
+        $this->addGuestCartItem($guestCart);
+
         $this->get(route('checkout.index'))
             ->assertRedirect(route('login'));
-
-        $guestSessionId = session()->getId();
-        $guestCart = $this->createGuestCart($guestSessionId);
 
         $this->post(route('login.store'), [
             'email' => $customer->email,
@@ -51,11 +55,15 @@ class CheckoutAuthenticationFlowTest extends TestCase
 
     public function test_guest_checkout_redirects_to_login_then_register_returns_to_checkout_and_keeps_cart(): void
     {
+        $this->get(route('cart.index'))->assertOk();
+        $guestCart = Cart::query()
+            ->whereNull('user_id')
+            ->where('status', 'active')
+            ->firstOrFail();
+        $this->addGuestCartItem($guestCart);
+
         $this->get(route('checkout.index'))
             ->assertRedirect(route('login'));
-
-        $guestSessionId = session()->getId();
-        $guestCart = $this->createGuestCart($guestSessionId);
 
         $this->post(route('register.store'), [
             'first_name' => 'مشتری',
@@ -119,6 +127,7 @@ class CheckoutAuthenticationFlowTest extends TestCase
             'installment_enabled' => false,
         ]);
 
+        $this->withoutMiddleware(ValidateCsrfToken::class);
         $this->app->detectEnvironment(fn () => 'production');
         config([
             'payment.production_ready' => false,
@@ -137,7 +146,7 @@ class CheckoutAuthenticationFlowTest extends TestCase
         $this->assertSame('pending', $order->fresh()->payment_status);
     }
 
-    private function createGuestCart(string $sessionId): Cart
+    private function addGuestCartItem(Cart $cart): void
     {
         $category = Category::query()->create([
             'name' => 'دسته تست Checkout',
@@ -160,12 +169,6 @@ class CheckoutAuthenticationFlowTest extends TestCase
             'installment_enabled' => false,
         ]);
 
-        $cart = Cart::query()->create([
-            'user_id' => null,
-            'session_id' => $sessionId,
-            'status' => 'active',
-        ]);
-
         $cart->items()->create([
             'product_id' => $product->id,
             'product_variant_id' => null,
@@ -174,7 +177,5 @@ class CheckoutAuthenticationFlowTest extends TestCase
             'quantity' => 2,
             'unit_price' => 1250000,
         ]);
-
-        return $cart;
     }
 }
