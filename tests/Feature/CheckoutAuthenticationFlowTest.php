@@ -28,12 +28,14 @@ class CheckoutAuthenticationFlowTest extends TestCase
         $this->get(route('checkout.index'))
             ->assertRedirect(route('login'));
 
-        $guestCart = Cart::query()->create([
-            'user_id' => null,
-            'session_id' => $this->app['session']->getId(),
-            'status' => 'active',
-        ]);
-        $this->addGuestCartItem($guestCart);
+        $product = $this->createProduct();
+
+        $this->post(route('cart.add', $product), [
+            'quantity' => 2,
+        ])->assertSessionHasNoErrors();
+
+        $this->get(route('checkout.index'))
+            ->assertRedirect(route('login'));
 
         $this->post(route('login.store'), [
             'email' => $customer->email,
@@ -55,12 +57,11 @@ class CheckoutAuthenticationFlowTest extends TestCase
 
     public function test_guest_checkout_redirects_to_login_then_register_returns_to_checkout_and_keeps_cart(): void
     {
-        $this->get(route('cart.index'))->assertOk();
-        $guestCart = Cart::query()
-            ->whereNull('user_id')
-            ->where('status', 'active')
-            ->firstOrFail();
-        $this->addGuestCartItem($guestCart);
+        $product = $this->createProduct();
+
+        $this->post(route('cart.add', $product), [
+            'quantity' => 2,
+        ])->assertSessionHasNoErrors();
 
         $this->get(route('checkout.index'))
             ->assertRedirect(route('login'));
@@ -145,7 +146,7 @@ class CheckoutAuthenticationFlowTest extends TestCase
         $this->assertSame('pending', $order->fresh()->payment_status);
     }
 
-    private function addGuestCartItem(Cart $cart): void
+    private function createProduct(): Product
     {
         $category = Category::query()->create([
             'name' => 'دسته تست Checkout',
@@ -155,7 +156,7 @@ class CheckoutAuthenticationFlowTest extends TestCase
             'sort_order' => 1,
         ]);
 
-        $product = Product::query()->create([
+        return Product::query()->create([
             'category_id' => $category->id,
             'name' => 'محصول تست Checkout',
             'slug' => 'checkout-auth-flow-product-' . uniqid(),
@@ -166,15 +167,6 @@ class CheckoutAuthenticationFlowTest extends TestCase
             'stock' => 5,
             'status' => 'active',
             'installment_enabled' => false,
-        ]);
-
-        $cart->items()->create([
-            'product_id' => $product->id,
-            'product_variant_id' => null,
-            'variant_key' => 'base',
-            'variant_options' => null,
-            'quantity' => 2,
-            'unit_price' => 1250000,
         ]);
     }
 }
