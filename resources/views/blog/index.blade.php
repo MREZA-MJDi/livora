@@ -38,7 +38,7 @@
                                 <span aria-hidden="true" class="pointer-events-none absolute inset-x-0 bottom-0 h-[58%] bg-gradient-to-t from-black/85 via-black/35 to-transparent"></span>
                             @endif
                         </a>
-                        <div class="{{ $loop->first ? 'pointer-events-none relative z-10 mt-auto p-6 text-white sm:p-9' : 'flex flex-1 flex-col p-5 sm:p-6' }}">
+                        <div class="{{ $loop->first ? 'relative z-10 mt-auto p-6 text-white sm:p-9' : 'flex flex-1 flex-col p-5 sm:p-6' }}">
                             <div class="flex flex-wrap items-center justify-between gap-3 text-xs {{ $loop->first ? 'text-white/75' : 'text-[var(--sg-stone)]' }}">
                                 <span class="font-semibold {{ $loop->first ? 'text-white' : 'text-[var(--sg-accent)]' }}">{{ $post->category ?: 'مجله سیلاگالری' }}</span>
                                 <time datetime="{{ $post->published_at?->toAtomString() }}">{{ $post->published_at?->format('Y/m/d') }}</time>
