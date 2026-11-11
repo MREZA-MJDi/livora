@@ -71,7 +71,7 @@ jobs:
           fi
 
       - name: Upload refreshed Composer lockfile
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: refreshed-composer-lock
           path: composer.lock
@@ -144,7 +144,7 @@ jobs:
 
       - name: Upload browser traces on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: livora-browser-smoke-results
           path: test-results/
