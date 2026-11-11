@@ -180,6 +180,17 @@
                     @endif
 
 
+                    {{-- Informational status --}}
+                    @if(session('info'))
+                        <div class="rounded-3xl border border-sky-200 bg-sky-50 p-5" role="status" aria-live="polite">
+                            <div class="flex items-start gap-3">
+                                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sky-600 text-white" aria-hidden="true">i</span>
+                                <p class="text-sm leading-7 text-sky-900">{{ session('info') }}</p>
+                            </div>
+                        </div>
+                    @endif
+
+
                     {{-- Error --}}
                     @if(session('error'))
 
