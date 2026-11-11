@@ -406,6 +406,25 @@
                                         </div>
 
 
+                                        {{-- Purchased product preview --}}
+                                        @if($order->items->isNotEmpty())
+                                            <div class="flex items-center gap-3 overflow-x-auto pb-1" aria-label="محصولات این سفارش">
+                                                @foreach($order->items->take(5) as $item)
+                                                    <div class="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-1.5">
+                                                        @if($item->product?->images?->first()?->card_url)
+                                                            <img src="{{ $item->product->images->first()->card_url }}" alt="{{ $item->product_name }}" class="h-full w-full object-contain" loading="lazy" decoding="async">
+                                                        @else
+                                                            <span class="text-[9px] text-[var(--sg-stone)]">بدون تصویر</span>
+                                                        @endif
+                                                    </div>
+                                                @endforeach
+                                                @if($order->items->count() > 5)
+                                                    <span class="shrink-0 text-[10px] text-[var(--sg-stone)]">+{{ $order->items->count() - 5 }} محصول دیگر</span>
+                                                @endif
+                                            </div>
+                                        @endif
+
+
                                         {{-- Payment / installment hint --}}
                                         <div class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--sg-stone)]">
 
