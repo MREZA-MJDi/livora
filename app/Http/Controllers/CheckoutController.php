@@ -35,6 +35,32 @@ class CheckoutController extends Controller
             'items.variant',
         ]);
 
+        // A product may have been deleted or deactivated after it was added
+        // to the cart. Never dereference a missing product while rendering
+        // checkout; remove stale lines and let the customer review the cart.
+        $unavailableItemIds = $cart->items
+            ->filter(fn (CartItem $item): bool => (
+                ! $item->product
+                || $item->product->status !== 'active'
+                || ! $item->product->category?->is_active
+            ))
+            ->pluck('id');
+
+        if ($unavailableItemIds->isNotEmpty()) {
+            $cart->items()->whereIn('id', $unavailableItemIds)->delete();
+            $cart->unsetRelation('items')->load([
+                'items.product.category',
+                'items.product.images',
+                'items.variant',
+            ]);
+
+            if ($cart->items->isEmpty()) {
+                return redirect()
+                    ->route('cart.index')
+                    ->with('error', 'یکی از محصولات سبد دیگر قابل خرید نبود؛ سبد خرید به‌روزرسانی شد.');
+            }
+        }
+
         abort_if(
             $cart->items->isEmpty(),
             404,
