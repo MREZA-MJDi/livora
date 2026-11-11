@@ -168,7 +168,7 @@
                             </p>
 
                             <a
-                                href="{{ route('login') }}"
+                                href="{{ request()->query('redirect') === 'checkout' ? route('login', ['redirect' => 'checkout']) : route('login') }}"
                                 class="mt-2 inline-block text-sm font-medium text-[var(--sg-accent)]"
                             >
                                 ورود به حساب
