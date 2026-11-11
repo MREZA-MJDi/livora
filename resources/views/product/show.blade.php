@@ -113,7 +113,7 @@
 
 
     $mainImage =
-        $product->images?->first()?->detail_url;
+        $product->images?->first()?->url;
 
     $variantGroups =
         $product->variants
@@ -146,7 +146,7 @@
         'name' => $product->name,
         'description' => $pageDescription,
         'sku' => $product->sku,
-        'image' => $product->images->pluck('detail_url')->filter()->values()->all(),
+        'image' => $product->images->pluck('url')->filter()->values()->all(),
         'brand' => ['@type' => 'Brand', 'name' => 'SillaGallery'],
     ];
 
