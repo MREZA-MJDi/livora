@@ -815,7 +815,7 @@ class AdminCrudLifecycleTest extends TestCase
             ->get(route('admin.product-variants.edit', $variant))
             ->assertOk()
             ->assertSee('variant-image-preview')
-            ->assertSee($variantImage->detail_url, false);
+            ->assertSee($variantImage->url, false);
     }
 
     public function test_admin_image_upload_previews_match_the_public_card_aspect_ratios(): void
