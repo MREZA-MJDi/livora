@@ -845,16 +845,16 @@ class AdminCrudLifecycleTest extends TestCase
         $this->actingAs($this->admin)
             ->get(route('admin.products.create'))
             ->assertOk()
-            ->assertSee('aspect-[4/5]', false)
-            ->assertSee('data-crop-ratio="0.8"', false)
-            ->assertSee('data-preview-target="product-image-preview"', false);
+            ->assertSee('data-preserve-original="1"', false)
+            ->assertSee('data-preview-target="product-image-preview"', false)
+            ->assertDontSee('data-crop-ratio="0.8"', false);
 
         $this->actingAs($this->admin)
             ->get(route('admin.product-images.create', ['product_id' => $product->id]))
             ->assertOk()
-            ->assertSee('aspect-[4/5]', false)
-            ->assertSee('data-crop-ratio="0.8"', false)
-            ->assertSee('data-preview-target="product-gallery-image-preview"', false);
+            ->assertSee('data-preserve-original="1"', false)
+            ->assertSee('data-preview-target="product-gallery-image-preview"', false)
+            ->assertDontSee('data-crop-ratio="0.8"', false);
 
         $this->actingAs($this->admin)
             ->get(route('admin.product-variants.create', ['product_id' => $product->id]))
