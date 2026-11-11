@@ -32,7 +32,10 @@ final class HtmlSanitizer
         }
 
         if (! class_exists(DOMDocument::class)) {
-            throw new RuntimeException('The PHP DOM extension is required to safely store rich text.');
+            // Keep page/blog publishing available on minimal PHP hosts. In this
+            // degraded mode we deliberately store plain text only rather than
+            // trusting unparsed HTML or turning the editor into a 500 response.
+            return nl2br(htmlspecialchars(strip_tags($html), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'));
         }
 
         $previous = libxml_use_internal_errors(true);
