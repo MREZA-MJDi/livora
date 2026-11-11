@@ -1,9 +1,9 @@
 @extends('layouts.app')
 
-@php($blogPageSeo = \\App\\Models\\SeoPageSetting::forRoute('blog.index'))
+@php($blogPageSeo = \App\Models\\SeoPageSetting::forRoute('blog.index'))
 @section('title', isset($activeTag) ? ('مطالب برچسب ' . $activeTag->name . ' | SillaGallery') : ($blogPageSeo?->meta_title ?: 'مجله SillaGallery'))
 @section('description', isset($activeTag) ? ('مقاله‌های برچسب ' . $activeTag->name . ' در مجله SillaGallery.') : ($blogPageSeo?->meta_description ?: 'مقاله‌ها و راهنمای انتخاب مبلمان و لوازم خانه از SillaGallery.'))
-@section('robots', \\App\\Models\\SeoSetting::current()->robotsFor(false, false))
+@section('robots', \App\Models\\SeoSetting::current()->robotsFor(false, false))
 @section('canonical', isset($activeTag) ? route('blog.tag', $activeTag->slug) : route('blog.index'))
 
 @section('content')
