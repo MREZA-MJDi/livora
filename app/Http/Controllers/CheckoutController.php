@@ -516,6 +516,23 @@ class CheckoutController extends Controller
             ],
         ]);
 
+        // Keep the backend closed until the real merchant contract and callback
+        // flow are explicitly approved. The UI gate alone is not a security boundary.
+        $gateway = $validated['gateway'];
+
+        if (
+            app()->isProduction()
+            && (
+                ! (bool) config('payment.production_ready', false)
+                || ! (bool) config("payment.{$gateway}.enabled", false)
+            )
+        ) {
+            return back()->with(
+                'info',
+                'درگاه پرداخت هنوز در حال راه‌اندازی است. سفارش شما محفوظ است و تا فعال‌شدن سرویس، هیچ مبلغی کسر نمی‌شود.'
+            );
+        }
+
         try {
             $result = $paymentService
                 ->startInstallmentPayment(
