@@ -85,6 +85,57 @@ class CheckoutAuthenticationFlowTest extends TestCase
         $this->get(route('checkout.index'))->assertOk();
     }
 
+    public function test_production_gateway_attempt_returns_a_waiting_notice_until_gateway_is_approved(): void
+    {
+        $customer = User::query()->create([
+            'name' => 'مشتری تست',
+            'email' => 'checkout-gateway-disabled@example.test',
+            'password' => Hash::make('StrongPass123'),
+            'role' => 'customer',
+        ]);
+
+        $order = Order::query()->create([
+            'user_id' => $customer->id,
+            'order_number' => 'LV-CHECKOUT-GATEWAY-WAIT',
+            'status' => 'pending',
+            'payment_status' => 'pending',
+            'payment_method' => 'online',
+            'payment_provider' => null,
+            'subtotal' => 1250000,
+            'shipping_cost' => 0,
+            'discount' => 0,
+            'total' => 1250000,
+            'first_name' => 'مشتری',
+            'last_name' => 'تست',
+            'phone' => '09121234567',
+            'email' => $customer->email,
+            'province' => 'تهران',
+            'city' => 'تهران',
+            'address' => 'آدرس تست',
+            'postal_code' => '1234567890',
+            'unit' => null,
+            'notes' => null,
+            'installment_enabled' => false,
+        ]);
+
+        $this->app->detectEnvironment(fn () => 'production');
+        config([
+            'payment.production_ready' => false,
+            'payment.digipay.enabled' => true,
+        ]);
+
+        $this->actingAs($customer)
+            ->from(route('checkout.payment', $order))
+            ->post(route('checkout.payment.installment', $order), [
+                'gateway' => 'digipay',
+            ])
+            ->assertRedirect(route('checkout.payment', $order))
+            ->assertSessionHas('info');
+
+        $this->assertDatabaseCount('payments', 0);
+        $this->assertSame('pending', $order->fresh()->payment_status);
+    }
+
     private function createGuestCart(string $sessionId): Cart
     {
         $category = Category::query()->create([
