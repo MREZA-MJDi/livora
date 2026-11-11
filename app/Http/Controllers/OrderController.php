@@ -12,7 +12,7 @@ class OrderController extends Controller
     {
         $orders = Auth::user()
             ->orders()
-            ->with('items')
+            ->with('items.product.images')
             ->latest()
             ->paginate(10);
 
