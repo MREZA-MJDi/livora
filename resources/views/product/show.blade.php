@@ -462,6 +462,7 @@
                         {{-- Product / Cart --}}
                         <form
                             id="product-purchase"
+                            data-cart-add-form
                             action="{{ route('cart.add', $product) }}"
                             method="POST"
                             class="mt-8 space-y-7"
@@ -552,6 +553,7 @@
                                 <div class="grid gap-3 sm:grid-cols-2">
                                     <button
                                         type="submit"
+                                        data-cart-add-button
                                         @disabled(!$canPurchase)
                                         class="flex min-h-12 w-full items-center justify-center rounded-2xl bg-[var(--sg-ink)] px-5 py-4 text-sm font-medium text-white transition duration-300 hover:bg-[var(--sg-accent)] disabled:cursor-not-allowed disabled:opacity-40"
                                     >
@@ -565,6 +567,13 @@
                                         درخواست مشاوره خرید
                                     </a>
                                 </div>
+                                <div
+                                    data-cart-feedback
+                                    role="status"
+                                    aria-live="polite"
+                                    aria-atomic="true"
+                                    class="pointer-events-none fixed bottom-24 right-4 z-[120] hidden max-w-[min(92vw,380px)] translate-y-3 rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] px-5 py-4 text-sm text-[var(--sg-ink)] opacity-0 shadow-[0_18px_55px_rgba(24,23,21,.18)] transition-all duration-300 sm:bottom-8 sm:right-8"
+                                ></div>
                                 @unless($canPurchase)
                                     <a
                                         href="{{ route('contact', ['product' => $product->slug, 'request' => 'stock-notification']) }}"
