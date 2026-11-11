@@ -7,21 +7,11 @@
 
 @section('content')
 <section class="overflow-hidden bg-[var(--sg-cream)]">
-    <header class="border-b border-[var(--sg-border)] bg-[var(--sg-white)]">
-        <x-layout.container>
-            <div class="grid gap-8 py-12 sm:py-16 lg:grid-cols-[1fr_.7fr] lg:items-end lg:py-20">
-                <div>
-                    <p class="sg-eyebrow">مجله سیلا گالری</p>
-                    <h1 class="mt-4 text-4xl font-semibold leading-tight tracking-tight text-[var(--sg-ink)] sm:text-5xl">{{ isset($activeTag) ? 'مطالب: '.$activeTag->name : 'مجله سیلاگالری' }}</h1>
-                </div>
-                <p class="max-w-xl text-sm leading-8 text-[var(--sg-stone)] sm:text-base">{{ isset($activeTag) ? ('مقاله‌های مرتبط با برچسب ' . $activeTag->name) : (\App\Models\SeoPageSetting::forRoute('blog.index')?->meta_description ?: 'ایده‌ها، راهنماها و روایت‌هایی برای انتخاب آگاهانه‌تر مبلمان و ساختن فضایی که به شما تعلق دارد.') }}</p>
-            </div>
-        </x-layout.container>
-    </header>
+
 
     <x-layout.container>
         @if($tags->isNotEmpty())
-            <nav aria-label="موضوعات مجله" class="flex flex-wrap gap-2 border-b border-[var(--sg-border)] py-6">
+            <nav aria-label="موضوعات مجله" class="flex flex-wrap gap-2 border-b border-[var(--sg-border)] py-5">
                 <a href="{{ route('blog.index') }}" class="rounded-full border px-4 py-2 text-xs font-medium transition {{ !isset($activeTag) ? 'border-[var(--sg-ink)] bg-[var(--sg-ink)] text-white' : 'border-[var(--sg-border)] bg-[var(--sg-white)] text-[var(--sg-stone)] hover:border-[var(--sg-accent)]' }}">همه مطالب</a>
                 @foreach($tags as $tag)
                     <a href="{{ route('blog.tag', $tag->slug) }}" class="rounded-full border px-4 py-2 text-xs font-medium transition {{ isset($activeTag) && $activeTag->is($tag) ? 'border-[var(--sg-ink)] bg-[var(--sg-ink)] text-white' : 'border-[var(--sg-border)] bg-[var(--sg-white)] text-[var(--sg-stone)] hover:border-[var(--sg-accent)]' }}">{{ $tag->name }}</a>
@@ -29,7 +19,7 @@
             </nav>
         @endif
 
-        <div class="py-10 sm:py-14">
+        <div class="py-7 sm:py-9">
             <div class="mb-8 flex items-center justify-between gap-4">
                 <p class="text-sm text-[var(--sg-stone)]">{{ number_format($posts->total()) }} مطلب</p>
                 <span class="text-xs tracking-[.16em] text-[var(--sg-accent)]">بخوانید · ایده بگیرید · انتخاب کنید</span>
@@ -37,18 +27,18 @@
 
             <div class="grid grid-cols-1 items-stretch gap-5 md:grid-cols-12 md:gap-6">
                 @forelse($posts as $post)
-                    <article class="group relative flex min-w-0 flex-col overflow-hidden rounded-[1.5rem] border border-[var(--sg-border)] bg-[var(--sg-white)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_20px_55px_rgba(35,29,23,.09)] {{ $loop->first ? 'md:col-span-7 md:row-span-2 md:min-h-[39rem]' : ($loop->index % 5 < 2 ? 'md:col-span-5 md:min-h-[18rem]' : 'md:col-span-4 md:min-h-[23rem]') }}">
-                        <a href="{{ route('blog.show', $post->slug) }}" class="relative block shrink-0 overflow-hidden bg-[var(--sg-surface)] {{ $loop->first ? 'aspect-[16/10] md:aspect-auto md:absolute md:inset-0' : ($loop->index % 3 === 1 ? 'aspect-[16/9]' : ($loop->index % 3 === 2 ? 'aspect-[4/5]' : 'aspect-[5/4]')) }}" aria-label="مطالعه {{ $post->title }}">
+                    <article class="group relative flex min-w-0 flex-col overflow-hidden rounded-[1.5rem] border border-[var(--sg-border)] bg-[var(--sg-white)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_20px_55px_rgba(35,29,23,.09)] {{ $loop->first ? 'md:col-span-7 md:row-span-2 md:min-h-[36rem]' : 'md:col-span-5 md:min-h-[17rem]' }}">
+                        <a href="{{ route('blog.show', $post->slug) }}" class="relative block shrink-0 overflow-hidden bg-[var(--sg-surface)] {{ $loop->first ? 'aspect-[16/10] md:absolute md:inset-0 md:h-full' : 'aspect-[16/10]' }}" aria-label="مطالعه {{ $post->title }}">
                             @if($post->featured_image_url)
-                                <img src="{{ $post->featured_image_url }}" alt="{{ $post->featured_image_alt ?: $post->title }}" class="h-full w-full object-cover transition duration-700 group-hover:scale-[1.04]" loading="lazy" decoding="async">
+                                <img src="{{ $post->featured_image_url }}" alt="{{ $post->featured_image_alt ?: $post->title }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.025]" loading="lazy" decoding="async">
                             @else
                                 <div class="flex h-full min-h-40 items-center justify-center"><span class="sg-eyebrow">مجله سیلا گالری</span></div>
                             @endif
                             @if($loop->first)
-                                <span class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-black/5"></span>
+                                <span aria-hidden="true" class="pointer-events-none absolute inset-x-0 bottom-0 h-[58%] bg-gradient-to-t from-black/85 via-black/35 to-transparent"></span>
                             @endif
                         </a>
-                        <div class="{{ $loop->first ? 'pointer-events-none mt-auto relative z-10 p-6 text-white sm:p-9 md:mt-auto' : 'flex flex-1 flex-col p-5 sm:p-6' }}">
+                        <div class="{{ $loop->first ? 'relative z-10 mt-auto p-6 text-white sm:p-9' : 'flex flex-1 flex-col p-5 sm:p-6' }}">
                             <div class="flex flex-wrap items-center justify-between gap-3 text-xs {{ $loop->first ? 'text-white/75' : 'text-[var(--sg-stone)]' }}">
                                 <span class="font-semibold {{ $loop->first ? 'text-white' : 'text-[var(--sg-accent)]' }}">{{ $post->category ?: 'مجله سیلاگالری' }}</span>
                                 <time datetime="{{ $post->published_at?->toAtomString() }}">{{ $post->published_at?->format('Y/m/d') }}</time>
