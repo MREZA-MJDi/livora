@@ -34,10 +34,17 @@ class CheckoutAuthenticationFlowTest extends TestCase
             'quantity' => 2,
         ])->assertSessionHasNoErrors();
 
+        $guestSessionId = $this->app['session']->getId();
+        $this->assertDatabaseHas('carts', [
+            'session_id' => $guestSessionId,
+            'user_id' => null,
+            'status' => 'active',
+        ]);
+
         $this->get(route('checkout.index'))
             ->assertRedirect(route('login'));
 
-        $this->post(route('login.store'), [
+        $this->withCookie(config('session.cookie'), $guestSessionId)->post(route('login.store'), [
             'email' => $customer->email,
             'password' => 'StrongPass123',
         ])->assertRedirect(route('checkout.index'));
@@ -66,7 +73,7 @@ class CheckoutAuthenticationFlowTest extends TestCase
         $this->get(route('checkout.index'))
             ->assertRedirect(route('login'));
 
-        $this->post(route('register.store'), [
+        $this->withCookie(config('session.cookie'), $guestSessionId)->post(route('register.store'), [
             'first_name' => 'مشتری',
             'last_name' => 'جدید',
             'email' => 'checkout-register@example.test',
