@@ -1155,13 +1155,31 @@ document.addEventListener('submit', async (event) => {
     if (!button || button.disabled) return;
 
     const originalButtonContent = button.innerHTML;
+    let succeeded = false;
     button.disabled = true;
     button.setAttribute('aria-busy', 'true');
     button.classList.add('is-loading');
+    button.innerHTML = '<span aria-hidden="true" class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"></span><span>در حال افزودن…</span>';
     if (feedback) {
-        feedback.textContent = 'در حال افزودن…';
+        feedback.textContent = 'در حال افزودن محصول به سبد خرید…';
         feedback.dataset.state = 'loading';
+        feedback.classList.remove('hidden', 'translate-y-3', 'opacity-0');
+        feedback.classList.add('translate-y-0', 'opacity-100');
     }
+
+    const showCartFeedback = (message, state) => {
+        if (!feedback) return;
+        feedback.textContent = message;
+        feedback.dataset.state = state;
+        feedback.classList.remove('hidden', 'translate-y-3', 'opacity-0');
+        feedback.classList.add('translate-y-0', 'opacity-100');
+        window.clearTimeout(feedback._hideTimer);
+        feedback._hideTimer = window.setTimeout(() => {
+            feedback.classList.remove('translate-y-0', 'opacity-100');
+            feedback.classList.add('translate-y-3', 'opacity-0');
+            window.setTimeout(() => feedback.classList.add('hidden'), 300);
+        }, state === 'success' ? 2600 : 4200);
+    };
 
     try {
         const response = await fetch(form.action, {
@@ -1191,28 +1209,32 @@ document.addEventListener('submit', async (event) => {
             badge.textContent = String(count);
             badge.dataset.cartCount = String(count);
             badge.hidden = count < 1;
+            badge.classList.remove('scale-100');
+            badge.classList.add('scale-125');
+            window.setTimeout(() => badge.classList.remove('scale-125'), 420);
         });
 
         window.dispatchEvent(new CustomEvent('cart:updated', {
             detail: { count, subtotal: payload.subtotal ?? null },
         }));
 
-        if (feedback) {
-            feedback.textContent = payload.message || 'به سبد خرید اضافه شد.';
-            feedback.dataset.state = 'success';
-        }
+        showCartFeedback(payload.message || 'محصول با موفقیت به سبد خرید اضافه شد.', 'success');
+        button.innerHTML = '<span aria-hidden="true" class="text-lg">✓</span><span>به سبد اضافه شد</span>';
+        succeeded = true;
     } catch (error) {
-        if (feedback) {
-            feedback.textContent = error instanceof Error
-                ? error.message
-                : 'ارتباط با سرور برقرار نشد؛ دوباره تلاش کنید.';
-            feedback.dataset.state = 'error';
-        }
+        showCartFeedback(
+            error instanceof Error ? error.message : 'ارتباط با سرور برقرار نشد؛ دوباره تلاش کنید.',
+            'error'
+        );
     } finally {
         button.disabled = false;
         button.removeAttribute('aria-busy');
         button.classList.remove('is-loading');
-        button.innerHTML = originalButtonContent;
+        if (succeeded) {
+            window.setTimeout(() => { button.innerHTML = originalButtonContent; }, 1400);
+        } else {
+            button.innerHTML = originalButtonContent;
+        }
     }
 });
 
