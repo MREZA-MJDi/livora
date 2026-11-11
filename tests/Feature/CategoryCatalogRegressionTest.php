@@ -1,12 +1,12 @@
 <?php
 
-namespace Tests\\Feature;
+namespace Tests\Feature;
 
-use App\\Models\\Category;
-use Illuminate\\Database\\Events\\QueryExecuted;
-use Illuminate\\Support\\Facades\\DB;
-use Illuminate\\Foundation\\Testing\\RefreshDatabase;
-use Tests\\TestCase;
+use App\Models\Category;
+use Illuminate\Database\Events\QueryExecuted;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 final class CategoryCatalogRegressionTest extends TestCase
 {
@@ -17,11 +17,11 @@ final class CategoryCatalogRegressionTest extends TestCase
         $this->createCategories(21);
 
         $firstPage = $this->get(route('categories.index'))->assertOk();
-        $firstPage->assertSee('نمایش ۱ تا ۱۲', false);
-        $firstPage->assertSee('از ۲۱ مجموعه', false);
+        $firstPage->assertSee('نمایش 1 تا 12', false);
+        $firstPage->assertSee('از 21 مجموعه', false);
 
         $secondPage = $this->get(route('categories.index', ['page' => 2]))->assertOk();
-        $secondPage->assertSee('نمایش ۱۳ تا ۲۱', false);
+        $secondPage->assertSee('نمایش 13 تا 21', false);
         $secondPage->assertSee('از ۲۱ مجموعه', false);
 
         $this->assertStringContainsString(
