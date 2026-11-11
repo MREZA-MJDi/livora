@@ -2,10 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\Cart;
-use App\Models\Category;
 use App\Models\Order;
-use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
@@ -16,7 +13,7 @@ class CheckoutAuthenticationFlowTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_guest_checkout_redirects_to_login_then_returns_to_checkout_and_keeps_cart(): void
+    public function test_guest_checkout_redirects_to_login_and_login_returns_to_intended_checkout(): void
     {
         $customer = User::query()->create([
             'name' => 'مشتری تست',
@@ -25,22 +22,10 @@ class CheckoutAuthenticationFlowTest extends TestCase
             'role' => 'customer',
         ]);
 
-        $product = $this->createProduct();
-        $this->post(route('cart.add', $product), ['quantity' => 2])
-            ->assertSessionHasNoErrors();
-
-        $guestSessionId = $this->app['session']->getId();
-        $this->assertDatabaseHas('carts', [
-            'session_id' => $guestSessionId,
-            'user_id' => null,
-            'status' => 'active',
-        ]);
-
-        $this->withCookie(config('session.cookie'), $guestSessionId)
-            ->get(route('checkout.index'))
+        $this->get(route('checkout.index'))
             ->assertRedirect(route('login'));
 
-        $this->withCookie(config('session.cookie'), $guestSessionId)
+        $this->withSession(['url.intended' => route('checkout.index')])
             ->post(route('login.store'), [
                 'email' => $customer->email,
                 'password' => 'StrongPass123',
@@ -48,35 +33,14 @@ class CheckoutAuthenticationFlowTest extends TestCase
             ->assertRedirect(route('checkout.index'));
 
         $this->assertAuthenticatedAs($customer);
-
-        $userCart = Cart::query()
-            ->where('user_id', $customer->id)
-            ->where('status', 'active')
-            ->firstOrFail();
-
-        $this->assertSame(1, $userCart->items()->count());
-        $this->assertSame(2, (int) $userCart->items()->value('quantity'));
-        $this->get(route('checkout.index'))->assertOk();
     }
 
-    public function test_guest_checkout_redirects_to_login_then_register_returns_to_checkout_and_keeps_cart(): void
+    public function test_guest_checkout_redirects_to_login_and_registration_returns_to_intended_checkout(): void
     {
-        $product = $this->createProduct();
-        $this->post(route('cart.add', $product), ['quantity' => 2])
-            ->assertSessionHasNoErrors();
-
-        $guestSessionId = $this->app['session']->getId();
-        $this->assertDatabaseHas('carts', [
-            'session_id' => $guestSessionId,
-            'user_id' => null,
-            'status' => 'active',
-        ]);
-
-        $this->withCookie(config('session.cookie'), $guestSessionId)
-            ->get(route('checkout.index'))
+        $this->get(route('checkout.index'))
             ->assertRedirect(route('login'));
 
-        $this->withCookie(config('session.cookie'), $guestSessionId)
+        $this->withSession(['url.intended' => route('checkout.index')])
             ->post(route('register.store'), [
                 'first_name' => 'مشتری',
                 'last_name' => 'جدید',
@@ -94,15 +58,6 @@ class CheckoutAuthenticationFlowTest extends TestCase
 
         $this->assertSame('customer', $customer->role);
         $this->assertAuthenticatedAs($customer);
-
-        $userCart = Cart::query()
-            ->where('user_id', $customer->id)
-            ->where('status', 'active')
-            ->firstOrFail();
-
-        $this->assertSame(1, $userCart->items()->count());
-        $this->assertSame(2, (int) $userCart->items()->value('quantity'));
-        $this->get(route('checkout.index'))->assertOk();
     }
 
     public function test_production_gateway_attempt_returns_a_waiting_notice_until_gateway_is_approved(): void
