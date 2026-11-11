@@ -12,14 +12,15 @@
     </header>
 
     <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <a href="{{ route('admin.home-sections.index') }}" class="admin-card group p-5 transition hover:-translate-y-0.5 hover:shadow-lg">
+        <div class="admin-card p-5">
             <span class="text-xs font-semibold text-[var(--admin-accent)]">STOREFRONT</span>
             <h2 class="mt-3 font-bold">مدیریت صفحه اصلی</h2>
             <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">هیرو، بنر، سکشن‌های محصول، دسته‌ها، محتوای تصویری و مجله را مدیریت کنید.</p>
-            <span class="mt-4 inline-flex text-xs font-semibold text-[var(--admin-accent)]">ویرایش سکشن‌ها ←</span>
-            <span class="mt-2 block text-xs font-semibold text-[var(--admin-accent)]">تنظیم مستقل سکشن مجله ←</span>
-            <a href="{{ route('admin.home-sections.create', ['preset' => 'homepage-journal']) }}" class="absolute inset-0" aria-label="تنظیم مستقل سکشن مجله"></a>
-        </a>
+            <div class="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs font-semibold text-[var(--admin-accent)]">
+                <a href="{{ route('admin.home-sections.index') }}" class="hover:underline">همه سکشن‌ها ←</a>
+                <a href="{{ route('admin.home-sections.create', ['preset' => 'homepage-journal']) }}" class="hover:underline">تنظیم سکشن مجله ←</a>
+            </div>
+        </div>
         <a href="{{ route('admin.blog.index') }}" class="admin-card group p-5 transition hover:-translate-y-0.5 hover:shadow-lg">
             <span class="text-xs font-semibold text-[var(--admin-accent)]">EDITORIAL</span>
             <h2 class="mt-3 font-bold">مقالات و مجله</h2>
