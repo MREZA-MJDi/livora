@@ -17,8 +17,8 @@ class CategoryController extends Controller
             ])
             ->with([
                 'media', 'cardMedia',
-                'latestActiveProduct.images.media',
-                'latestActiveProduct.variants.images.media',
+                'latestActiveProduct.images' => fn ($imageQuery) => $imageQuery->orderByDesc('is_primary')->orderBy('sort_order')->limit(1)->with('media'),
+                'latestActiveProduct.variants' => fn ($query) => $this->constrainCardVariantImage($query),
             ])
             ->orderBy('sort_order')
             ->paginate(12)
@@ -37,16 +37,19 @@ class CategoryController extends Controller
         $category->load([
             'media', 'cardMedia', 'bannerMedia',
             'children' => fn ($query) => $query->where('is_active', true)
+                ->limit(8)
                 ->withCount(['products' => fn ($productQuery) => $productQuery->active()])
-                ->with(['media', 'cardMedia', 'latestActiveProduct.images.media', 'latestActiveProduct.variants.images.media']),
-            'latestActiveProduct.images.media',
-            'latestActiveProduct.variants.images.media',
+                ->with(['media', 'cardMedia', 'latestActiveProduct.images' => fn ($imageQuery) => $imageQuery->orderByDesc('is_primary')->orderBy('sort_order')->limit(1)->with('media'), 'latestActiveProduct.variants' => fn ($variantQuery) => $this->constrainCardVariantImage($variantQuery)]),
+            'latestActiveProduct.images' => fn ($imageQuery) => $imageQuery->orderByDesc('is_primary')->orderBy('sort_order')->limit(1)->with('media'),
+            'latestActiveProduct.variants' => fn ($variantQuery) => $this->constrainCardVariantImage($variantQuery),
             'relatedCategories' => fn ($query) => $query
                 ->where('is_active', true)
+                ->limit(8)
                 ->withCount(['products' => fn ($productQuery) => $productQuery->active()])
-                ->with(['media', 'cardMedia', 'latestActiveProduct.images.media', 'latestActiveProduct.variants.images.media']),
+                ->with(['media', 'cardMedia', 'latestActiveProduct.images' => fn ($imageQuery) => $imageQuery->orderByDesc('is_primary')->orderBy('sort_order')->limit(1)->with('media'), 'latestActiveProduct.variants' => fn ($variantQuery) => $this->constrainCardVariantImage($variantQuery)]),
             'recommendedProducts' => fn ($query) => $query
                 ->where('status', 'active')
+                ->orderByPivot('sort_order')->limit(8)
                 ->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('is_active', true))
                 ->withCount(['allVariants', 'variants as available_variants_count' => fn ($variantQuery) => $variantQuery->where('stock', '>', 0)])
                 ->with([
@@ -57,7 +60,7 @@ class CategoryController extends Controller
                         ->orderBy('sort_order')
                         ->orderBy('id')
                         ->limit(1),
-                    'variants.images.media',
+                    'variants' => fn ($variantQuery) => $this->constrainCardVariantImage($variantQuery),
                 ]),
         ]);
 
@@ -73,7 +76,7 @@ class CategoryController extends Controller
                     ->orderBy('sort_order')
                     ->orderBy('id')
                     ->limit(1),
-                'variants.images.media',
+                'variants' => fn ($variantQuery) => $this->constrainCardVariantImage($variantQuery),
             ]);
 
         if (! empty($filters['search'])) {
@@ -83,7 +86,6 @@ class CategoryController extends Controller
                     ->where('name', 'like', "%{$search}%")
                     ->orWhere('sku', 'like', "%{$search}%")
                     ->orWhere('short_description', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%")
                     ->orWhereHas('variants', fn ($variantQuery) => $variantQuery
                         ->where('type', 'like', "%{$search}%")
                         ->orWhere('name', 'like', "%{$search}%")
@@ -137,4 +139,21 @@ class CategoryController extends Controller
             'products' => $products,
         ]);
     }
+    /**
+     * Product cards need at most one image-bearing active variant, not every
+     * variant and every gallery image. Aggregate counts remain independent.
+     */
+    private function constrainCardVariantImage($query): void
+    {
+        $query->whereHas('images')
+            ->orderByDesc('stock')
+            ->orderBy('id')
+            ->limit(1)
+            ->with([
+                // ProductVariant::images is a pivot relation whose model
+                // already defines deterministic pivot and image ordering.
+                'images' => fn ($imageQuery) => $imageQuery->limit(1)->with('media'),
+            ]);
+    }
+
 }

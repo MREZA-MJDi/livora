@@ -24,9 +24,30 @@ class ProductController extends Controller
     public function index(): View
     {
         $products = Product::query()
-            ->with(['category', 'images' => fn ($query) => $query->limit(1), 'variants.images'])
-            ->latest()
-            ->paginate(15);
+            ->with([
+                'category',
+                'images' => fn ($query) => $query->limit(1),
+                // The list only needs one image-bearing variant to decide whether
+                // a product can be selected for the home hero. Do not hydrate every
+                // variant image for every row in the catalog.
+                'variants' => fn ($query) => $query
+                    ->whereHas('images')
+                    ->orderByDesc('stock')
+                    ->orderBy('id')
+                    ->limit(1)
+                    ->with(['images' => fn ($images) => $images->orderBy('sort_order')->orderBy('id')->limit(1)]),
+            ])
+            ->when(request()->filled('search'), function ($query): void {
+                $term = trim((string) request()->query('search'));
+                $query->where(function ($searchQuery) use ($term): void {
+                    $searchQuery
+                        ->where('name', 'like', "%{$term}%")
+                        ->orWhere('sku', 'like', "%{$term}%");
+                });
+            })
+            ->latest('id')
+            ->paginate(12)
+            ->withQueryString();
 
         $homeHeroProductCount = Product::query()->where('is_home_hero', true)->count();
 
