@@ -172,6 +172,12 @@ class ProductController extends Controller
             throw $exception;
         }
 
+        if ($request->boolean('continue_to_variants')) {
+            return redirect()
+                ->route('admin.product-variants.create', ['product_id' => $createdProductId])
+                ->with('success', 'محصول ایجاد شد؛ حالا اولین رنگ، اندازه یا تنوع آن را ثبت کن.');
+        }
+
         return redirect()->route('admin.products.edit', $createdProductId)->with('success', 'محصول با موفقیت ایجاد شد. حالا می‌توانی تنوع‌های رنگ، جنس و اندازه را ثبت کنی.');
     }
 

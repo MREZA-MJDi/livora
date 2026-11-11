@@ -1281,6 +1281,20 @@
                     {{ $editing ? 'ذخیره تغییرات' : 'ایجاد محصول' }}
                 </button>
 
+                @unless($editing)
+                    <button
+                        type="submit"
+                        name="continue_to_variants"
+                        value="1"
+                        class="admin-btn admin-btn-secondary w-full"
+                    >
+                        ایجاد محصول و افزودن رنگ، اندازه و تنوع‌ها
+                    </button>
+                    <p class="text-xs leading-6 text-[var(--admin-muted)]">
+                        ابتدا محصول ذخیره می‌شود؛ سپس مستقیماً فرم ثبت اولین تنوع با قیمت، موجودی و تصویر اختصاصی باز خواهد شد.
+                    </p>
+                @endunless
+
 
                 <a
                     href="{{ route('admin.products.index') }}"
