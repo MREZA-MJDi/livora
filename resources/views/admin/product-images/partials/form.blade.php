@@ -83,7 +83,7 @@
                     <img
                         src="{{ $productImage->url }}"
                         alt="{{ $productImage->alt ?: 'Product image' }}"
-                        class="admin-image"
+                        class="h-auto max-h-[32rem] w-auto max-w-full object-contain"
                     >
 
                 </div>
@@ -100,7 +100,7 @@
             </div>
             <input
                 id="image"
-                name="image" data-crop-ratio="0.8" data-original-field="original_image" data-preview-target="product-gallery-image-preview"
+                name="image" data-preserve-original="1" data-preview-target="product-gallery-image-preview"
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
                 class="admin-input p-2"
