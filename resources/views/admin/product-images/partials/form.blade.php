@@ -78,7 +78,7 @@
 
             @if($editing && $productImage->url)
 
-                <div class="admin-image-preview mb-5 aspect-[4/5] max-w-xl">
+                <div class="admin-image-preview mb-5 flex min-h-64 items-center justify-center p-3">
 
                     <img
                         src="{{ $productImage->url }}"
@@ -96,7 +96,7 @@
             </label>
 
             <div class="admin-image-preview mb-5 aspect-[4/5] max-w-xl">
-                <img id="product-gallery-image-preview" src="{{ $productImage->url ?? '' }}" alt="{{ $productImage->alt ?? 'تصویر محصول' }}" class="admin-image {{ $editing ? '' : 'hidden' }}">
+                <img id="product-gallery-image-preview" src="{{ $productImage->url ?? '' }}" alt="{{ $productImage->alt ?? 'تصویر محصول' }}" class="h-auto max-h-[32rem] w-auto max-w-full object-contain {{ $editing ? '' : 'hidden' }}">
             </div>
             <input
                 id="image"
