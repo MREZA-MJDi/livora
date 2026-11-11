@@ -241,14 +241,14 @@
 
                                                     @foreach($order->items->take(4) as $item)
 
-                                                        <div class="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-[var(--sg-surface)]">
+                                                        <div class="flex h-[4.5rem] w-[4.5rem] shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-surface)] p-1.5">
 
-                                                            @if($item->product?->images?->first()?->url)
+                                                            @if($item->product?->images?->first()?->card_url)
 
                                                                 <img
-                                                                    src="{{ $item->product->images->first()->url }}"
+                                                                    src="{{ $item->product->images->first()->card_url }}"
                                                                     alt="{{ $item->product_name }}"
-                                                                    class="h-full w-full object-cover"
+                                                                    class="h-full w-full object-contain"
                                                                     loading="lazy"
                                                                 >
 
