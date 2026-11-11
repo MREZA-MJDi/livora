@@ -159,45 +159,50 @@
                 </x-layout.container>
             </section>
         @elseif($section->type === 'categories' && $section->categories->isNotEmpty())
-            <section class="border-b border-[var(--sg-border)] bg-[var(--sg-white)] py-14 sm:py-20">
-                <x-layout.container>
-                    <div class="mb-8 max-w-2xl">
-                        @if($section->eyebrow)<p class="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--sg-accent)]">{{ $section->eyebrow }}</p>@endif
-                        @if($section->title)<h2 class="mt-3 text-3xl font-semibold tracking-tight text-[var(--sg-ink)] sm:text-4xl">{{ $section->title }}</h2>@endif
-                        @if($section->subtitle)<p class="mt-4 text-sm leading-8 text-[var(--sg-stone)]">{{ $section->subtitle }}</p>@endif
+    @if($blogSection)
+        <section class="border-b border-[var(--sg-border)] bg-[var(--sg-white)] py-14 sm:py-20">
+            <x-layout.container>
+                <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+                    <div class="max-w-2xl">
+                        @if($blogSection->eyebrow)<p class="text-[10px] font-semibold uppercase tracking-[.22em] text-[var(--sg-accent)]">{{ $blogSection->eyebrow }}</p>@endif
+                        @if($blogSection->title)<h2 class="mt-3 text-3xl font-semibold tracking-tight text-[var(--sg-ink)] sm:text-4xl">{{ $blogSection->title }}</h2>@endif
+                        @if($blogSection->subtitle)<p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">{{ $blogSection->subtitle }}</p>@endif
                     </div>
-                    <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-                        @foreach($section->categories as $category)
-                            <x-shop.category-card :name="$category->name" :image="$category->homepage_image_url" :href="route('categories.show', $category->slug)" :count="$category->products_count" />
-                        @endforeach
-                    </div>
-                </x-layout.container>
-            </section>
-
-        @elseif($section->type === 'products' && $section->products->isNotEmpty())
-            <section class="border-b border-[var(--sg-border)] bg-[var(--sg-cream)] py-14 sm:py-20">
-                <x-layout.container>
-                    <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
-                        <div class="max-w-2xl">
-                            @if($section->eyebrow)<p class="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--sg-accent)]">{{ $section->eyebrow }}</p>@endif
-                            @if($section->title)<h2 class="mt-3 text-3xl font-semibold tracking-tight text-[var(--sg-ink)] sm:text-4xl">{{ $section->title }}</h2>@endif
-                            @if($section->subtitle)<p class="mt-4 text-sm leading-8 text-[var(--sg-stone)]">{{ $section->subtitle }}</p>@endif
-                        </div>
-                        @if($section->cta_label)<a href="{{ $ctaUrl }}" class="text-sm font-semibold text-[var(--sg-ink)] transition hover:text-[var(--sg-accent)]">{{ $section->cta_label }} ←</a>@endif
-                    </div>
-                    <div data-sg-carousel class="relative">
-                        <div class="mb-3 hidden items-center justify-end gap-2 sm:flex">
-                            <button type="button" data-carousel-prev aria-label="محصول قبلی" class="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)] text-[var(--sg-ink)] transition hover:border-[var(--sg-ink)]">←</button>
-                            <button type="button" data-carousel-next aria-label="محصول بعدی" class="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)] text-[var(--sg-ink)] transition hover:border-[var(--sg-ink)]">→</button>
-                        </div>
-                        <div class="sg-product-carousel" data-carousel-track>
-                            @foreach($section->products as $product)
-                                <div class="sg-product-carousel-item"><x-product.card :product="$product" /></div>
-                            @endforeach
-                        </div>
-                    </div>
-                </x-layout.container>
-            </section>
+                    @if($blogSection->cta_label)
+                        @php($journalUrl = filled($blogSection->cta_url) ? (str_starts_with($blogSection->cta_url, 'http') ? $blogSection->cta_url : url($blogSection->cta_url)) : route('blog.index'))
+                        <a href="{{ $journalUrl }}" class="text-sm font-semibold text-[var(--sg-ink)] transition hover:text-[var(--sg-accent)]">{{ $blogSection->cta_label }} ←</a>
+                    @endif
+                </div>
+                @if(filled($blogSection->image_url))
+                    <a href="{{ route('blog.index') }}" class="mb-6 block overflow-hidden rounded-2xl bg-[var(--sg-surface)]">
+                        <img src="{{ $blogSection->image_url }}" alt="{{ $blogSection->title ?: 'مجله سیلا گالری' }}" class="max-h-[22rem] w-full object-cover" loading="lazy" decoding="async">
+                    </a>
+                @endif
+                <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                    @foreach($blogPosts as $post)
+                        <article class="group overflow-hidden rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-cream)]">
+                            <a href="{{ route('blog.show', $post->slug) }}" class="block overflow-hidden bg-[var(--sg-surface)]">
+                                @if($post->featured_image_url)
+                                    <img src="{{ $post->featured_image_url }}" alt="{{ $post->featured_image_alt ?: $post->title }}" class="aspect-[16/10] w-full object-cover transition duration-700 group-hover:scale-[1.035]" loading="lazy" decoding="async">
+                                @else
+                                    <div class="flex aspect-[16/10] items-center justify-center text-sm text-[var(--sg-stone)]">مجله سیلا</div>
+                                @endif
+                            </a>
+                            <div class="p-5">
+                                <p class="text-[10px] text-[var(--sg-stone)]">{{ $post->published_at?->format('Y/m/d') }}</p>
+                                <h3 class="mt-2 text-base font-semibold leading-7 text-[var(--sg-ink)]"><a href="{{ route('blog.show', $post->slug) }}">{{ $post->title }}</a></h3>
+                                @if(filled($post->excerpt))<p class="mt-2 line-clamp-2 text-sm leading-7 text-[var(--sg-stone)]">{{ $post->excerpt }}</p>@endif
+                                <a href="{{ route('blog.show', $post->slug) }}" class="mt-4 inline-flex text-xs font-semibold text-[var(--sg-accent)]">ادامه مطلب ←</a>
+                            </div>
+                        </article>
+                    @endforeach
+                    @if($blogPosts->isEmpty())
+                        <div class="rounded-2xl border border-dashed border-[var(--sg-border)] p-6 text-sm leading-7 text-[var(--sg-stone)] sm:col-span-2 lg:col-span-3">هنوز مقاله‌ای برای نمایش منتشر نشده است.</div>
+                    @endif
+                </div>
+            </x-layout.container>
+        </section>
+    @endif
 
         @elseif($section->type === 'trust')
             @php($items = $payload['items'] ?? [])
