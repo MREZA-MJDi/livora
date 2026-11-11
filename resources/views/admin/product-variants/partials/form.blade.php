@@ -167,9 +167,9 @@
             <div class="grid gap-4 sm:grid-cols-[160px_minmax(0,1fr)] sm:items-start">
                 <div class="overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface-soft)]">
                     <img id="variant-image-preview"
-                         src="{{ $variantCover?->detail_url ?? '' }}"
+                         src="{{ $variantCover?->url ?? '' }}"
                          alt="{{ $variantCover?->alt ?: 'پیش‌نمایش تصویر تنوع' }}"
-                         class="aspect-[4/5] w-full object-cover {{ $variantCover ? '' : 'hidden' }}">
+                         class="h-auto max-h-72 w-auto max-w-full object-contain {{ $variantCover ? '' : 'hidden' }}">
                     @unless($variantCover)
                         <div id="variant-image-placeholder" class="flex aspect-[4/5] items-center justify-center px-3 text-center text-xs text-[var(--admin-muted)]">
                             پیش‌نمایش تصویر این گزینه
