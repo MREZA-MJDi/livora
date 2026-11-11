@@ -949,6 +949,53 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
         $this->assertSame('pending', $order->fresh()->payment_status);
     }
 
+    public function test_checkout_removes_a_soft_deleted_product_from_the_cart_instead_of_crashing(): void
+    {
+        $customer = $this->user('customer', 'checkout-stale-product@example.test');
+        $category = Category::query()->create([
+            'name' => 'دسته محصول حذف‌شده',
+            'slug' => 'checkout-stale-product-category',
+            'description' => null,
+            'is_active' => true,
+            'sort_order' => 1,
+        ]);
+        $product = Product::query()->create([
+            'category_id' => $category->id,
+            'name' => 'محصول حذف‌شده',
+            'slug' => 'checkout-stale-product',
+            'sku' => 'SG-CHECKOUT-STALE-001',
+            'short_description' => 'محصول تست',
+            'description' => 'محصول تست',
+            'price' => 1000000,
+            'stock' => 2,
+            'status' => 'active',
+            'installment_enabled' => false,
+        ]);
+        $cart = Cart::query()->create([
+            'user_id' => $customer->id,
+            'session_id' => null,
+            'status' => 'active',
+        ]);
+        $item = CartItem::query()->create([
+            'cart_id' => $cart->id,
+            'product_id' => $product->id,
+            'product_variant_id' => null,
+            'variant_key' => 'base',
+            'variant_options' => null,
+            'quantity' => 1,
+            'unit_price' => 1000000,
+        ]);
+
+        $product->delete();
+
+        $this->actingAs($customer)
+            ->get(route('checkout.index'))
+            ->assertRedirect(route('cart.index'))
+            ->assertSessionHas('error');
+
+        $this->assertDatabaseMissing('cart_items', ['id' => $item->id]);
+    }
+
     private function validCheckoutPayload(User $customer): array
     {
         return [
