@@ -20,7 +20,7 @@ class AccountController extends Controller
 
         $orders = $user
             ->orders()
-            ->with('items')
+            ->with('items.product.images')
             ->latest()
             ->limit(5)
             ->get();

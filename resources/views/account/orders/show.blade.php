@@ -272,14 +272,14 @@
 
                                     <div class="flex gap-4 p-5 sm:p-7">
 
-                                        <div class="h-20 w-20 shrink-0 overflow-hidden rounded-2xl bg-[var(--sg-surface)]">
+                                        <div class="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-surface)] p-2 sm:h-28 sm:w-28">
 
-                                            @if($item->product?->images?->first()?->url)
+                                            @if($item->product?->images?->first()?->card_url)
 
                                                 <img
-                                                    src="{{ $item->product->images->first()->url }}"
+                                                    src="{{ $item->product->images->first()->card_url }}"
                                                     alt="{{ $item->product_name }}"
-                                                    class="h-full w-full object-cover"
+                                                    class="h-full w-full object-contain"
                                                     loading="lazy"
                                                 >
 
