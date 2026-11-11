@@ -8,6 +8,9 @@ use Illuminate\Contracts\View\View;
 
 class CategoryController extends Controller
 {
+    private const CATEGORY_PAGE_SIZE = 12;
+
+    private const PRODUCT_PAGE_SIZE = 12;
     public function index(): View
     {
         $categories = Category::query()
@@ -21,7 +24,8 @@ class CategoryController extends Controller
                 'latestActiveProduct.variants' => fn ($query) => $this->constrainCardVariantImage($query),
             ])
             ->orderBy('sort_order')
-            ->paginate(12)
+            ->orderBy('id')
+            ->paginate(self::CATEGORY_PAGE_SIZE)
             ->withQueryString();
 
         return view('categories.index', [
@@ -132,7 +136,7 @@ class CategoryController extends Controller
             default => $query->orderByDesc('created_at')->orderByDesc('id'),
         };
 
-        $products = $query->paginate(12)->withQueryString();
+        $products = $query->paginate(self::PRODUCT_PAGE_SIZE)->withQueryString();
 
         return view('categories.show', [
             'category' => $category,

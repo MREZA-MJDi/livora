@@ -10,50 +10,50 @@
 
 @section('content')
     <div class="overflow-hidden bg-[var(--sg-cream)]">
-        <section class="sg-category-intro relative overflow-hidden border-b border-[var(--sg-border)] bg-[var(--sg-white)]">
+        <section class="sg-category-intro relative overflow-hidden border-b border-[var(--sg-border)] bg-[var(--sg-ink)] text-white">
             <x-layout.container>
-                <div class="py-10 sm:py-14 lg:py-20">
-                    <nav aria-label="مسیر صفحه" class="flex flex-wrap items-center gap-2 text-[11px] text-[var(--sg-stone)]">
-                        <a href="{{ route('home') }}" class="transition hover:text-[var(--sg-ink)]">خانه</a>
+                <div class="py-7 sm:py-10 lg:py-12">
+                    <nav aria-label="مسیر صفحه" class="flex flex-wrap items-center gap-2 text-[11px] text-white/55">
+                        <a href="{{ route('home') }}" class="transition hover:text-white">خانه</a>
                         <span aria-hidden="true">/</span>
-                        <span aria-current="page" class="font-medium text-[var(--sg-ink)]">مجموعه‌ها</span>
+                        <span aria-current="page" class="font-medium text-white">مجموعه‌ها</span>
                     </nav>
 
-                    <div class="mt-10 grid items-end gap-8 lg:mt-14 lg:grid-cols-[minmax(0,1fr)_minmax(260px,0.62fr)] lg:gap-14">
-                        <div class="max-w-3xl">
-                            <p class="sg-eyebrow">CURATED FOR YOUR SPACE</p>
-                            <h1 class="mt-4 max-w-3xl text-4xl font-semibold leading-[1.35] tracking-tight text-[var(--sg-ink)] sm:text-5xl lg:text-[3.75rem]">
-                                هر فضا، داستان خودش را دارد.
+                    <div class="mt-7 grid items-center gap-7 lg:mt-9 lg:grid-cols-[minmax(0,1fr)_minmax(300px,.82fr)] lg:gap-12">
+                        <div class="max-w-2xl">
+                            <p class="text-[10px] font-semibold uppercase tracking-[.24em] text-[var(--sg-accent)]">SILLAGALLERY / THE EDIT</p>
+                            <h1 class="mt-4 text-3xl font-semibold leading-[1.4] tracking-tight sm:text-4xl lg:text-5xl">
+                                برای هر گوشه‌ی خانه، انتخابی با شخصیت.
                             </h1>
-                            <p class="mt-5 max-w-2xl text-sm leading-8 text-[var(--sg-stone)] sm:text-base">
-                                مجموعه‌ها را بر اساس نیاز و حال‌وهوای فضای خود مرور کنید. از هر دسته می‌توانید وارد محصولات واقعی فروشگاه شوید، جزئیات را ببینید و انتخابتان را با خیال راحت مقایسه کنید.
+                            <p class="mt-4 max-w-xl text-sm leading-8 text-white/65 sm:text-base">
+                                از میان مجموعه‌های مبلمان و دکوراسیون عبور کنید؛ هر مجموعه نقطه‌ی شروعی برای ساختن فضایی هماهنگ، کاربردی و ماندگار است.
                             </p>
-
-                            <div class="mt-8 flex flex-wrap items-center gap-3">
-                                <a href="#category-collections" class="sg-button sg-button-primary">
-                                    مرور مجموعه‌ها
-                                    <span aria-hidden="true">↓</span>
-                                </a>
-                                <a href="{{ route('shop.index') }}" class="sg-button sg-button-secondary">
-                                    مشاهده همه محصولات
-                                    <span aria-hidden="true">←</span>
-                                </a>
+                            <div class="mt-6 flex flex-wrap items-center gap-3">
+                                <a href="#category-collections" class="sg-button sg-button-primary">کشف مجموعه‌ها <span aria-hidden="true">↓</span></a>
+                                <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[.06] px-4 py-2.5 text-xs text-white/75">
+                                    <span class="h-1.5 w-1.5 rounded-full bg-[var(--sg-accent)]"></span>
+                                    {{ number_format($categories->total()) }} مجموعه برای انتخاب
+                                </span>
                             </div>
                         </div>
 
-                        <aside class="sg-category-intro-panel relative overflow-hidden rounded-[2rem] bg-[var(--sg-ink)] p-6 text-white sm:p-8">
-                            <span class="sg-category-intro-orbit sg-category-intro-orbit--one" aria-hidden="true"></span>
-                            <span class="sg-category-intro-orbit sg-category-intro-orbit--two" aria-hidden="true"></span>
-                            <div class="relative z-10">
-                                <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/55">THE COLLECTIONS</p>
-                                <p class="mt-6 text-5xl font-semibold leading-none tracking-tight sm:text-6xl">{{ number_format($categories->total()) }}</p>
-                                <p class="mt-3 text-sm font-medium text-white/90">دسته‌بندی برای کشف انتخاب‌های تازه</p>
-                                <div class="mt-7 flex items-center justify-between gap-3 border-t border-white/15 pt-5">
-                                    <p class="max-w-[15rem] text-xs leading-7 text-white/60">هر مجموعه با تصویر، توضیح و تعداد محصولات خودش از اطلاعات فروشگاه ساخته می‌شود.</p>
-                                    <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-lg" aria-hidden="true">↙</span>
+                        <div class="sg-category-editorial-visual relative min-h-[15rem] overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/[.04] sm:min-h-[19rem]">
+                            @if($categories->first()?->homepage_image_url)
+                                <img src="{{ $categories->first()->homepage_image_url }}" alt="{{ $categories->first()->image_alt ?: $categories->first()->name }}" width="1200" height="900" fetchpriority="high" decoding="async" class="absolute inset-0 h-full w-full object-cover">
+                                <span class="absolute inset-0 bg-gradient-to-l from-black/65 via-black/15 to-transparent" aria-hidden="true"></span>
+                            @else
+                                <div class="absolute inset-0 flex items-center justify-center bg-[radial-gradient(ellipse_at_70%_20%,rgba(255,255,255,.12),transparent_55%)]">
+                                    <span class="sillagallery-wordmark"><span class="sillagallery-wordmark__main">Silla</span><span class="sillagallery-wordmark__sub">Gallery</span></span>
                                 </div>
+                            @endif
+                            <div class="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 sm:p-7">
+                                <div>
+                                    <p class="text-[9px] font-semibold uppercase tracking-[.22em] text-white/65">A SPACE OF YOUR OWN</p>
+                                    <p class="mt-2 text-lg font-semibold text-white sm:text-xl">{{ $categories->first()?->name ?: 'SillaGallery Collections' }}</p>
+                                </div>
+                                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/30 bg-black/20 text-lg text-white backdrop-blur">↙</span>
                             </div>
-                        </aside>
+                        </div>
                     </div>
                 </div>
             </x-layout.container>
@@ -75,7 +75,7 @@
                     </div>
 
                     @if($categories->isNotEmpty())
-                        <div class="sg-category-grid sg-category-grid--index sg-category-index-grid">
+                        <div class="sg-category-grid sg-category-grid--index sg-category-index-grid sg-category-index-track">
                             @foreach($categories as $category)
                                 <a
                                     href="{{ route('categories.show', $category->slug) }}"
