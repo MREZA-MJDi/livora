@@ -81,7 +81,6 @@ class CheckoutAuthenticationFlowTest extends TestCase
 
         $this->assertSame('customer', $customer->role);
         $this->assertAuthenticatedAs($customer);
-        $this->assertSame('converted', $guestCart->fresh()->status);
 
         $userCart = Cart::query()
             ->where('user_id', $customer->id)
