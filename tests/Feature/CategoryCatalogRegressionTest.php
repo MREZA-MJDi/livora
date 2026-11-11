@@ -22,7 +22,7 @@ final class CategoryCatalogRegressionTest extends TestCase
 
         $secondPage = $this->get(route('categories.index', ['page' => 2]))->assertOk();
         $secondPage->assertSee('نمایش 13 تا 21', false);
-        $secondPage->assertSee('از ۲۱ مجموعه', false);
+        $secondPage->assertSee('از 21 مجموعه', false);
 
         $this->assertStringContainsString(
             route('categories.show', 'catalog-regression-13'),
