@@ -986,7 +986,7 @@
 
 
                                     <a
-                                        href="{{ route('checkout.index') }}"
+                                        href="{{ $canCheckout ? route('checkout.index') : route('login', ['redirect' => 'checkout']) }}"
                                         class="mt-6 flex w-full items-center justify-center rounded-2xl bg-[var(--sg-ink)] px-6 py-4 text-sm font-medium text-white transition hover:bg-[var(--sg-accent)]"
                                     >
                                         ادامه به تسویه حساب
