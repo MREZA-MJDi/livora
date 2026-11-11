@@ -568,6 +568,7 @@
                                                 :title="$variants->first()->name"
                                                 :options="$variants"
                                                 :name="$type"
+                                                :type="$type"
                                             />
 
                                         @endforeach
