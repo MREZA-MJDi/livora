@@ -187,7 +187,7 @@
                     : 'opacity-60 hover:opacity-100'"
             >
                 <img :src="image.url" :alt="image.alt || productName" loading="lazy" decoding="async"
-                     class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                     class="h-full w-full object-contain transition duration-300">
             </button>
         </template>
     </div>
