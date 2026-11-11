@@ -670,6 +670,18 @@ window.richTextEditor = (uploadUrl) => ({
                 window.alert('حجم هر تصویر نباید بیشتر از ۱۰ مگابایت باشد.');
                 return;
             }
+            if (input.dataset.preserveOriginal === '1') {
+                const original = selected.find(file => file.type.startsWith('image/'));
+                if (original) {
+                    if (previewUrl) URL.revokeObjectURL(previewUrl);
+                    previewUrl = URL.createObjectURL(original);
+                    previewImage.src = previewUrl;
+                    preview.hidden = false;
+                    preview.querySelector('.sg-recrop').hidden = true;
+                    syncBoundPreview(original);
+                }
+                return;
+            }
             processedInputs.add(input); input.dataset.cropping = '1'; input.disabled = true;
             try {
                 const result = [];
