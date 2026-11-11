@@ -167,9 +167,9 @@
             <div class="grid gap-4 sm:grid-cols-[160px_minmax(0,1fr)] sm:items-start">
                 <div class="overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface-soft)]">
                     <img id="variant-image-preview"
-                         src="{{ $variantCover?->detail_url ?? '' }}"
+                         src="{{ $variantCover?->url ?? '' }}"
                          alt="{{ $variantCover?->alt ?: 'پیش‌نمایش تصویر تنوع' }}"
-                         class="aspect-[4/5] w-full object-cover {{ $variantCover ? '' : 'hidden' }}">
+                         class="h-auto max-h-72 w-auto max-w-full object-contain {{ $variantCover ? '' : 'hidden' }}">
                     @unless($variantCover)
                         <div id="variant-image-placeholder" class="flex aspect-[4/5] items-center justify-center px-3 text-center text-xs text-[var(--admin-muted)]">
                             پیش‌نمایش تصویر این گزینه
@@ -180,13 +180,12 @@
                     <label for="variant_image" class="admin-label">تصویر اصلی این گزینه</label>
                     <input id="variant_image" name="variant_image" type="file"
                            accept="image/jpeg,image/png,image/webp"
-                           data-crop-ratio="0.8"
-                           data-original-field="variant_original_image"
+                           data-preserve-original="1"
                            data-preview-target="variant-image-preview"
                            data-preview-placeholder="variant-image-placeholder"
                            class="admin-input p-2">
                     <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">
-                        یک تصویر اختصاصی برای این گزینه بارگذاری کن. ابزار برش با نسبت کارت محصول باز می‌شود و پیش‌نمایش دقیق تصویر ذخیره‌شده را نشان می‌دهد.
+                        یک تصویر اختصاصی برای این گزینه بارگذاری کن. فایل اصلی با همان نسبت و کادر بارگذاری‌شده نگهداری می‌شود و بدون برش اجباری نمایش داده خواهد شد.
                     </p>
                     <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">
                         اگر تصویر جدیدی انتخاب نکنی، تصاویر انتخاب‌شده از گالری عمومی محصول حفظ می‌شوند.

@@ -17,7 +17,7 @@
     $resolvedImages = collect($resolvedImages ?? []);
 
     $baseImages = $resolvedImages->map(fn ($image) => [
-        'url' => $image->detail_url,
+        'url' => $image->url,
         'alt' => $image->alt ?: $productName,
     ])->filter(fn ($image) => filled($image['url']))
         ->values();
@@ -97,7 +97,7 @@
     <div class="product-gallery-shell group relative overflow-hidden rounded-[2rem] bg-[var(--sg-surface)]">
         @if($hasAnyImages)
             <div
-                class="product-gallery-stage relative aspect-[4/5] w-full overflow-hidden bg-[var(--sg-surface)] lg:aspect-auto lg:h-[clamp(500px,calc(100svh-220px),720px)]"
+                class="product-gallery-stage relative flex min-h-[320px] w-full items-center justify-center overflow-hidden bg-[var(--sg-surface)] p-3 lg:min-h-[500px] lg:p-6"
                 @click="if (images.length) zoom = true"
                 :class="images.length ? 'cursor-zoom-in' : 'cursor-default'"
             >
@@ -111,7 +111,7 @@
                         :alt="image.alt || productName"
                         :loading="index === 0 ? 'eager' : 'lazy'"
                         decoding="async"
-                        class="product-gallery-image absolute inset-0 h-full w-full object-contain"
+                        class="product-gallery-image block max-h-[min(78svh,900px)] max-w-full object-contain"
                     >
                 </template>
 
@@ -163,7 +163,7 @@
                 </div>
             </div>
         @else
-            <div class="flex aspect-[4/5] w-full items-center justify-center lg:aspect-auto lg:h-[clamp(500px,calc(100svh-220px),720px)]">
+            <div class="flex min-h-[320px] w-full items-center justify-center lg:min-h-[500px]">
                 <div class="text-center">
                     <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)]">
                         <span class="text-xs tracking-[0.2em] text-[var(--sg-stone)]">LV</span>
@@ -187,7 +187,7 @@
                     : 'opacity-60 hover:opacity-100'"
             >
                 <img :src="image.url" :alt="image.alt || productName" loading="lazy" decoding="async"
-                     class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                     class="h-full w-full object-contain transition duration-300">
             </button>
         </template>
     </div>

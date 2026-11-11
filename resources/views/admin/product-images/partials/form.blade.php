@@ -78,12 +78,12 @@
 
             @if($editing && $productImage->url)
 
-                <div class="admin-image-preview mb-5 aspect-[4/5] max-w-xl">
+                <div class="admin-image-preview mb-5 flex min-h-64 items-center justify-center p-3">
 
                     <img
                         src="{{ $productImage->url }}"
                         alt="{{ $productImage->alt ?: 'Product image' }}"
-                        class="admin-image"
+                        class="h-auto max-h-[32rem] w-auto max-w-full object-contain"
                     >
 
                 </div>
@@ -96,11 +96,11 @@
             </label>
 
             <div class="admin-image-preview mb-5 aspect-[4/5] max-w-xl">
-                <img id="product-gallery-image-preview" src="{{ $productImage->url ?? '' }}" alt="{{ $productImage->alt ?? 'تصویر محصول' }}" class="admin-image {{ $editing ? '' : 'hidden' }}">
+                <img id="product-gallery-image-preview" src="{{ $productImage->url ?? '' }}" alt="{{ $productImage->alt ?? 'تصویر محصول' }}" class="h-auto max-h-[32rem] w-auto max-w-full object-contain {{ $editing ? '' : 'hidden' }}">
             </div>
             <input
                 id="image"
-                name="image" data-crop-ratio="0.8" data-original-field="original_image" data-preview-target="product-gallery-image-preview"
+                name="image" data-preserve-original="1" data-preview-target="product-gallery-image-preview"
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
                 class="admin-input p-2"

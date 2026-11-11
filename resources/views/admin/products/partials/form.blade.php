@@ -407,18 +407,18 @@
 
                 <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">
                     {{ $editing
-                        ? 'قاب نهایی تصویر با کارت فروشگاه یکسان است (۴:۵)؛ تصویر کامل محصول بدون برش ناخواسته نمایش داده می‌شود.'
-                        : 'تصویر اصلی محصول را در قاب ۴:۵ انتخاب کنید. این نسبت در پیش‌نمایش پنل، کارت فروشگاه و تصویر محصول یکسان خواهد بود.' }}
+                        ? 'تصویر اصلی با نسبت و ابعاد فایل بارگذاری‌شده نمایش داده می‌شود؛ هیچ برش اجباری روی آن اعمال نمی‌شود.'
+                        : 'تصویر اصلی محصول را با کیفیت و کادر اصلی فایل انتخاب کنید.' }}
                 </p>
             </div>
 
-            <div class="admin-image-preview mx-auto mb-5 aspect-[4/5] w-full max-w-72 bg-[var(--admin-white)]">
+            <div class="admin-image-preview mx-auto mb-5 flex min-h-64 w-full max-w-2xl items-center justify-center bg-[var(--admin-white)] p-3">
 
                 <img
                     id="product-image-preview"
                     src="{{ $productImageUrl ?: '' }}"
                     alt="{{ $primaryImage?->alt ?: ($product->name ?? 'تصویر محصول') }}"
-                    class="admin-image product-primary-preview {{ $productImageUrl ? '' : 'hidden' }}"
+                    class="product-primary-preview h-auto max-h-[32rem] w-auto max-w-full object-contain {{ $productImageUrl ? '' : 'hidden' }}"
                 >
 
                 <div
@@ -462,7 +462,7 @@
                 data-preview-target="product-image-preview" data-preview-placeholder="product-image-placeholder"
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
-                data-crop-ratio="0.8" data-original-field="original_image"
+                data-preserve-original="1"
                 class="admin-input mt-3 p-2"
             >
 
@@ -478,7 +478,7 @@
                 <div class="min-w-0 flex-1">
                     <p class="truncate text-sm font-semibold" x-text="selectedMedia?.name"></p>
                     <p class="text-xs text-[var(--admin-muted)]">پیش‌نمایش نهایی در قاب فروشگاه، بالای همین بخش نمایش داده می‌شود.</p>
-                    <button type="button" class="admin-btn admin-btn-secondary mt-2" @click="cropSelected()">تنظیم برش برای نمایش در فروشگاه</button>
+                    
                 </div>
                 <button type="button" class="admin-btn admin-btn-secondary" @click="clearSelection()">لغو انتخاب</button>
             </div>
@@ -523,67 +523,6 @@
             @enderror
 
         </div>
-
-        {{-- Product Marketing Banner --}}
-        <section class="admin-card space-y-5 p-6">
-            <div>
-                <h3 class="text-base font-bold text-[var(--admin-text)]">بنر بالای صفحه محصول</h3>
-                <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">
-                    بنر اختصاصی این محصول در ابتدای صفحه نمایش داده می‌شود. نسبت تصویر ۱۲:۵ است؛ بهتر است پیام اصلی را داخل خود تصویر طراحی کنی و فضای امن اطراف متن را رعایت کنی.
-                </p>
-            </div>
-
-            <div>
-                <label for="banner_image" class="admin-label">انتخاب یا جایگزینی بنر</label>
-                <p class="admin-help mb-2">پیش‌نمایش زیر همان قاب ۱۲:۵ فروشگاه است؛ قبل از ذخیره، نتیجه نهایی را بررسی کن.</p>
-                <div class="relative aspect-[12/5] overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]">
-                    <img
-                        id="product-banner-image-preview"
-                        src="{{ $product->banner_image ? \Illuminate\Support\Facades\Storage::disk('public')->url($product->banner_image) : '' }}"
-                        alt="{{ $product->banner_image_alt ?: ($product->name ?? 'بنر محصول') }}"
-                        class="{{ $product->banner_image ? '' : 'hidden' }} h-full w-full object-cover"
-                    >
-                    <div
-                        id="product-banner-image-placeholder"
-                        class="{{ $product->banner_image ? 'hidden' : 'flex' }} absolute inset-0 flex-col items-center justify-center gap-2 p-4 text-center text-xs text-[var(--admin-muted)]"
-                    >
-                        <span>هنوز بنری انتخاب نشده است.</span>
-                    </div>
-                </div>
-                <input
-                    id="banner_image"
-                    name="banner_image"
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    data-crop-ratio="2.4"
-                    data-preview-target="product-banner-image-preview"
-                    data-preview-placeholder="product-banner-image-placeholder"
-                    class="admin-input p-2"
-                >
-                @include('admin.media.partials.picker', ['mediaPickerField' => 'banner_image', 'mediaPickerId' => old('banner_media_id', $product->banner_media_id ?? null), 'mediaPickerUrl' => $product->banner_image ? \Illuminate\Support\Facades\Storage::disk('public')->url($product->banner_image) : null, 'mediaPickerName' => $product->name, 'mediaPickerPreviewId' => 'product-banner-image-preview', 'mediaPickerInputName' => 'banner_media_id', 'mediaPickerRemoveName' => 'remove_banner_image'])
-                <p class="admin-help">اندازه پیشنهادی ۱۹۲۰×۸۰۰ پیکسل؛ JPG، PNG یا WEBP تا ۱۰ مگابایت.</p>
-                @if($editing && $product->banner_image)
-                    <label class="mt-2 flex items-center gap-2 text-sm text-rose-700"><input type="checkbox" name="remove_banner_image" value="1" class="admin-checkbox"> حذف بنر فعلی از محصول</label>
-                @endif
-                @error('banner_image')<p class="admin-error">{{ $message }}</p>@enderror
-            </div>
-
-            <div>
-                <label for="banner_image_alt" class="admin-label">Alt بنر برای دسترس‌پذیری و SEO</label>
-                <input
-                    id="banner_image_alt"
-                    name="banner_image_alt"
-                    maxlength="255"
-                    class="admin-input"
-                    value="{{ old('banner_image_alt', $product->banner_image_alt ?? ($product->name ?? '')) }}"
-                    placeholder="توضیح کوتاه و واقعی تصویر بنر"
-                >
-                @error('banner_image_alt')<p class="admin-error">{{ $message }}</p>@enderror
-            </div>
-
-            <p class="admin-help">در صورت عدم انتخاب فایل جدید، بنر فعلی حفظ می‌شود.</p>
-        </section>
-
 
         <details class="xl:col-span-2 overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-white)]">
             <summary class="cursor-pointer list-none px-5 py-4 text-sm font-semibold text-[var(--admin-text)]">

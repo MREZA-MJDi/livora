@@ -103,7 +103,7 @@
         ->mapWithKeys(fn ($variant) => [
             (string) $variant->id => $variant->images
                 ->map(fn ($image) => [
-                    'url' => $image->detail_url,
+                    'url' => $image->url,
                     'alt' => $image->alt ?: $product->name,
                 ])
                 ->values()
@@ -113,7 +113,7 @@
 
 
     $mainImage =
-        $product->images?->first()?->detail_url;
+        $product->images?->first()?->url;
 
     $variantGroups =
         $product->variants
@@ -146,7 +146,7 @@
         'name' => $product->name,
         'description' => $pageDescription,
         'sku' => $product->sku,
-        'image' => $product->images->pluck('detail_url')->filter()->values()->all(),
+        'image' => $product->images->pluck('url')->filter()->values()->all(),
         'brand' => ['@type' => 'Brand', 'name' => 'SillaGallery'],
     ];
 
@@ -271,25 +271,6 @@
         </section>
 
 
-        @if($product->banner_image_url)
-            <section class="product-page-banner border-b border-[var(--sg-border)] bg-[var(--sg-white)] py-4 sm:py-6">
-                <x-layout.container>
-                    <figure class="relative overflow-hidden rounded-2xl bg-[var(--sg-surface)] sm:rounded-3xl">
-                        <img
-                            src="{{ $product->banner_image_url }}"
-                            alt="{{ $product->banner_image_alt ?: $product->name }}"
-                            width="1920"
-                            height="800"
-                            fetchpriority="high"
-                            decoding="async"
-                            class="product-page-banner-image block aspect-[12/5] w-full object-cover"
-                        >
-                    </figure>
-                </x-layout.container>
-            </section>
-        @endif
-
-
         {{-- =========================================================
              PRODUCT HERO
         ========================================================== --}}
@@ -402,6 +383,99 @@
                         @endif
 
 
+                        @php
+                            $visibleFeatures = collect($product->key_features ?? [])
+                                ->filter(fn ($item) => filled($item['label'] ?? null) && filled($item['value'] ?? null))
+                                ->values();
+                            $visibleSpecs = collect($product->specifications ?? [])
+                                ->filter(fn ($item) => filled($item['label'] ?? null) && filled($item['value'] ?? null))
+                                ->values();
+                            $hasMoreProductInfo = $visibleFeatures->count() > 4
+                                || $visibleSpecs->isNotEmpty()
+                                || filled($product->description)
+                                || !empty($product->content_sections)
+                                || filled($product->care_guide)
+                                || !empty($product->faq_items);
+                        @endphp
+
+                        @if($visibleFeatures->isNotEmpty())
+                            <div class="mt-5 flex flex-wrap gap-2" aria-label="ویژگی‌های مهم محصول">
+                                @foreach($visibleFeatures->take(4) as $feature)
+                                    <span class="inline-flex items-center gap-1.5 rounded-full border border-[var(--sg-border)] bg-[var(--sg-white)] px-3 py-2 text-[11px] leading-5 text-[var(--sg-ink)]">
+                                        <span class="font-semibold">{{ $feature['label'] }}:</span>
+                                        <span class="text-[var(--sg-stone)]">{{ $feature['value'] }}</span>
+                                    </span>
+                                @endforeach
+                            </div>
+                        @endif
+
+                        @if($hasMoreProductInfo)
+                            <details class="product-more-info mt-4 overflow-hidden rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)]">
+                                <summary class="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3.5 text-xs font-semibold text-[var(--sg-ink)]">
+                                    <span>مشخصات و جزئیات بیشتر</span>
+                                    <span class="text-[var(--sg-accent)]">+</span>
+                                </summary>
+                                <div class="space-y-5 border-t border-[var(--sg-border)] p-4">
+                                    @if($visibleFeatures->count() > 4)
+                                        <div class="flex flex-wrap gap-2">
+                                            @foreach($visibleFeatures->skip(4) as $feature)
+                                                <span class="rounded-full bg-[var(--sg-surface)] px-3 py-2 text-[11px] leading-5">
+                                                    <strong>{{ $feature['label'] }}:</strong>
+                                                    <span class="text-[var(--sg-stone)]">{{ $feature['value'] }}</span>
+                                                </span>
+                                            @endforeach
+                                        </div>
+                                    @endif
+
+                                    @if($visibleSpecs->isNotEmpty())
+                                        <h3 class="text-xs font-bold">مشخصات فنی</h3>
+                                        <dl class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                                            @foreach($visibleSpecs as $specification)
+                                                <div class="flex items-start justify-between gap-3 rounded-xl bg-[var(--sg-surface)] px-3 py-2.5 text-[11px]">
+                                                    <dt class="shrink-0 font-semibold text-[var(--sg-ink)]">{{ $specification['label'] }}</dt>
+                                                    <dd class="text-left leading-5 text-[var(--sg-stone)]">{{ $specification['value'] }}</dd>
+                                                </div>
+                                            @endforeach
+                                        </dl>
+                                    @endif
+
+                                    @if(filled($product->description))
+                                        <div class="text-xs leading-7 text-[var(--sg-stone)]">{{ $product->description }}</div>
+                                    @endif
+
+                                    @foreach($product->content_sections ?? [] as $section)
+                                        @if(filled($section['heading'] ?? null) && filled($section['body'] ?? null))
+                                            <article>
+                                                <h3 class="text-xs font-bold">{{ $section['heading'] }}</h3>
+                                                <p class="mt-2 whitespace-pre-line text-xs leading-7 text-[var(--sg-stone)]">{{ $section['body'] }}</p>
+                                            </article>
+                                        @endif
+                                    @endforeach
+
+                                    @if(filled($product->care_guide))
+                                        <article>
+                                            <h3 class="text-xs font-bold">راهنمای نگهداری</h3>
+                                            <p class="mt-2 whitespace-pre-line text-xs leading-7 text-[var(--sg-stone)]">{{ $product->care_guide }}</p>
+                                        </article>
+                                    @endif
+
+                                    @if(!empty($product->faq_items))
+                                        <div class="space-y-2">
+                                            @foreach($product->faq_items as $faq)
+                                                @if(filled($faq['question'] ?? null) && filled($faq['answer'] ?? null))
+                                                    <details class="rounded-xl border border-[var(--sg-border)] p-3">
+                                                        <summary class="cursor-pointer text-xs font-semibold">{{ $faq['question'] }}</summary>
+                                                        <p class="mt-2 whitespace-pre-line text-xs leading-7 text-[var(--sg-stone)]">{{ $faq['answer'] }}</p>
+                                                    </details>
+                                                @endif
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                </div>
+                            </details>
+                        @endif
+
+
                         {{-- Compact installment summary. Full cheque schedule stays optional. --}}
                         @if($installmentEnabled)
                             <section x-show="!hasSelectedVariant"
@@ -462,6 +536,7 @@
                         {{-- Product / Cart --}}
                         <form
                             id="product-purchase"
+                            data-cart-add-form
                             action="{{ route('cart.add', $product) }}"
                             method="POST"
                             class="mt-8 space-y-7"
@@ -494,6 +569,7 @@
                                                 :title="$variants->first()->name"
                                                 :options="$variants"
                                                 :name="$type"
+                                                :type="$type"
                                             />
 
                                         @endforeach
@@ -552,6 +628,7 @@
                                 <div class="grid gap-3 sm:grid-cols-2">
                                     <button
                                         type="submit"
+                                        data-cart-add-button
                                         @disabled(!$canPurchase)
                                         class="flex min-h-12 w-full items-center justify-center rounded-2xl bg-[var(--sg-ink)] px-5 py-4 text-sm font-medium text-white transition duration-300 hover:bg-[var(--sg-accent)] disabled:cursor-not-allowed disabled:opacity-40"
                                     >
@@ -565,6 +642,13 @@
                                         درخواست مشاوره خرید
                                     </a>
                                 </div>
+                                <div
+                                    data-cart-feedback
+                                    role="status"
+                                    aria-live="polite"
+                                    aria-atomic="true"
+                                    class="pointer-events-none fixed bottom-24 right-4 z-[120] hidden max-w-[min(92vw,380px)] translate-y-3 rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] px-5 py-4 text-sm text-[var(--sg-ink)] opacity-0 shadow-[0_18px_55px_rgba(24,23,21,.18)] transition-all duration-300 sm:bottom-8 sm:right-8"
+                                ></div>
                                 @unless($canPurchase)
                                     <a
                                         href="{{ route('contact', ['product' => $product->slug, 'request' => 'stock-notification']) }}"
@@ -616,220 +700,6 @@
                                 </p>
 
                             </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </x-layout.container>
-
-        </section>
-
-
-        {{-- =========================================================
-             مشخصات محصول
-        ========================================================== --}}
-        <section class="border-t border-[var(--sg-border)] bg-[var(--sg-white)]">
-
-            <x-layout.container>
-
-                <div class="grid gap-10 py-14 lg:grid-cols-[0.75fr_1.25fr] lg:py-20">
-
-                    <div>
-
-                        <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
-                            مشخصات محصول
-                        </p>
-
-                        <h2 class="mt-3 text-3xl font-semibold tracking-tight">
-                            درباره این محصول
-                        </h2>
-
-                        <p class="mt-4 text-sm leading-8 text-[var(--sg-stone)]">
-                            اطلاعات و مشخصات محصول را بررسی کنید تا انتخاب دقیق‌تری برای فضای خود داشته باشید.
-                        </p>
-
-                    </div>
-
-                    <div>
-
-                        @if($product->description)
-
-                            <div class="text-sm leading-9 text-[var(--sg-stone)]">
-                                {!! nl2br(e($product->description)) !!}
-                            </div>
-
-                        @else
-
-                            <p class="text-sm leading-8 text-[var(--sg-stone)]">
-                                توضیحات کامل این محصول هنوز توسط فروشگاه ثبت نشده است.
-                            </p>
-
-                        @endif
-
-                    </div>
-
-                </div>
-
-            </x-layout.container>
-
-        </section>
-
-
-        @if(!empty($product->content_sections) || !empty($product->specifications) || filled($product->care_guide) || !empty($product->faq_items))
-            <section class="border-t border-[var(--sg-border)] bg-[var(--sg-white)]">
-                <x-layout.container>
-                    <div class="space-y-12 py-14 sm:py-18">
-                        @foreach($product->content_sections ?? [] as $section)
-                            @if(filled($section['heading'] ?? null) && filled($section['body'] ?? null))
-                                <article class="max-w-4xl">
-                                    <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">راهنمای محصول</p>
-                                    <h2 class="mt-3 text-2xl font-semibold sm:text-3xl">{{ $section['heading'] }}</h2>
-                                    <p class="mt-4 whitespace-pre-line text-sm leading-9 text-[var(--sg-stone)]">{{ $section['body'] }}</p>
-                                </article>
-                            @endif
-                        @endforeach
-
-                        @if(!empty($product->specifications))
-                            <section class="max-w-4xl">
-                                <h2 class="text-2xl font-semibold">مشخصات فنی {{ $product->name }}</h2>
-                                <div class="mt-5 overflow-hidden rounded-2xl border border-[var(--sg-border)]">
-                                    <table class="w-full text-right text-sm">
-                                        <tbody>
-                                            @foreach($product->specifications as $specification)
-                                                @if(filled($specification['label'] ?? null) && filled($specification['value'] ?? null))
-                                                    <tr class="border-b border-[var(--sg-border)] last:border-0">
-                                                        <th scope="row" class="w-1/3 bg-[var(--sg-surface)] px-4 py-4 font-semibold">{{ $specification['label'] }}</th>
-                                                        <td class="px-4 py-4 leading-7 text-[var(--sg-stone)]">{{ $specification['value'] }}</td>
-                                                    </tr>
-                                                @endif
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </section>
-                        @endif
-
-                        @if(filled($product->care_guide))
-                            <section class="max-w-4xl">
-                                <h2 class="text-2xl font-semibold">راهنمای نگهداری و استفاده</h2>
-                                <p class="mt-4 whitespace-pre-line text-sm leading-9 text-[var(--sg-stone)]">{{ $product->care_guide }}</p>
-                            </section>
-                        @endif
-
-                        @if(!empty($product->faq_items))
-                            <section class="max-w-4xl">
-                                <h2 class="text-2xl font-semibold">سؤالات متداول درباره {{ $product->name }}</h2>
-                                <div class="mt-5 space-y-3">
-                                    @foreach($product->faq_items as $faq)
-                                        @if(filled($faq['question'] ?? null) && filled($faq['answer'] ?? null))
-                                            <details class="rounded-2xl border border-[var(--sg-border)] p-5">
-                                                <summary class="cursor-pointer text-sm font-semibold">{{ $faq['question'] }}</summary>
-                                                <p class="mt-3 whitespace-pre-line text-sm leading-8 text-[var(--sg-stone)]">{{ $faq['answer'] }}</p>
-                                            </details>
-                                        @endif
-                                    @endforeach
-                                </div>
-                            </section>
-                        @endif
-                    </div>
-                </x-layout.container>
-            </section>
-        @endif
-
-        @if(!empty($product->key_features))
-            <section class="border-t border-[var(--sg-border)] bg-[var(--sg-surface)]">
-                <x-layout.container>
-                    <div class="py-12 sm:py-16">
-                        <div class="max-w-3xl">
-                            <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">ویژگی‌های اصلی</p>
-                            <h2 class="mt-3 text-2xl font-semibold">ویژگی‌های کلیدی {{ $product->name }}</h2>
-                        </div>
-                        <ul class="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                            @foreach($product->key_features as $feature)
-                                @if(filled($feature['label'] ?? null) && filled($feature['value'] ?? null))
-                                    <li class="rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
-                                        <strong class="block text-sm">{{ $feature['label'] }}</strong>
-                                        <span class="mt-2 block text-sm leading-7 text-[var(--sg-stone)]">{{ $feature['value'] }}</span>
-                                    </li>
-                                @endif
-                            @endforeach
-                        </ul>
-                    </div>
-                </x-layout.container>
-            </section>
-        @endif
-
-        {{-- =========================================================
-             اطلاعات محصول
-        ========================================================== --}}
-        <section class="border-t border-[var(--sg-border)]">
-
-            <x-layout.container>
-
-                <div class="py-14 sm:py-18">
-
-                    <div class="mb-8">
-
-                        <p class="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--sg-accent)]">
-                            نگاهی کوتاه
-                        </p>
-
-                        <h2 class="mt-3 text-2xl font-semibold">
-                            اطلاعات سریع
-                        </h2>
-
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
-
-                        <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
-
-                            <p class="text-[10px] uppercase tracking-[0.16em] text-[var(--sg-stone)]">
-                                دسته‌بندی
-                            </p>
-
-                            <p class="mt-3 text-sm font-semibold">
-                                {{ $product->category?->name ?? '—' }}
-                            </p>
-
-                        </div>
-
-                        <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
-
-                            <p class="text-[10px] uppercase tracking-[0.16em] text-[var(--sg-stone)]">
-                                SKU
-                            </p>
-
-                            <p class="mt-3 break-all text-sm font-semibold">
-                                {{ $product->sku }}
-                            </p>
-
-                        </div>
-
-                        <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
-
-                            <p class="text-[10px] uppercase tracking-[0.16em] text-[var(--sg-stone)]">
-                                وضعیت موجودی
-                            </p>
-
-                            <p class="mt-3 text-sm font-semibold">
-                                {{ $product->stock > 0 ? 'موجود در انبار' : 'ناموجود' }}
-                            </p>
-
-                        </div>
-
-                        <div class="rounded-3xl border border-[var(--sg-border)] bg-[var(--sg-white)] p-5">
-
-                            <p class="text-[10px] uppercase tracking-[0.16em] text-[var(--sg-stone)]">
-                                روش پرداخت
-                            </p>
-
-                            <p class="mt-3 text-sm font-semibold">
-                                {{ $installmentEnabled ? 'قابل خرید اقساطی' : 'پرداخت کامل' }}
-                            </p>
 
                         </div>
 

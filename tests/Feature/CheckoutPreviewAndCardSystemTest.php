@@ -85,7 +85,7 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
         Storage::disk('public')->assertExists($product->banner_image);
     }
 
-    public function test_product_page_displays_dashboard_managed_banner_with_its_alt_text(): void
+    public function test_product_page_does_not_render_the_redundant_dashboard_managed_banner(): void
     {
         Storage::fake('public');
         Storage::disk('public')->put('products/banners/sofa-banner.webp', 'fake-banner');
@@ -117,12 +117,12 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
 
         $this->get(route('product.show', $product->slug))
             ->assertOk()
-            ->assertSee(Storage::disk('public')->url('products/banners/sofa-banner.webp'), false)
-            ->assertSee('بنر معرفی مبل تست')
-            ->assertSee('aspect-[12/5]', false);
+            ->assertDontSee(Storage::disk('public')->url('products/banners/sofa-banner.webp'), false)
+            ->assertDontSee('بنر معرفی مبل تست')
+            ->assertDontSee('product-page-banner');
     }
 
-    public function test_product_admin_form_exposes_matching_primary_crop_and_page_banner_uploads(): void
+    public function test_product_admin_form_preserves_original_primary_image_and_omits_product_banner(): void
     {
         $admin = $this->user('admin', 'product-banner-admin@example.test');
         $category = Category::query()->create([
@@ -146,10 +146,11 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
         $this->actingAs($admin)
             ->get(route('admin.products.edit', $product))
             ->assertOk()
-            ->assertSee('data-crop-ratio="0.8"', false)
-            ->assertSee('data-crop-ratio="2.4"', false)
-            ->assertSee('بنر بالای صفحه محصول')
-            ->assertSee('banner_image_alt');
+            ->assertSee('data-preserve-original="1"', false)
+            ->assertSee('data-preview-target="product-image-preview"', false)
+            ->assertDontSee('بنر بالای صفحه محصول')
+            ->assertDontSee('name="banner_image"')
+            ->assertDontSee('name="banner_image_alt"');
     }
 
     public function test_customers_cannot_open_the_admin_checkout_preview(): void
@@ -417,7 +418,7 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
             ->assertOk()
             ->assertSee('ساختار محتوای قابل مدیریت')
             ->assertSee('مشخصات فنی محصول')
-            ->assertSee('راهنمای نگهداری و استفاده')
+            ->assertSee('راهنمای نگهداری')
             ->assertSee('محصولات مرتبط');
 
         $this->actingAs($admin)->put(route('admin.products.update', $product), [
@@ -470,16 +471,15 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
         $this->get(route('product.show', $product->slug))
             ->assertOk()
             ->assertSee('معرفی محصول')
-            ->assertSee('ویژگی‌های کلیدی')
+            ->assertSee('مشخصات و جزئیات بیشتر')
             ->assertSee('طراحی')
             ->assertSee('مدرن و مینیمال')
             ->assertSee('additionalProperty', false)
             ->assertSee('مشخصات فنی')
             ->assertSee('جنس بدنه')
             ->assertSee('چوب راش')
-            ->assertSee('راهنمای نگهداری و استفاده')
+            ->assertSee('راهنمای نگهداری')
             ->assertSee('با دستمال نرم و خشک تمیز شود.')
-            ->assertSee('سؤالات متداول درباره')
             ->assertSee('آیا روکش قابل شست‌وشو است؟')
             ->assertSee('میز جلو مبلی');
     }
@@ -947,6 +947,53 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
         $this->assertSame('initiated', $payment->status);
         $this->assertTrue((bool) data_get($payment->metadata, 'verification_pending'));
         $this->assertSame('pending', $order->fresh()->payment_status);
+    }
+
+    public function test_checkout_removes_a_soft_deleted_product_from_the_cart_instead_of_crashing(): void
+    {
+        $customer = $this->user('customer', 'checkout-stale-product@example.test');
+        $category = Category::query()->create([
+            'name' => 'دسته محصول حذف‌شده',
+            'slug' => 'checkout-stale-product-category',
+            'description' => null,
+            'is_active' => true,
+            'sort_order' => 1,
+        ]);
+        $product = Product::query()->create([
+            'category_id' => $category->id,
+            'name' => 'محصول حذف‌شده',
+            'slug' => 'checkout-stale-product',
+            'sku' => 'SG-CHECKOUT-STALE-001',
+            'short_description' => 'محصول تست',
+            'description' => 'محصول تست',
+            'price' => 1000000,
+            'stock' => 2,
+            'status' => 'active',
+            'installment_enabled' => false,
+        ]);
+        $cart = Cart::query()->create([
+            'user_id' => $customer->id,
+            'session_id' => null,
+            'status' => 'active',
+        ]);
+        $item = CartItem::query()->create([
+            'cart_id' => $cart->id,
+            'product_id' => $product->id,
+            'product_variant_id' => null,
+            'variant_key' => 'base',
+            'variant_options' => null,
+            'quantity' => 1,
+            'unit_price' => 1000000,
+        ]);
+
+        $product->delete();
+
+        $this->actingAs($customer)
+            ->get(route('checkout.index'))
+            ->assertRedirect(route('cart.index'))
+            ->assertSessionHas('error');
+
+        $this->assertDatabaseMissing('cart_items', ['id' => $item->id]);
     }
 
     private function validCheckoutPayload(User $customer): array

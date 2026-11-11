@@ -25,7 +25,7 @@ class CheckoutController extends Controller
     /**
      * Show checkout page.
      */
-    public function index(): View
+    public function index(): View|RedirectResponse
     {
         $cart = $this->getActiveCart();
 
@@ -35,11 +35,37 @@ class CheckoutController extends Controller
             'items.variant',
         ]);
 
-        abort_if(
-            $cart->items->isEmpty(),
-            404,
-            'سبد خرید خالی است.'
-        );
+        // A product may have been deleted or deactivated after it was added
+        // to the cart. Never dereference a missing product while rendering
+        // checkout; remove stale lines and let the customer review the cart.
+        $unavailableItemIds = $cart->items
+            ->filter(fn (CartItem $item): bool => (
+                ! $item->product
+                || $item->product->status !== 'active'
+                || ! $item->product->category?->is_active
+            ))
+            ->pluck('id');
+
+        if ($unavailableItemIds->isNotEmpty()) {
+            $cart->items()->whereIn('id', $unavailableItemIds)->delete();
+            $cart->unsetRelation('items')->load([
+                'items.product.category',
+                'items.product.images',
+                'items.variant',
+            ]);
+
+            if ($cart->items->isEmpty()) {
+                return redirect()
+                    ->route('cart.index')
+                    ->with('error', 'یکی از محصولات سبد دیگر قابل خرید نبود؛ سبد خرید به‌روزرسانی شد.');
+            }
+        }
+
+        if ($cart->items->isEmpty()) {
+            return redirect()
+                ->route('cart.index')
+                ->with('info', 'سبد خرید شما خالی است؛ ابتدا محصولی به سبد اضافه کنید.');
+        }
 
         $defaultAddress = Auth::user()
             ->defaultAddress()
@@ -489,6 +515,23 @@ class CheckoutController extends Controller
                 'in:digipay,snappay,torobpay',
             ],
         ]);
+
+        // Keep the backend closed until the real merchant contract and callback
+        // flow are explicitly approved. The UI gate alone is not a security boundary.
+        $gateway = $validated['gateway'];
+
+        if (
+            app()->isProduction()
+            && (
+                ! (bool) config('payment.production_ready', false)
+                || ! (bool) config("payment.{$gateway}.enabled", false)
+            )
+        ) {
+            return back()->with(
+                'info',
+                'درگاه پرداخت هنوز در حال راه‌اندازی است. سفارش شما محفوظ است و تا فعال‌شدن سرویس، هیچ مبلغی کسر نمی‌شود.'
+            );
+        }
 
         try {
             $result = $paymentService
