@@ -100,7 +100,7 @@ test('mobile customer login, cart and checkout remain usable through order creat
     await page.goto('/login', { waitUntil: 'domcontentloaded' });
     await page.locator('input[name="email"]').fill('demo@livora.test');
     await page.locator('input[name="password"]').fill('password');
-    await page.locator('button[type="submit"]').click();
+    await page.getByRole('button', { name: 'ورود به حساب' }).click();
 
     await expect(page).toHaveURL(/\/account(?:\/)?$/);
 
@@ -231,7 +231,7 @@ test('public category, product and banner image frames preserve their editor cro
         await page.setViewportSize(viewport);
 
         await page.goto('/categories', { waitUntil: 'domcontentloaded' });
-        await expectRatio('.sg-category-index-tile__media', 4 / 3, 'category directory card ratio');
+        await expectRatio('.sg-category-index-grid .sg-category-index-tile__media', 4 / 3, 'category directory card ratio');
 
         await page.goto('/', { waitUntil: 'domcontentloaded' });
         await expectRatio('.category-card-media', 4 / 3, 'homepage category card ratio');
