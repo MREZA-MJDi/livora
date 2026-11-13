@@ -27,6 +27,7 @@ class CategoryController extends Controller
         ]);
 
         $categories = Category::query()
+            ->with(['media'])
             ->withCount('products')
             ->when(filled($filters['search'] ?? null), function ($query) use ($filters): void {
                 $term = trim($filters['search']);
