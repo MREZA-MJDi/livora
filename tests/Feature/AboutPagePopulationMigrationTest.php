@@ -16,7 +16,7 @@ class AboutPagePopulationMigrationTest extends TestCase
             $table->string('title');
             $table->string('slug')->unique();
             $table->text('excerpt')->nullable();
-            $table->longText('body')->nullable();
+            $table->longText('body');
             $table->string('meta_title')->nullable();
             $table->text('meta_description')->nullable();
             $table->string('status')->default('draft');
@@ -32,7 +32,7 @@ class AboutPagePopulationMigrationTest extends TestCase
         DB::table('content_pages')->insert([
             'title' => 'درباره ما',
             'slug' => 'about',
-            'body' => null,
+            'body' => '',
             'status' => 'draft',
             'published_at' => null,
             'created_at' => now(),
