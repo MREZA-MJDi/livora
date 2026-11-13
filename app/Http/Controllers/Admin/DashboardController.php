@@ -175,24 +175,28 @@ class DashboardController extends Controller
         $storeSetupChecks = [
             [
                 'title' => 'نام برند و لوگوی فروشگاه',
+                'anchor' => 'brand-identity',
                 'description' => 'نامی که مشتری در سایت می‌بیند و لوگوی اصلی را ثبت کنید.',
                 'complete' => filled($storeSettings?->brand_name) && (filled($storeSettings?->logo_path) || filled($storeSettings?->logo_media_id)),
                 'optional' => false,
             ],
             [
                 'title' => 'راه‌های ارتباط با فروشگاه',
+                'anchor' => 'contact-details',
                 'description' => 'حداقل یک شماره تماس یا ایمیل معتبر ثبت کنید.',
                 'complete' => (bool) $storeSettings?->is_active && (filled($storeSettings?->phone) || filled($storeSettings?->email)),
                 'optional' => false,
             ],
             [
                 'title' => 'لینک‌های پایین سایت',
+                'anchor' => 'footer-links',
                 'description' => 'لینک‌های راهنما و دسترسی سریع فوتر را تنظیم کنید.',
                 'complete' => $footerLinks > 0,
                 'optional' => true,
             ],
             [
                 'title' => 'نمادهای اعتماد و مجوزها',
+                'anchor' => 'trust-and-legal',
                 'description' => 'فقط لینک نماد یا مجوز معتبر متعلق به همین کسب‌وکار را وارد کنید.',
                 'complete' => filled($storeSettings?->enamad_url) || filled($storeSettings?->samandehi_url),
                 'optional' => true,
