@@ -4,9 +4,9 @@
     $footerMenus = $storeSettings?->footer_menu ?? [];
     $footerPayments = $storeSettings?->payment_methods ?? [];
     $footerSocials = [
-        ['label' => 'اینستاگرام', 'url' => $storeSettings?->instagram_url],
-        ['label' => 'واتساپ', 'url' => $storeSettings?->whatsapp_url],
-        ['label' => 'تلگرام', 'url' => $storeSettings?->telegram_url],
+        ['label' => 'اینستاگرام', 'aria' => 'Instagram', 'icon' => 'instagram', 'url' => $storeSettings?->instagram_url],
+        ['label' => 'واتساپ', 'aria' => 'WhatsApp', 'icon' => 'whatsapp', 'url' => $storeSettings?->whatsapp_url],
+        ['label' => 'تلگرام', 'aria' => 'Telegram', 'icon' => 'telegram', 'url' => $storeSettings?->telegram_url],
         ['label' => 'ایتا', 'url' => $storeSettings?->eitaa_url],
         ['label' => 'بله', 'url' => $storeSettings?->bale_url],
     ];
@@ -60,7 +60,17 @@
                         <div class="flex flex-wrap gap-2">
                             @foreach($footerSocials as $social)
                                 @if(filled($social['url']))
-                                    <a href="{{ $social['url'] }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center rounded-full border border-white/15 px-3 py-2 text-xs text-white/70 transition hover:border-[var(--sg-accent)] hover:text-white">{{ $social['label'] }}</a>
+                                    <a href="{{ $social['url'] }}" target="_blank" rel="noopener noreferrer" aria-label="{{ $social['aria'] ?? $social['label'] }}" title="{{ $social['label'] }}" class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-white/75 transition hover:border-[var(--sg-accent)] hover:bg-white/[.06] hover:text-white">
+                                        @if(($social['icon'] ?? null) === 'instagram')
+                                            <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="currentColor" stroke="none"/></svg>
+                                        @elseif(($social['icon'] ?? null) === 'whatsapp')
+                                            <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.4 11.7a8.3 8.3 0 0 1-12.3 7.2L3 20l1.2-4.9a8.3 8.3 0 1 1 16.2-3.4Z"/><path d="M8.7 8.5c.3-.6.6-.6.9-.6h.5c.2 0 .4.1.5.4l.7 1.7c.1.2.1.4-.1.6l-.6.7c-.2.2-.2.4-.1.6.5.9 1.3 1.7 2.2 2.2.2.1.4.1.6-.1l.7-.6c.2-.2.4-.2.6-.1l1.7.7c.3.1.4.3.4.5v.5c0 .3 0 .6-.6.9-.5.3-1.2.4-2 .2-1.1-.3-2.4-1-3.6-2.2-1.2-1.2-1.9-2.5-2.2-3.6-.2-.8-.1-1.5.2-2Z"/></svg>
+                                        @elseif(($social['icon'] ?? null) === 'telegram')
+                                            <svg viewBox="0 0 24 24" class="h-4 w-4" fill="currentColor" aria-hidden="true"><path d="M21.7 3.3a1 1 0 0 0-1-.2L2.8 10a1 1 0 0 0 .1 1.9l4.6 1.5 1.7 5.2a1 1 0 0 0 1.8.2l2.6-3.5 4.5 3.3a1 1 0 0 0 1.6-.6l2.6-13.7a1 1 0 0 0-.6-1Zm-3.7 4.1-7.3 6.6a.8.8 0 0 0-.2.3l-.5 1.8-1-3.1 8.9-6.2Z"/></svg>
+                                        @else
+                                            <span class="text-[10px] font-semibold">{{ $social['label'] }}</span>
+                                        @endif
+                                    </a>
                                 @endif
                             @endforeach
                         </div>
