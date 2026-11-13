@@ -67,6 +67,16 @@ class PageController extends Controller
         return redirect()->route('admin.pages.index')->with('success', 'صفحه ذخیره شد.');
     }
 
+    public function preview(ContentPage $page): View
+    {
+        $page->load('media');
+
+        return view('pages.show', [
+            'page' => $page,
+            'robots' => 'noindex, nofollow',
+        ]);
+    }
+
     public function edit(ContentPage $page): View
     {
         $page->load('media');
