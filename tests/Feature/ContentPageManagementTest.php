@@ -48,6 +48,30 @@ class ContentPageManagementTest extends TestCase
             ->assertSee('ابعاد و کاربرد');
     }
 
+    public function test_admin_can_preview_a_draft_page_without_publishing_it(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $page = ContentPage::query()->create([
+            'user_id' => $admin->id,
+            'title' => 'پیش‌نمایش صفحه پیش‌نویس',
+            'slug' => 'draft-preview-test',
+            'body' => '<h2>محتوای آزمایشی</h2><p>این صفحه هنوز منتشر نشده است.</p>',
+            'status' => 'draft',
+            'seo_index' => false,
+            'seo_follow' => false,
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.pages.preview', $page))
+            ->assertOk()
+            ->assertSee('پیش‌نمایش صفحه پیش‌نویس')
+            ->assertSee('این صفحه هنوز منتشر نشده است.')
+            ->assertSee('noindex, nofollow', false);
+
+        $this->assertSame('draft', $page->fresh()->status);
+        $this->get('/draft-preview-test')->assertNotFound();
+    }
+
     public function test_admin_can_save_the_same_content_page_more_than_once(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);
