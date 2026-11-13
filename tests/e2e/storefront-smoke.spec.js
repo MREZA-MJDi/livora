@@ -261,7 +261,7 @@ test('about page contains the SillaGallery story and the footer offers useful sh
     await expect(page.getByRole('link', { name: 'مشاهده محصولات و مجموعه‌ها' })).toHaveAttribute('href', '/shop');
     await expect(page.locator('footer a[href$="/about"]').first()).toHaveAttribute('href', '/about');
     await expect(page.locator('footer a[href$="/terms"]').first()).toHaveAttribute('href', '/terms');
-    await expect(page.locator('footer').getByRole('link', { name: 'تماس' })).toHaveAttribute('href', '/contact');
+    await expect(page.locator('footer a[href$="/contact"]').last()).toHaveAttribute('href', '/contact');
 
     const overflow = await page.evaluate(() => (
         Math.max(document.documentElement.scrollWidth, document.body.scrollWidth)
