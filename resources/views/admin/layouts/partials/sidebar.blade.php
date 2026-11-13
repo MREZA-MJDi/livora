@@ -59,7 +59,7 @@
                 <span class="mt-1 block text-[10px] text-[var(--admin-muted)]">مدیریت فروشگاه اینترنتی</span>
             </span>
         </a>
-        <button type="button" @click="sidebarOpen = false" aria-label="بستن منو" class="flex h-9 w-9 items-center justify-center rounded-lg text-[var(--admin-muted)] hover:bg-[var(--admin-surface)] lg:hidden">✕</button>
+        <button type="button" @click="sidebarOpen = false" aria-label="بستن منوی مدیریت" class="flex h-9 w-9 items-center justify-center rounded-lg text-[var(--admin-muted)] hover:bg-[var(--admin-surface)] lg:hidden">✕</button>
     </div>
 
     <nav class="min-h-0 flex-1 overflow-y-auto px-3 py-4" aria-label="بخش‌های مدیریت">
