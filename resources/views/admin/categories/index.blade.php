@@ -36,6 +36,34 @@
 
     </div>
 
+    @if(session('success'))
+        <div role="status" class="admin-card border border-emerald-200 p-4 text-sm text-emerald-700">{{ session('success') }}</div>
+    @endif
+    @if(session('error'))
+        <div role="alert" class="admin-card border border-rose-200 p-4 text-sm text-rose-700">{{ session('error') }}</div>
+    @endif
+
+    <form method="GET" action="{{ route('admin.categories.index') }}" class="admin-card flex flex-col gap-3 p-4 sm:flex-row">
+        <label for="category-search" class="sr-only">جستجوی دسته‌بندی</label>
+        <input id="category-search" name="search" value="{{ request('search') }}" type="search" maxlength="120" class="admin-input min-w-0 flex-1" placeholder="جستجو بر اساس نام یا آدرس دسته‌بندی">
+        <label for="category-status" class="sr-only">وضعیت دسته‌بندی</label>
+        <select id="category-status" name="status" class="admin-select sm:w-44">
+            <option value="all" @selected(request('status', 'all') === 'all')>همه وضعیت‌ها</option>
+            <option value="active" @selected(request('status') === 'active')>فقط فعال</option>
+            <option value="inactive" @selected(request('status') === 'inactive')>فقط غیرفعال</option>
+        </select>
+        <div class="flex gap-2">
+            <button type="submit" class="admin-btn admin-btn-secondary">اعمال فیلتر</button>
+            @if(request()->hasAny(['search', 'status']))
+                <a href="{{ route('admin.categories.index') }}" class="admin-btn admin-btn-ghost">پاک‌کردن</a>
+            @endif
+        </div>
+    </form>
+
+    <div class="flex items-center justify-between text-xs text-[var(--admin-muted)]">
+        <span>نمایش {{ number_format($categories->firstItem() ?? 0) }} تا {{ number_format($categories->lastItem() ?? 0) }} از {{ number_format($categories->total()) }} دسته‌بندی</span>
+        <span>۱۵ دسته‌بندی در هر صفحه</span>
+    </div>
 
     <div class="admin-table-wrap">
 
@@ -49,6 +77,7 @@
                     <th>تصویر</th>
                     <th>نام</th>
                     <th>Slug</th>
+                    <th>تعداد محصولات</th>
                     <th>ترتیب</th>
                     <th>وضعیت</th>
                     <th class="text-left">عملیات</th>
@@ -72,9 +101,7 @@
                                 @if($category->image)
 
                                     <img
-                                        src="{{ str_starts_with($category->image, 'http://') || str_starts_with($category->image, 'https://') || str_starts_with($category->image, '//')
-                                                    ? $category->image
-                                                    : asset('storage/' . ltrim($category->image, '/')) }}"
+                                        src="{{ $category->image_url }}"
                                         alt="{{ $category->name }}"
                                         class="admin-image"
                                     >
@@ -107,6 +134,10 @@
 
                         <td class="font-mono text-xs">
                             {{ $category->slug ?? '—' }}
+                        </td>
+
+                        <td>
+                            {{ number_format($category->products_count) }}
                         </td>
 
                         <td>
@@ -194,7 +225,7 @@
                 @empty
 
                     <tr>
-                        <td colspan="7">
+                        <td colspan="8">
 
                             <div class="admin-empty">
 
