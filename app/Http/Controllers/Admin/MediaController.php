@@ -13,6 +13,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 use RuntimeException;
 use Throwable;
@@ -164,6 +165,15 @@ class MediaController extends Controller
             ->sum(fn (HomeSection $section) => collect(data_get($section->payload, 'slides', []))
                 ->filter(fn ($slide) => ($slide['image_path'] ?? null) === $media->path)
                 ->count());
+
+        // Rich-text images are embedded as public URLs in HTML rather than foreign keys.
+        // Keep them in the library while any CMS page or article still references them.
+        $embeddedPageUsages = Schema::hasTable('content_pages') && Schema::hasColumn('content_pages', 'body')
+            ? DB::table('content_pages')->where('body', 'like', '%'.$media->path.'%')->count()
+            : 0;
+        $embeddedArticleUsages = Schema::hasTable('blog_posts') && Schema::hasColumn('blog_posts', 'body')
+            ? DB::table('blog_posts')->where('body', 'like', '%'.$media->path.'%')->count()
+            : 0;
 
         $usages = [
             'تصاویر محصولات' => $media->productImages()->count(),
