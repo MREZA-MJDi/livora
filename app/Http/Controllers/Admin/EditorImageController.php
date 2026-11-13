@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\\Http\\Controllers\\Admin;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use App\\Http\\Controllers\\Controller;
+use App\\Support\\MediaLibrary;
+use Illuminate\\Http\\JsonResponse;
+use Illuminate\\Http\\Request;
 
 class EditorImageController extends Controller
 {
@@ -12,16 +13,27 @@ class EditorImageController extends Controller
     {
         $validated = $request->validate([
             'image' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
+            'alt' => ['nullable', 'string', 'max:255'],
         ]);
 
-        $path = $validated['image']->store('editor', 'public');
-        if (! $path) {
-            return response()->json(['message' => 'ذخیره تصویر انجام نشد.'], 500);
+        $media = MediaLibrary::store(
+            $validated['image'],
+            (int) $request->user()->id,
+            'editor',
+            $validated['alt'] ?? null,
+        );
+
+        if (! $media->url) {
+            return response()->json(['message' => 'تصویر ذخیره شد، اما نشانی عمومی آن در دسترس نیست.'], 422);
         }
 
         return response()->json([
-            'url' => asset('storage/' . $path),
-            'path' => $path,
+            'id' => $media->id,
+            'name' => $media->original_name,
+            'alt' => $media->alt,
+            'url' => $media->url,
+            'path' => $media->path,
+            'size' => $media->human_size,
         ], 201);
     }
 }
