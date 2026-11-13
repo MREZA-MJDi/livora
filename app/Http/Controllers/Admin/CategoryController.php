@@ -19,14 +19,30 @@ use Throwable;
 
 class CategoryController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
+        $filters = $request->validate([
+            'search' => ['nullable', 'string', 'max:120'],
+            'status' => ['nullable', 'in:all,active,inactive'],
+        ]);
+
         $categories = Category::query()
+            ->withCount('products')
+            ->when(filled($filters['search'] ?? null), function ($query) use ($filters): void {
+                $term = trim($filters['search']);
+                $query->where(function ($search) use ($term): void {
+                    $search->where('name', 'like', '%'.$term.'%')
+                        ->orWhere('slug', 'like', '%'.$term.'%');
+                });
+            })
+            ->when(($filters['status'] ?? 'all') === 'active', fn ($query) => $query->where('is_active', true))
+            ->when(($filters['status'] ?? 'all') === 'inactive', fn ($query) => $query->where('is_active', false))
             ->orderBy('sort_order')
             ->orderBy('name')
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
 
-        return view('admin.categories.index', compact('categories'));
+        return view('admin.categories.index', compact('categories', 'filters'));
     }
 
     public function create(ContentSeoAnalyzer $seoAnalyzer): View
