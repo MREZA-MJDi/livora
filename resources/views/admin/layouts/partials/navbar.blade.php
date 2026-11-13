@@ -28,7 +28,14 @@
 
         'admin.contact-messages.index' => 'پیام‌های کاربران',
         'admin.contact-messages.show' => 'مشاهده پیام',
-        'admin.contact-settings.edit' => 'تنظیمات تماس',
+        'admin.contact-settings.edit' => 'اطلاعات و هویت فروشگاه',
+        'admin.seo.edit' => 'تنظیمات کلی سئو',
+        'admin.seo.pages' => 'عنوان صفحات در گوگل',
+        'admin.seo.audit' => 'بررسی سلامت سئو',
+        'admin.pages.create' => 'افزودن صفحه سایت',
+        'admin.pages.edit' => 'ویرایش صفحه سایت',
+        'admin.blog.create' => 'نوشتن مقاله',
+        'admin.blog.edit' => 'ویرایش مقاله',
 
         'admin.home-sections.index' => 'مدیریت صفحه اصلی',
         'admin.home-sections.create' => 'افزودن بخش صفحه اصلی',
@@ -136,7 +143,7 @@
                 <div class="hidden items-center gap-2 text-[9px] text-[var(--admin-muted)] sm:flex">
 
                     <span>
-                        SillaGallery
+                        مدیریت فروشگاه
                     </span>
 
                     <span>
@@ -144,7 +151,7 @@
                     </span>
 
                     <span>
-                        ADMIN
+                        پنل مدیریت
                     </span>
 
                 </div>

@@ -106,7 +106,7 @@
             <div>
 
                 <div class="mb-2 text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--admin-accent)]">
-                    SillaGallery / ADMIN
+                    مدیریت فروشگاه
                 </div>
 
                 <h1 class="admin-title">
@@ -169,6 +169,46 @@
                     <span class="mt-2 block text-xs leading-6 text-[var(--admin-muted)]">پیام‌های ارسال‌شده از طرف مشتریان.</span>
                     <span class="mt-3 block text-xs font-semibold text-[var(--admin-accent)]">دیدن پیام‌ها ←</span>
                 </a>
+            </div>
+        </section>
+
+        {{-- Store setup checklist: plain-language tasks linked to their real settings form. --}}
+        @php
+            $requiredSetupRemaining = collect($storeSetupChecks)
+                ->where('complete', false)
+                ->where('optional', false)
+                ->count();
+        @endphp
+        <section class="admin-card space-y-4 p-5 sm:p-6">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                    <p class="text-xs font-semibold text-[var(--admin-accent)]">راهنمای راه‌اندازی</p>
+                    <h2 class="mt-2 text-lg font-bold text-[var(--admin-text)]">اطلاعات اصلی فروشگاه را تکمیل کنید</h2>
+                    <p class="admin-help mt-2">این موارد تعیین می‌کنند مشتری چه اطلاعاتی از کسب‌وکار شما در سایت ببیند. برای هر مورد روی «تنظیم» بزنید.</p>
+                </div>
+                <span class="rounded-full px-3 py-2 text-xs font-semibold {{ $requiredSetupRemaining === 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-800' }}">
+                    {{ $requiredSetupRemaining === 0 ? 'اطلاعات ضروری تکمیل است' : number_format($requiredSetupRemaining) . ' مورد ضروری باقی مانده' }}
+                </span>
+            </div>
+            <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                @foreach($storeSetupChecks as $check)
+                    <article class="rounded-xl border border-[var(--admin-border)] p-4">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-xs font-bold text-[var(--admin-text)]">{{ $check['title'] }}</span>
+                            @if($check['complete'])
+                                <span class="text-[10px] font-semibold text-emerald-700">تکمیل شده</span>
+                            @elseif($check['optional'])
+                                <span class="text-[10px] font-semibold text-[var(--admin-muted)]">اختیاری</span>
+                            @else
+                                <span class="text-[10px] font-semibold text-amber-700">نیاز به تکمیل</span>
+                            @endif
+                        </div>
+                        <p class="mt-2 min-h-10 text-xs leading-6 text-[var(--admin-muted)]">{{ $check['description'] }}</p>
+                        <a href="{{ route('admin.contact-settings.edit') }}#{{ $check['anchor'] }}" class="mt-3 inline-flex text-xs font-semibold text-[var(--admin-accent)]">
+                            {{ $check['complete'] ? 'مشاهده و ویرایش' : 'تنظیم این بخش' }} ←
+                        </a>
+                    </article>
+                @endforeach
             </div>
         </section>
 
@@ -1333,8 +1373,8 @@
 
         <section class="space-y-4">
             <div>
-                <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--admin-accent)]">CONTENT / SEO</p>
-                <h2 class="mt-2 text-xl font-bold text-[var(--admin-text)]">مدیریت محتوا و سلامت SEO</h2>
+                <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--admin-accent)]">محتوا و وضعیت سایت</p>
+                <h2 class="mt-2 text-xl font-bold text-[var(--admin-text)]">محتوای سایت و وضعیت دیده‌شدن در گوگل</h2>
                 <p class="mt-1 text-xs text-[var(--admin-muted)]">وضعیت‌ها مستقیماً از جدول‌های عملیاتی سایت محاسبه می‌شوند.</p>
             </div>
             <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">

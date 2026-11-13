@@ -13,6 +13,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 use RuntimeException;
 use Throwable;
@@ -51,6 +52,44 @@ class MediaController extends Controller
         };
 
         $media = $query->paginate(24)->withQueryString();
+
+        // Editor images are referenced inside CMS HTML. They do not have a
+        // foreign-key pivot, so calculate their usage for the current page
+        // in two bounded queries instead of hiding those connections from admins.
+        $paths = $media->getCollection()->pluck('path')->filter()->unique()->values();
+        $embeddedPageRows = collect();
+        $embeddedArticleRows = collect();
+
+        if ($paths->isNotEmpty() && Schema::hasTable('content_pages') && Schema::hasColumn('content_pages', 'body')) {
+            $embeddedPageRows = DB::table('content_pages')
+                ->select(['id', 'body'])
+                ->where(function ($builder) use ($paths): void {
+                    foreach ($paths as $path) {
+                        $builder->orWhere('body', 'like', '%'.$path.'%');
+                    }
+                })
+                ->get();
+        }
+
+        if ($paths->isNotEmpty() && Schema::hasTable('blog_posts') && Schema::hasColumn('blog_posts', 'body')) {
+            $embeddedArticleRows = DB::table('blog_posts')
+                ->select(['id', 'body'])
+                ->where(function ($builder) use ($paths): void {
+                    foreach ($paths as $path) {
+                        $builder->orWhere('body', 'like', '%'.$path.'%');
+                    }
+                })
+                ->get();
+        }
+
+        $media->getCollection()->each(function (Media $item) use ($embeddedPageRows, $embeddedArticleRows): void {
+            $item->setAttribute('embedded_page_usage_count', $embeddedPageRows
+                ->filter(fn ($row): bool => str_contains((string) $row->body, (string) $item->path))
+                ->count());
+            $item->setAttribute('embedded_article_usage_count', $embeddedArticleRows
+                ->filter(fn ($row): bool => str_contains((string) $row->body, (string) $item->path))
+                ->count());
+        });
 
         return view('admin.media.index', compact('media', 'filters'));
     }
@@ -165,6 +204,15 @@ class MediaController extends Controller
                 ->filter(fn ($slide) => ($slide['image_path'] ?? null) === $media->path)
                 ->count());
 
+        // Rich-text images are embedded as public URLs in HTML rather than foreign keys.
+        // Keep them in the library while any CMS page or article still references them.
+        $embeddedPageUsages = Schema::hasTable('content_pages') && Schema::hasColumn('content_pages', 'body')
+            ? DB::table('content_pages')->where('body', 'like', '%'.$media->path.'%')->count()
+            : 0;
+        $embeddedArticleUsages = Schema::hasTable('blog_posts') && Schema::hasColumn('blog_posts', 'body')
+            ? DB::table('blog_posts')->where('body', 'like', '%'.$media->path.'%')->count()
+            : 0;
+
         $usages = [
             'تصاویر محصولات' => $media->productImages()->count(),
             'بنر محصولات' => $media->productBanners()->count(),
@@ -172,6 +220,8 @@ class MediaController extends Controller
             'تصاویر کارت دسته‌بندی' => $media->categoryCards()->count(),
             'بنرهای دسته‌بندی' => $media->categoryBanners()->count(),
             'مقاله‌ها' => $media->blogPosts()->count(),
+            'تصاویر داخل متن صفحات' => $embeddedPageUsages,
+            'تصاویر داخل متن مقاله‌ها' => $embeddedArticleUsages,
             'صفحه‌ها' => $media->contentPages()->count(),
             'بنر فروشگاه' => $media->shopBannerSettings()->count(),
             'تصویر پیش‌فرض Open Graph' => $media->seoSettings()->count(),

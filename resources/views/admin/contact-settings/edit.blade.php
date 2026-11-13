@@ -1,7 +1,7 @@
 @extends('admin.layouts.app')
 
-@section('title', 'اطلاعات تماس')
-@section('page_title', 'مدیریت تماس با ما')
+@section('title', 'اطلاعات و هویت فروشگاه')
+@section('page_title', 'اطلاعات و هویت فروشگاه')
 
 @section('content')
 @php
@@ -13,10 +13,25 @@
 @endphp
 <div class="mx-auto max-w-5xl space-y-6">
     <header>
-        <p class="mb-2 text-xs font-medium text-[var(--admin-accent)]">CONTENT / CONTACT</p>
-        <h1 class="admin-title">مدیریت صفحه تماس با ما</h1>
-        <p class="admin-subtitle mt-2">اطلاعات تماس و پرسش‌های متداول این فرم مستقیماً از این بخش در سایت نمایش داده می‌شوند.</p>
+        <p class="mb-2 text-xs font-medium text-[var(--admin-accent)]">تنظیمات فروشگاه</p>
+        <h1 class="admin-title">اطلاعات و هویت فروشگاه</h1>
+        <p class="admin-subtitle mt-2">از همین صفحه نام و لوگوی برند، راه‌های ارتباطی، نمادها، لینک‌های فوتر و محتوای صفحه تماس را مدیریت کنید. هر تغییر پس از ذخیره در بخش مربوط به خودش در سایت نمایش داده می‌شود.</p>
     </header>
+
+
+    <nav aria-label="دسترسی سریع به تنظیمات" class="admin-card p-4">
+        <p class="mb-3 text-xs font-bold text-[var(--admin-text)]">مستقیم برو به بخشی که می‌خواهی تغییر بدهی</p>
+        <div class="flex flex-wrap gap-2">
+            <a href="#brand-identity" class="admin-btn admin-btn-secondary">نام و لوگوی برند</a>
+            <a href="#trust-and-legal" class="admin-btn admin-btn-secondary">نمادها و مجوزها</a>
+            <a href="#footer-links" class="admin-btn admin-btn-secondary">فوتر سایت</a>
+            <a href="#contact-details" class="admin-btn admin-btn-secondary">تلفن و ایمیل</a>
+            <a href="#store-location" class="admin-btn admin-btn-secondary">آدرس و نقشه</a>
+            <a href="#customer-policies" class="admin-btn admin-btn-secondary">شرایط خرید و خدمات</a>
+            <a href="#contact-page-content" class="admin-btn admin-btn-secondary">متن صفحه تماس</a>
+            <a href="#contact-faqs" class="admin-btn admin-btn-secondary">پرسش‌های متداول</a>
+        </div>
+    </nav>
 
     @if(session('success'))
         <div class="admin-card border border-emerald-200 p-4 text-sm text-emerald-700">{{ session('success') }}</div>
@@ -26,7 +41,7 @@
         @csrf
         @method('PUT')
 
-        <section class="admin-card space-y-5 p-6">
+        <section id="brand-identity" class="admin-card space-y-5 p-6">
             <div>
                 <h2 class="text-base font-bold">هویت و ارتباطات فروشگاه</h2>
                 <p class="admin-help mt-1">فقط مقدارهای ثبت‌شده در سایت نمایش داده می‌شوند؛ وارد نکردن یک مقدار، همان بخش را پنهان می‌کند.</p>
@@ -50,17 +65,17 @@
             <label class="flex items-center gap-2 rounded-xl border border-[var(--admin-border)] px-4 py-3 text-xs"><input type="hidden" name="floating_actions_enabled" value="0"><input type="checkbox" name="floating_actions_enabled" value="1" class="admin-checkbox" @checked(old('floating_actions_enabled', $settings->floating_actions_enabled ?? false))> نمایش دکمه‌های شناور ارتباط در سایت</label>
         </section>
 
-        <section class="admin-card space-y-5 p-6">
-            <div><h2 class="text-base font-bold">معرفی برند و نشان‌های رسمی</h2><p class="admin-help mt-1">نام، لوگو و توضیح برند از همین منبع برای هدر، فوتر و اطلاعات سازمانی SEO استفاده می‌شوند.</p></div>
+        <section id="trust-and-legal" class="admin-card space-y-5 p-6">
+            <div><h2 class="text-base font-bold">معرفی برند و نمادهای رسمی</h2><p class="admin-help mt-1">نام و توضیح برند در هدر، فوتر و اطلاعات سازمانی سایت استفاده می‌شود. فقط لینک نماد یا مجوز معتبر متعلق به همین کسب‌وکار را وارد کنید؛ نماد دیگران را کپی نکنید.</p></div>
             <div class="grid gap-4 sm:grid-cols-2">
                 <label class="sm:col-span-2"><span class="admin-label">توضیح برند</span><textarea name="brand_description" rows="3" maxlength="3000" class="admin-textarea">{{ old('brand_description', $settings->brand_description ?? '') }}</textarea>@error('brand_description')<p class="admin-error">{{ $message }}</p>@enderror</label>
-                <label><span class="admin-label">لینک نماد اعتماد (Enamad)</span><input name="enamad_url" type="url" dir="ltr" class="admin-input" value="{{ old('enamad_url', $settings->enamad_url ?? '') }}">@error('enamad_url')<p class="admin-error">{{ $message }}</p>@enderror</label>
-                <label><span class="admin-label">لینک ساماندهی</span><input name="samandehi_url" type="url" dir="ltr" class="admin-input" value="{{ old('samandehi_url', $settings->samandehi_url ?? '') }}">@error('samandehi_url')<p class="admin-error">{{ $message }}</p>@enderror</label>
+                <label><span class="admin-label">لینک استعلام نماد اعتماد الکترونیکی</span><input name="enamad_url" type="url" dir="ltr" class="admin-input" value="{{ old('enamad_url', $settings->enamad_url ?? '') }}">@error('enamad_url')<p class="admin-error">{{ $message }}</p>@enderror</label>
+                <label><span class="admin-label">لینک صفحه ساماندهی</span><input name="samandehi_url" type="url" dir="ltr" class="admin-input" value="{{ old('samandehi_url', $settings->samandehi_url ?? '') }}">@error('samandehi_url')<p class="admin-error">{{ $message }}</p>@enderror</label>
                 <label class="sm:col-span-2"><span class="admin-label">متن کپی‌رایت</span><input name="copyright_text" maxlength="255" class="admin-input" value="{{ old('copyright_text', $settings->copyright_text ?? '') }}" placeholder="تمام حقوق برای سیلا گالری محفوظ است.">@error('copyright_text')<p class="admin-error">{{ $message }}</p>@enderror</label>
             </div>
         </section>
 
-        <section class="admin-card space-y-5 p-6" x-data="footerSettingsBuilder(
+        <section id="footer-links" class="admin-card space-y-5 p-6" x-data="footerSettingsBuilder(
             @js(old('footer_menu.shop', data_get($settings->footer_menu, 'shop', []))),
             @js(old('footer_menu.guide', data_get($settings->footer_menu, 'guide', []))),
             @js(old('footer_menu.contact', data_get($settings->footer_menu, 'contact', []))),
@@ -72,7 +87,7 @@
                     <div class="flex items-center justify-between gap-3"><h3 class="font-semibold" x-text="group.label"></h3><button type="button" class="admin-btn admin-btn-secondary" @click="addLink(group.key)">افزودن لینک</button></div>
                     <template x-for="(link, index) in menus[group.key]" :key="group.key + '-' + index">
                         <div class="grid gap-2 sm:grid-cols-[1fr_1.4fr_auto]">
-                            <input class="admin-input" :name="'footer_menu[' + group.key + '][' + index + '][label]'" x-model="link.label" placeholder="عنوان لینک">
+                            <input class="admin-input" :name="'footer_menu[' + group.key + '][' + index + '][label]'" x-model="link.label" placeholder="عنوانی که مشتری می‌بیند">
                             <input class="admin-input" dir="ltr" :name="'footer_menu[' + group.key + '][' + index + '][url]'" x-model="link.url" placeholder="/shop">
                             <button type="button" class="admin-btn admin-btn-danger" @click="menus[group.key].splice(index, 1)">حذف</button>
                         </div>
@@ -81,12 +96,12 @@
                 </div>
             </template>
             <div class="space-y-3 rounded-2xl border border-[var(--admin-border)] p-4">
-                <div class="flex items-center justify-between gap-3"><h3 class="font-semibold">روش‌های پرداخت و نشان‌های تصویری</h3><button type="button" class="admin-btn admin-btn-secondary" @click="payments.push({label:'', image:'', url:''})">افزودن نشان</button></div>
+                <div class="flex items-center justify-between gap-3"><h3 class="font-semibold">نشان‌های پرداخت و اعتماد</h3><button type="button" class="admin-btn admin-btn-secondary" @click="payments.push({label:'', image:'', url:''})">افزودن نشان</button></div>
                 <template x-for="(item, index) in payments" :key="'payment-' + index">
                     <div class="grid gap-2 sm:grid-cols-[1fr_1.3fr_1.3fr_auto]">
                         <input class="admin-input" :name="'payment_methods[' + index + '][label]'" x-model="item.label" placeholder="عنوان">
                         <div class="space-y-2">
-                            <input class="admin-input" dir="ltr" :name="'payment_methods[' + index + '][image]'" x-model="item.image" @input="item.image_error = false" placeholder="URL تصویر نشان">
+                            <input class="admin-input" dir="ltr" :name="'payment_methods[' + index + '][image]'" x-model="item.image" @input="item.image_error = false" placeholder="نشانی تصویر نشان">
                             <div class="flex min-h-12 items-center gap-3 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] p-2">
                                 <template x-if="item.image && !item.image_error">
                                     <img :src="item.image" :alt="item.label || 'پیش‌نمایش نشان پرداخت'" class="h-8 max-w-24 object-contain" x-on:error="item.image_error = true" x-on:load="item.image_error = false">
@@ -104,7 +119,7 @@
             </div>
         </section>
 
-        <section class="admin-card space-y-5 p-6">
+        <section id="contact-details" class="admin-card space-y-5 p-6">
             <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
                     <h2 class="text-base font-bold">اطلاعات اصلی تماس</h2>
@@ -135,6 +150,7 @@
         </section>
 
         <section
+            id="store-location"
             class="admin-card space-y-5 p-6"
             x-data="{
                 address: @js(old('address', $settings->address ?? '')),
@@ -255,6 +271,11 @@
                 </div>
             </div>
 
+            <div id="customer-policies" class="space-y-4 border-t border-[var(--admin-border)] pt-5">
+                <div>
+                    <h2 class="text-base font-bold">شرایط خرید و خدمات پس از فروش</h2>
+                    <p class="admin-help mt-1">متن ضمانت، ارسال، نصب و مرجوعی که مشتری در بخش‌های عمومی سایت می‌خواند.</p>
+                </div>
             @foreach(['warranty_text' => 'متن گارانتی', 'shipping_text' => 'متن ارسال', 'installation_text' => 'متن نصب/خدمات', 'returns_text' => 'متن مرجوعی'] as $field => $label)
                 <div>
                     <label class="admin-label" for="{{ $field }}">{{ $label }}</label>
@@ -262,9 +283,10 @@
                     @error($field)<p class="admin-error mt-1">{{ $message }}</p>@enderror
                 </div>
             @endforeach
+            </div>
         </section>
 
-        <section class="admin-card space-y-5 p-6">
+        <section id="contact-card-labels" class="admin-card space-y-5 p-6">
             <h2 class="text-base font-bold">عنوان و توضیحات کارت‌ها</h2>
             <div class="grid gap-4 sm:grid-cols-2">
                 @foreach(['phone_label'=>'عنوان کارت تلفن','email_label'=>'عنوان کارت ایمیل','support_label'=>'عنوان پشتیبانی','online_label'=>'عنوان ارتباط آنلاین'] as $field=>$label)
@@ -313,7 +335,7 @@
                 'success_message' => ['label' => 'پیام موفقیت ارسال فرم', 'type' => 'textarea', 'default' => 'پیام شما با موفقیت ارسال شد.'],
             ];
         @endphp
-        <section class="admin-card space-y-5 p-6">
+        <section id="contact-page-content" class="admin-card space-y-5 p-6">
             <h2 class="text-base font-bold">متن‌ها و بخش‌های صفحه تماس</h2>
             <p class="admin-help">تیترها، توضیحات، دکمه‌ها و پیام موفقیت از این بخش کنترل می‌شوند. ساختار و چیدمان صفحه ثابت می‌ماند.</p>
             <div class="grid gap-4 sm:grid-cols-2">
@@ -331,7 +353,7 @@
             </div>
         </section>
 
-        <section class="admin-card space-y-5 p-6" x-data="{
+        <section id="contact-faqs" class="admin-card space-y-5 p-6" x-data="{
             items: @js(old('faqs', $settings->faqs ?? [])),
             add() { this.items.push({ question: '', answer: '' }); },
             remove(index) { this.items.splice(index, 1); }
@@ -363,7 +385,10 @@
         </section>
 
         <div class="flex flex-wrap justify-between gap-3">
-            <a href="{{ route('contact') }}" target="_blank" rel="noopener" class="admin-btn admin-btn-secondary">مشاهده صفحه تماس</a>
+            <div class="flex flex-wrap gap-2">
+                <a href="{{ route('contact') }}" target="_blank" rel="noopener" class="admin-btn admin-btn-secondary">پیش‌نمایش صفحه تماس</a>
+                <a href="{{ route('home') }}" target="_blank" rel="noopener" class="admin-btn admin-btn-secondary">مشاهده صفحه اصلی و فوتر</a>
+            </div>
             <button type="submit" class="admin-btn admin-btn-primary">ذخیره تنظیمات تماس</button>
         </div>
     </form>

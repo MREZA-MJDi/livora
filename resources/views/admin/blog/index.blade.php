@@ -30,6 +30,9 @@
                             <td class="p-4 text-xs" dir="ltr">{{ $post->seo_index ? 'index' : 'noindex' }} / {{ $post->seo_follow ? 'follow' : 'nofollow' }}</td>
                             <td class="p-4">
                                 <div class="flex items-center gap-3">
+                                    @if($post->status === 'published')
+                                        <a class="text-xs text-[var(--admin-text-soft)]" target="_blank" rel="noopener" href="{{ route('blog.show', $post->slug) }}">مشاهده سایت</a>
+                                    @endif
                                     <a class="text-xs font-semibold text-[var(--admin-accent)]" href="{{ route('admin.blog.edit', $post) }}">ویرایش</a>
                                     <form method="POST" action="{{ route('admin.blog.destroy', $post) }}" onsubmit="return confirm('این مقاله حذف شود؟')">@csrf @method('DELETE')<button class="text-xs text-red-500">حذف</button></form>
                                 </div>

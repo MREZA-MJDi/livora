@@ -33,10 +33,12 @@
         $seoOgDescription = trim($__env->yieldContent('og_description')) ?: $seoDescription;
         $seoOgImage = $pageSeo?->og_image ?: (trim($__env->yieldContent('og_image')) ?: $siteSeo->default_og_image_url);
         $seoOgType = trim($__env->yieldContent('og_type')) ?: 'website';
+        $seoRobots = isset($previewRobots) ? trim((string) $previewRobots) : '';
     @endphp
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="{{ $seoDescription }}">
+    @if($seoRobots !== '')<meta name="robots" content="{{ $seoRobots }}">@endif
     <meta name="theme-color" content="#f3f1ed">
     <meta property="og:site_name" content="{{ $brandName }}">
     <meta property="og:type" content="{{ $seoOgType }}">

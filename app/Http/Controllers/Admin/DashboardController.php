@@ -6,6 +6,7 @@ use App\Helpers\JalaliHelper;
 use App\Http\Controllers\Controller;
 use App\Models\BlogPost;
 use App\Models\ContactMessage;
+use App\Models\ContactSetting;
 use App\Models\ContentPage;
 use App\Models\HomeSection;
 use App\Models\Order;
@@ -164,6 +165,44 @@ class DashboardController extends Controller
         $seoSettings = SeoSetting::current();
         $seoGlobalGateOpen = $seoSettings->indexing_enabled && $seoSettings->following_enabled;
 
+        // Actionable setup checks for store owners who are not familiar with the admin.
+        $storeSettings = ContactSetting::query()->first();
+        $footerLinks = collect($storeSettings?->footer_menu ?? [])
+            ->flatten(1)
+            ->filter(fn ($link) => filled(data_get($link, 'label')) && filled(data_get($link, 'url')))
+            ->count();
+
+        $storeSetupChecks = [
+            [
+                'title' => 'نام برند و لوگوی فروشگاه',
+                'anchor' => 'brand-identity',
+                'description' => 'نامی که مشتری در سایت می‌بیند و لوگوی اصلی را ثبت کنید.',
+                'complete' => filled($storeSettings?->brand_name) && (filled($storeSettings?->logo_path) || filled($storeSettings?->logo_media_id)),
+                'optional' => false,
+            ],
+            [
+                'title' => 'راه‌های ارتباط با فروشگاه',
+                'anchor' => 'contact-details',
+                'description' => 'حداقل یک شماره تماس یا ایمیل معتبر ثبت کنید.',
+                'complete' => (bool) $storeSettings?->is_active && (filled($storeSettings?->phone) || filled($storeSettings?->email)),
+                'optional' => false,
+            ],
+            [
+                'title' => 'لینک‌های پایین سایت',
+                'anchor' => 'footer-links',
+                'description' => 'لینک‌های راهنما و دسترسی سریع فوتر را تنظیم کنید.',
+                'complete' => $footerLinks > 0,
+                'optional' => true,
+            ],
+            [
+                'title' => 'نمادهای اعتماد و مجوزها',
+                'anchor' => 'trust-and-legal',
+                'description' => 'فقط لینک نماد یا مجوز معتبر متعلق به همین کسب‌وکار را وارد کنید.',
+                'complete' => filled($storeSettings?->enamad_url) || filled($storeSettings?->samandehi_url),
+                'optional' => true,
+            ],
+        ];
+
         return view('admin.dashboard.index', [
             'totalProducts' => (int) ($productStats->total_products ?? 0),
             'activeProducts' => (int) ($productStats->active_products ?? 0),
@@ -207,6 +246,7 @@ class DashboardController extends Controller
             'seoGlobalGateOpen' => $seoGlobalGateOpen,
             'heroSection' => $heroSection,
             'heroSlidesCount' => $heroSlidesCount,
+            'storeSetupChecks' => $storeSetupChecks,
 
             'featuredProductsCount' => (int) ($productStats->featured_products ?? 0),
             'newProductsCount' => (int) ($productStats->new_products ?? 0),

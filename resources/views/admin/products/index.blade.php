@@ -80,7 +80,10 @@
                             @if($product->is_home_hero)<span class="admin-badge admin-badge-success">انتخاب شده</span>@endif
                         </form>
                         <div class="flex items-center gap-1.5">
-                            <a href="{{ route('admin.products.show', $product) }}" class="admin-btn admin-btn-ghost px-2.5 py-1.5 text-xs">مشاهده</a>
+                            @if($product->status === 'active' && $product->category?->is_active)
+                                <a href="{{ route('product.show', $product->slug) }}" target="_blank" rel="noopener" class="admin-btn admin-btn-ghost px-2.5 py-1.5 text-xs">سایت</a>
+                            @endif
+                            <a href="{{ route('admin.products.show', $product) }}" class="admin-btn admin-btn-ghost px-2.5 py-1.5 text-xs">جزئیات</a>
                             <a href="{{ route('admin.products.edit', $product) }}" class="admin-btn admin-btn-secondary px-2.5 py-1.5 text-xs">ویرایش</a>
                             <form action="{{ route('admin.products.destroy', $product) }}" method="POST" onsubmit="return confirm('آیا از حذف این محصول مطمئن هستید؟');">
                                 @csrf
