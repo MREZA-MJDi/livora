@@ -47,7 +47,7 @@ class AdminOrderManagementTest extends TestCase
             ->get(route('admin.orders.show', $order))
             ->assertOk()
             ->assertSee('وضعیت سفارش')
-            ->assertSee('پرداخت این سفارش');
+            ->assertSee('وضعیت پرداخت');
 
         $this->patch(route('admin.orders.status', $order), [
             'status' => 'processing',
