@@ -1,11 +1,11 @@
 <?php
 
-namespace App\\Http\\Controllers\\Admin;
+namespace App\Http\Controllers\Admin;
 
-use App\\Http\\Controllers\\Controller;
-use App\\Support\\MediaLibrary;
-use Illuminate\\Http\\JsonResponse;
-use Illuminate\\Http\\Request;
+use App\Http\Controllers\Controller;
+use App\Support\MediaLibrary;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class EditorImageController extends Controller
 {
@@ -22,10 +22,6 @@ class EditorImageController extends Controller
             'editor',
             $validated['alt'] ?? null,
         );
-
-        if (! $media->url) {
-            return response()->json(['message' => 'تصویر ذخیره شد، اما نشانی عمومی آن در دسترس نیست.'], 422);
-        }
 
         return response()->json([
             'id' => $media->id,
