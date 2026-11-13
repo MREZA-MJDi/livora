@@ -98,7 +98,7 @@
 
                             <div class="admin-image-thumb">
 
-                                @if($category->image)
+                                @if($category->image_url)
 
                                     <img
                                         src="{{ $category->image_url }}"
