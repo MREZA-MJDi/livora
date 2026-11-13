@@ -24,13 +24,13 @@ final class CategoryCatalogRegressionTest extends TestCase
         $secondPage->assertSee('نمایش 13 تا 21', false);
         $secondPage->assertSee('از 21 مجموعه', false);
 
-        $dom = new \\DOMDocument();
+        $dom = new \DOMDocument();
         $previousLibxmlState = libxml_use_internal_errors(true);
         $dom->loadHTML(mb_convert_encoding($secondPage->getContent(), 'HTML-ENTITIES', 'UTF-8'));
         libxml_clear_errors();
         libxml_use_internal_errors($previousLibxmlState);
 
-        $xpath = new \\DOMXPath($dom);
+        $xpath = new \DOMXPath($dom);
         $grid = $xpath->query('//*[contains(concat(" ", normalize-space(@class), " "), " sg-category-index-grid ")]')->item(0);
         $this->assertNotNull($grid);
 
@@ -54,7 +54,7 @@ final class CategoryCatalogRegressionTest extends TestCase
 
         // Eager-loaded category media/product relations must stay bounded;
         // rendering one more category must not issue per-card SQL queries.
-        $this->assertLessThanOrEqual(14, count($selectSql), implode("\\n", $selectSql));
+        $this->assertLessThanOrEqual(14, count($selectSql), implode(PHP_EOL, $selectSql));
     }
 
     private function createCategories(int $count): void
