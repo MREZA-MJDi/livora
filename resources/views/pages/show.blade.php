@@ -3,7 +3,7 @@
 @php
     $siteBrandName = $storeSettings?->brand_name ?: config('app.name');
     $isAboutPage = $page->slug === 'about';
-    $aboutExcerpt = 'با سیلا گالری بیشتر آشنا شوید؛ نگاهی به شیوه انتخاب محصولات، تجربه خرید و راه‌های ارتباط با ما.';
+    $aboutExcerpt = 'با رویکرد سیلا گالری در انتخاب مبلمان و عناصر خانه، توجه به طراحی، کیفیت و تجربه خرید آشنا شوید.';
 @endphp
 
 @section('title', $page->meta_title ?: ($page->title . ' | ' . $siteBrandName))
@@ -53,28 +53,28 @@
                     <section class="max-w-3xl">
                         <p class="sg-eyebrow">OUR APPROACH</p>
                         <h2 class="mt-3 text-2xl font-semibold leading-9 text-[var(--sg-ink)]">خرید خوب، از یک انتخاب روشن شروع می‌شود</h2>
-                        <p class="mt-4 text-sm leading-8 text-[var(--sg-stone)]">سیلا گالری با این نگاه شکل گرفته است که خرید اینترنتی باید ساده، قابل‌فهم و دلنشین باشد. می‌خواهیم پیش از ثبت سفارش، فرصت کافی برای دیدن محصولات، مقایسه انتخاب‌ها و بررسی اطلاعات هر کالا در اختیار شما باشد.</p>
+                        <p class="mt-4 text-sm leading-8 text-[var(--sg-stone)]">سیلا گالری با تمرکز بر مبلمان و عناصر خانه، تلاش می‌کند مسیر پیدا کردن انتخاب مناسب را روشن‌تر و دلنشین‌تر کند. هر فضا نیازها و سلیقه خودش را دارد؛ برای همین باور داریم انتخاب خوب فقط به ظاهر یک محصول محدود نیست.</p>
                     </section>
                     <div class="grid gap-4 md:grid-cols-3">
                         <article class="rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-cream)] p-5">
                             <span class="text-xs font-semibold tracking-wider text-[var(--sg-accent)]">01 · انتخاب</span>
-                            <h3 class="mt-3 font-semibold text-[var(--sg-ink)]">با حوصله بررسی کنید</h3>
-                            <p class="mt-2 text-sm leading-7 text-[var(--sg-stone)]">تصاویر، مشخصات و اطلاعات درج‌شده برای هر محصول را ببینید و گزینه‌های مناسب خودتان را پیدا کنید.</p>
+                            <h3 class="mt-3 font-semibold text-[var(--sg-ink)]">به فضای خودتان فکر کنید</h3>
+                            <p class="mt-2 text-sm leading-7 text-[var(--sg-stone)]">ابعاد، سبک و کاربرد محصول را با نیاز و فضای موردنظرتان مقایسه کنید.</p>
                         </article>
                         <article class="rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-cream)] p-5">
                             <span class="text-xs font-semibold tracking-wider text-[var(--sg-accent)]">02 · سفارش</span>
-                            <h3 class="mt-3 font-semibold text-[var(--sg-ink)]">مراحل خرید را دنبال کنید</h3>
-                            <p class="mt-2 text-sm leading-7 text-[var(--sg-stone)]">محصول موردنظر را به سبد خرید اضافه کنید و پیش از نهایی‌کردن سفارش، جزئیات و مبلغ آن را بررسی کنید.</p>
+                            <h3 class="mt-3 font-semibold text-[var(--sg-ink)]">ویژگی‌ها را بشناسید</h3>
+                            <p class="mt-2 text-sm leading-7 text-[var(--sg-stone)]">مشخصات، جنس و اطلاعات درج‌شده در صفحه محصول را بخوانید و در صورت نیاز پیش از خرید سوال کنید.</p>
                         </article>
                         <article class="rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-cream)] p-5">
                             <span class="text-xs font-semibold tracking-wider text-[var(--sg-accent)]">03 · ارتباط</span>
-                            <h3 class="mt-3 font-semibold text-[var(--sg-ink)]">اگر سوالی دارید، با ما در میان بگذارید</h3>
-                            <p class="mt-2 text-sm leading-7 text-[var(--sg-stone)]">برای پرسش درباره محصولات یا روند خرید، از راه‌های ارتباطی ثبت‌شده در صفحه تماس استفاده کنید.</p>
+                            <h3 class="mt-3 font-semibold text-[var(--sg-ink)]">با ما در ارتباط باشید</h3>
+                            <p class="mt-2 text-sm leading-7 text-[var(--sg-stone)]">برای پرسش درباره ویژگی‌ها، موجودی یا روند سفارش، از اطلاعات ثبت‌شده در صفحه تماس استفاده کنید.</p>
                         </article>
                     </div>
                     <section class="max-w-3xl">
                         <h2 class="text-xl font-semibold text-[var(--sg-ink)]">تعهد ما به تجربه‌ای شفاف‌تر</h2>
-                        <p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">تلاش می‌کنیم اطلاعات فروشگاه و محصولات تا جای ممکن روشن و به‌روز باشد؛ از معرفی کالا و وضعیت موجودی تا نمایش جزئیات سفارش. بازخوردها و سوال‌های شما کمک می‌کند مسیر خرید را بهتر و ساده‌تر کنیم.</p>
+                        <p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">تلاش می‌کنیم اطلاعات محصولات، از جمله مشخصات، قیمت، موجودی و شرایط سفارش، تا جای ممکن روشن و به‌روز باشد. بازخوردها و پرسش‌های شما به بهترشدن تجربه خرید کمک می‌کند.</p>
                     </section>
                     <section class="flex flex-col gap-5 rounded-3xl bg-[var(--sg-ink)] p-6 text-[var(--sg-cream)] sm:flex-row sm:items-center sm:justify-between sm:p-8">
                         <div>
