@@ -45,7 +45,7 @@ class AboutPagePopulationMigrationTest extends TestCase
         $page = DB::table('content_pages')->where('slug', 'about')->first();
 
         $this->assertNotEmpty($page->body);
-        $this->assertStringContainsString('خرید خوب', $page->body);
+        $this->assertStringContainsString('خانه، با انتخاب‌هایی شکل می‌گیرد', $page->body);
         $this->assertNotEmpty($page->excerpt);
         $this->assertNotEmpty($page->meta_title);
         $this->assertNotEmpty($page->meta_description);
