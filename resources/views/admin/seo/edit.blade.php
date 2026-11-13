@@ -11,6 +11,36 @@
         <p class="admin-subtitle mt-2">هویت برند، اطلاعات متادیتا، شبکه‌های اجتماعی و داده‌های ساختاریافته سیلا گالری.</p>
     </header>
 
+    <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div class="admin-card p-5">
+            <span class="text-xs font-semibold text-[var(--admin-accent)]">STOREFRONT</span>
+            <h2 class="mt-3 font-bold">مدیریت صفحه اصلی</h2>
+            <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">هیرو، بنر، سکشن‌های محصول، دسته‌ها، محتوای تصویری و مجله را مدیریت کنید.</p>
+            <div class="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs font-semibold text-[var(--admin-accent)]">
+                <a href="{{ route('admin.home-sections.index') }}" class="hover:underline">همه سکشن‌ها ←</a>
+                <a href="{{ route('admin.home-sections.create', ['preset' => 'homepage-journal']) }}" class="hover:underline">تنظیم سکشن مجله ←</a>
+            </div>
+        </div>
+        <a href="{{ route('admin.blog.index') }}" class="admin-card group p-5 transition hover:-translate-y-0.5 hover:shadow-lg">
+            <span class="text-xs font-semibold text-[var(--admin-accent)]">EDITORIAL</span>
+            <h2 class="mt-3 font-bold">مقالات و مجله</h2>
+            <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">محتوا، تصویر شاخص، متن جایگزین، زمان انتشار و متادیتای هر مقاله.</p>
+            <span class="mt-4 inline-flex text-xs font-semibold text-[var(--admin-accent)]">مدیریت مقالات ←</span>
+        </a>
+        <a href="{{ route('admin.shop-banner.edit') }}" class="admin-card group p-5 transition hover:-translate-y-0.5 hover:shadow-lg">
+            <span class="text-xs font-semibold text-[var(--admin-accent)]">CAMPAIGNS</span>
+            <h2 class="mt-3 font-bold">بنر فروشگاه</h2>
+            <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">تصویر کمپین، پیام و لینک بنرهای فروشگاه را از پنل تنظیم کنید.</p>
+            <span class="mt-4 inline-flex text-xs font-semibold text-[var(--admin-accent)]">ویرایش بنر ←</span>
+        </a>
+        <a href="{{ route('admin.media.index') }}" class="admin-card group p-5 transition hover:-translate-y-0.5 hover:shadow-lg">
+            <span class="text-xs font-semibold text-[var(--admin-accent)]">ASSET LIBRARY</span>
+            <h2 class="mt-3 font-bold">کتابخانه رسانه</h2>
+            <p class="mt-2 text-xs leading-6 text-[var(--admin-muted)]">مدیریت تصاویر، انتخاب فایل موجود و بررسی محل استفاده رسانه‌ها.</p>
+            <span class="mt-4 inline-flex text-xs font-semibold text-[var(--admin-accent)]">باز کردن رسانه‌ها ←</span>
+        </a>
+    </section>
+
     <form method="POST" action="{{ route('admin.seo.update') }}" enctype="multipart/form-data" class="space-y-6">
         @csrf @method('PUT')
         <section class="admin-card space-y-5 p-6">

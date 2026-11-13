@@ -24,12 +24,27 @@ class HomeSectionController extends Controller
         ]);
     }
 
-    public function create(): View
+    public function create(Request $request): View|RedirectResponse
     {
+        $isJournalPreset = $request->query('preset') === 'homepage-journal';
+
+        if ($isJournalPreset) {
+            $existingJournal = HomeSection::query()->where('key', 'homepage-journal')->first();
+            if ($existingJournal) {
+                return redirect()->route('admin.home-sections.edit', $existingJournal);
+            }
+        }
+
         $section = new HomeSection([
+            'key' => $isJournalPreset ? 'homepage-journal' : null,
             'enabled' => true,
-            'type' => 'products',
-            'payload' => ['product_source' => 'latest', 'limit' => 8],
+            'type' => $isJournalPreset ? 'editorial' : 'products',
+            'eyebrow' => $isJournalPreset ? 'مجله سیلا' : null,
+            'title' => $isJournalPreset ? 'مجله سیلا' : null,
+            'subtitle' => $isJournalPreset ? 'راهنماها و نوشته‌های تازه برای انتخاب آگاهانه‌تر.' : null,
+            'cta_label' => $isJournalPreset ? 'همه نوشته‌ها' : null,
+            'cta_url' => $isJournalPreset ? '/blog' : null,
+            'payload' => $isJournalPreset ? ['limit' => 3] : ['product_source' => 'latest', 'limit' => 8],
         ]);
 
         return view('admin.home-sections.form', [

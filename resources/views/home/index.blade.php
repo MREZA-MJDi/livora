@@ -218,18 +218,26 @@
         @endif
     @endforeach
 
-            <section class="border-b border-[var(--sg-border)] bg-[var(--sg-white)] py-14 sm:py-20">
+    @if($blogSection)
+        <section class="border-b border-[var(--sg-border)] bg-[var(--sg-white)] py-14 sm:py-20">
             <x-layout.container>
                 <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
-                    <div>
-                        <p class="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--sg-accent)]">مجله سیلا</p>
-                        <h2 class="mt-3 text-3xl font-semibold tracking-tight text-[var(--sg-ink)] sm:text-4xl">ایده‌هایی برای خانه‌ای دلنشین‌تر</h2>
-                        <p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">راهنماها و نوشته‌های تازه برای انتخاب آگاهانه‌تر.</p>
+                    <div class="max-w-2xl">
+                        @if($blogSection->eyebrow)<p class="text-[10px] font-semibold uppercase tracking-[.22em] text-[var(--sg-accent)]">{{ $blogSection->eyebrow }}</p>@endif
+                        @if($blogSection->title)<h2 class="mt-3 text-3xl font-semibold tracking-tight text-[var(--sg-ink)] sm:text-4xl">{{ $blogSection->title }}</h2>@endif
+                        @if($blogSection->subtitle)<p class="mt-3 text-sm leading-8 text-[var(--sg-stone)]">{{ $blogSection->subtitle }}</p>@endif
                     </div>
-                    <a href="{{ route('blog.index') }}" class="text-sm font-semibold text-[var(--sg-ink)] transition hover:text-[var(--sg-accent)]">همه نوشته‌ها ←</a>
+                    @if($blogSection->cta_label)
+                        @php($journalUrl = filled($blogSection->cta_url) ? (str_starts_with($blogSection->cta_url, 'http') ? $blogSection->cta_url : url($blogSection->cta_url)) : route('blog.index'))
+                        <a href="{{ $journalUrl }}" class="text-sm font-semibold text-[var(--sg-ink)] transition hover:text-[var(--sg-accent)]">{{ $blogSection->cta_label }} ←</a>
+                    @endif
                 </div>
+                @if(filled($blogSection->image_url))
+                    <a href="{{ route('blog.index') }}" class="mb-6 block overflow-hidden rounded-2xl bg-[var(--sg-surface)]">
+                        <img src="{{ $blogSection->image_url }}" alt="{{ $blogSection->title ?: 'مجله سیلا گالری' }}" class="max-h-[22rem] w-full object-cover" loading="lazy" decoding="async">
+                    </a>
+                @endif
                 <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                    @if($blogPosts->isNotEmpty())
                     @foreach($blogPosts as $post)
                         <article class="group overflow-hidden rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-cream)]">
                             <a href="{{ route('blog.show', $post->slug) }}" class="block overflow-hidden bg-[var(--sg-surface)]">
@@ -242,23 +250,19 @@
                             <div class="p-5">
                                 <p class="text-[10px] text-[var(--sg-stone)]">{{ $post->published_at?->format('Y/m/d') }}</p>
                                 <h3 class="mt-2 text-base font-semibold leading-7 text-[var(--sg-ink)]"><a href="{{ route('blog.show', $post->slug) }}">{{ $post->title }}</a></h3>
-                                @if(filled($post->excerpt))
-                                    <p class="mt-2 line-clamp-2 text-sm leading-7 text-[var(--sg-stone)]">{{ $post->excerpt }}</p>
-                                @endif
+                                @if(filled($post->excerpt))<p class="mt-2 line-clamp-2 text-sm leading-7 text-[var(--sg-stone)]">{{ $post->excerpt }}</p>@endif
                                 <a href="{{ route('blog.show', $post->slug) }}" class="mt-4 inline-flex text-xs font-semibold text-[var(--sg-accent)]">ادامه مطلب ←</a>
                             </div>
                         </article>
                     @endforeach
-                    @else
-                        <article class="rounded-2xl border border-[var(--sg-border)] bg-[var(--sg-cream)] p-6 sm:col-span-2 lg:col-span-3">
-                            <p class="text-sm font-semibold text-[var(--sg-ink)]">راهنمای انتخاب مبلمان</p>
-                            <p class="mt-2 text-sm leading-7 text-[var(--sg-stone)]">پیش از انتخاب، ابعاد فضا، متریال و شرایط سفارش را بررسی کنید.</p>
-                            <a href="{{ url('/buying-guide') }}" class="mt-4 inline-flex text-xs font-semibold text-[var(--sg-accent)]">مطالعه راهنمای خرید ←</a>
-                        </article>
+                    @if($blogPosts->isEmpty())
+                        <div class="rounded-2xl border border-dashed border-[var(--sg-border)] p-6 text-sm leading-7 text-[var(--sg-stone)] sm:col-span-2 lg:col-span-3">هنوز مقاله‌ای برای نمایش منتشر نشده است.</div>
                     @endif
                 </div>
             </x-layout.container>
         </section>
+    @endif
+
     @if($finalCta)
         <section class="border-b border-[var(--sg-border)] bg-[var(--sg-ink)] py-14 text-white sm:py-20">
             <x-layout.container>
