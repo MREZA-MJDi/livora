@@ -74,6 +74,7 @@ class PageController extends Controller
         return view('pages.show', [
             'page' => $page,
             'robots' => 'noindex, nofollow',
+            'previewRobots' => 'noindex, nofollow',
         ]);
     }
 
