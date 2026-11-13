@@ -145,7 +145,7 @@
         @endif
 
         <div class="flex flex-col gap-3 border-t border-white/10 py-6 text-[11px] text-white/45 sm:flex-row sm:items-center sm:justify-between">
-            <p>© {{ \\App\\Helpers\\JalaliHelper::formatYear(now()) }} {{ $storeSettings?->copyright_text ?: ('تمام حقوق برای '.$footerBrandName.' محفوظ است.') }}</p>
+            <p>© {{ \App\Helpers\JalaliHelper::formatYear(now()) }} {{ $storeSettings?->copyright_text ?: ('تمام حقوق برای '.$footerBrandName.' محفوظ است.') }}</p>
             <div class="flex flex-wrap gap-x-5 gap-y-2">
                 <a href="{{ route('about') }}" class="transition hover:text-white">درباره ما</a>
                 <a href="{{ route('terms') }}" class="transition hover:text-white">قوانین و مقررات</a>
