@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Services\Seo\ContentSeoAnalyzer;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
