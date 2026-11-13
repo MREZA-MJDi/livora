@@ -106,7 +106,7 @@
             <div>
 
                 <div class="mb-2 text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--admin-accent)]">
-                    SillaGallery / ADMIN
+                    مدیریت فروشگاه
                 </div>
 
                 <h1 class="admin-title">
@@ -1373,8 +1373,8 @@
 
         <section class="space-y-4">
             <div>
-                <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--admin-accent)]">CONTENT / SEO</p>
-                <h2 class="mt-2 text-xl font-bold text-[var(--admin-text)]">مدیریت محتوا و سلامت SEO</h2>
+                <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--admin-accent)]">محتوا و وضعیت سایت</p>
+                <h2 class="mt-2 text-xl font-bold text-[var(--admin-text)]">محتوای سایت و وضعیت دیده‌شدن در گوگل</h2>
                 <p class="mt-1 text-xs text-[var(--admin-muted)]">وضعیت‌ها مستقیماً از جدول‌های عملیاتی سایت محاسبه می‌شوند.</p>
             </div>
             <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
