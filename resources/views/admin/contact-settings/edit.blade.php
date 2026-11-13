@@ -96,7 +96,7 @@
                 </div>
             </template>
             <div class="space-y-3 rounded-2xl border border-[var(--admin-border)] p-4">
-                <div class="flex items-center justify-between gap-3"><h3 class="font-semibold">روش‌های پرداخت و نشان‌های تصویری</h3><button type="button" class="admin-btn admin-btn-secondary" @click="payments.push({label:'', image:'', url:''})">افزودن نشان</button></div>
+                <div class="flex items-center justify-between gap-3"><h3 class="font-semibold">نشان‌های پرداخت و اعتماد</h3><button type="button" class="admin-btn admin-btn-secondary" @click="payments.push({label:'', image:'', url:''})">افزودن نشان</button></div>
                 <template x-for="(item, index) in payments" :key="'payment-' + index">
                     <div class="grid gap-2 sm:grid-cols-[1fr_1.3fr_1.3fr_auto]">
                         <input class="admin-input" :name="'payment_methods[' + index + '][label]'" x-model="item.label" placeholder="عنوان">
@@ -385,7 +385,10 @@
         </section>
 
         <div class="flex flex-wrap justify-between gap-3">
-            <a href="{{ route('contact') }}" target="_blank" rel="noopener" class="admin-btn admin-btn-secondary">مشاهده صفحه تماس</a>
+            <div class="flex flex-wrap gap-2">
+                <a href="{{ route('contact') }}" target="_blank" rel="noopener" class="admin-btn admin-btn-secondary">پیش‌نمایش صفحه تماس</a>
+                <a href="{{ route('home') }}" target="_blank" rel="noopener" class="admin-btn admin-btn-secondary">مشاهده صفحه اصلی و فوتر</a>
+            </div>
             <button type="submit" class="admin-btn admin-btn-primary">ذخیره تنظیمات تماس</button>
         </div>
     </form>
