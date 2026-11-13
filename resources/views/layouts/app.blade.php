@@ -33,7 +33,7 @@
         $seoOgDescription = trim($__env->yieldContent('og_description')) ?: $seoDescription;
         $seoOgImage = $pageSeo?->og_image ?: (trim($__env->yieldContent('og_image')) ?: $siteSeo->default_og_image_url);
         $seoOgType = trim($__env->yieldContent('og_type')) ?: 'website';
-        $seoRobots = trim($__env->yieldContent('robots'));
+        $seoRobots = isset($robots) ? trim((string) $robots) : '';
     @endphp
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
