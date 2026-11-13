@@ -172,7 +172,7 @@ class MediaController extends Controller
             'تصاویر کارت دسته‌بندی' => $media->categoryCards()->count(),
             'بنرهای دسته‌بندی' => $media->categoryBanners()->count(),
             'مقاله‌ها' => $media->blogPosts()->count(),
-            'صفحه‌ها' => $media->contentPages()->count(),
+            'تصاویر داخل متن صفحات' => $embeddedPageUsages,\n            'تصاویر داخل متن مقاله‌ها' => $embeddedArticleUsages,\n            'صفحه‌ها' => $media->contentPages()->count(),
             'بنر فروشگاه' => $media->shopBannerSettings()->count(),
             'تصویر پیش‌فرض Open Graph' => $media->seoSettings()->count(),
             'لوگوی برند' => ContactSetting::query()->where('logo_media_id', $media->id)->count(),
