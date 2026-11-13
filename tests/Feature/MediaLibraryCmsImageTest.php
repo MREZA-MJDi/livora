@@ -66,6 +66,11 @@ class MediaLibraryCmsImageTest extends TestCase
         ]);
 
         $this->actingAs($admin)
+            ->get(route('admin.media.index'))
+            ->assertOk()
+            ->assertSee('متن صفحات 1');
+
+        $this->actingAs($admin)
             ->delete(route('admin.media.destroy', $media))
             ->assertRedirect(route('admin.media.index'))
             ->assertSessionHas('error');
