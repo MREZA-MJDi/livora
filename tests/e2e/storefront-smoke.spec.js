@@ -100,7 +100,7 @@ test('mobile customer login, cart and checkout remain usable through order creat
     await page.goto('/login', { waitUntil: 'domcontentloaded' });
     await page.locator('input[name="email"]').fill('demo@livora.test');
     await page.locator('input[name="password"]').fill('password');
-    await page.getByRole('button', { name: 'ورود به حساب' }).click();
+    await page.locator('button[type="submit"]').click();
 
     await expect(page).toHaveURL(/\/account(?:\/)?$/);
 
