@@ -521,6 +521,7 @@ Route::middleware(['auth', 'admin', 'admin.session.timeout'])
         Route::put('/seo', [AdminSeoController::class, 'update'])->name('seo.update');
         Route::get('/seo/pages', [PageSeoController::class, 'index'])->name('seo.pages');
         Route::put('/seo/pages', [PageSeoController::class, 'update'])->name('seo.pages.update');
+        Route::get('/pages/{page}/preview', [AdminPageController::class, 'preview'])->name('pages.preview');
         Route::resource('pages', AdminPageController::class)->except(['show']);
         Route::post('/editor-images', [EditorImageController::class, 'store'])->middleware('throttle:30,1')->name('editor-images.store');
         Route::resource('blog', AdminBlogPostController::class)->except(['show']);
