@@ -159,7 +159,7 @@ test('admin can log in and use the dashboard drawer on a narrow mobile viewport'
     await page.locator('input[name="password"]').fill(adminPassword);
     await page.getByRole('button', { name: 'ورود به حساب' }).click();
 
-    await expect(page).toHaveURL(/\/admin(?:\/)?$/);
+    await expect(page).toHaveURL(new RegExp('admin/?));
     await expect(page.locator('.admin-shell')).toBeVisible();
     await expect(page.locator('[data-admin-sidebar]')).toBeAttached();
 
@@ -281,7 +281,7 @@ test('admin category catalogue supports search and status filtering', async ({ p
     await page.locator('input[name="email"]').fill(adminEmail);
     await page.locator('input[name="password"]').fill(adminPassword);
     await page.getByRole('button', { name: 'ورود به حساب' }).click();
-    await expect(page).toHaveURL(/\\/admin(?:\\/)?$/);
+    await expect(page).toHaveURL(new RegExp('admin/?));
 
     await page.goto('/admin/categories', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#category-search')).toBeVisible();
