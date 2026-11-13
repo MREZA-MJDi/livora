@@ -1,613 +1,141 @@
+@php
+    $adminUser = auth()->user();
+
+    $navigationGroups = [
+        [
+            'title' => 'فروش و مشتریان',
+            'description' => 'پیگیری سفارش‌ها و ارتباط با خریداران',
+            'items' => [
+                ['label' => 'سفارش‌ها', 'description' => 'مشاهده سفارش‌های جدید و پیگیری وضعیت آن‌ها', 'route' => 'admin.orders.index', 'active' => 'admin.orders.*'],
+                ['label' => 'مشتریان', 'description' => 'اطلاعات و سوابق خرید مشتریان', 'route' => 'admin.customers.index', 'active' => 'admin.customers.*'],
+                ['label' => 'پیام‌های دریافتی', 'description' => 'خواندن و پاسخ دادن به پیام‌های تماس با ما', 'route' => 'admin.contact-messages.index', 'active' => 'admin.contact-messages.*'],
+                ['label' => 'پیش‌نمایش فرایند خرید', 'description' => 'بررسی مسیر خریدی که مشتری در سایت می‌بیند', 'route' => 'admin.checkout.preview', 'active' => 'admin.checkout.preview'],
+            ],
+        ],
+        [
+            'title' => 'محصولات و دسته‌بندی‌ها',
+            'description' => 'مدیریت کالاهایی که برای فروش عرضه می‌کنید',
+            'items' => [
+                ['label' => 'محصولات', 'description' => 'ثبت کالا، قیمت، تصویر و مشخصات', 'route' => 'admin.products.index', 'active' => 'admin.products.*'],
+                ['label' => 'دسته‌بندی‌ها', 'description' => 'گروه‌بندی محصولات برای پیدا کردن آسان‌تر', 'route' => 'admin.categories.index', 'active' => 'admin.categories.*'],
+            ],
+        ],
+        [
+            'title' => 'محتوای سایت',
+            'description' => 'چیزهایی که بازدیدکننده در صفحات سایت می‌بیند',
+            'items' => [
+                ['label' => 'بخش‌های صفحه اصلی', 'description' => 'مدیریت اسلایدر و بخش‌های صفحه اول', 'route' => 'admin.home-sections.index', 'active' => 'admin.home-sections.*'],
+                ['label' => 'صفحات سایت', 'description' => 'ویرایش درباره ما، قوانین و صفحه‌های متنی', 'route' => 'admin.pages.index', 'active' => 'admin.pages.*'],
+                ['label' => 'وبلاگ و مقاله‌ها', 'description' => 'نوشتن، ویرایش و انتشار مقاله‌ها', 'route' => 'admin.blog.index', 'active' => 'admin.blog.*'],
+                ['label' => 'بنر صفحه فروشگاه', 'description' => 'تغییر تصویر و متن بنر بالای فروشگاه', 'route' => 'admin.shop-banner.edit', 'active' => 'admin.shop-banner.*'],
+                ['label' => 'رسانه و تصاویر', 'description' => 'مدیریت فایل‌ها و انتخاب تصاویر سایت', 'route' => 'admin.media.index', 'active' => 'admin.media.*'],
+            ],
+        ],
+        [
+            'title' => 'تنظیمات فروشگاه و دیده‌شدن در گوگل',
+            'description' => 'مشخصات کسب‌وکار، نمادها، فوتر و تنظیمات جستجو',
+            'items' => [
+                ['label' => 'اطلاعات و هویت فروشگاه', 'description' => 'نام برند، لوگو، راه‌های تماس، نمادها و فوتر', 'route' => 'admin.contact-settings.edit', 'active' => 'admin.contact-settings.*'],
+                ['label' => 'تنظیمات کلی سئو', 'description' => 'عنوان و توضیحات پیش‌فرض و تنظیم ایندکس سایت', 'route' => 'admin.seo.edit', 'active' => 'admin.seo.edit'],
+                ['label' => 'عنوان صفحات در گوگل', 'description' => 'تنظیم عنوان و توضیحات صفحات اصلی', 'route' => 'admin.seo.pages', 'active' => 'admin.seo.pages'],
+                ['label' => 'بررسی سلامت سئو', 'description' => 'پیدا کردن مشکلات فنی و محتوایی سئو', 'route' => 'admin.seo.audit', 'active' => 'admin.seo.audit'],
+            ],
+        ],
+    ];
+@endphp
+
 <aside
     id="admin-sidebar"
     data-admin-sidebar
-    aria-label="منوی مدیریت SillaGallery"
-    class="admin-sidebar fixed inset-y-0 right-0 z-50 flex w-[260px] -translate-x-0 flex-col border-l border-[var(--admin-border)] bg-[var(--admin-white)] transition-transform duration-300 lg:translate-x-0"
+    aria-label="منوی مدیریت فروشگاه"
+    class="admin-sidebar fixed inset-y-0 right-0 z-50 flex w-[280px] -translate-x-0 flex-col border-l border-[var(--admin-border)] bg-[var(--admin-white)] transition-transform duration-300 lg:translate-x-0"
     :class="sidebarOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'"
 >
+    <div class="flex h-[76px] shrink-0 items-center justify-between border-b border-[var(--admin-border)] px-5">
+        <a href="{{ route('admin.dashboard') }}" class="flex min-w-0 items-center gap-3">
+            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-text)] text-xs font-bold text-white">SG</span>
+            <span class="min-w-0">
+                <span class="block truncate text-sm font-bold text-[var(--admin-text)]">سیلا گالری</span>
+                <span class="mt-1 block text-[10px] text-[var(--admin-muted)]">مدیریت فروشگاه اینترنتی</span>
+            </span>
+        </a>
+        <button type="button" @click="sidebarOpen = false" aria-label="بستن منو" class="flex h-9 w-9 items-center justify-center rounded-lg text-[var(--admin-muted)] hover:bg-[var(--admin-surface)] lg:hidden">✕</button>
+    </div>
 
-    {{-- =========================================================
-         BRAND
-    ========================================================== --}}
-    <div class="flex h-[72px] shrink-0 items-center justify-between border-b border-[var(--admin-border)] px-5">
-
+    <nav class="min-h-0 flex-1 overflow-y-auto px-3 py-4" aria-label="بخش‌های مدیریت">
         <a
             href="{{ route('admin.dashboard') }}"
-            class="group flex min-w-0 items-center gap-3"
+            @class([
+                'mb-4 flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold transition',
+                'bg-[var(--admin-text)] text-white' => request()->routeIs('admin.dashboard'),
+                'text-[var(--admin-text)] hover:bg-[var(--admin-surface)]' => !request()->routeIs('admin.dashboard'),
+            ])
         >
-
-            <div
-                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[var(--admin-text)] text-xs font-bold tracking-[0.12em] text-white transition duration-300 group-hover:bg-[var(--admin-accent)]"
-            >
-                SG
-            </div>
-
-            <div class="min-w-0">
-
-                <p class="truncate text-sm font-bold tracking-[0.18em] text-[var(--admin-text)]">
-                    SillaGallery
-                </p>
-
-                <p class="mt-0.5 text-[9px] uppercase tracking-[0.16em] text-[var(--admin-muted)]">
-                    پنل مدیریت
-                </p>
-
-            </div>
-
+            <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-black/5 text-base" aria-hidden="true">⌂</span>
+            <span class="flex-1">پیشخوان فروشگاه</span>
+            @if(request()->routeIs('admin.dashboard'))
+                <span class="h-2 w-2 rounded-full bg-[var(--admin-accent)]"></span>
+            @endif
         </a>
 
-
-        {{-- Mobile close --}}
-        <button
-            type="button"
-            @click="sidebarOpen = false"
-            aria-label="بستن منوی مدیریت"
-            class="flex h-9 w-9 items-center justify-center rounded-xl text-[var(--admin-muted)] transition hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text)] lg:hidden"
-        >
-
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="h-4 w-4"
-            >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M6 18 18 6M6 6l12 12"
-                />
-            </svg>
-
-        </button>
-
-    </div>
-
-
-    {{-- =========================================================
-         NAVIGATION
-    ========================================================== --}}
-    <nav
-        class="flex-1 overflow-y-auto px-3 py-5"
-        aria-label="منوی مدیریت"
-    >
-
-        {{-- Dashboard --}}
-        <div class="mb-5">
-
-            <p class="px-3 text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--admin-muted)]">
-                نمای کلی
-            </p>
-
-            <div class="mt-2 space-y-1">
-
-                <a
-                    href="{{ route('admin.dashboard') }}"
-                    @class([
-                        'group flex items-center gap-3 rounded-2xl px-3 py-3 text-xs font-medium transition',
-                        'bg-[var(--admin-text)] text-white shadow-sm' => request()->routeIs('admin.dashboard'),
-                        'text-[var(--admin-text-soft)] hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text)]' => !request()->routeIs('admin.dashboard'),
-                    ])
-                >
-
-                    <span
-                        @class([
-                            'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition',
-                            'bg-white/10 text-white' => request()->routeIs('admin.dashboard'),
-                            'bg-[var(--admin-surface)] text-[var(--admin-muted)] group-hover:text-[var(--admin-text)]' => !request()->routeIs('admin.dashboard'),
-                        ])
-                    >
-
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            class="h-4 w-4"
+        @foreach($navigationGroups as $group)
+            @php
+                $groupIsActive = collect($group['items'])->contains(
+                    fn (array $item): bool => request()->routeIs($item['active'])
+                );
+            @endphp
+            <details class="mb-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-white)]" @if($groupIsActive) open @endif>
+                <summary class="flex cursor-pointer list-none items-center gap-2 rounded-xl px-3 py-3 hover:bg-[var(--admin-surface)]">
+                    <span class="min-w-0 flex-1">
+                        <span class="block text-xs font-bold text-[var(--admin-text)]">{{ $group['title'] }}</span>
+                        <span class="mt-1 block text-[10px] leading-5 text-[var(--admin-muted)]">{{ $group['description'] }}</span>
+                    </span>
+                    <span class="text-xs text-[var(--admin-muted)]" aria-hidden="true">⌄</span>
+                </summary>
+                <div class="space-y-1 px-2 pb-2">
+                    @foreach($group['items'] as $item)
+                        @php($itemIsActive = request()->routeIs($item['active']))
+                        <a
+                            href="{{ route($item['route']) }}"
+                            @class([
+                                'block rounded-lg px-3 py-2.5 transition',
+                                'bg-[var(--admin-accent-soft)] text-[var(--admin-accent-dark)]' => $itemIsActive,
+                                'text-[var(--admin-text-soft)] hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text)]' => !$itemIsActive,
+                            ])
+                            @if($itemIsActive) aria-current="page" @endif
                         >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M3.75 3.75h6.5v6.5h-6.5v-6.5Zm10 0h6.5v6.5h-6.5v-6.5Zm-10 10h6.5v6.5h-6.5v-6.5Zm10 0h6.5v6.5h-6.5v-6.5Z"
-                            />
-                        </svg>
+                            <span class="flex items-center justify-between gap-2">
+                                <span class="text-xs font-semibold">{{ $item['label'] }}</span>
+                                @if($itemIsActive)
+                                    <span class="h-1.5 w-1.5 rounded-full bg-[var(--admin-accent)]"></span>
+                                @endif
+                            </span>
+                            <span class="mt-1 block text-[10px] leading-5 text-[var(--admin-muted)]">{{ $item['description'] }}</span>
+                        </a>
+                    @endforeach
+                </div>
+            </details>
+        @endforeach
+
+        <a href="{{ route('home') }}" target="_blank" rel="noopener" class="mt-4 flex items-center justify-between rounded-xl border border-dashed border-[var(--admin-border-dark)] px-3 py-3 text-xs font-semibold text-[var(--admin-text-soft)] hover:bg-[var(--admin-surface)]">
+            <span>مشاهده سایت برای مشتریان</span>
+            <span aria-hidden="true">↗</span>
+        </a>
+    </nav>
 
-                    </span>
-
-                    <span class="flex-1">
-                        داشبورد
-                    </span>
-
-                    @if(request()->routeIs('admin.dashboard'))
-
-                        <span class="h-1.5 w-1.5 rounded-full bg-[var(--admin-accent)]"></span>
-
-                    @endif
-
-                </a>
-
-            </div>
-
-        </div>
-
-
-        {{-- =====================================================
-             مدیریت فروشگاه
-        ====================================================== --}}
-        <div class="mb-5">
-
-            <p class="px-3 text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--admin-muted)]">
-                مدیریت فروشگاه
-            </p>
-
-            <div class="mt-2 space-y-1">
-
-                {{-- Products --}}
-                <a
-                    href="{{ route('admin.products.index') }}"
-                    @class([
-                        'group flex items-center gap-3 rounded-2xl px-3 py-3 text-xs font-medium transition',
-                        'bg-[var(--admin-accent-soft)] text-[var(--admin-accent-dark)]' => request()->routeIs('admin.products.*'),
-                        'text-[var(--admin-text-soft)] hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text)]' => !request()->routeIs('admin.products.*'),
-                    ])
-                >
-
-                    <span
-                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)] group-hover:text-[var(--admin-text)]"
-                    >
-
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            class="h-4 w-4"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="m20.25 7.5-8.25-4.5-8.25 4.5m16.5 0-8.25 4.5m8.25-4.5V16.5L12 21l-8.25-4.5V7.5m0 0L12 12m0 0v9"
-                            />
-                        </svg>
-
-                    </span>
-
-                    <span class="flex-1">
-                        محصولات
-                    </span>
-
-                    @if(request()->routeIs('admin.products.*'))
-
-                        <span class="h-1.5 w-1.5 rounded-full bg-[var(--admin-accent)]"></span>
-
-                    @endif
-
-                </a>
-
-
-                {{-- Categories --}}
-                <a
-                    href="{{ route('admin.categories.index') }}"
-                    @class([
-                        'group flex items-center gap-3 rounded-2xl px-3 py-3 text-xs font-medium transition',
-                        'bg-[var(--admin-accent-soft)] text-[var(--admin-accent-dark)]' => request()->routeIs('admin.categories.*'),
-                        'text-[var(--admin-text-soft)] hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text)]' => !request()->routeIs('admin.categories.*'),
-                    ])
-                >
-
-                    <span
-                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]"
-                    >
-
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            class="h-4 w-4"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M3.75 6.75h6.5v4.5h-6.5v-4.5Zm10 0h6.5v4.5h-6.5v-4.5Zm-10 6h6.5v4.5h-6.5v-4.5Zm10 0h6.5v4.5h-6.5v-4.5Z"
-                            />
-                        </svg>
-
-                    </span>
-
-                    <span class="flex-1">
-                        دسته‌بندی‌ها
-                    </span>
-
-                    @if(request()->routeIs('admin.categories.*'))
-
-                        <span class="h-1.5 w-1.5 rounded-full bg-[var(--admin-accent)]"></span>
-
-                    @endif
-
-                </a>
-
-
-                {{-- Media --}}
-                <a
-                    href="{{ route('admin.media.index') }}"
-                    @class([
-                        'group flex items-center gap-3 rounded-2xl px-3 py-3 text-xs font-medium transition',
-                        'bg-[var(--admin-accent-soft)] text-[var(--admin-accent-dark)]' => request()->routeIs('admin.media.*'),
-                        'text-[var(--admin-text-soft)] hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text)]' => !request()->routeIs('admin.media.*'),
-                    ])
-                >
-
-                    <span
-                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]"
-                    >
-
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            class="h-4 w-4"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l2.159 2.159m0 0 1.409-1.409a2.25 2.25 0 0 1 3.182 0l4.909 4.909M21.75 12V6.75a2.25 2.25 0 0 0-2.25-2.25H4.5a2.25 2.25 0 0 0-2.25 2.25v10.5a2.25 2.25 0 0 1-2.25 2.25h10.5"
-                            />
-                        </svg>
-
-                    </span>
-
-                    <span class="flex-1">
-                        رسانه
-                    </span>
-
-                    @if(request()->routeIs('admin.media.*'))
-
-                        <span class="h-1.5 w-1.5 rounded-full bg-[var(--admin-accent)]"></span>
-
-                    @endif
-
-                </a>
-
-            </div>
-
-        </div>
-
-
-        {{-- =====================================================
-             فروش و مشتریان
-        ====================================================== --}}
-        <div class="mb-5">
-
-            <p class="px-3 text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--admin-muted)]">
-                فروش و مشتریان
-            </p>
-
-            <div class="mt-2 space-y-1">
-
-                {{-- Orders --}}
-                <a
-                    href="{{ route('admin.orders.index') }}"
-                    @class([
-                        'group flex items-center gap-3 rounded-2xl px-3 py-3 text-xs font-medium transition',
-                        'bg-[var(--admin-accent-soft)] text-[var(--admin-accent-dark)]' => request()->routeIs('admin.orders.*'),
-                        'text-[var(--admin-text-soft)] hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text)]' => !request()->routeIs('admin.orders.*'),
-                    ])
-                >
-
-                    <span
-                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]"
-                    >
-
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            class="h-4 w-4"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M6.75 6.75h10.5M6.75 10.5h7.5m-7.5 3.75h7.5M4.5 3.75h15A1.5 1.5 0 0 1 21 5.25v13.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.75V5.25a1.5 1.5 0 0 1 1.5-1.5Z"
-                            />
-                        </svg>
-
-                    </span>
-
-                    <span class="flex-1">
-                        سفارش‌ها
-                    </span>
-
-                    @if(request()->routeIs('admin.orders.*'))
-
-                        <span class="h-1.5 w-1.5 rounded-full bg-[var(--admin-accent)]"></span>
-
-                    @endif
-
-                </a>
-
-
-                {{-- Customers --}}
-                <a
-                    href="{{ route('admin.customers.index') }}"
-                    @class([
-                        'group flex items-center gap-3 rounded-2xl px-3 py-3 text-xs font-medium transition',
-                        'bg-[var(--admin-accent-soft)] text-[var(--admin-accent-dark)]' => request()->routeIs('admin.customers.*'),
-                        'text-[var(--admin-text-soft)] hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text)]' => !request()->routeIs('admin.customers.*'),
-                    ])
-                >
-
-                    <span
-                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]"
-                    >
-
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            class="h-4 w-4"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M15.75 6a3.75 3.75 0 1 1-7.5 0ZM4.5 20.25a8.25 8.25 0 0 1 15 0ZM19.5 20.25a4.5 4.5 0 0 0-3.75-4.44"
-                            />
-                        </svg>
-
-                    </span>
-
-                    <span class="flex-1">
-                        مشتریان
-                    </span>
-
-                    @if(request()->routeIs('admin.customers.*'))
-
-                        <span class="h-1.5 w-1.5 rounded-full bg-[var(--admin-accent)]"></span>
-
-                    @endif
-
-                </a>
-
-
-                {{-- Contact Messages --}}
-                <a
-                    href="{{ route('admin.contact-messages.index') }}"
-                    @class([
-                        'group flex items-center gap-3 rounded-2xl px-3 py-3 text-xs font-medium transition',
-                        'bg-[var(--admin-accent-soft)] text-[var(--admin-accent-dark)]' => request()->routeIs('admin.contact-messages.*'),
-                        'text-[var(--admin-text-soft)] hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text)]' => !request()->routeIs('admin.contact-messages.*'),
-                    ])
-                >
-
-                    <span
-                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)] group-hover:text-[var(--admin-text)]"
-                    >
-
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            class="h-4 w-4"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M21.75 12c0 4.556-4.365 8.25-9.75 8.25a10.57 10.57 0 0 1-3.867-.72L4.5 20.25l.966-2.9A7.92 7.92 0 0 1 2.25 12c0-4.556 4.365-8.25 9.75-8.25s9.75 3.694 9.75 8.25Z"
-                            />
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M8.25 12h.008v.008H8.25V12Zm3.742 0H12v.008h-.008V12Zm3.75 0h.008v.008h-.008V12Z"
-                            />
-                        </svg>
-
-                    </span>
-
-                    <span class="flex-1">
-                        پیام‌های کاربران
-                    </span>
-
-                    @if(request()->routeIs('admin.contact-messages.*'))
-
-                        <span class="h-1.5 w-1.5 rounded-full bg-[var(--admin-accent)]"></span>
-
-                    @endif
-
-                </a>
-
-            </div>
-
-        </div>
-
-
-        {{-- =====================================================
-             محتوای سایت
-        ====================================================== --}}
-        <div class="mb-5">
-
-            <p class="px-3 text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--admin-muted)]">
-                محتوای سایت
-            </p>
-
-            <div class="mt-2 space-y-1">
-
-                {{-- Frontend --}}
-                <a
-                    href="{{ route('home') }}"
-                    target="_blank"
-                    rel="noopener"
-                    class="group flex items-center gap-3 rounded-2xl px-3 py-3 text-xs font-medium text-[var(--admin-text-soft)] transition hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text)]"
-                >
-
-                    <span
-                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]"
-                    >
-
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            class="h-4 w-4"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M2.25 12s3.75-6 9.75-6 9.75 6 9.75 6-3.75 6-9.75 6-9.75-6-9.75-6Z"
-                            />
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                            />
-                        </svg>
-
-                    </span>
-
-                    <span class="flex-1">
-                        مشاهده فروشگاه
-                    </span>
-
-                    <span class="text-[10px] text-[var(--admin-muted)]">
-                        ↗
-                    </span>
-
-                </a>
-
-                <a href="{{ route('admin.checkout.preview') }}" class="group flex items-center gap-3 rounded-2xl px-3 py-3 text-xs font-medium text-[var(--admin-text-soft)] transition hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text)]">
-                    <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">▣</span>
-                    <span class="flex-1">پیش‌نمایش Checkout</span>
-                </a>
-
-                <a href="{{ route('admin.pages.index') }}" class="group flex items-center gap-3 rounded-2xl px-3 py-3 text-xs font-medium text-[var(--admin-text-soft)] transition hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text)]">
-                    <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">▤</span>
-                    <span class="flex-1">صفحات سایت</span>
-                </a>
-
-                <a href="{{ route('admin.shop-banner.edit') }}" class="group flex items-center gap-3 rounded-2xl px-3 py-3 text-xs font-medium text-[var(--admin-text-soft)] transition hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text)] {{ request()->routeIs('admin.shop-banner.*') ? 'bg-[var(--admin-surface)] text-[var(--admin-text)]' : '' }}">
-                    <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">▧</span>
-                    <span class="flex-1">بنر صفحه فروشگاه</span>
-                </a>
-
-                <a href="{{ route('admin.blog.index') }}" class="group flex items-center gap-3 rounded-2xl px-3 py-3 text-xs font-medium text-[var(--admin-text-soft)] transition hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text)]">
-                    <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">✎</span>
-                    <span class="flex-1">وبلاگ و مقاله‌ها</span>
-                </a>
-
-                <a href="{{ route('admin.contact-settings.edit') }}" class="group flex items-center gap-3 rounded-2xl px-3 py-3 text-xs font-medium text-[var(--admin-text-soft)] transition hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text)]">
-                    <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">☎</span>
-                    <span class="flex-1">اطلاعات تماس و FAQ</span>
-                </a>
-
-                <details class="mt-2 rounded-xl border border-[var(--admin-border)] px-3 py-2">
-                    <summary class="cursor-pointer list-none text-xs font-semibold text-[var(--admin-text-soft)]">تنظیمات تخصصی و سئو</summary>
-                    <div class="mt-2 space-y-1">
-                <a href="{{ route('admin.seo.audit') }}" class="group flex items-center gap-3 rounded-2xl px-3 py-3 text-xs font-medium text-[var(--admin-text-soft)] transition hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text)]">
-                    <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">✓</span>
-                    <span class="flex-1">ممیزی فنی SEO</span>
-                </a>
-
-                <a href="{{ route('admin.seo.pages') }}" class="group flex items-center gap-3 rounded-2xl px-3 py-3 text-xs font-medium text-[var(--admin-text-soft)] transition hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text)]">
-                    <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">⌗</span>
-                    <span class="flex-1">SEO صفحات ثابت</span>
-                </a>
-
-                <a href="{{ route('admin.seo.edit') }}" class="group flex items-center gap-3 rounded-2xl px-3 py-3 text-xs font-medium text-[var(--admin-text-soft)] transition hover:bg-[var(--admin-surface)] hover:text-[var(--admin-text)]">
-                    <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--admin-surface)] text-[var(--admin-muted)]">⌕</span>
-                    <span class="flex-1">مدیریت SEO</span>
-                </a>
-                    </div>
-                </details>
-
-            </div>
-
-        </div>
-
-    
-        <a href="{{ route('admin.home-sections.index') }}" @class(['group flex items-center gap-3 rounded-2xl px-3 py-3 text-xs font-medium transition', 'bg-[var(--admin-accent-soft)] text-[var(--admin-accent-dark)]' => request()->routeIs('admin.home-sections.*'), 'text-[var(--admin-text-soft)] hover:bg-[var(--admin-surface)]' => !request()->routeIs('admin.home-sections.*')])><span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--admin-surface)]">⌘</span><span>سکشن‌های صفحه اصلی</span></a>
-</nav>
-
-
-    {{-- =========================================================
-         BOTTOM USER PANEL
-    ========================================================== --}}
     <div class="shrink-0 border-t border-[var(--admin-border)] p-3">
-
-        @php
-            $adminUser = auth()->user();
-        @endphp
-
-        <div class="rounded-2xl bg-[var(--admin-surface)] p-3">
-
-            <div class="flex items-center gap-3">
-
-                <div
-                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-text)] text-xs font-bold text-white"
-                >
-                    {{ mb_substr($adminUser?->name ?: 'A', 0, 1) }}
-                </div>
-
-                <div class="min-w-0 flex-1">
-
-                    <p class="truncate text-xs font-semibold text-[var(--admin-text)]">
-                        {{ $adminUser?->name ?: 'مدیر فروشگاه' }}
-                    </p>
-
-                    <p class="mt-0.5 truncate text-[9px] text-[var(--admin-muted)]">
-                        Administrator
-                    </p>
-
-                </div>
-
-                <form
-                    action="{{ route('logout') }}"
-                    method="POST"
-                >
-
-                    @csrf
-
-                    <button
-                        type="submit"
-                        aria-label="خروج"
-                        class="flex h-8 w-8 items-center justify-center rounded-xl text-[var(--admin-muted)] transition hover:bg-white hover:text-[var(--admin-danger)]"
-                    >
-
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            class="h-4 w-4"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3-6-3 3m0 0 3 3m-3-3h8.25"
-                            />
-                        </svg>
-
-                    </button>
-
-                </form>
-
-            </div>
-
+        <div class="flex items-center gap-3 rounded-xl bg-[var(--admin-surface)] p-3">
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--admin-text)] text-xs font-bold text-white">
+                {{ mb_substr($adminUser?->name ?: 'م', 0, 1) }}
+            </span>
+            <span class="min-w-0 flex-1">
+                <span class="block truncate text-xs font-semibold text-[var(--admin-text)]">{{ $adminUser?->name ?: 'مدیر فروشگاه' }}</span>
+                <span class="mt-1 block text-[10px] text-[var(--admin-muted)]">حساب مدیر</span>
+            </span>
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit" aria-label="خروج از پنل" class="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--admin-muted)] hover:bg-white hover:text-[var(--admin-danger)]">↪</button>
+            </form>
         </div>
-
     </div>
-
 </aside>
