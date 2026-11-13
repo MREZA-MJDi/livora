@@ -28,7 +28,17 @@
 
         'admin.contact-messages.index' => 'پیام‌های کاربران',
         'admin.contact-messages.show' => 'مشاهده پیام',
-        'admin.contact-settings.edit' => 'تنظیمات تماس',
+        'admin.contact-settings.edit' => 'اطلاعات و هویت فروشگاه',
+        'admin.home-sections.create' => 'افزودن بخش صفحه اصلی',
+        'admin.home-sections.edit' => 'ویرایش بخش صفحه اصلی',
+        'admin.shop-banner.edit' => 'بنر صفحه فروشگاه',
+        'admin.seo.edit' => 'تنظیمات کلی سئو',
+        'admin.seo.pages' => 'عنوان صفحات در گوگل',
+        'admin.seo.audit' => 'بررسی سلامت سئو',
+        'admin.pages.create' => 'افزودن صفحه سایت',
+        'admin.pages.edit' => 'ویرایش صفحه سایت',
+        'admin.blog.create' => 'نوشتن مقاله',
+        'admin.blog.edit' => 'ویرایش مقاله',
 
         'admin.home-sections.index' => 'مدیریت صفحه اصلی',
         'admin.home-sections.create' => 'افزودن بخش صفحه اصلی',
