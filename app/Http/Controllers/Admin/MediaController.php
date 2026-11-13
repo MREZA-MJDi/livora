@@ -53,6 +53,44 @@ class MediaController extends Controller
 
         $media = $query->paginate(24)->withQueryString();
 
+        // Editor images are referenced inside CMS HTML. They do not have a
+        // foreign-key pivot, so calculate their usage for the current page
+        // in two bounded queries instead of hiding those connections from admins.
+        $paths = $media->getCollection()->pluck('path')->filter()->unique()->values();
+        $embeddedPageRows = collect();
+        $embeddedArticleRows = collect();
+
+        if ($paths->isNotEmpty() && Schema::hasTable('content_pages') && Schema::hasColumn('content_pages', 'body')) {
+            $embeddedPageRows = DB::table('content_pages')
+                ->select(['id', 'body'])
+                ->where(function ($builder) use ($paths): void {
+                    foreach ($paths as $path) {
+                        $builder->orWhere('body', 'like', '%'.$path.'%');
+                    }
+                })
+                ->get();
+        }
+
+        if ($paths->isNotEmpty() && Schema::hasTable('blog_posts') && Schema::hasColumn('blog_posts', 'body')) {
+            $embeddedArticleRows = DB::table('blog_posts')
+                ->select(['id', 'body'])
+                ->where(function ($builder) use ($paths): void {
+                    foreach ($paths as $path) {
+                        $builder->orWhere('body', 'like', '%'.$path.'%');
+                    }
+                })
+                ->get();
+        }
+
+        $media->getCollection()->each(function (Media $item) use ($embeddedPageRows, $embeddedArticleRows): void {
+            $item->setAttribute('embedded_page_usage_count', $embeddedPageRows
+                ->filter(fn ($row): bool => str_contains((string) $row->body, (string) $item->path))
+                ->count());
+            $item->setAttribute('embedded_article_usage_count', $embeddedArticleRows
+                ->filter(fn ($row): bool => str_contains((string) $row->body, (string) $item->path))
+                ->count());
+        });
+
         return view('admin.media.index', compact('media', 'filters'));
     }
 
