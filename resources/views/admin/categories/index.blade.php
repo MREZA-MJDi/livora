@@ -166,6 +166,10 @@
 
                             <div class="flex items-center justify-end gap-2">
 
+                                @if($category->is_active)
+                                    <a href="{{ route('categories.show', $category->slug) }}" target="_blank" rel="noopener" class="admin-btn admin-btn-ghost px-3" title="مشاهده در سایت">سایت</a>
+                                @endif
+
                                 <a
                                     href="{{ route('admin.categories.show', $category) }}"
                                     class="admin-btn admin-btn-ghost px-3"
