@@ -82,6 +82,33 @@ class AboutPagePopulationMigrationTest extends TestCase
         $this->assertSame('published', $page->status);
     }
 
+    public function test_it_upgrades_only_the_original_seed_about_copy(): void
+    {
+        $this->createContentPagesTable();
+
+        DB::table('content_pages')->insert([
+            'title' => 'درباره SillaGallery',
+            'slug' => 'about',
+            'body' => '<h1>درباره SillaGallery</h1><p>SillaGallery با تمرکز بر مبلمان و عناصر خانه، تلاش می‌کند انتخاب محصول را به تجربه‌ای روشن، دقیق و دلنشین تبدیل کند.</p><h2>نگاه ما</h2><p>ما باور داریم انتخاب خوب فقط به ظاهر محصول محدود نمی‌شود؛ کیفیت متریال، تناسب با فضا، کاربرد روزمره و دوام در طول زمان نیز اهمیت دارند.</p><h2>چیزهایی که برای ما مهم‌اند</h2><ul><li><strong>طراحی:</strong> فرم و ظاهر باید در خدمت فضای زندگی باشد.</li><li><strong>کیفیت:</strong> انتخاب متریال و ساخت خوب، ارزش محصول را در طول زمان حفظ می‌کند.</li><li><strong>شفافیت:</strong> مشخصات، قیمت، موجودی و شرایط خرید باید روشن باشند.</li><li><strong>تجربه:</strong> مسیر کشف، بررسی و سفارش باید ساده و قابل‌اعتماد باشد.</li></ul><h2>از کشف تا انتخاب</h2><p>در فروشگاه می‌توانید مجموعه‌ها را بررسی کنید، مشخصات محصولات را بخوانید و شرایط خرید را پیش از ثبت سفارش ببینید.</p><p>برای دریافت راهنمایی بیشتر از <a href="/contact">صفحه تماس با ما</a> با ما در ارتباط باشید.</p>',
+            'excerpt' => 'با نگاه، ارزش‌ها و رویکرد SillaGallery در انتخاب مبلمان و عناصر خانه آشنا شوید.',
+            'meta_title' => 'درباره SillaGallery | مبلمان و لوازم خانه',
+            'meta_description' => 'با داستان، رویکرد و ارزش‌های SillaGallery در انتخاب مبلمان و عناصر خانه آشنا شوید.',
+            'status' => 'published',
+            'published_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $migration = require database_path('migrations/2026_11_13_130000_populate_sillagallery_about_page.php');
+        $migration->up();
+
+        $page = DB::table('content_pages')->where('slug', 'about')->first();
+
+        $this->assertStringContainsString('خانه، با انتخاب‌هایی شکل می‌گیرد', $page->body);
+        $this->assertStringContainsString('کیفیت متریال و کاربرد', $page->body);
+        $this->assertSame('published', $page->status);
+    }
+
     public function test_it_is_safe_when_the_content_pages_table_does_not_exist(): void
     {
         $migration = require database_path('migrations/2026_11_13_130000_populate_sillagallery_about_page.php');
