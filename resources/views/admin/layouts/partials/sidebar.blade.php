@@ -48,7 +48,7 @@
     id="admin-sidebar"
     data-admin-sidebar
     aria-label="منوی مدیریت فروشگاه"
-    class="admin-sidebar fixed inset-y-0 right-0 z-50 flex w-[280px] -translate-x-0 flex-col border-l border-[var(--admin-border)] bg-[var(--admin-white)] transition-transform duration-300 lg:translate-x-0"
+    class="admin-sidebar fixed inset-y-0 right-0 z-50 flex w-[260px] -translate-x-0 flex-col border-l border-[var(--admin-border)] bg-[var(--admin-white)] transition-transform duration-300 lg:translate-x-0"
     :class="sidebarOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'"
 >
     <div class="flex h-[76px] shrink-0 items-center justify-between border-b border-[var(--admin-border)] px-5">
