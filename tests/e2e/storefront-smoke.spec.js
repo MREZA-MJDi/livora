@@ -250,3 +250,46 @@ test('public category, product and banner image frames preserve their editor cro
         }
     }
 });
+
+
+test('about page contains the SillaGallery story and the footer offers useful shopping paths', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/about', { waitUntil: 'domcontentloaded' });
+
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('درباره');
+    await expect(page.getByText('خانه، با انتخاب‌هایی شکل می‌گیرند که به آن معنا می‌دهند')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'مشاهده محصولات و مجموعه‌ها' })).toHaveAttribute('href', '/shop');
+    await expect(page.locator('footer').getByRole('link', { name: 'درباره ما' })).toHaveAttribute('href', '/about');
+    await expect(page.locator('footer').getByRole('link', { name: 'قوانین و مقررات' })).toHaveAttribute('href', '/terms');
+    await expect(page.locator('footer').getByRole('link', { name: 'تماس' })).toHaveAttribute('href', '/contact');
+
+    const overflow = await page.evaluate(() => (
+        Math.max(document.documentElement.scrollWidth, document.body.scrollWidth)
+        - document.documentElement.clientWidth
+    ));
+    expect(overflow, 'about page and marketing footer mobile overflow').toBeLessThanOrEqual(1);
+});
+
+test('admin category catalogue supports search and status filtering', async ({ page }) => {
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+
+    test.skip(!adminEmail || !adminPassword, 'Admin credentials are injected only by the isolated browser CI job.');
+
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto('/login', { waitUntil: 'domcontentloaded' });
+    await page.locator('input[name="email"]').fill(adminEmail);
+    await page.locator('input[name="password"]').fill(adminPassword);
+    await page.getByRole('button', { name: 'ورود به حساب' }).click();
+    await expect(page).toHaveURL(/\\/admin(?:\\/)?$/);
+
+    await page.goto('/admin/categories', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('#category-search')).toBeVisible();
+    await page.locator('#category-search').fill('furniture');
+    await page.locator('#category-status').selectOption('all');
+    await page.getByRole('button', { name: 'اعمال فیلتر' }).click();
+
+    await expect(page).toHaveURL(/search=furniture/);
+    await expect(page.locator('.admin-table')).toContainText('furniture');
+    await expect(page.locator('.admin-table')).toContainText('تعداد محصولات');
+});
