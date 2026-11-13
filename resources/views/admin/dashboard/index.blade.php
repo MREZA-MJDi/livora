@@ -204,7 +204,7 @@
                             @endif
                         </div>
                         <p class="mt-2 min-h-10 text-xs leading-6 text-[var(--admin-muted)]">{{ $check['description'] }}</p>
-                        <a href="{{ route('admin.contact-settings.edit') }}" class="mt-3 inline-flex text-xs font-semibold text-[var(--admin-accent)]">
+                        <a href="{{ route('admin.contact-settings.edit') }}#{{ $check['anchor'] }}" class="mt-3 inline-flex text-xs font-semibold text-[var(--admin-accent)]">
                             {{ $check['complete'] ? 'مشاهده و ویرایش' : 'تنظیم این بخش' }} ←
                         </a>
                     </article>
