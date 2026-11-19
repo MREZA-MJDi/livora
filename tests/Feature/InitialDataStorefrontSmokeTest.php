@@ -38,7 +38,7 @@ class InitialDataStorefrontSmokeTest extends TestCase
         $this->get(route('about'))
             ->assertOk()
             ->assertSee($about->title)
-            ->assertSee('خانه، بازتابی از شیوه زندگی ما')
+            ->assertSee('خانه، با انتخاب‌هایی شکل می‌گیرد که به آن معنا می‌دهند')
             ->assertDontSee('images.unsplash.com');
 
         $this->get(route('blog.index'))

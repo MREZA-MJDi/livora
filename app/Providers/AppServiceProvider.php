@@ -24,11 +24,16 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         View::composer('*', function ($view): void {
-            $view->with('storeSettings', Cache::remember(
+            // Cache::remember treats a cached null as a cache miss. On a fresh
+            // database with no ContactSetting row, every nested view composer
+            // would otherwise issue the same SELECT again.
+            $settings = Cache::remember(
                 'storefront.settings',
                 now()->addMinutes(10),
-                static fn () => ContactSetting::query()->first(),
-            ));
+                static fn () => ContactSetting::query()->first() ?? false,
+            );
+
+            $view->with('storeSettings', $settings === false ? null : $settings);
         });
         View::composer('components.layout.search-overlay', function ($view): void {
             $searchCategories = Cache::remember(

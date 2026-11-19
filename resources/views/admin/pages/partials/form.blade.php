@@ -55,6 +55,9 @@
             <h2 class="text-base font-bold">انتشار</h2>
             <div><label class="admin-label" for="status">وضعیت</label><select id="status" name="status" class="admin-select"><option value="draft" @selected(old('status', $page->status ?? 'draft') === 'draft')>پیش‌نویس</option><option value="published" @selected(old('status', $page->status ?? 'draft') === 'published')>منتشرشده</option></select></div>
             <div><label class="admin-label" for="published_at">زمان انتشار</label><input id="published_at" name="published_at" type="datetime-local" class="admin-input" value="{{ old('published_at', isset($page) && $page->published_at ? $page->published_at->format('Y-m-d\TH:i') : '') }}"></div>
+            @if($editing)
+                <a href="{{ route('admin.pages.preview', $page) }}" target="_blank" rel="noopener" class="admin-btn admin-btn-secondary w-full">پیش‌نمایش آخرین نسخه ذخیره‌شده</a>
+            @endif
             <button type="submit" class="admin-btn admin-btn-primary w-full">{{ $editing ? 'ذخیره تغییرات' : 'ایجاد صفحه' }}</button>
             <a href="{{ route('admin.pages.index') }}" class="admin-btn admin-btn-secondary w-full">بازگشت</a>
         </section>

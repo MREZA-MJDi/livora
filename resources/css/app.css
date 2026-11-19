@@ -2474,7 +2474,7 @@ body {
     scroll-snap-align: start;
 }
 .sg-category-index-track .sg-category-index-tile__media {
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 4 / 3;
     border-radius: 1.15rem;
 }
 .sg-category-index-track .sg-category-index-tile__shade {

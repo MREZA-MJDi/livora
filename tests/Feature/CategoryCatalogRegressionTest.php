@@ -24,24 +24,29 @@ final class CategoryCatalogRegressionTest extends TestCase
         $secondPage->assertSee('نمایش 13 تا 21', false);
         $secondPage->assertSee('از 21 مجموعه', false);
 
-        $this->assertStringContainsString(
-            route('categories.show', 'catalog-regression-13'),
-            $secondPage->getContent()
-        );
-        $this->assertStringNotContainsString(
-            route('categories.show', 'catalog-regression-01'),
-            $secondPage->getContent()
-        );
+        $dom = new \DOMDocument();
+        $previousLibxmlState = libxml_use_internal_errors(true);
+        $dom->loadHTML(mb_convert_encoding($secondPage->getContent(), 'HTML-ENTITIES', 'UTF-8'));
+        libxml_clear_errors();
+        libxml_use_internal_errors($previousLibxmlState);
+
+        $xpath = new \DOMXPath($dom);
+        $grid = $xpath->query('//*[contains(concat(" ", normalize-space(@class), " "), " sg-category-index-grid ")]')->item(0);
+        $this->assertNotNull($grid);
+
+        $gridHtml = $dom->saveHTML($grid);
+        $this->assertStringContainsString(route('categories.show', 'catalog-regression-13'), $gridHtml);
+        $this->assertStringNotContainsString(route('categories.show', 'catalog-regression-01'), $gridHtml);
     }
 
     public function test_category_index_query_count_does_not_grow_with_category_count(): void
     {
         $this->createCategories(24);
-        $selectQueries = 0;
+        $selectSql = [];
 
-        DB::listen(function (QueryExecuted $query) use (&$selectQueries): void {
+        DB::listen(function (QueryExecuted $query) use (&$selectSql): void {
             if (str_starts_with(strtolower(ltrim($query->sql)), 'select')) {
-                $selectQueries++;
+                $selectSql[] = $query->sql;
             }
         });
 
@@ -49,7 +54,7 @@ final class CategoryCatalogRegressionTest extends TestCase
 
         // Eager-loaded category media/product relations must stay bounded;
         // rendering one more category must not issue per-card SQL queries.
-        $this->assertLessThanOrEqual(14, $selectQueries);
+        $this->assertLessThanOrEqual(14, count($selectSql), implode(PHP_EOL, $selectSql));
     }
 
     private function createCategories(int $count): void

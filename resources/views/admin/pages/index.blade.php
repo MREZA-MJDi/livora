@@ -32,7 +32,7 @@
                         <td><span class="admin-badge {{ $page->status === 'published' ? 'admin-badge-success' : 'admin-badge-warning' }}">{{ $page->status === 'published' ? 'منتشرشده' : 'پیش‌نویس' }}</span></td>
                         <td dir="ltr">{{ $page->seo_index ? 'index' : 'noindex' }} / {{ $page->seo_follow ? 'follow' : 'nofollow' }}</td>
                         <td>{{ $page->updated_at?->format('Y/m/d H:i') }}</td>
-                        <td><div class="flex gap-3"><a class="text-xs font-semibold text-[var(--admin-accent)]" href="{{ route('admin.pages.edit', $page) }}">ویرایش</a>
+                        <td><div class="flex gap-3"><a class="text-xs font-semibold text-[var(--admin-accent)]" href="{{ route('admin.pages.edit', $page) }}">ویرایش</a><a target="_blank" rel="noopener" class="text-xs text-[var(--admin-text-soft)]" href="{{ route('admin.pages.preview', $page) }}">پیش‌نمایش</a>
                         @if($page->status === 'published')<a target="_blank" rel="noopener" class="text-xs" href="{{ route('pages.show', $page->slug) }}">مشاهده</a>@endif
                         <form method="POST" action="{{ route('admin.pages.destroy', $page) }}" onsubmit="return confirm('صفحه حذف شود؟')">@csrf @method('DELETE')<button class="text-xs text-red-500">حذف</button></form></div></td>
                     </tr>
