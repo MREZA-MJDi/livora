@@ -141,13 +141,11 @@ class SmtpSettingsController extends Controller
 
     private function saveTrustBadgeImagePath(string $path): ?string
     {
-        $settings = ContactSetting::query()->first();
-        if (! $settings) {
-            return null;
-        }
-        $oldPath = $settings->enamad_image_path;
-        $settings->enamad_image_path = $path;
-        $settings->save();
+        $oldPath = ContactSetting::query()->where('id', 1)->value('enamad_image_path');
+        ContactSetting::query()->updateOrCreate(
+            ['id' => 1],
+            ['enamad_image_path' => $path]
+        );
         cache()->forget('storefront.settings');
         return $oldPath;
     }
