@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\SmtpSettingsController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Admin\ContactMessageController;
 use App\Http\Controllers\Admin\ContactSettingController;
@@ -386,6 +387,10 @@ Route::middleware(['auth', 'admin', 'admin.session.timeout'])
             '/',
             [AdminDashboardController::class, 'index']
         )->name('dashboard');
+
+        Route::get('/smtp-settings', [SmtpSettingsController::class, 'edit'])->name('smtp-settings.edit');
+        Route::put('/smtp-settings', [SmtpSettingsController::class, 'update'])->name('smtp-settings.update');
+        Route::post('/smtp-settings/test', [SmtpSettingsController::class, 'test'])->middleware('throttle:5,1')->name('smtp-settings.test');
 
         Route::post('/session/heartbeat', fn () => response()->noContent())
             ->middleware('throttle:30,1')
