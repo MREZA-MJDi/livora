@@ -29,7 +29,7 @@ class BlogController extends Controller
     {
         $posts = $tag->posts()
             ->published()
-            ->with('tags')
+            ->with(['tags', 'media'])
             ->latest('published_at')
             ->paginate(12);
 
