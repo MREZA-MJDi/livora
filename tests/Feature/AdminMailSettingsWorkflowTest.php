@@ -23,8 +23,8 @@ class AdminMailSettingsWorkflowTest extends TestCase
             'mail-provider.api_url' => 'https://mail-api.example.test',
             'mail-provider.api_token' => 'project-scoped-secret',
             'mail-provider.domain' => 'sillashop.com',
-            'mail-provider.smtp_host' => 'mail.sillashop.com',
-            'mail-provider.imap_host' => 'mail.sillashop.com',
+            'mail-provider.smtp_host' => 'mail.farajihome.com',
+            'mail-provider.imap_host' => 'mail.farajihome.com',
         ]);
 
         Http::fake([
@@ -49,8 +49,8 @@ class AdminMailSettingsWorkflowTest extends TestCase
         $this->assertSame('info@sillashop.com', $settings->username);
         $this->assertSame('info@sillashop.com', $settings->imap_username);
         $this->assertSame($settings->password, $settings->imap_password);
-        $this->assertSame('mail.sillashop.com', $settings->host);
-        $this->assertSame('mail.sillashop.com', $settings->imap_host);
+        $this->assertSame('mail.farajihome.com', $settings->host);
+        $this->assertSame('mail.farajihome.com', $settings->imap_host);
         $this->assertTrue($settings->enabled);
         $this->assertNotSame($settings->password, DB::table('smtp_settings')->value('password'));
 
