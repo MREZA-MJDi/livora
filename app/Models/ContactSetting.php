@@ -11,7 +11,7 @@ class ContactSetting extends Model
 {
     protected $fillable = [
         'brand_name', 'brand_description',
-        'enamad_url', 'samandehi_url', 'footer_menu', 'payment_methods', 'copyright_text', 'logo_media_id',
+        'enamad_url', 'enamad_image_path', 'samandehi_url', 'footer_menu', 'payment_methods', 'copyright_text', 'logo_media_id',
         'logo_path',
         'phone',
         'email',
@@ -40,23 +40,18 @@ class ContactSetting extends Model
         'floating_actions_enabled',
     ];
 
-
     public function getLogoUrlAttribute(): ?string
     {
         if ($this->logo_media_id && $this->logoMedia && filled($this->logoMedia->url)) {
             return $this->logoMedia->url;
         }
-
         if (! $this->logo_path) {
             return null;
         }
-
         if (Str::startsWith($this->logo_path, ['http://', 'https://', '//'])) {
             return $this->logo_path;
         }
-
         $path = ltrim($this->logo_path, '/');
-
         return Storage::disk('public')->exists($path) ? Storage::disk('public')->url($path) : null;
     }
 
@@ -70,16 +65,11 @@ class ContactSetting extends Model
         if (! is_numeric($this->map_latitude) || ! is_numeric($this->map_longitude)) {
             return false;
         }
-
         $latitude = (float) $this->map_latitude;
         $longitude = (float) $this->map_longitude;
-
-        return is_finite($latitude)
-            && is_finite($longitude)
-            && $latitude >= -90
-            && $latitude <= 90
-            && $longitude >= -180
-            && $longitude <= 180;
+        return is_finite($latitude) && is_finite($longitude)
+            && $latitude >= -90 && $latitude <= 90
+            && $longitude >= -180 && $longitude <= 180;
     }
 
     public function googleMapsEmbedUrl(): ?string
@@ -87,14 +77,8 @@ class ContactSetting extends Model
         if (! $this->hasMapLocation()) {
             return null;
         }
-
         $coordinates = sprintf('%.7F,%.7F', (float) $this->map_latitude, (float) $this->map_longitude);
-
-        return 'https://maps.google.com/maps?' . http_build_query([
-            'q' => $coordinates,
-            'z' => 15,
-            'output' => 'embed',
-        ]);
+        return 'https://maps.google.com/maps?' . http_build_query(['q' => $coordinates, 'z' => 15, 'output' => 'embed']);
     }
 
     public function googleMapsDirectionsUrl(): ?string
@@ -102,13 +86,8 @@ class ContactSetting extends Model
         if (! $this->hasMapLocation()) {
             return null;
         }
-
         $coordinates = sprintf('%.7F,%.7F', (float) $this->map_latitude, (float) $this->map_longitude);
-
-        return 'https://www.google.com/maps/dir/?' . http_build_query([
-            'api' => 1,
-            'destination' => $coordinates,
-        ]);
+        return 'https://www.google.com/maps/dir/?' . http_build_query(['api' => 1, 'destination' => $coordinates]);
     }
 
     public function googleMapsSearchUrl(): ?string
@@ -116,12 +95,8 @@ class ContactSetting extends Model
         if ($this->hasMapLocation()) {
             return $this->googleMapsDirectionsUrl();
         }
-
         $address = trim((string) $this->address);
-
-        return $address !== ''
-            ? 'https://www.google.com/maps/search/?' . http_build_query(['api' => 1, 'query' => $address])
-            : null;
+        return $address !== '' ? 'https://www.google.com/maps/search/?' . http_build_query(['api' => 1, 'query' => $address]) : null;
     }
 
     protected function casts(): array
