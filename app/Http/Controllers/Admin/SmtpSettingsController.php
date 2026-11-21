@@ -147,6 +147,7 @@ class SmtpSettingsController extends Controller
         $oldPath = $settings->enamad_image_path;
         $settings->enamad_image_path = $path;
         $settings->save();
+        cache()->forget('storefront.settings');
         return $oldPath;
     }
 }
