@@ -15,11 +15,11 @@ return [
     'api_token' => env('MAIL_PROVIDER_API_TOKEN'),
     'domain' => env('MAIL_PROVIDER_DOMAIN', 'sillashop.com'),
 
-    'smtp_host' => env('MAIL_PROVIDER_SMTP_HOST', 'mail.sillashop.com'),
+    'smtp_host' => env('MAIL_PROVIDER_SMTP_HOST', 'mail.farajihome.com'),
     'smtp_port' => (int) env('MAIL_PROVIDER_SMTP_PORT', 587),
     'smtp_encryption' => env('MAIL_PROVIDER_SMTP_ENCRYPTION', 'tls'),
 
-    'imap_host' => env('MAIL_PROVIDER_IMAP_HOST', 'mail.sillashop.com'),
+    'imap_host' => env('MAIL_PROVIDER_IMAP_HOST', 'mail.farajihome.com'),
     'imap_port' => (int) env('MAIL_PROVIDER_IMAP_PORT', 993),
     'imap_encryption' => env('MAIL_PROVIDER_IMAP_ENCRYPTION', 'ssl'),
 
