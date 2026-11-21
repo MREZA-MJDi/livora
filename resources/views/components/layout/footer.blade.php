@@ -78,8 +78,8 @@
                 @endif
 
                 <div class="mt-6 flex flex-wrap items-center gap-4">
-                    @if(filled($storeSettings?->enamad_url))
-                        <a href="{{ $storeSettings->enamad_url }}" target="_blank" rel="noopener noreferrer" aria-label="استعلام نماد اعتماد الکترونیکی" class="inline-flex min-h-20 items-center justify-center rounded-xl border border-white/15 bg-white p-2 transition hover:border-white/40">
+                    @if(filled($storeSettings?->enamad_url) || filled($storeSettings?->enamad_image_path))
+                        <a href="{{ $storeSettings?->enamad_url ?: '#' }}" target="_blank" rel="noopener noreferrer" aria-label="استعلام نماد اعتماد الکترونیکی" class="inline-flex min-h-20 items-center justify-center rounded-xl border border-white/15 bg-white p-2 transition hover:border-white/40">
                             @if(filled($storeSettings?->enamad_image_path) && \Illuminate\Support\Facades\Storage::disk('public')->exists($storeSettings->enamad_image_path))
                                 <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($storeSettings->enamad_image_path) }}" alt="نماد اعتماد الکترونیکی" width="92" height="92" loading="lazy" decoding="async" class="h-20 w-20 object-contain">
                             @else
