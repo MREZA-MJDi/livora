@@ -77,9 +77,15 @@
                     </div>
                 @endif
 
-                <div class="mt-6 flex flex-wrap gap-2">
+                <div class="mt-6 flex flex-wrap items-center gap-4">
                     @if(filled($storeSettings?->enamad_url))
-                        <a href="{{ $storeSettings->enamad_url }}" target="_blank" rel="noopener noreferrer" class="rounded-full border border-white/15 px-3 py-2 text-[11px] text-white/75 transition hover:border-white/40 hover:text-white">استعلام نماد اعتماد</a>
+                        <a href="{{ $storeSettings->enamad_url }}" target="_blank" rel="noopener noreferrer" aria-label="استعلام نماد اعتماد الکترونیکی" class="inline-flex min-h-20 items-center justify-center rounded-xl border border-white/15 bg-white p-2 transition hover:border-white/40">
+                            @if(filled($storeSettings?->enamad_image_path) && \Illuminate\Support\Facades\Storage::disk('public')->exists($storeSettings->enamad_image_path))
+                                <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($storeSettings->enamad_image_path) }}" alt="نماد اعتماد الکترونیکی" width="92" height="92" loading="lazy" decoding="async" class="h-20 w-20 object-contain">
+                            @else
+                                <span class="px-2 text-[11px] font-semibold text-slate-700">استعلام نماد اعتماد</span>
+                            @endif
+                        </a>
                     @endif
                     @if(filled($storeSettings?->samandehi_url))
                         <a href="{{ $storeSettings->samandehi_url }}" target="_blank" rel="noopener noreferrer" class="rounded-full border border-white/15 px-3 py-2 text-[11px] text-white/75 transition hover:border-white/40 hover:text-white">ساماندهی</a>
