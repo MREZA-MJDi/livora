@@ -67,7 +67,7 @@
             </div>
             <div class="grid gap-4 sm:grid-cols-2">
                 <label class="block text-sm font-medium">میزبان SMTP
-                    <input name="host" value="{{ old('host', $settings->host) }}" placeholder="mail.sillashop.com" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" autocomplete="off">
+                    <input name="host" value="{{ old('host', $settings->host) }}" placeholder="mail.farajihome.com" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" autocomplete="off">
                 </label>
                 <label class="block text-sm font-medium">پورت SMTP
                     <input type="number" min="1" max="65535" name="port" value="{{ old('port', $settings->port ?: 587) }}" required class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm">
@@ -111,7 +111,7 @@
                     <input type="email" name="mailbox_address" value="{{ old('mailbox_address', $settings->mailbox_address ?: 'info@sillashop.com') }}" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" dir="ltr">
                 </label>
                 <label class="block text-sm font-medium">میزبان IMAP
-                    <input name="imap_host" value="{{ old('imap_host', $settings->imap_host ?: $settings->host) }}" placeholder="mail.sillashop.com" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" dir="ltr">
+                    <input name="imap_host" value="{{ old('imap_host', $settings->imap_host ?: $settings->host) }}" placeholder="mail.farajihome.com" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" dir="ltr">
                 </label>
                 <label class="block text-sm font-medium">پورت IMAP
                     <input type="number" min="1" max="65535" name="imap_port" value="{{ old('imap_port', $settings->imap_port ?: 993) }}" required class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm">
