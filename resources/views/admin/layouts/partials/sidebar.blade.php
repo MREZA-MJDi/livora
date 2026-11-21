@@ -39,6 +39,7 @@
                 ['label' => 'تنظیمات کلی سئو', 'description' => 'عنوان و توضیحات پیش‌فرض و تنظیم ایندکس سایت', 'route' => 'admin.seo.edit', 'active' => 'admin.seo.edit'],
                 ['label' => 'عنوان صفحات در گوگل', 'description' => 'تنظیم عنوان و توضیحات صفحات اصلی', 'route' => 'admin.seo.pages', 'active' => 'admin.seo.pages'],
                 ['label' => 'بررسی سلامت سئو', 'description' => 'پیدا کردن مشکلات فنی و محتوایی سئو', 'route' => 'admin.seo.audit', 'active' => 'admin.seo.audit'],
+                ['label' => 'تنظیمات ایمیل (SMTP)', 'description' => 'مدیریت اتصال ایمیل‌های سیستمی و ارسال پیام آزمایشی', 'route' => 'admin.smtp-settings.edit', 'active' => 'admin.smtp-settings.*'],
             ],
         ],
     ];
