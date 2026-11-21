@@ -391,6 +391,7 @@ Route::middleware(['auth', 'admin', 'admin.session.timeout'])
         Route::get('/smtp-settings', [SmtpSettingsController::class, 'edit'])->name('smtp-settings.edit');
         Route::put('/smtp-settings', [SmtpSettingsController::class, 'update'])->name('smtp-settings.update');
         Route::post('/smtp-settings/test', [SmtpSettingsController::class, 'test'])->middleware('throttle:5,1')->name('smtp-settings.test');
+        Route::post('/smtp-settings/inbox/sync', [SmtpSettingsController::class, 'syncInbox'])->middleware('throttle:5,1')->name('smtp-settings.inbox.sync');
 
         Route::post('/session/heartbeat', fn () => response()->noContent())
             ->middleware('throttle:30,1')
