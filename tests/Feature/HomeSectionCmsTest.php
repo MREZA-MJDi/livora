@@ -138,7 +138,9 @@ class HomeSectionCmsTest extends TestCase
         $this->get(route('home'))
             ->assertOk()
             ->assertSee('عنوان اول')
-            ->assertSee('data-sg-hero-dot="1"', false)
+            ->assertSee('data-sg-hero-next', false)
+            ->assertSee('data-sg-hero-prev', false)
+            ->assertSee('data-sg-hero-progress', false)
             ->assertSee('data-sg-hero-data', false);
     }
 
