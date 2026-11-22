@@ -84,10 +84,15 @@
                 <x-layout.container>
                     <div class="sg-home-hero__layout">
                         <div class="sg-home-hero__content" dir="ltr">
-                            <div class="sg-home-hero__dots" role="tablist" aria-label="انتخاب اسلاید هیرو">
-                                @foreach($heroSlides as $index => $slide)
-                                    <button type="button" class="sg-home-hero__dot {{ $index === 0 ? 'is-active' : '' }}" data-sg-hero-dot="{{ $index }}" aria-label="نمایش اسلاید {{ $index + 1 }}" aria-pressed="{{ $index === 0 ? 'true' : 'false' }}"></button>
-                                @endforeach
+                            <div class="sg-home-hero__controls" aria-label="کنترل اسلایدر">
+                                <div class="sg-home-hero__control-buttons">
+                                    <button type="button" class="sg-home-hero__arrow" data-sg-hero-prev aria-label="اسلاید قبلی">→</button>
+                                    <button type="button" class="sg-home-hero__arrow" data-sg-hero-next aria-label="اسلاید بعدی">←</button>
+                                </div>
+                                <div class="sg-home-hero__progress" aria-hidden="true">
+                                    <span class="sg-home-hero__count"><span class="sg-home-hero__count-current" data-sg-hero-current>01</span> / <span data-sg-hero-total>{{ str_pad((string) $heroSlides->count(), 2, '0', STR_PAD_LEFT) }}</span></span>
+                                    <span class="sg-home-hero__progress-track"><span class="sg-home-hero__progress-fill" data-sg-hero-progress></span></span>
+                                </div>
                             </div>
                             <div class="sg-home-hero__copy" dir="rtl">
                                 <p class="sg-home-hero__eyebrow" data-sg-hero-eyebrow>{{ $heroSlides[0]['eyebrow'] ?? '' }}</p>
