@@ -57,7 +57,7 @@
         @if($settings->mailbox_address)
             <div class="mt-4 rounded-xl bg-[var(--admin-surface)] p-4 text-sm" dir="ltr">
                 <strong>{{ $settings->mailbox_address }}</strong>
-                <p class="mt-2 text-xs text-[var(--admin-muted)]" dir="rtl">رمز هنگام ساخت فقط یک‌بار نمایش داده می‌شود؛ اگر آن را ذخیره نکرده‌اید، پیش از تغییر رمز با مدیر سرور هماهنگ کنید.</p>
+                <p class="mt-2 text-xs text-[var(--admin-muted)]" dir="rtl">رمز صندوق در تنظیمات امن سرور تعریف و در پایگاه داده رمزنگاری‌شده نگهداری می‌شود.</p>
             </div>
         @else
             <form method="POST" action="{{ route('admin.smtp-settings.mailbox.create') }}" class="mt-4 grid gap-3 sm:grid-cols-[1fr_150px_auto] sm:items-end">
