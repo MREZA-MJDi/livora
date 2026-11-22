@@ -1100,16 +1100,17 @@ class StorefrontReadinessTest extends TestCase
         $currentMonthOrder->forceFill([
             'total' => 300,
             'status' => 'delivered',
-            'created_at' => now()->startOfMonth()->addDay(),
-            'updated_at' => now()->startOfMonth()->addDay(),
+            // Dashboard revenue buckets follow Jalali month boundaries.
+            'created_at' => now(),
+            'updated_at' => now(),
         ])->save();
 
         $previousMonthOrder = $this->inventoryOrder();
         $previousMonthOrder->forceFill([
             'total' => 150,
             'status' => 'pending',
-            'created_at' => now()->subMonthNoOverflow()->startOfMonth()->addDay(),
-            'updated_at' => now()->subMonthNoOverflow()->startOfMonth()->addDay(),
+            'created_at' => now()->subMonthNoOverflow(),
+            'updated_at' => now()->subMonthNoOverflow(),
         ])->save();
 
         $this->actingAs($admin)
