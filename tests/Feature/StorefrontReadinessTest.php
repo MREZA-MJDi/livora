@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Helpers\JalaliHelper;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\ContactSetting;
@@ -1096,20 +1097,42 @@ class StorefrontReadinessTest extends TestCase
             'role' => 'admin',
         ]);
 
+        $now = now();
+        [$jalaliYear, $jalaliMonth] = JalaliHelper::toJalali(
+            (int) $now->format('Y'),
+            (int) $now->format('n'),
+            (int) $now->format('j')
+        );
+
+        $currentMonthStart = JalaliHelper::monthStart(
+            $jalaliYear,
+            $jalaliMonth,
+            $now->getTimezone()
+        )->modify('+2 days');
+
+        $previousMonthIndex = ($jalaliYear * 12) + ($jalaliMonth - 1) - 1;
+        $previousMonthYear = intdiv($previousMonthIndex, 12);
+        $previousMonth = ($previousMonthIndex % 12) + 1;
+        $previousMonthStart = JalaliHelper::monthStart(
+            $previousMonthYear,
+            $previousMonth,
+            $now->getTimezone()
+        )->modify('+2 days');
+
         $currentMonthOrder = $this->inventoryOrder();
         $currentMonthOrder->forceFill([
             'total' => 300,
             'status' => 'delivered',
-            'created_at' => now()->startOfMonth()->addDay(),
-            'updated_at' => now()->startOfMonth()->addDay(),
+            'created_at' => $currentMonthStart,
+            'updated_at' => $currentMonthStart,
         ])->save();
 
         $previousMonthOrder = $this->inventoryOrder();
         $previousMonthOrder->forceFill([
             'total' => 150,
             'status' => 'pending',
-            'created_at' => now()->subMonthNoOverflow()->startOfMonth()->addDay(),
-            'updated_at' => now()->subMonthNoOverflow()->startOfMonth()->addDay(),
+            'created_at' => $previousMonthStart,
+            'updated_at' => $previousMonthStart,
         ])->save();
 
         $this->actingAs($admin)

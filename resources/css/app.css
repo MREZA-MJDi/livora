@@ -30,7 +30,7 @@ body {
     background:
         radial-gradient(
             circle at top left,
-            rgba(154, 118, 88, 0.035),
+            rgba(181, 138, 106, 0.035),
             transparent 30rem
         ),
         var(--sg-cream);
@@ -341,7 +341,7 @@ h6 {
 
     box-shadow:
         0 0 0 3px
-        rgba(24, 23, 21, 0.05);
+        rgba(38, 53, 43, 0.05);
 }
 
 .admin-input:disabled,
@@ -489,15 +489,15 @@ h6 {
 
     border:
         1px solid
-        rgba(154, 118, 88, 0.18);
+        rgba(181, 138, 106, 0.18);
 
     border-radius: 1rem;
 
     background:
         linear-gradient(
             135deg,
-            rgba(154, 118, 88, 0.08),
-            rgba(154, 118, 88, 0.025)
+            rgba(181, 138, 106, 0.08),
+            rgba(181, 138, 106, 0.025)
         );
 }
 
@@ -542,7 +542,7 @@ h6 {
     justify-content: space-between;
     gap: 1rem;
 
-    color: #5e5a54;
+    color: #536456;
 
     font-size: 0.7rem;
 }
@@ -558,7 +558,7 @@ h6 {
 
     border-top:
         1px solid
-        rgba(154, 118, 88, 0.12);
+        rgba(181, 138, 106, 0.12);
 
     color: var(--sg-stone);
 
@@ -975,7 +975,7 @@ body {
     min-height: 3.25rem;
     background: var(--sg-ink);
     color: #fff;
-    box-shadow: 0 6px 18px rgba(24, 23, 21, 0.16);
+    box-shadow: 0 6px 18px rgba(38, 53, 43, 0.16);
 }
 
 .mobile-bottom-search:hover,
@@ -1729,7 +1729,7 @@ body {
 
 /* Storefront card finishing pass */
 .sg-product-grid .product-card{display:flex;min-width:0;height:100%;flex-direction:column}
-.sg-product-grid .product-card-media{aspect-ratio:4/5;overflow:hidden;background:#f4f2ee}
+.sg-product-grid .product-card-media{aspect-ratio:4/5;overflow:hidden;background:#e5efe2}
 .sg-product-grid .product-card-image{width:100%;height:100%;object-fit:contain;object-position:center}
 .sg-product-grid .product-card-content{display:flex;flex:1 1 auto;flex-direction:column;min-width:0;gap:.15rem;padding:clamp(.75rem,1.2vw,1rem)}
 .sg-product-grid .product-card-content h3{min-height:2.8rem;line-height:1.65}
@@ -1856,7 +1856,7 @@ body {
     width: 100%;
     aspect-ratio: 4 / 5;
     overflow: hidden;
-    background: #e9e5dd;
+    background: #c3d8c1;
 }
 .product-card .product-card-image {
     position: absolute;
@@ -2157,7 +2157,7 @@ body {
     top: calc(100% + .15rem);
     z-index: 2;
     min-height: 0;
-    color: #28734f;
+    color: #416d4b;
     font-size: .58rem;
     line-height: 1.4;
     text-align: center;
@@ -2166,7 +2166,7 @@ body {
     display: none;
 }
 .product-card-quick-add-feedback[data-state="error"] {
-    color: #b42318;
+    color: #a83f3f;
 }
 .product-card-quick-add-feedback[data-state="loading"] {
     color: var(--sg-stone);

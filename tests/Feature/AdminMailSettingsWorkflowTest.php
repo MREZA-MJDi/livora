@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\SmtpSetting;
+use App\Models\User;
 use App\Models\ContactSetting;
 use App\Services\Mail\ImapInboxReader;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -19,7 +20,7 @@ class AdminMailSettingsWorkflowTest extends TestCase
 
     public function test_project_mailbox_is_created_by_the_scoped_vps_provider_and_credentials_are_encrypted(): void
     {
-        $this->withoutMiddleware();
+        $this->actingAs(User::factory()->create(['role' => 'admin']));
 
         config([
             'mail-provider.api_url' => 'https://mail-api.example.test',
@@ -56,6 +57,15 @@ class AdminMailSettingsWorkflowTest extends TestCase
         $this->assertTrue($settings->enabled);
         $this->assertNotSame($settings->password, DB::table('smtp_settings')->value('password'));
 
+        $generatedPassword = session('mailbox_credentials.password');
+        $this->assertNotEmpty($generatedPassword);
+        $this->get(route('admin.smtp-settings.edit'))
+            ->assertOk()
+            ->assertSee($generatedPassword);
+        $this->get(route('admin.smtp-settings.edit'))
+            ->assertOk()
+            ->assertDontSee($generatedPassword);
+
         Http::assertSent(function (ClientRequest $request): bool {
             return str_ends_with($request->url(), '/api/v1/mailboxes')
                 && $request->hasHeader('Authorization', 'Bearer project-scoped-secret')
@@ -65,6 +75,48 @@ class AdminMailSettingsWorkflowTest extends TestCase
         });
     }
 
+
+    public function test_enamad_link_is_generated_from_official_id_and_code_and_rendered_with_uploaded_badge(): void
+    {
+        $this->actingAs(User::factory()->create(['role' => 'admin']));
+        Storage::fake('public');
+
+        $this->put(route('admin.smtp-settings.update'), [
+            'port' => 587,
+            'encryption' => 'tls',
+            'imap_port' => 993,
+            'imap_encryption' => 'ssl',
+            'trust_badge_image' => UploadedFile::fake()->image('enamad-badge.png'),
+        ])->assertRedirect(route('admin.smtp-settings.edit'));
+
+        $this->put(route('admin.smtp-settings.enamad.update'), [
+            'enamad_id' => '123456',
+            'enamad_code' => 'OfficialCode_ABC-123',
+        ])->assertRedirect(route('admin.smtp-settings.edit'))
+            ->assertSessionHas('success');
+
+        $setting = ContactSetting::query()->firstOrFail();
+        $this->assertSame(
+            'https://trustseal.enamad.ir/?id=123456&Code=OfficialCode_ABC-123',
+            $setting->enamad_url
+        );
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('https://trustseal.enamad.ir/?id=123456&amp;Code=OfficialCode_ABC-123', false)
+            ->assertSee(Storage::disk('public')->url($setting->enamad_image_path), false);
+    }
+
+    public function test_enamad_link_builder_rejects_malformed_ids_and_codes(): void
+    {
+        $this->withoutMiddleware();
+
+        $this->put(route('admin.smtp-settings.enamad.update'), [
+            'enamad_id' => 'not-a-number',
+            'enamad_code' => 'contains spaces',
+        ])->assertRedirect()
+            ->assertSessionHasErrors(['enamad_id', 'enamad_code']);
+    }
 
     public function test_enamad_code_extraction_supports_persian_and_arabic_digits(): void
     {
@@ -123,7 +175,7 @@ class AdminMailSettingsWorkflowTest extends TestCase
 
     public function test_enamad_badge_image_is_saved_for_the_storefront_footer(): void
     {
-        $this->withoutMiddleware();
+        $this->actingAs(User::factory()->create(['role' => 'admin']));
         Storage::fake('public');
 
         $this->put(route('admin.smtp-settings.update'), [
@@ -139,6 +191,17 @@ class AdminMailSettingsWorkflowTest extends TestCase
 
         $this->assertNotEmpty($setting?->enamad_image_path);
         Storage::disk('public')->assertExists($setting->enamad_image_path);
+
+        $setting->update([
+            'enamad_url' => 'https://trustseal.enamad.ir/?id=12345&Code=verified-code',
+        ]);
+        cache()->forget('storefront.settings');
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('https://trustseal.enamad.ir/?id=12345&amp;Code=verified-code', false)
+            ->assertSee(Storage::disk('public')->url($setting->enamad_image_path), false)
+            ->assertSee('alt="نماد اعتماد الکترونیکی"', false);
     }
 
 }

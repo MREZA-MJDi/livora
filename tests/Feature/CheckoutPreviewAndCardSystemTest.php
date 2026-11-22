@@ -273,7 +273,8 @@ class CheckoutPreviewAndCardSystemTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertSee('sg-home-hero', false)
-            ->assertSee('data-sg-hero-dot="0"', false)
+            ->assertSee('data-sg-hero-next', false)
+            ->assertSee('data-sg-hero-prev', false)
             ->assertSee('data-sg-hero-image="0"', false)
             ->assertSee($product->name);
 
