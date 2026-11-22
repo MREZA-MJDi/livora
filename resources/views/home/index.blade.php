@@ -180,9 +180,9 @@
             </section>
 
         @elseif($section->type === 'products' && $section->products->isNotEmpty())
-            <section class="border-b border-[var(--sg-border)] bg-[var(--sg-cream)] py-14 sm:py-20">
+            <section class="sg-home-products-section border-b border-[var(--sg-border)] bg-[var(--sg-cream)]">
                 <x-layout.container>
-                    <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+                    <div class="sg-home-products-section__header mb-5 flex flex-wrap items-end justify-between gap-3">
                         <div class="max-w-2xl">
                             @if($section->eyebrow)<p class="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--sg-accent)]">{{ $section->eyebrow }}</p>@endif
                             @if($section->title)<h2 class="mt-3 text-3xl font-semibold tracking-tight text-[var(--sg-ink)] sm:text-4xl">{{ $section->title }}</h2>@endif
