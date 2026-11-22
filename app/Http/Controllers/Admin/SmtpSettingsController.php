@@ -25,7 +25,6 @@ class SmtpSettingsController extends Controller
         return view('admin.smtp-settings.edit', [
             'settings' => $settings,
             'hasPassword' => filled($settings->password),
-            'mailboxPassword' => $settings->imap_password ?: $settings->password,
             'trustBadgeImagePath' => $this->trustBadgeImagePath(),
             'inboxMessages' => cache()->get('enamad.inbox.latest', []),
             'inboxLastSync' => cache()->get('enamad.inbox.last_sync'),
@@ -193,7 +192,11 @@ class SmtpSettingsController extends Controller
         ])->save();
 
         return redirect()->route('admin.smtp-settings.edit')
-            ->with('success', 'صندوق '.$address.' ساخته شد. رمز آن در همین صفحه قابل نمایش و کپی است.');
+            ->with('success', 'صندوق '.$address.' با موفقیت ساخته شد.')
+            ->with('mailbox_credentials', [
+                'email' => $address,
+                'password' => $password,
+            ]);
     }
 
     public function uploadVerificationFile(Request $request): RedirectResponse
