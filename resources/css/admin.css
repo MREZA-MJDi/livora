@@ -415,7 +415,7 @@ p {
 }
 
 .admin-btn-danger:hover {
-    background: #991b1b;
+    background: var(--admin-danger);
 }
 
 .admin-btn-success {
@@ -424,7 +424,7 @@ p {
 }
 
 .admin-btn-success:hover {
-    background: #166534;
+    background: var(--admin-success);
 }
 
 
@@ -508,11 +508,11 @@ p {
 }
 
 .admin-input-error {
-    border-color: #fca5a5 !important;
+    border-color: var(--admin-danger) !important;
 
     box-shadow:
         0 0 0 3px
-        rgba(185, 28, 28, 0.05);
+        rgba(168, 63, 63, 0.05);
 }
 
 .admin-error {
@@ -806,27 +806,27 @@ p {
 }
 
 .admin-alert-success {
-    border-color: #bbf7d0;
+    border-color: var(--admin-border-dark);
     background: var(--admin-success-bg);
-    color: #166534;
+    color: var(--admin-success);
 }
 
 .admin-alert-warning {
-    border-color: #fed7aa;
+    border-color: var(--admin-accent-soft);
     background: var(--admin-warning-bg);
-    color: #9a3412;
+    color: var(--admin-warning);
 }
 
 .admin-alert-danger {
-    border-color: #fecaca;
+    border-color: var(--admin-danger-soft);
     background: var(--admin-danger-bg);
-    color: #991b1b;
+    color: var(--admin-danger);
 }
 
 .admin-alert-info {
-    border-color: #bae6fd;
+    border-color: var(--admin-border-dark);
     background: var(--admin-info-bg);
-    color: #075985;
+    color: var(--admin-info);
 }
 
 
@@ -1220,7 +1220,7 @@ p {
         linear-gradient(
             to top,
             var(--admin-accent-dark),
-            #d5b28f
+            #b58a6a
         );
 
     transition:
