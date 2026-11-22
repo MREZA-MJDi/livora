@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\SmtpSetting;
+use App\Models\User;
 use App\Models\ContactSetting;
 use App\Services\Mail\ImapInboxReader;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -19,7 +20,7 @@ class AdminMailSettingsWorkflowTest extends TestCase
 
     public function test_project_mailbox_is_created_by_the_scoped_vps_provider_and_credentials_are_encrypted(): void
     {
-        $this->withoutMiddleware();
+        $this->actingAs(User::factory()->create(['role' => 'admin']));
 
         config([
             'mail-provider.api_url' => 'https://mail-api.example.test',
@@ -77,7 +78,7 @@ class AdminMailSettingsWorkflowTest extends TestCase
 
     public function test_enamad_link_is_generated_from_official_id_and_code_and_rendered_with_uploaded_badge(): void
     {
-        $this->withoutMiddleware();
+        $this->actingAs(User::factory()->create(['role' => 'admin']));
         Storage::fake('public');
 
         $this->put(route('admin.smtp-settings.update'), [
@@ -174,7 +175,7 @@ class AdminMailSettingsWorkflowTest extends TestCase
 
     public function test_enamad_badge_image_is_saved_for_the_storefront_footer(): void
     {
-        $this->withoutMiddleware();
+        $this->actingAs(User::factory()->create(['role' => 'admin']));
         Storage::fake('public');
 
         $this->put(route('admin.smtp-settings.update'), [
