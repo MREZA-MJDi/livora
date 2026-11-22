@@ -51,6 +51,9 @@
                 <span class="rounded-full bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-800">صندوق ساخته شده</span>
             @endif
         </div>
+        @unless($mailProviderConfigured)
+            <p class="mt-4 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-xs leading-6 text-amber-900">برای ساخت واقعی صندوق، مدیر سرور باید <code dir="ltr">MAIL_PROVIDER_API_URL</code> و توکن اختصاصی دامنه را در فایل محیطی سرور تنظیم کند. این مقادیر نباید در مخزن کد ثبت شوند.</p>
+        @endunless
         @if($settings->mailbox_address)
             <div class="mt-4 rounded-xl bg-[var(--admin-surface)] p-4 text-sm" dir="ltr">
                 <strong>{{ $settings->mailbox_address }}</strong>
@@ -159,7 +162,7 @@
             </div>
             <div class="rounded-xl bg-[var(--admin-surface)] p-4 text-xs leading-7 text-[var(--admin-text-soft)]">
                 <strong class="text-[var(--admin-text)]">نحوه دریافت:</strong>
-                دکمه «خواندن صندوق و دریافت کد» ایمیل‌های اخیر مرتبط با اینماد را بررسی می‌کند و کد احتمالی را همین‌جا نشان می‌دهد. برای این قابلیت باید افزونه PHP IMAP روی VPS فعال باشد.
+                دکمه «خواندن صندوق و دریافت کد» ایمیل‌های اخیر مرتبط با اینماد را بررسی می‌کند و کد احتمالی را همین‌جا نشان می‌دهد. این اتصال با کتابخانه PHP خالص انجام می‌شود و به افزونه native ‏ext-imap نیاز ندارد؛ OpenSSL و mbstring باید روی سرور فعال باشند.
             </div>
         </section>
 
