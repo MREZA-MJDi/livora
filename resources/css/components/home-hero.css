@@ -290,9 +290,12 @@
     .sg-home-hero__media {
         grid-column: 1;
         grid-row: 1;
-        height: 100%;
+        width: 100%;
+        height: auto;
         min-height: 0;
-        aspect-ratio: auto;
+        max-height: min(100%, calc(100svh - 250px));
+        aspect-ratio: 1.25 / 1;
+        align-self: center;
         order: initial;
     }
 
