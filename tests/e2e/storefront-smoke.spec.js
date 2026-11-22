@@ -213,6 +213,42 @@ test('mobile menu is reachable from the visible header and can be closed', async
 });
 
 
+test('desktop homepage hero fits in the first viewport without scrolling', async ({ page }) => {
+    for (const viewport of [
+        { width: 1280, height: 720 },
+        { width: 1440, height: 900 },
+        { width: 1920, height: 1080 },
+    ]) {
+        await page.setViewportSize(viewport);
+        await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+        const hero = page.locator('[data-sg-home-hero]');
+        await expect(hero).toBeVisible();
+        await expect(hero.locator('.sg-home-hero__title')).toBeVisible();
+        await expect(hero.locator('.sg-home-hero__media')).toBeVisible();
+
+        const bounds = await hero.evaluate(element => {
+            const rect = element.getBoundingClientRect();
+            const image = element.querySelector('.sg-home-hero__image.is-active');
+            const imageRect = image?.getBoundingClientRect();
+
+            return {
+                top: rect.top,
+                bottom: rect.bottom,
+                height: rect.height,
+                viewportHeight: window.innerHeight,
+                imageWidth: imageRect?.width ?? 0,
+                imageHeight: imageRect?.height ?? 0,
+                titleFontSize: Number.parseFloat(getComputedStyle(element.querySelector('.sg-home-hero__title')).fontSize),
+            };
+        });
+
+        expect(bounds.bottom, 'hero should end inside the initial viewport at ' + viewport.width + 'px').toBeLessThanOrEqual(bounds.viewportHeight + 1);
+        expect(bounds.imageWidth / bounds.imageHeight, 'hero image should use a landscape crop').toBeGreaterThan(1.2);
+        expect(bounds.titleFontSize, 'hero title should stay within a controlled desktop scale').toBeLessThanOrEqual(60);
+    }
+});
+
 test('public category, product and banner image frames preserve their editor crop ratios', async ({ page }) => {
     const expectRatio = async (selector, expected, label) => {
         const element = page.locator(selector).first();
