@@ -29,6 +29,7 @@ class SmtpSettingsController extends Controller
 
         return view('admin.smtp-settings.edit', [
             'settings' => $settings,
+            'mailProviderConfigured' => filled(config('mail-provider.api_url')) && filled(config('mail-provider.api_token')),
             'enamadSettings' => $enamadSettings,
             'enamadId' => $enamadQuery['id'] ?? '',
             'enamadCode' => $enamadQuery['Code'] ?? $enamadQuery['code'] ?? '',
