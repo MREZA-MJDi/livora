@@ -21,9 +21,17 @@ class SmtpSettingsController extends Controller
     public function edit(): View
     {
         $settings = SmtpSetting::current();
+        $enamadSettings = ContactSetting::query()->first();
+        $enamadQuery = [];
+        if (filled($enamadSettings?->enamad_url)) {
+            parse_str((string) parse_url($enamadSettings->enamad_url, PHP_URL_QUERY), $enamadQuery);
+        }
 
         return view('admin.smtp-settings.edit', [
             'settings' => $settings,
+            'enamadSettings' => $enamadSettings,
+            'enamadId' => $enamadQuery['id'] ?? '',
+            'enamadCode' => $enamadQuery['Code'] ?? $enamadQuery['code'] ?? '',
             'hasPassword' => filled($settings->password),
             'trustBadgeImagePath' => $this->trustBadgeImagePath(),
             'inboxMessages' => cache()->get('enamad.inbox.latest', []),
@@ -197,6 +205,33 @@ class SmtpSettingsController extends Controller
                 'email' => $address,
                 'password' => $password,
             ]);
+    }
+
+    public function saveEnamadSettings(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'enamad_id' => ['required', 'string', 'max:20', 'regex:/^[0-9]+$/'],
+            'enamad_code' => ['required', 'string', 'max:255', 'regex:/^[A-Za-z0-9_-]+$/'],
+        ], [
+            'enamad_id.required' => 'شناسه نماد اینماد الزامی است.',
+            'enamad_id.regex' => 'شناسه اینماد باید فقط شامل رقم باشد.',
+            'enamad_code.required' => 'کد تأیید/Code اینماد الزامی است.',
+            'enamad_code.regex' => 'فرمت کد اینماد معتبر نیست.',
+        ]);
+
+        $url = 'https://trustseal.enamad.ir/?'.http_build_query([
+            'id' => $data['enamad_id'],
+            'Code' => $data['enamad_code'],
+        ], '', '&', PHP_QUERY_RFC3986);
+
+        $settings = ContactSetting::query()->first() ?? new ContactSetting();
+        $settings->enamad_url = $url;
+        $settings->save();
+
+        cache()->forget('storefront.settings');
+
+        return redirect()->route('admin.smtp-settings.edit')
+            ->with('success', 'لینک استعلام رسمی اینماد ساخته و برای نمایش در فوتر ذخیره شد.');
     }
 
     public function uploadVerificationFile(Request $request): RedirectResponse
