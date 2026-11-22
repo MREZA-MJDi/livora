@@ -11,6 +11,29 @@
     @if(session('success'))
         <div class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{{ session('success') }}</div>
     @endif
+
+    @if(session()->has('mailbox_credentials'))
+        @php($mailboxCredentials = session('mailbox_credentials'))
+        <section class="rounded-2xl border border-[var(--admin-accent)]/40 bg-[var(--admin-surface)] p-5 shadow-sm" aria-labelledby="mailbox-credentials-title">
+            <h2 id="mailbox-credentials-title" class="text-base font-bold text-[var(--admin-text)]">صندوق ایمیل ساخته شد — اطلاعات ورود را همین حالا ذخیره کنید</h2>
+            <p class="mt-2 text-xs leading-6 text-[var(--admin-text-soft)]">رمز فقط در همین نوبت نمایش داده می‌شود و در بازدید بعدی دوباره در صفحه قرار نمی‌گیرد.</p>
+            <div class="mt-4 grid gap-3 sm:grid-cols-2">
+                <label class="block text-xs font-semibold text-[var(--admin-text)]">آدرس ایمیل
+                    <div class="mt-2 flex gap-2" dir="ltr">
+                        <input id="created-mailbox-email" readonly value="{{ $mailboxCredentials['email'] }}" class="min-w-0 flex-1 rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm">
+                        <button type="button" data-copy-target="created-mailbox-email" class="rounded-xl border border-[var(--admin-border)] px-3 text-xs font-bold">کپی</button>
+                    </div>
+                </label>
+                <label class="block text-xs font-semibold text-[var(--admin-text)]">رمز عبور
+                    <div class="mt-2 flex gap-2" dir="ltr">
+                        <input id="created-mailbox-password" type="password" readonly value="{{ $mailboxCredentials['password'] }}" class="min-w-0 flex-1 rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm">
+                        <button type="button" data-toggle-secret="created-mailbox-password" class="rounded-xl border border-[var(--admin-border)] px-3 text-xs font-bold">نمایش</button>
+                        <button type="button" data-copy-target="created-mailbox-password" class="rounded-xl border border-[var(--admin-border)] px-3 text-xs font-bold">کپی</button>
+                    </div>
+                </label>
+            </div>
+        </section>
+    @endif
     @if($errors->any())
         <div class="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
             @foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach
@@ -31,7 +54,7 @@
         @if($settings->mailbox_address)
             <div class="mt-4 rounded-xl bg-[var(--admin-surface)] p-4 text-sm" dir="ltr">
                 <strong>{{ $settings->mailbox_address }}</strong>
-                <p class="mt-2 text-xs text-[var(--admin-muted)]" dir="rtl">اطلاعات ورود و رمز قابل نمایش/کپی در بخش تنظیمات SMTP و IMAP همین صفحه است.</p>
+                <p class="mt-2 text-xs text-[var(--admin-muted)]" dir="rtl">رمز هنگام ساخت فقط یک‌بار نمایش داده می‌شود؛ اگر آن را ذخیره نکرده‌اید، پیش از تغییر رمز با مدیر سرور هماهنگ کنید.</p>
             </div>
         @else
             <form method="POST" action="{{ route('admin.smtp-settings.mailbox.create') }}" class="mt-4 grid gap-3 sm:grid-cols-[1fr_150px_auto] sm:items-end">
@@ -84,11 +107,11 @@
                 </label>
                 <label class="block text-sm font-medium sm:col-span-2">رمز کامل صندوق ایمیل
                     <div class="mt-2 flex gap-2">
-                        <input id="smtp-password" type="password" name="password" value="{{ $settings->password }}" autocomplete="new-password" placeholder="{{ $hasPassword ? 'رمز فعلی ذخیره شده است' : 'رمز صندوق ایمیل را وارد کنید' }}" class="min-w-0 flex-1 rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" dir="ltr">
+                        <input id="smtp-password" type="password" name="password" value="" autocomplete="new-password" placeholder="{{ $hasPassword ? 'رمز فعلی ذخیره شده است؛ برای حفظ آن خالی بگذارید' : 'رمز صندوق ایمیل را وارد کنید' }}" class="min-w-0 flex-1 rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" dir="ltr">
                         <button type="button" data-toggle-secret="smtp-password" class="rounded-xl border border-[var(--admin-border)] px-3 text-xs font-bold">نمایش رمز</button>
                         <button type="button" data-copy-target="smtp-password" class="rounded-xl border border-[var(--admin-border)] px-3 text-xs font-bold">کپی رمز</button>
                     </div>
-                    <span class="mt-1 block text-xs text-[var(--admin-muted)]">رمز در پایگاه داده رمزنگاری می‌شود. برای حفظ رمز قبلی، آن را تغییر ندهید.</span>
+                    <span class="mt-1 block text-xs text-[var(--admin-muted)]">رمز در پایگاه داده رمزنگاری می‌شود. برای حفظ رمز قبلی، فیلد را خالی بگذارید.</span>
                 </label>
                 <label class="block text-sm font-medium">آدرس فرستنده
                     <input type="email" name="from_address" value="{{ old('from_address', $settings->from_address ?: 'info@sillashop.com') }}" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" dir="ltr">
@@ -128,7 +151,7 @@
                 </label>
                 <label class="block text-sm font-medium">رمز IMAP (در صورت تفاوت)
                     <div class="mt-2 flex gap-2">
-                        <input id="imap-password" type="password" name="imap_password" value="{{ $mailboxPassword }}" autocomplete="new-password" placeholder="در صورت یکسان بودن، رمز SMTP استفاده می‌شود" class="min-w-0 flex-1 rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" dir="ltr">
+                        <input id="imap-password" type="password" name="imap_password" value="" autocomplete="new-password" placeholder="برای حفظ رمز فعلی خالی بگذارید" class="min-w-0 flex-1 rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" dir="ltr">
                         <button type="button" data-toggle-secret="imap-password" class="rounded-xl border border-[var(--admin-border)] px-3 text-xs font-bold">نمایش</button>
                         <button type="button" data-copy-target="imap-password" class="rounded-xl border border-[var(--admin-border)] px-3 text-xs font-bold">کپی</button>
                     </div>
