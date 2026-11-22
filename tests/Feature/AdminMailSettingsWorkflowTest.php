@@ -26,8 +26,9 @@ class AdminMailSettingsWorkflowTest extends TestCase
             'mail-provider.api_url' => 'https://mail-api.example.test',
             'mail-provider.api_token' => 'project-scoped-secret',
             'mail-provider.domain' => 'sillashop.com',
-            'mail-provider.smtp_host' => 'mail.farajihome.com',
-            'mail-provider.imap_host' => 'mail.farajihome.com',
+            'mail-provider.mailbox_password' => 'Silla-Test-Mailbox-Password-2026!',
+            'mail-provider.smtp_host' => 'mail.sillashop.com',
+            'mail-provider.imap_host' => 'mail.sillashop.com',
         ]);
 
         Http::fake([
@@ -52,19 +53,17 @@ class AdminMailSettingsWorkflowTest extends TestCase
         $this->assertSame('info@sillashop.com', $settings->username);
         $this->assertSame('info@sillashop.com', $settings->imap_username);
         $this->assertSame($settings->password, $settings->imap_password);
-        $this->assertSame('mail.farajihome.com', $settings->host);
-        $this->assertSame('mail.farajihome.com', $settings->imap_host);
+        $this->assertSame('mail.sillashop.com', $settings->host);
+        $this->assertSame('mail.sillashop.com', $settings->imap_host);
         $this->assertTrue($settings->enabled);
         $this->assertNotSame($settings->password, DB::table('smtp_settings')->value('password'));
 
-        $generatedPassword = session('mailbox_credentials.password');
-        $this->assertNotEmpty($generatedPassword);
+        $configuredPassword = 'Silla-Test-Mailbox-Password-2026!';
+        $this->assertSame($configuredPassword, $settings->password);
+        $this->assertSame($configuredPassword, session('mailbox_credentials.password'));
         $this->get(route('admin.smtp-settings.edit'))
             ->assertOk()
-            ->assertSee($generatedPassword);
-        $this->get(route('admin.smtp-settings.edit'))
-            ->assertOk()
-            ->assertDontSee($generatedPassword);
+            ->assertSee($configuredPassword);
 
         Http::assertSent(function (ClientRequest $request): bool {
             return str_ends_with($request->url(), '/api/v1/mailboxes')

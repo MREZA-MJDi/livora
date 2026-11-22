@@ -63,7 +63,7 @@
 
         <a
             href="{{ route('product.show', $product->slug) }}"
-            class="product-card-media relative block aspect-[4/5] overflow-hidden"
+            class="product-card-media relative block aspect-square max-h-[280px] overflow-hidden"
         >
 
             @if($image)
