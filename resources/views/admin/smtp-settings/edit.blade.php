@@ -57,7 +57,12 @@
         @if($settings->mailbox_address)
             <div class="mt-4 rounded-xl bg-[var(--admin-surface)] p-4 text-sm" dir="ltr">
                 <strong>{{ $settings->mailbox_address }}</strong>
-                <p class="mt-2 text-xs text-[var(--admin-muted)]" dir="rtl">رمز صندوق در تنظیمات امن سرور تعریف و در پایگاه داده رمزنگاری‌شده نگهداری می‌شود.</p>
+                <div class="mt-3 flex flex-wrap items-center gap-2" dir="ltr">
+                    <input id="saved-mailbox-password" type="password" readonly value="{{ $mailboxPassword }}" class="min-w-0 flex-1 rounded-lg border border-[var(--admin-border)] bg-white px-3 py-2 text-sm">
+                    <button type="button" data-toggle-secret="saved-mailbox-password" class="rounded-lg border border-[var(--admin-border)] px-3 py-2 text-xs font-bold">نمایش رمز</button>
+                    <button type="button" data-copy-target="saved-mailbox-password" class="rounded-lg border border-[var(--admin-border)] px-3 py-2 text-xs font-bold">کپی رمز</button>
+                </div>
+                <p class="mt-2 text-xs text-[var(--admin-muted)]" dir="rtl">رمز صندوق در تنظیمات امن سرور تعریف و در پایگاه داده رمزنگاری‌شده نگهداری می‌شود؛ این بخش فقط برای مدیر واردشده نمایش داده می‌شود.</p>
             </div>
         @else
             <form method="POST" action="{{ route('admin.smtp-settings.mailbox.create') }}" class="mt-4 grid gap-3 sm:grid-cols-[1fr_150px_auto] sm:items-end">
