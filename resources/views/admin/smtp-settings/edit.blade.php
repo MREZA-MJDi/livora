@@ -165,6 +165,33 @@
 
         <div class="border-t border-[var(--admin-border)]"></div>
 
+        <section class="space-y-4 rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-white)] p-5 shadow-sm sm:p-7">
+            <div>
+                <h2 class="text-base font-bold text-[var(--admin-text)]">لینک رسمی استعلام اینماد</h2>
+                <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">شناسه و Code را دقیقاً از پنل رسمی اینماد وارد کنید. لینک استعلام در قالب رسمی trustseal ساخته می‌شود و روی تصویر نماد در فوتر قرار می‌گیرد.</p>
+            </div>
+            <form method="POST" action="{{ route('admin.smtp-settings.enamad.update') }}" class="grid gap-4 sm:grid-cols-2">
+                @csrf
+                @method('PUT')
+                <label class="block text-sm font-medium">شناسه نماد (ID)
+                    <input name="enamad_id" value="{{ old('enamad_id', $enamadId) }}" required inputmode="numeric" pattern="[0-9]+" maxlength="20" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" dir="ltr">
+                    @error('enamad_id')<span class="mt-1 block text-xs text-rose-600">{{ $message }}</span>@enderror
+                </label>
+                <label class="block text-sm font-medium">کد نماد (Code)
+                    <input name="enamad_code" value="{{ old('enamad_code', $enamadCode) }}" required maxlength="255" autocomplete="off" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" dir="ltr">
+                    @error('enamad_code')<span class="mt-1 block text-xs text-rose-600">{{ $message }}</span>@enderror
+                </label>
+                <div class="sm:col-span-2 flex flex-wrap items-center justify-between gap-3">
+                    @if(filled($enamadSettings?->enamad_url))
+                        <a href="{{ $enamadSettings->enamad_url }}" target="_blank" rel="noopener noreferrer" class="break-all text-xs font-semibold text-[var(--admin-accent-dark)] underline" dir="ltr">مشاهده لینک فعلی استعلام</a>
+                    @else
+                        <span class="text-xs text-[var(--admin-muted)]">هنوز لینک استعلام ثبت نشده است.</span>
+                    @endif
+                    <button type="submit" class="rounded-xl bg-[var(--admin-accent)] px-5 py-3 text-sm font-bold text-white">ساخت و ذخیره لینک اینماد</button>
+                </div>
+            </form>
+        </section>
+
         <section class="space-y-4">
             <div>
                 <h2 class="text-base font-bold text-[var(--admin-text)]">۳. تصویر نماد اعتماد برای فوتر</h2>
