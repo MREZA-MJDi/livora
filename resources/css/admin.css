@@ -8,59 +8,35 @@
    ========================================================= */
 
 :root {
-    /* Brand */
-    --admin-text: #1c1b19;
-    --admin-text-soft: #4e4a44;
-    --admin-muted: #8b857c;
-
-    /* Background */
-    --admin-bg: #f3f1ed;
-    --admin-surface: #ece9e3;
-    --admin-white: #fbfaf8;
-
-    /* Brand Accent */
-    --admin-accent: #9a7658;
-    --admin-accent-dark: #76583f;
-    --admin-accent-soft: #eee3d8;
-
-    /* Borders */
-    --admin-border: #ddd8d0;
-    --admin-border-dark: #c5beb4;
-
-    /* States */
-    --admin-success: #15803d;
-    --admin-success-bg: #ecfdf3;
-
-    --admin-warning: #b45309;
-    --admin-warning-bg: #fff7ed;
-
-    --admin-danger: #b91c1c;
-    --admin-danger-bg: #fef2f2;
-
-    --admin-info: #0369a1;
-    --admin-info-bg: #f0f9ff;
-
-    /* Shadows */
-    --admin-shadow-sm:
-        0 2px 10px rgba(28, 27, 25, 0.04);
-
-    --admin-shadow-md:
-        0 10px 30px rgba(28, 27, 25, 0.07);
-
-    --admin-shadow-lg:
-        0 20px 60px rgba(28, 27, 25, 0.10);
-
-    /* Radius */
+    /* Shared SILLA sage / earth brand palette */
+    --admin-text: #26352b;
+    --admin-text-soft: #536456;
+    --admin-muted: #738174;
+    --admin-bg: #f7f3ea;
+    --admin-surface: #e5efe2;
+    --admin-white: #f7f3ea;
+    --admin-accent: #b58a6a;
+    --admin-accent-dark: #956d50;
+    --admin-accent-soft: #f0e4d9;
+    --admin-border: #c3d8c1;
+    --admin-border-dark: #9fb99c;
+    --admin-success: #416d4b;
+    --admin-success-bg: #e5efe2;
+    --admin-warning: #a66b32;
+    --admin-warning-bg: #f8eddf;
+    --admin-danger: #a83f3f;
+    --admin-danger-bg: #f8e8e5;
+    --admin-info: #456b78;
+    --admin-info-bg: #e8f0ef;
+    --admin-shadow-sm: 0 2px 10px rgba(38, 53, 43, 0.04);
+    --admin-shadow-md: 0 10px 30px rgba(38, 53, 43, 0.07);
+    --admin-shadow-lg: 0 20px 60px rgba(38, 53, 43, 0.10);
     --admin-radius-sm: 0.75rem;
     --admin-radius-md: 1rem;
     --admin-radius-lg: 1.5rem;
     --admin-radius-xl: 2rem;
-
-    /* Layout */
     --admin-sidebar-width: 260px;
     --admin-navbar-height: 72px;
-
-    /* Motion */
     --admin-duration-fast: 160ms;
     --admin-duration: 280ms;
     --admin-duration-slow: 500ms;
@@ -91,7 +67,7 @@ body {
     background:
         radial-gradient(
             circle at top right,
-            rgba(154, 118, 88, 0.035),
+            rgba(181, 138, 106, 0.035),
             transparent 28rem
         ),
         var(--admin-bg);
@@ -519,7 +495,7 @@ p {
 
     box-shadow:
         0 0 0 3px
-        rgba(154, 118, 88, 0.08);
+        rgba(181, 138, 106, 0.08);
 }
 
 .admin-input:disabled,
@@ -739,7 +715,7 @@ p {
 
     box-shadow:
         0 0 0 3px
-        rgba(154, 118, 88, 0.08);
+        rgba(181, 138, 106, 0.08);
 }
 
 .admin-search-icon {
@@ -864,7 +840,7 @@ p {
 
     z-index: 100;
 
-    background: rgba(28, 27, 25, 0.45);
+    background: rgba(38, 53, 43, 0.45);
 
     backdrop-filter: blur(5px);
 }
