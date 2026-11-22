@@ -1361,54 +1361,42 @@ document.addEventListener('submit', async (event) => {
 });
 
 
-/* Homepage hero slider: synchronized copy/image transitions and accessible autoplay. */
+/* Homepage hero: accessible arrows, progress, reduced-motion and swipe support. */
 const initSgHomeHeroes = () => {
     document.querySelectorAll('[data-sg-home-hero]').forEach((root) => {
         if (root.dataset.heroReady === '1') return;
         const dataNode = root.querySelector('[data-sg-hero-data]');
-        const dots = Array.from(root.querySelectorAll('[data-sg-hero-dot]'));
+        const prev = root.querySelector('[data-sg-hero-prev]');
+        const next = root.querySelector('[data-sg-hero-next]');
         const images = Array.from(root.querySelectorAll('[data-sg-hero-image]'));
         const eyebrow = root.querySelector('[data-sg-hero-eyebrow]');
         const title = root.querySelector('[data-sg-hero-title]');
         const subtitle = root.querySelector('[data-sg-hero-subtitle]');
         const price = root.querySelector('[data-sg-hero-price]');
         const cta = root.querySelector('[data-sg-hero-cta]');
-        if (!dataNode || !dots.length) return;
-
+        const current = root.querySelector('[data-sg-hero-current]');
+        const progress = root.querySelector('[data-sg-hero-progress]');
+        if (!dataNode) return;
         let slides = [];
-        try {
-            slides = JSON.parse(dataNode.textContent || '[]');
-        } catch (_) {
-            return;
-        }
+        try { slides = JSON.parse(dataNode.textContent || '[]'); } catch (_) { return; }
         if (!Array.isArray(slides) || !slides.length) return;
         root.dataset.heroReady = '1';
-
         let currentIndex = 0;
         let autoplayTimer = null;
-
+        let touchStartX = null;
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        const pad = (value) => String(value).padStart(2, '0');
         const stopAutoplay = () => {
             if (autoplayTimer) window.clearInterval(autoplayTimer);
             autoplayTimer = null;
         };
-
         const show = (index) => {
             currentIndex = (index + slides.length) % slides.length;
             const slide = slides[currentIndex] || {};
-
-            if (eyebrow) {
-                eyebrow.textContent = slide.eyebrow || '';
-                eyebrow.hidden = !slide.eyebrow;
-            }
+            if (eyebrow) { eyebrow.textContent = slide.eyebrow || ''; eyebrow.hidden = !slide.eyebrow; }
             if (title) title.textContent = slide.title || '';
-            if (subtitle) {
-                subtitle.textContent = slide.subtitle || '';
-                subtitle.hidden = !slide.subtitle;
-            }
-            if (price) {
-                price.textContent = slide.price_label || '';
-                price.hidden = !slide.price_label;
-            }
+            if (subtitle) { subtitle.textContent = slide.subtitle || ''; subtitle.hidden = !slide.subtitle; }
+            if (price) { price.textContent = slide.price_label || ''; price.hidden = !slide.price_label; }
             if (cta) {
                 cta.textContent = slide.cta_label || '';
                 cta.hidden = !slide.cta_label;
@@ -1420,44 +1408,48 @@ const initSgHomeHeroes = () => {
                     cta.append(arrow);
                 }
             }
-
-            dots.forEach((dot, dotIndex) => {
-                const selected = dotIndex === currentIndex;
-                dot.classList.toggle('is-active', selected);
-                dot.setAttribute('aria-pressed', selected ? 'true' : 'false');
-            });
             images.forEach((image) => {
-                image.classList.toggle('is-active', Number(image.dataset.sgHeroImage) === currentIndex);
+                const active = Number(image.dataset.sgHeroImage) === currentIndex;
+                image.classList.toggle('is-active', active);
+                image.setAttribute('aria-hidden', active ? 'false' : 'true');
             });
-
+            if (current) current.textContent = pad(currentIndex + 1);
+            if (progress) progress.style.width = ((currentIndex + 1) / slides.length * 100) + '%';
             root.classList.remove('is-animating');
-            void root.offsetWidth;
-            root.classList.add('is-animating');
-            window.setTimeout(() => root.classList.remove('is-animating'), 650);
+            if (!reducedMotion.matches) { void root.offsetWidth; root.classList.add('is-animating'); }
         };
-
         const startAutoplay = () => {
             stopAutoplay();
-            if (slides.length < 2 || window.matchMedia('(prefers-reduced-motion: reduce)').matches || document.hidden) return;
-            autoplayTimer = window.setInterval(() => show(currentIndex + 1), 4000);
+            if (slides.length < 2 || reducedMotion.matches || document.hidden) return;
+            autoplayTimer = window.setInterval(() => show(currentIndex + 1), 6500);
         };
-
-        dots.forEach((dot, index) => dot.addEventListener('click', () => {
-            show(index);
-            startAutoplay();
-        }));
+        prev?.addEventListener('click', () => { show(currentIndex - 1); startAutoplay(); });
+        next?.addEventListener('click', () => { show(currentIndex + 1); startAutoplay(); });
         root.addEventListener('mouseenter', stopAutoplay);
         root.addEventListener('mouseleave', startAutoplay);
+        root.addEventListener('focusin', stopAutoplay);
+        root.addEventListener('focusout', startAutoplay);
+        root.addEventListener('touchstart', (event) => {
+            touchStartX = event.changedTouches?.[0]?.clientX ?? null;
+            stopAutoplay();
+        }, { passive: true });
+        root.addEventListener('touchend', (event) => {
+            const endX = event.changedTouches?.[0]?.clientX;
+            if (touchStartX !== null && typeof endX === 'number') {
+                const delta = endX - touchStartX;
+                if (Math.abs(delta) > 48) show(currentIndex + (delta > 0 ? -1 : 1));
+            }
+            touchStartX = null;
+            startAutoplay();
+        }, { passive: true });
         document.addEventListener('visibilitychange', startAutoplay);
-
+        reducedMotion.addEventListener?.('change', startAutoplay);
         show(0);
         startAutoplay();
     });
 };
-
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initSgHomeHeroes, { once: true });
 } else {
     initSgHomeHeroes();
 }
-
