@@ -56,6 +56,15 @@ class AdminMailSettingsWorkflowTest extends TestCase
         $this->assertTrue($settings->enabled);
         $this->assertNotSame($settings->password, DB::table('smtp_settings')->value('password'));
 
+        $generatedPassword = session('mailbox_credentials.password');
+        $this->assertNotEmpty($generatedPassword);
+        $this->get(route('admin.smtp-settings.edit'))
+            ->assertOk()
+            ->assertSee($generatedPassword);
+        $this->get(route('admin.smtp-settings.edit'))
+            ->assertOk()
+            ->assertDontSee($generatedPassword);
+
         Http::assertSent(function (ClientRequest $request): bool {
             return str_ends_with($request->url(), '/api/v1/mailboxes')
                 && $request->hasHeader('Authorization', 'Bearer project-scoped-secret')
@@ -139,6 +148,17 @@ class AdminMailSettingsWorkflowTest extends TestCase
 
         $this->assertNotEmpty($setting?->enamad_image_path);
         Storage::disk('public')->assertExists($setting->enamad_image_path);
+
+        $setting->update([
+            'enamad_url' => 'https://trustseal.enamad.ir/?id=12345&Code=verified-code',
+        ]);
+        cache()->forget('storefront.settings');
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('https://trustseal.enamad.ir/?id=12345&amp;Code=verified-code', false)
+            ->assertSee(Storage::disk('public')->url($setting->enamad_image_path), false)
+            ->assertSee('alt="نماد اعتماد الکترونیکی"', false);
     }
 
 }
