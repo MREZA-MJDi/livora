@@ -2500,3 +2500,113 @@ body {
 @media (min-width: 1024px) and (max-width: 1279px) {
     .sg-category-index-track { grid-auto-columns: minmax(30vw, 32vw); }
 }
+
+
+/* Homepage product rails: compact, viewport-friendly cards.
+   Scoped to the two CMS product sections; shop/category/product pages are unchanged. */
+.sila-home .sg-home-products-section {
+    padding-block: clamp(1.75rem, 3.2vw, 2.75rem);
+}
+
+.sila-home .sg-home-products-section__header h2 {
+    margin-top: .5rem;
+    font-size: clamp(1.45rem, 2.2vw, 2rem);
+    line-height: 1.35;
+}
+
+.sila-home .sg-home-products-section__header > div > p:last-child {
+    margin-top: .45rem;
+    line-height: 1.7;
+}
+
+.sila-home .sg-home-products-section [data-carousel-prev],
+.sila-home .sg-home-products-section [data-carousel-next] {
+    width: 2.15rem;
+    height: 2.15rem;
+}
+
+.sila-home .sg-home-products-section [data-carousel-track] {
+    align-items: stretch;
+}
+
+.sila-home .sg-home-products-section .sg-product-carousel-item {
+    min-width: 0;
+}
+
+.sila-home .sg-home-products-section .product-card-media {
+    height: clamp(132px, 16vw, 188px);
+    max-height: none;
+    aspect-ratio: auto;
+}
+
+.sila-home .sg-home-products-section .product-card-content {
+    padding: .7rem;
+}
+
+.sila-home .sg-home-products-section .product-card-category {
+    min-height: 0;
+}
+
+.sila-home .sg-home-products-section .product-card-content > a {
+    margin-top: .35rem;
+}
+
+.sila-home .sg-home-products-section .product-card-content h3 {
+    min-height: 0;
+    font-size: .84rem;
+    line-height: 1.55;
+}
+
+.sila-home .sg-home-products-section .product-card-description {
+    margin-top: .25rem;
+    font-size: .68rem;
+    line-height: 1.55;
+}
+
+.sila-home .sg-home-products-section .product-card-content > .mt-2.space-y-1 {
+    display: none;
+}
+
+.sila-home .sg-home-products-section .product-card-content > p.mt-2.text-emerald-700,
+.sila-home .sg-home-products-section .product-card-content > p.mt-2.text-rose-700 {
+    margin-top: .3rem;
+}
+
+.sila-home .sg-home-products-section .product-card-content > p.mt-1 {
+    margin-top: .15rem;
+    line-height: 1.45;
+}
+
+.sila-home .sg-home-products-section .product-card-price {
+    margin-top: .45rem;
+}
+
+.sila-home .sg-home-products-section .product-card-actions {
+    gap: .4rem;
+}
+
+.sila-home .sg-home-products-section .product-card-details,
+.sila-home .sg-home-products-section .product-card-choose-options,
+.sila-home .sg-home-products-section .product-card-quick-add {
+    min-height: 2.15rem;
+    padding-block: .45rem;
+    font-size: .68rem;
+}
+
+@media (max-width: 639px) {
+    .sila-home .sg-home-products-section {
+        padding-block: 1.5rem;
+    }
+
+    .sila-home .sg-home-products-section__header {
+        margin-bottom: .9rem;
+    }
+
+    .sila-home .sg-home-products-section .product-card-media {
+        height: 132px;
+    }
+
+    .sila-home .sg-home-products-section .product-card-content {
+        padding: .6rem;
+    }
+}
