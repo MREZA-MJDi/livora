@@ -47,7 +47,7 @@ jobs:
           cache: npm
 
       - name: Resolve PHP dependencies and the pure-PHP IMAP client
-        run: composer update 'symfony/*' webklex/php-imap --with-all-dependencies --prefer-dist --no-interaction --no-progress
+        run: composer install --prefer-dist --no-interaction --no-progress
 
       - name: Prepare application environment
         run: |
@@ -191,7 +191,7 @@ jobs:
           cache: npm
 
       - name: Resolve PHP dependencies and the pure-PHP IMAP client
-        run: composer update 'symfony/*' webklex/php-imap --with-all-dependencies --prefer-dist --no-interaction --no-progress
+        run: composer install --prefer-dist --no-interaction --no-progress
 
       - name: Prepare application environment
         run: |
