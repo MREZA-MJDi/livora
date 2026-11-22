@@ -34,6 +34,7 @@ class SmtpSettingsController extends Controller
             'enamadId' => $enamadQuery['id'] ?? '',
             'enamadCode' => $enamadQuery['Code'] ?? $enamadQuery['code'] ?? '',
             'hasPassword' => filled($settings->password),
+            'mailboxPassword' => $settings->password,
             'trustBadgeImagePath' => $this->trustBadgeImagePath(),
             'inboxMessages' => cache()->get('enamad.inbox.latest', []),
             'inboxLastSync' => cache()->get('enamad.inbox.last_sync'),
@@ -164,7 +165,10 @@ class SmtpSettingsController extends Controller
             return back()->withErrors(['mailbox' => 'برای این پروژه یک صندوق اصلی ثبت شده است: '.$settings->mailbox_address]);
         }
 
-        $password = rtrim(strtr(base64_encode(random_bytes(32)), '+/', 'AZ'), '=');
+        $password = (string) config('mail-provider.mailbox_password');
+        if ($password === '' || strlen($password) < 16) {
+            return back()->withErrors(['mailbox' => 'رمز ثابت صندوق باید در MAIL_PROVIDER_MAILBOX_PASSWORD تنظیم شود و حداقل ۱۶ نویسه داشته باشد.']);
+        }
 
         try {
             $mailbox = $provider->createMailbox(
