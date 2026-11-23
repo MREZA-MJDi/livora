@@ -8,6 +8,25 @@
         <p class="mt-2 text-sm leading-7 text-[var(--admin-text-soft)]">تنظیم ارسال و دریافت ایمیل، مشاهده رمز صندوق، دریافت کد اینماد و بارگذاری تصویر نماد برای نمایش در فوتر.</p>
     </header>
 
+    <section class="rounded-2xl border border-[var(--admin-accent)]/30 bg-[var(--admin-white)] p-5 shadow-sm sm:p-7">
+        <h2 class="text-base font-bold text-[var(--admin-text)]">اتصال سریع صندوق ایمیل</h2>
+        <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">فقط آدرس و رمز صندوق را وارد کن. سیستم تنظیمات SMTP و IMAP را ذخیره می‌کند، ایمیل آزمایشی می‌فرستد و برای دریافت همان پیام صندوق را بررسی می‌کند.</p>
+        <form method="POST" action="{{ route('admin.smtp-settings.connect') }}" class="mt-4 grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+            @csrf
+            <label class="block text-sm font-medium">آدرس ایمیل
+                <input type="email" name="email" required value="{{ old('email', $settings->mailbox_address ?: 'info@sillashop.com') }}" autocomplete="username" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" dir="ltr">
+            </label>
+            <label class="block text-sm font-medium">رمز صندوق
+                <input type="password" name="password" required autocomplete="new-password" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" dir="ltr">
+            </label>
+            <button type="submit" class="rounded-xl bg-[var(--admin-accent)] px-5 py-3 text-sm font-bold text-white">ذخیره و تست اتصال</button>
+        </form>
+        <p class="mt-3 text-xs text-[var(--admin-muted)]">رمز به‌صورت رمزنگاری‌شده در دیتابیس ذخیره می‌شود و در خروجی صفحه نمایش داده نمی‌شود.</p>
+    </section>
+    @if(session('warning'))
+        <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">{{ session('warning') }}</div>
+    @endif
+
     @if(session('success'))
         <div class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{{ session('success') }}</div>
     @endif
