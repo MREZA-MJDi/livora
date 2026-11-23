@@ -54,8 +54,6 @@ class AdminMailSettingsWorkflowTest extends TestCase
         $this->assertSame('info@sillashop.com', $settings->imap_username);
         $this->assertSame($settings->password, $settings->imap_password);
         $this->assertSame('mail.sillashop.com', $settings->host);
-        $this->assertSame('info', $settings->username);
-        $this->assertSame('info', $settings->imap_username);
         $this->assertSame('mail.sillashop.com', $settings->imap_host);
         $this->assertTrue($settings->enabled);
         $this->assertNotSame($settings->password, DB::table('smtp_settings')->value('password'));
@@ -83,9 +81,9 @@ class AdminMailSettingsWorkflowTest extends TestCase
 
         $subject = null;
         $email = 'info@sillashop.com';
-        $mailer = \\Mockery::mock();
+        $mailer = \Mockery::mock();
         $mailer->shouldReceive('raw')->once()->withArgs(function (string $body, callable $callback) use (&$subject, $email): bool {
-            $message = \\Mockery::mock();
+            $message = \Mockery::mock();
             $message->shouldReceive('to')->once()->with($email)->andReturnSelf();
             $message->shouldReceive('subject')->once()->andReturnUsing(function (string $value) use (&$subject): void {
                 $subject = $value;
@@ -94,10 +92,10 @@ class AdminMailSettingsWorkflowTest extends TestCase
             return str_contains($body, 'automatic connection test');
         });
 
-        \\Illuminate\\Support\\Facades\\Mail::shouldReceive('purge')->twice()->with('smtp');
-        \\Illuminate\\Support\\Facades\\Mail::shouldReceive('mailer')->once()->with('smtp')->andReturn($mailer);
+        \Illuminate\Support\Facades\Mail::shouldReceive('purge')->twice()->with('smtp');
+        \Illuminate\Support\Facades\Mail::shouldReceive('mailer')->once()->with('smtp')->andReturn($mailer);
 
-        $reader = \\Mockery::mock(ImapInboxReader::class);
+        $reader = \Mockery::mock(ImapInboxReader::class);
         $reader->shouldReceive('recentMessages')->once()->andReturnUsing(function () use (&$subject, $email): array {
             return [['from' => $email, 'subject' => $subject, 'date' => now()->toDateTimeString(), 'code' => null]];
         });
@@ -112,6 +110,8 @@ class AdminMailSettingsWorkflowTest extends TestCase
         $settings = SmtpSetting::query()->firstOrFail();
         $this->assertSame($email, $settings->mailbox_address);
         $this->assertSame('mail.sillashop.com', $settings->host);
+        $this->assertSame('info', $settings->username);
+        $this->assertSame('info', $settings->imap_username);
         $this->assertSame(587, $settings->port);
         $this->assertSame(993, $settings->imap_port);
         $this->assertTrue($settings->enabled);
