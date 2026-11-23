@@ -23,6 +23,25 @@
         </form>
         <p class="mt-3 text-xs text-[var(--admin-muted)]">رمز به‌صورت رمزنگاری‌شده در دیتابیس ذخیره می‌شود و در خروجی صفحه نمایش داده نمی‌شود.</p>
     </section>
+    <section class="rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-white)] p-5 shadow-sm sm:p-7">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <div><h2 class="text-base font-bold text-[var(--admin-text)]">صندوق ورودی واقعی</h2>
+                <p class="mt-1 text-xs text-[var(--admin-muted)]">آخرین پیام‌های دریافت‌شده از IMAP، بدون ذخیره متن محرمانه ایمیل‌ها.</p></div>
+            <form method="POST" action="{{ route('admin.smtp-settings.inbox.read') }}">@csrf
+                <button type="submit" class="rounded-xl border border-[var(--admin-border)] px-4 py-2 text-xs font-bold">به‌روزرسانی صندوق</button>
+            </form>
+        </div>
+        <p class="mt-3 text-xs text-[var(--admin-muted)]">{{ $mailInboxLastSync ? 'آخرین دریافت: '.\\Illuminate\\Support\\Carbon::parse($mailInboxLastSync)->format('Y/m/d H:i') : 'هنوز صندوق دریافت نشده است.' }}</p>
+        @forelse($mailInboxMessages as $message)
+            <article class="mt-3 rounded-xl border border-[var(--admin-border)] p-4">
+                <p class="break-all text-sm font-semibold">{{ $message['subject'] ?: 'بدون عنوان' }}</p>
+                <p class="mt-1 break-all text-xs text-[var(--admin-muted)]" dir="ltr">{{ $message['from'] }} · {{ $message['date'] }}</p>
+                @if(!empty($message['code']))<p class="mt-2 font-mono text-sm" dir="ltr">کد: {{ $message['code'] }}</p>@endif
+            </article>
+        @empty
+            <p class="mt-4 text-sm text-[var(--admin-muted)]">پیامی برای نمایش وجود ندارد. ابتدا اتصال را تست یا صندوق را به‌روزرسانی کن.</p>
+        @endforelse
+    </section>
     @if(session('warning'))
         <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">{{ session('warning') }}</div>
     @endif
