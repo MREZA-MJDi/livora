@@ -119,6 +119,43 @@ class AdminMailSettingsWorkflowTest extends TestCase
         $this->assertNotSame($settings->password, DB::table('smtp_settings')->value('password'));
         $this->assertSame($subject, cache()->get('mail.inbox.latest')[0]['subject']);
     }
+    public function test_mail_settings_accept_hostname_values_without_email_at_sign(): void
+    {
+        $this->actingAs(User::factory()->create(['role' => 'admin']));
+
+        $this->put(route('admin.smtp-settings.update'), [
+            'host' => 'MAIL.SILLASHOP.COM',
+            'port' => 587,
+            'encryption' => 'tls',
+            'username' => 'info',
+            'imap_host' => ' mail.sillashop.com ',
+            'imap_port' => 993,
+            'imap_encryption' => 'ssl',
+            'imap_username' => 'info',
+            'mailbox_address' => 'info@sillashop.com',
+        ])->assertRedirect(route('admin.smtp-settings.edit'))
+            ->assertSessionHasNoErrors();
+
+        $settings = SmtpSetting::query()->firstOrFail();
+        $this->assertSame('mail.sillashop.com', $settings->host);
+        $this->assertSame('mail.sillashop.com', $settings->imap_host);
+    }
+
+    public function test_mail_host_fields_reject_email_addresses_with_clear_field_errors(): void
+    {
+        $this->actingAs(User::factory()->create(['role' => 'admin']));
+
+        $this->put(route('admin.smtp-settings.update'), [
+            'host' => 'smtp@example.com',
+            'port' => 587,
+            'encryption' => 'tls',
+            'imap_host' => 'info@sillashop.com',
+            'imap_port' => 993,
+            'imap_encryption' => 'ssl',
+        ])->assertRedirect()
+            ->assertSessionHasErrors(['host', 'imap_host']);
+    }
+
     public function test_enamad_link_is_generated_from_official_id_and_code_and_rendered_with_uploaded_badge(): void
     {
         $this->actingAs(User::factory()->create(['role' => 'admin']));

@@ -47,8 +47,13 @@ class SmtpSettingsController extends Controller
 
     public function update(Request $request): RedirectResponse
     {
+        $request->merge([
+            'host' => is_string($request->input('host')) ? strtolower(rtrim(trim($request->input('host')), '.')) : $request->input('host'),
+            'imap_host' => is_string($request->input('imap_host')) ? strtolower(rtrim(trim($request->input('imap_host')), '.')) : $request->input('imap_host'),
+        ]);
+
         $data = $request->validate([
-            'host' => ['nullable', 'string', 'max:255'],
+            'host' => ['nullable', 'string', 'max:255', 'regex:/^(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(?:\\.(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*|(?:\\d{1,3}\\.){3}\\d{1,3})\\.?$/'],
             'port' => ['required', 'integer', 'between:1,65535'],
             'encryption' => ['required', 'in:tls,ssl,none'],
             'username' => ['nullable', 'string', 'max:255'],
@@ -57,12 +62,15 @@ class SmtpSettingsController extends Controller
             'from_name' => ['nullable', 'string', 'max:255'],
             'enabled' => ['nullable', 'boolean'],
             'mailbox_address' => ['nullable', 'email:rfc', 'max:255'],
-            'imap_host' => ['nullable', 'string', 'max:255'],
+            'imap_host' => ['nullable', 'string', 'max:255', 'regex:/^(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(?:\\.(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*|(?:\\d{1,3}\\.){3}\\d{1,3})\\.?$/'],
             'imap_port' => ['required', 'integer', 'between:1,65535'],
             'imap_encryption' => ['required', 'in:ssl,tls,none'],
             'imap_username' => ['nullable', 'string', 'max:255'],
             'imap_password' => ['nullable', 'string', 'max:1024'],
             'trust_badge_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+        ], [
+            'host.regex' => 'میزبان SMTP باید نام دامنه یا IP باشد؛ مانند mail.sillashop.com، نه آدرس ایمیل یا URL.',
+            'imap_host.regex' => 'میزبان IMAP باید نام دامنه یا IP باشد؛ مانند mail.sillashop.com، نه آدرس ایمیل یا URL.',
         ]);
 
         $settings = SmtpSetting::current();

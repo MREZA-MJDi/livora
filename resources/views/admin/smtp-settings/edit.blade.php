@@ -136,7 +136,9 @@
             </div>
             <div class="grid gap-4 sm:grid-cols-2">
                 <label class="block text-sm font-medium">میزبان SMTP
-                    <input name="host" value="{{ old('host', $settings->host) }}" placeholder="mail.farajihome.com" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" autocomplete="off">
+                    <input type="text" name="host" value="{{ old('host', $settings->host ?: 'mail.sillashop.com') }}" placeholder="mail.sillashop.com" inputmode="url" autocapitalize="none" spellcheck="false" dir="ltr" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" autocomplete="off">
+                    <span class="mt-1 block text-xs text-[var(--admin-muted)]">فقط نام میزبان؛ بدون @ و بدون https://</span>
+                    @error('host')<span class="mt-1 block text-xs text-rose-600">{{ $message }}</span>@enderror
                 </label>
                 <label class="block text-sm font-medium">پورت SMTP
                     <input type="number" min="1" max="65535" name="port" value="{{ old('port', $settings->port ?: 587) }}" required class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm">
@@ -177,13 +179,17 @@
             </div>
             <div class="grid gap-4 sm:grid-cols-2">
                 <label class="block text-sm font-medium">آدرس صندوق
-                    <input type="email" name="mailbox_address" value="{{ old('mailbox_address', $settings->mailbox_address ?: 'info@sillashop.com') }}" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" dir="ltr">
+                    <input type="email" name="mailbox_address" value="{{ old('mailbox_address', $settings->mailbox_address ?: 'info@sillashop.com') }}" placeholder="info@sillashop.com" autocomplete="email" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" dir="ltr">
+                    @error('mailbox_address')<span class="mt-1 block text-xs text-rose-600">{{ $message }}</span>@enderror
                 </label>
                 <label class="block text-sm font-medium">میزبان IMAP
-                    <input name="imap_host" value="{{ old('imap_host', $settings->imap_host ?: $settings->host) }}" placeholder="mail.farajihome.com" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" dir="ltr">
+                    <input type="text" name="imap_host" value="{{ old('imap_host', $settings->imap_host ?: $settings->host ?: 'mail.sillashop.com') }}" placeholder="mail.sillashop.com" inputmode="url" autocapitalize="none" spellcheck="false" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" dir="ltr" autocomplete="off">
+                    <span class="mt-1 block text-xs text-[var(--admin-muted)]">نام سرور IMAP است، نه آدرس ایمیل؛ مثال: mail.sillashop.com</span>
+                    @error('imap_host')<span class="mt-1 block text-xs text-rose-600">{{ $message }}</span>@enderror
                 </label>
                 <label class="block text-sm font-medium">پورت IMAP
                     <input type="number" min="1" max="65535" name="imap_port" value="{{ old('imap_port', $settings->imap_port ?: 993) }}" required class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm">
+                    @error('imap_port')<span class="mt-1 block text-xs text-rose-600">{{ $message }}</span>@enderror
                 </label>
                 <label class="block text-sm font-medium">رمزنگاری IMAP
                     <select name="imap_encryption" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm">
@@ -193,7 +199,9 @@
                     </select>
                 </label>
                 <label class="block text-sm font-medium">نام کاربری IMAP
-                    <input name="imap_username" value="{{ old('imap_username', $settings->imap_username ?: $settings->username ?: 'info@sillashop.com') }}" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" dir="ltr">
+                    <input type="text" name="imap_username" value="{{ old('imap_username', $settings->imap_username ?: $settings->username ?: 'info') }}" placeholder="info یا info@sillashop.com" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" dir="ltr" autocomplete="username">
+                    <span class="mt-1 block text-xs text-[var(--admin-muted)]">نام کاربری صندوق؛ بسته به تنظیم سرور می‌تواند info یا آدرس کامل باشد.</span>
+                    @error('imap_username')<span class="mt-1 block text-xs text-rose-600">{{ $message }}</span>@enderror
                 </label>
                 <label class="block text-sm font-medium">رمز IMAP (در صورت تفاوت)
                     <div class="mt-2 flex gap-2">
@@ -210,33 +218,6 @@
         </section>
 
         <div class="border-t border-[var(--admin-border)]"></div>
-
-        <section class="space-y-4 rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-white)] p-5 shadow-sm sm:p-7">
-            <div>
-                <h2 class="text-base font-bold text-[var(--admin-text)]">لینک رسمی استعلام اینماد</h2>
-                <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">شناسه و Code را دقیقاً از پنل رسمی اینماد وارد کنید. لینک استعلام در قالب رسمی trustseal ساخته می‌شود و روی تصویر نماد در فوتر قرار می‌گیرد.</p>
-            </div>
-            <form method="POST" action="{{ route('admin.smtp-settings.enamad.update') }}" class="grid gap-4 sm:grid-cols-2">
-                @csrf
-                @method('PUT')
-                <label class="block text-sm font-medium">شناسه نماد (ID)
-                    <input name="enamad_id" value="{{ old('enamad_id', $enamadId) }}" required inputmode="numeric" pattern="[0-9]+" maxlength="20" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" dir="ltr">
-                    @error('enamad_id')<span class="mt-1 block text-xs text-rose-600">{{ $message }}</span>@enderror
-                </label>
-                <label class="block text-sm font-medium">کد نماد (Code)
-                    <input name="enamad_code" value="{{ old('enamad_code', $enamadCode) }}" required maxlength="255" autocomplete="off" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" dir="ltr">
-                    @error('enamad_code')<span class="mt-1 block text-xs text-rose-600">{{ $message }}</span>@enderror
-                </label>
-                <div class="sm:col-span-2 flex flex-wrap items-center justify-between gap-3">
-                    @if(filled($enamadSettings?->enamad_url))
-                        <a href="{{ $enamadSettings->enamad_url }}" target="_blank" rel="noopener noreferrer" class="break-all text-xs font-semibold text-[var(--admin-accent-dark)] underline" dir="ltr">مشاهده لینک فعلی استعلام</a>
-                    @else
-                        <span class="text-xs text-[var(--admin-muted)]">هنوز لینک استعلام ثبت نشده است.</span>
-                    @endif
-                    <button type="submit" class="rounded-xl bg-[var(--admin-accent)] px-5 py-3 text-sm font-bold text-white">ساخت و ذخیره لینک اینماد</button>
-                </div>
-            </form>
-        </section>
 
         <section class="space-y-4">
             <div>
@@ -258,6 +239,34 @@
             <button type="submit" class="rounded-xl bg-[var(--admin-text)] px-6 py-3 text-sm font-bold text-white hover:opacity-90">ذخیره همه تنظیمات</button>
         </div>
     </form>
+
+    <section class="space-y-4 rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-white)] p-5 shadow-sm sm:p-7">
+        <div>
+                <h2 class="text-base font-bold text-[var(--admin-text)]">لینک رسمی استعلام اینماد</h2>
+                <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">شناسه و Code را دقیقاً از پنل رسمی اینماد وارد کنید. لینک استعلام در قالب رسمی trustseal ساخته می‌شود و روی تصویر نماد در فوتر قرار می‌گیرد.</p>
+        </div>
+        <form method="POST" action="{{ route('admin.smtp-settings.enamad.update') }}" class="grid gap-4 sm:grid-cols-2">
+                @csrf
+                @method('PUT')
+                <label class="block text-sm font-medium">شناسه نماد (ID)
+                    <input name="enamad_id" value="{{ old('enamad_id', $enamadId) }}" required inputmode="numeric" pattern="[0-9]+" maxlength="20" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" dir="ltr">
+                    @error('enamad_id')<span class="mt-1 block text-xs text-rose-600">{{ $message }}</span>@enderror
+                </label>
+                <label class="block text-sm font-medium">کد نماد (Code)
+                    <input name="enamad_code" value="{{ old('enamad_code', $enamadCode) }}" required maxlength="255" autocomplete="off" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" dir="ltr">
+                    @error('enamad_code')<span class="mt-1 block text-xs text-rose-600">{{ $message }}</span>@enderror
+                </label>
+                <div class="sm:col-span-2 flex flex-wrap items-center justify-between gap-3">
+                    @if(filled($enamadSettings?->enamad_url))
+                        <a href="{{ $enamadSettings->enamad_url }}" target="_blank" rel="noopener noreferrer" class="break-all text-xs font-semibold text-[var(--admin-accent-dark)] underline" dir="ltr">مشاهده لینک فعلی استعلام</a>
+                    @else
+                        <span class="text-xs text-[var(--admin-muted)]">هنوز لینک استعلام ثبت نشده است.</span>
+                    @endif
+                    <button type="submit" class="rounded-xl bg-[var(--admin-accent)] px-5 py-3 text-sm font-bold text-white">ساخت و ذخیره لینک اینماد</button>
+                </div>
+            </form>
+        </section>
+
 
 
     <section class="rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-white)] p-5 shadow-sm sm:p-7">
