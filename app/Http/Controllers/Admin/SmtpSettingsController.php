@@ -47,6 +47,11 @@ class SmtpSettingsController extends Controller
 
     public function update(Request $request): RedirectResponse
     {
+        $request->merge([
+            'host' => is_string($request->input('host')) ? strtolower(rtrim(trim($request->input('host')), '.')) : $request->input('host'),
+            'imap_host' => is_string($request->input('imap_host')) ? strtolower(rtrim(trim($request->input('imap_host')), '.')) : $request->input('imap_host'),
+        ]);
+
         $data = $request->validate([
             'host' => ['nullable', 'string', 'max:255', 'regex:/^(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(?:\\.(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?))*|(?:\\d{1,3}\\.){3}\\d{1,3})\\.?$/'],
             'port' => ['required', 'integer', 'between:1,65535'],
@@ -67,9 +72,6 @@ class SmtpSettingsController extends Controller
             'host.regex' => 'میزبان SMTP باید نام دامنه یا IP باشد؛ مانند mail.sillashop.com، نه آدرس ایمیل یا URL.',
             'imap_host.regex' => 'میزبان IMAP باید نام دامنه یا IP باشد؛ مانند mail.sillashop.com، نه آدرس ایمیل یا URL.',
         ]);
-
-        $data['host'] = filled($data['host'] ?? null) ? strtolower(rtrim(trim($data['host']), '.')) : null;
-        $data['imap_host'] = filled($data['imap_host'] ?? null) ? strtolower(rtrim(trim($data['imap_host']), '.')) : null;
 
         $settings = SmtpSetting::current();
         unset($data['password'], $data['imap_password'], $data['trust_badge_image']);
