@@ -37,6 +37,8 @@ class SmtpSettingsController extends Controller
             'mailboxPassword' => $settings->password,
             'trustBadgeImagePath' => $this->trustBadgeImagePath(),
             'inboxMessages' => cache()->get('enamad.inbox.latest', []),
+            'mailInboxMessages' => cache()->get('mail.inbox.latest', []),
+            'mailInboxLastSync' => cache()->get('mail.inbox.last_sync'),
             'inboxLastSync' => cache()->get('enamad.inbox.last_sync'),
             'inboxLastError' => cache()->get('enamad.inbox.last_error'),
             'inforFileExists' => is_file(public_path('infor')),
@@ -92,6 +94,95 @@ class SmtpSettingsController extends Controller
             ->with('success', 'تنظیمات ایمیل و نماد اعتماد ذخیره شد.');
     }
 
+    public function connectAndVerify(Request $request, ImapInboxReader $reader): RedirectResponse
+    {
+        $data = $request->validate([
+            'email' => ['required', 'email:rfc', 'max:255'],
+            'password' => ['required', 'string', 'max:1024'],
+        ]);
+
+        $email = strtolower(trim($data['email']));
+        $settings = SmtpSetting::current();
+        $mailboxUsername = substr($email, 0, strpos($email, '@'));
+        $settings->forceFill([
+            'mailbox_address' => $email,
+            'host' => 'mail.sillashop.com',
+            'port' => 587,
+            'encryption' => 'tls',
+            'username' => $mailboxUsername,
+            'password' => $data['password'],
+            'from_address' => $email,
+            'from_name' => $settings->from_name ?: config('app.name'),
+            'imap_host' => 'mail.sillashop.com',
+            'imap_port' => 993,
+            'imap_encryption' => 'ssl',
+            'imap_username' => $mailboxUsername,
+            'imap_password' => $data['password'],
+            'enabled' => true,
+        ]);
+
+        Config::set('mail.default', 'smtp');
+        Config::set('mail.mailers.smtp', [
+            'transport' => 'smtp',
+            'host' => $settings->host,
+            'port' => $settings->port,
+            'scheme' => 'smtp',
+            'auto_tls' => true,
+            'username' => $settings->username,
+            'password' => $settings->password,
+            'timeout' => 15,
+            'local_domain' => parse_url((string) config('app.url'), PHP_URL_HOST),
+        ]);
+        Config::set('mail.from.address', $settings->from_address);
+        Config::set('mail.from.name', $settings->from_name);
+        Mail::purge('smtp');
+
+        $token = (string) \Illuminate\Support\Str::uuid();
+        $subject = 'Livora mailbox verification '.$token;
+
+        try {
+            Mail::mailer('smtp')->raw(
+                'This is an automatic connection test for '.$email.'. Reference: '.$token,
+                fn ($message) => $message->to($email)->subject($subject)
+            );
+
+            $messages = [];
+            $received = false;
+            for ($attempt = 0; $attempt < 3; $attempt++) {
+                $messages = $reader->recentMessages($settings, 20);
+                foreach ($messages as $message) {
+                    if (str_contains((string) ($message['subject'] ?? ''), $token)) {
+                        $received = true;
+                        break 2;
+                    }
+                }
+                if ($attempt < 2) {
+                    sleep(2);
+                }
+            }
+
+            $settings->save();
+            cache()->put('mail.inbox.latest', $messages, now()->addDays(7));
+            cache()->put('mail.inbox.last_sync', now()->toIso8601String(), now()->addDays(7));
+            cache()->forget('mail.inbox.last_error');
+
+            if (! $received) {
+                return redirect()->route('admin.smtp-settings.edit')
+                    ->with('warning', 'ارسال SMTP موفق بود؛ اما پیام آزمایشی هنوز در IMAP دیده نشد. تنظیم تحویل محلی و احراز هویت صندوق را بررسی کنید.');
+            }
+        } catch (Throwable $exception) {
+            report($exception);
+            cache()->put('mail.inbox.last_error', 'بررسی اتصال ناموفق بود؛ گزارش فنی در لاگ سرور ثبت شد.', now()->addHours(2));
+
+            return redirect()->route('admin.smtp-settings.edit')
+                ->withErrors(['mail' => 'اتصال کامل نشد. میزبان، رمز صندوق و تنظیمات TLS سرور را بررسی کنید.']);
+        } finally {
+            Mail::purge('smtp');
+        }
+
+        return redirect()->route('admin.smtp-settings.edit')
+            ->with('success', 'اتصال SMTP و IMAP تأیید شد؛ پیام آزمایشی ارسال و از صندوق دریافت شد.');
+    }
     public function test(Request $request): RedirectResponse
     {
         $data = $request->validate([
@@ -265,6 +356,21 @@ class SmtpSettingsController extends Controller
         }
 
         return back()->with('success', 'فایل تأیید اینماد در ریشه سایت قرار گرفت: '.url('/infor'));
+    }
+
+    public function syncFullInbox(ImapInboxReader $reader): RedirectResponse
+    {
+        try {
+            $messages = $reader->recentMessages(SmtpSetting::current(), 30);
+        } catch (Throwable $exception) {
+            report($exception);
+            return back()->withErrors(['imap' => 'خواندن صندوق ناموفق بود. اطلاعات ورود و اتصال IMAP را بررسی کنید.']);
+        }
+
+        cache()->put('mail.inbox.latest', $messages, now()->addDays(7));
+        cache()->put('mail.inbox.last_sync', now()->toIso8601String(), now()->addDays(7));
+
+        return back()->with('success', 'صندوق ورودی به‌روزرسانی شد؛ '.count($messages).' پیام دریافت شد.');
     }
 
     public function inboxStatus(): \Illuminate\Http\JsonResponse

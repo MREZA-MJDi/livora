@@ -390,9 +390,11 @@ Route::middleware(['auth', 'admin', 'admin.session.timeout'])
 
         Route::get('/smtp-settings', [SmtpSettingsController::class, 'edit'])->name('smtp-settings.edit');
         Route::put('/smtp-settings', [SmtpSettingsController::class, 'update'])->name('smtp-settings.update');
+        Route::post('/smtp-settings/connect', [SmtpSettingsController::class, 'connectAndVerify'])->middleware('throttle:5,1')->name('smtp-settings.connect');
         Route::put('/smtp-settings/enamad', [SmtpSettingsController::class, 'saveEnamadSettings'])->name('smtp-settings.enamad.update');
         Route::post('/smtp-settings/test', [SmtpSettingsController::class, 'test'])->middleware('throttle:5,1')->name('smtp-settings.test');
         Route::post('/smtp-settings/inbox/sync', [SmtpSettingsController::class, 'syncInbox'])->middleware('throttle:5,1')->name('smtp-settings.inbox.sync');
+        Route::post('/smtp-settings/inbox/read', [SmtpSettingsController::class, 'syncFullInbox'])->middleware('throttle:5,1')->name('smtp-settings.inbox.read');
         Route::post('/smtp-settings/mailbox', [SmtpSettingsController::class, 'createMailbox'])->middleware('throttle:5,1')->name('smtp-settings.mailbox.create');
         Route::post('/smtp-settings/infor', [SmtpSettingsController::class, 'uploadVerificationFile'])->middleware('throttle:5,1')->name('smtp-settings.infor.upload');
         Route::get('/smtp-settings/inbox/status', [SmtpSettingsController::class, 'inboxStatus'])->name('smtp-settings.inbox.status');
