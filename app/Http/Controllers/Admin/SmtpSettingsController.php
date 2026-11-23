@@ -103,22 +103,23 @@ class SmtpSettingsController extends Controller
 
         $email = strtolower(trim($data['email']));
         $settings = SmtpSetting::current();
+        $mailboxUsername = substr($email, 0, strpos($email, '@'));
         $settings->forceFill([
             'mailbox_address' => $email,
             'host' => 'mail.sillashop.com',
             'port' => 587,
             'encryption' => 'tls',
-            'username' => $email,
+            'username' => $mailboxUsername,
             'password' => $data['password'],
             'from_address' => $email,
             'from_name' => $settings->from_name ?: config('app.name'),
             'imap_host' => 'mail.sillashop.com',
             'imap_port' => 993,
             'imap_encryption' => 'ssl',
-            'imap_username' => $email,
+            'imap_username' => $mailboxUsername,
             'imap_password' => $data['password'],
             'enabled' => true,
-        ])->save();
+        ]);
 
         Config::set('mail.default', 'smtp');
         Config::set('mail.mailers.smtp', [
@@ -160,6 +161,7 @@ class SmtpSettingsController extends Controller
                 }
             }
 
+            $settings->save();
             cache()->put('mail.inbox.latest', $messages, now()->addDays(7));
             cache()->put('mail.inbox.last_sync', now()->toIso8601String(), now()->addDays(7));
             cache()->forget('mail.inbox.last_error');
