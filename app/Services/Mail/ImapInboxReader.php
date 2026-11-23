@@ -15,7 +15,7 @@ class ImapInboxReader
      *
      * @return array<int, array{from:string,subject:string,date:string,code:?string}>
      */
-    public function recentVerificationMessages(SmtpSetting $settings, int $limit = 20): array
+    public function recentMessages(SmtpSetting $settings, int $limit = 20, bool $verificationOnly = false): array
     {
         $host = trim((string) ($settings->imap_host ?: $settings->host));
         $username = trim((string) ($settings->imap_username ?: $settings->username));
@@ -90,7 +90,7 @@ class ImapInboxReader
                 $code = $this->extractVerificationCode($from, $subject, $body);
                 $isEnamad = preg_match('/enamad|اینماد|نماد اعتماد/i', $from.' '.$subject.' '.$body) === 1;
 
-                if (! $isEnamad) {
+                if ($verificationOnly && ! $isEnamad) {
                     continue;
                 }
 
@@ -121,6 +121,16 @@ class ImapInboxReader
                 }
             }
         }
+    }
+
+    /**
+     * Read only messages relevant to eNamad verification.
+     *
+     * @return array<int, array{from:string,subject:string,date:string,code:?string}>
+     */
+    public function recentVerificationMessages(SmtpSetting $settings, int $limit = 20): array
+    {
+        return $this->recentMessages($settings, $limit, true);
     }
 
     /**
