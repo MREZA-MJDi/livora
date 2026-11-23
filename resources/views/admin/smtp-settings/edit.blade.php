@@ -199,7 +199,9 @@
                     </select>
                 </label>
                 <label class="block text-sm font-medium">نام کاربری IMAP
-                    <input name="imap_username" value="{{ old('imap_username', $settings->imap_username ?: $settings->username ?: 'info@sillashop.com') }}" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" dir="ltr">
+                    <input type="text" name="imap_username" value="{{ old('imap_username', $settings->imap_username ?: $settings->username ?: 'info') }}" placeholder="info یا info@sillashop.com" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" dir="ltr" autocomplete="username">
+                    <span class="mt-1 block text-xs text-[var(--admin-muted)]">نام کاربری صندوق؛ بسته به تنظیم سرور می‌تواند info یا آدرس کامل باشد.</span>
+                    @error('imap_username')<span class="mt-1 block text-xs text-rose-600">{{ $message }}</span>@enderror
                 </label>
                 <label class="block text-sm font-medium">رمز IMAP (در صورت تفاوت)
                     <div class="mt-2 flex gap-2">
@@ -217,7 +219,7 @@
 
         <div class="border-t border-[var(--admin-border)]"></div>
 
-            <section class="space-y-4">
+        <section class="space-y-4">
             <div>
                 <h2 class="text-base font-bold text-[var(--admin-text)]">۳. تصویر نماد اعتماد برای فوتر</h2>
                 <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">تصویر رسمی نماد را بارگذاری کنید؛ پس از ذخیره، در بخش مناسب فوتر سایت نمایش داده می‌شود.</p>
@@ -239,11 +241,11 @@
     </form>
 
     <section class="space-y-4 rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-white)] p-5 shadow-sm sm:p-7">
-            <div>
+        <div>
                 <h2 class="text-base font-bold text-[var(--admin-text)]">لینک رسمی استعلام اینماد</h2>
                 <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">شناسه و Code را دقیقاً از پنل رسمی اینماد وارد کنید. لینک استعلام در قالب رسمی trustseal ساخته می‌شود و روی تصویر نماد در فوتر قرار می‌گیرد.</p>
-            </div>
-            <form method="POST" action="{{ route('admin.smtp-settings.enamad.update') }}" class="grid gap-4 sm:grid-cols-2">
+        </div>
+        <form method="POST" action="{{ route('admin.smtp-settings.enamad.update') }}" class="grid gap-4 sm:grid-cols-2">
                 @csrf
                 @method('PUT')
                 <label class="block text-sm font-medium">شناسه نماد (ID)
