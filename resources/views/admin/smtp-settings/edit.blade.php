@@ -136,7 +136,9 @@
             </div>
             <div class="grid gap-4 sm:grid-cols-2">
                 <label class="block text-sm font-medium">میزبان SMTP
-                    <input name="host" value="{{ old('host', $settings->host) }}" placeholder="mail.farajihome.com" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" autocomplete="off">
+                    <input type="text" name="host" value="{{ old('host', $settings->host ?: 'mail.sillashop.com') }}" placeholder="mail.sillashop.com" inputmode="url" autocapitalize="none" spellcheck="false" dir="ltr" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" autocomplete="off">
+                    <span class="mt-1 block text-xs text-[var(--admin-muted)]">فقط نام میزبان؛ بدون @ و بدون https://</span>
+                    @error('host')<span class="mt-1 block text-xs text-rose-600">{{ $message }}</span>@enderror
                 </label>
                 <label class="block text-sm font-medium">پورت SMTP
                     <input type="number" min="1" max="65535" name="port" value="{{ old('port', $settings->port ?: 587) }}" required class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm">
@@ -177,13 +179,17 @@
             </div>
             <div class="grid gap-4 sm:grid-cols-2">
                 <label class="block text-sm font-medium">آدرس صندوق
-                    <input type="email" name="mailbox_address" value="{{ old('mailbox_address', $settings->mailbox_address ?: 'info@sillashop.com') }}" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" dir="ltr">
+                    <input type="email" name="mailbox_address" value="{{ old('mailbox_address', $settings->mailbox_address ?: 'info@sillashop.com') }}" placeholder="info@sillashop.com" autocomplete="email" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" dir="ltr">
+                    @error('mailbox_address')<span class="mt-1 block text-xs text-rose-600">{{ $message }}</span>@enderror
                 </label>
                 <label class="block text-sm font-medium">میزبان IMAP
-                    <input name="imap_host" value="{{ old('imap_host', $settings->imap_host ?: $settings->host) }}" placeholder="mail.farajihome.com" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" dir="ltr">
+                    <input type="text" name="imap_host" value="{{ old('imap_host', $settings->imap_host ?: $settings->host ?: 'mail.sillashop.com') }}" placeholder="mail.sillashop.com" inputmode="url" autocapitalize="none" spellcheck="false" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm" dir="ltr" autocomplete="off">
+                    <span class="mt-1 block text-xs text-[var(--admin-muted)]">نام سرور IMAP است، نه آدرس ایمیل؛ مثال: mail.sillashop.com</span>
+                    @error('imap_host')<span class="mt-1 block text-xs text-rose-600">{{ $message }}</span>@enderror
                 </label>
                 <label class="block text-sm font-medium">پورت IMAP
                     <input type="number" min="1" max="65535" name="imap_port" value="{{ old('imap_port', $settings->imap_port ?: 993) }}" required class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm">
+                    @error('imap_port')<span class="mt-1 block text-xs text-rose-600">{{ $message }}</span>@enderror
                 </label>
                 <label class="block text-sm font-medium">رمزنگاری IMAP
                     <select name="imap_encryption" class="mt-2 w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm">
@@ -211,7 +217,28 @@
 
         <div class="border-t border-[var(--admin-border)]"></div>
 
-        <section class="space-y-4 rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-white)] p-5 shadow-sm sm:p-7">
+            <section class="space-y-4">
+            <div>
+                <h2 class="text-base font-bold text-[var(--admin-text)]">۳. تصویر نماد اعتماد برای فوتر</h2>
+                <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">تصویر رسمی نماد را بارگذاری کنید؛ پس از ذخیره، در بخش مناسب فوتر سایت نمایش داده می‌شود.</p>
+            </div>
+            @if($trustBadgeImagePath && \Illuminate\Support\Facades\Storage::disk('public')->exists($trustBadgeImagePath))
+                <div class="flex flex-wrap items-center gap-4 rounded-xl border border-[var(--admin-border)] p-4">
+                    <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($trustBadgeImagePath) }}" alt="پیش‌نمایش نماد اعتماد" class="h-24 w-24 rounded-lg bg-white object-contain p-2">
+                    <div class="text-xs leading-6 text-[var(--admin-text-soft)]">تصویر فعلی نماد اعتماد؛ با بارگذاری تصویر جدید جایگزین می‌شود.</div>
+                </div>
+            @endif
+            <label class="block text-sm font-medium">انتخاب تصویر نماد (JPG، PNG یا WEBP؛ حداکثر ۵ مگابایت)
+                <input type="file" name="trust_badge_image" accept="image/jpeg,image/png,image/webp" class="mt-2 block w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm file:ml-3 file:rounded-lg file:border-0 file:bg-[var(--admin-surface)] file:px-3 file:py-2">
+            </label>
+        </section>
+
+        <div class="flex justify-end border-t border-[var(--admin-border)] pt-5">
+            <button type="submit" class="rounded-xl bg-[var(--admin-text)] px-6 py-3 text-sm font-bold text-white hover:opacity-90">ذخیره همه تنظیمات</button>
+        </div>
+    </form>
+
+    <section class="space-y-4 rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-white)] p-5 shadow-sm sm:p-7">
             <div>
                 <h2 class="text-base font-bold text-[var(--admin-text)]">لینک رسمی استعلام اینماد</h2>
                 <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">شناسه و Code را دقیقاً از پنل رسمی اینماد وارد کنید. لینک استعلام در قالب رسمی trustseal ساخته می‌شود و روی تصویر نماد در فوتر قرار می‌گیرد.</p>
@@ -238,26 +265,6 @@
             </form>
         </section>
 
-        <section class="space-y-4">
-            <div>
-                <h2 class="text-base font-bold text-[var(--admin-text)]">۳. تصویر نماد اعتماد برای فوتر</h2>
-                <p class="mt-1 text-xs leading-6 text-[var(--admin-muted)]">تصویر رسمی نماد را بارگذاری کنید؛ پس از ذخیره، در بخش مناسب فوتر سایت نمایش داده می‌شود.</p>
-            </div>
-            @if($trustBadgeImagePath && \Illuminate\Support\Facades\Storage::disk('public')->exists($trustBadgeImagePath))
-                <div class="flex flex-wrap items-center gap-4 rounded-xl border border-[var(--admin-border)] p-4">
-                    <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($trustBadgeImagePath) }}" alt="پیش‌نمایش نماد اعتماد" class="h-24 w-24 rounded-lg bg-white object-contain p-2">
-                    <div class="text-xs leading-6 text-[var(--admin-text-soft)]">تصویر فعلی نماد اعتماد؛ با بارگذاری تصویر جدید جایگزین می‌شود.</div>
-                </div>
-            @endif
-            <label class="block text-sm font-medium">انتخاب تصویر نماد (JPG، PNG یا WEBP؛ حداکثر ۵ مگابایت)
-                <input type="file" name="trust_badge_image" accept="image/jpeg,image/png,image/webp" class="mt-2 block w-full rounded-xl border border-[var(--admin-border)] bg-white px-3 py-3 text-sm file:ml-3 file:rounded-lg file:border-0 file:bg-[var(--admin-surface)] file:px-3 file:py-2">
-            </label>
-        </section>
-
-        <div class="flex justify-end border-t border-[var(--admin-border)] pt-5">
-            <button type="submit" class="rounded-xl bg-[var(--admin-text)] px-6 py-3 text-sm font-bold text-white hover:opacity-90">ذخیره همه تنظیمات</button>
-        </div>
-    </form>
 
 
     <section class="rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-white)] p-5 shadow-sm sm:p-7">
