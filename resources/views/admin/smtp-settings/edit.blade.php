@@ -31,7 +31,7 @@
                 <button type="submit" class="rounded-xl border border-[var(--admin-border)] px-4 py-2 text-xs font-bold">به‌روزرسانی صندوق</button>
             </form>
         </div>
-        <p class="mt-3 text-xs text-[var(--admin-muted)]">{{ $mailInboxLastSync ? 'آخرین دریافت: '.\\Illuminate\\Support\\Carbon::parse($mailInboxLastSync)->format('Y/m/d H:i') : 'هنوز صندوق دریافت نشده است.' }}</p>
+        <p class="mt-3 text-xs text-[var(--admin-muted)]">{{ $mailInboxLastSync ? 'آخرین دریافت: '.\Illuminate\Support\Carbon::parse($mailInboxLastSync)->format('Y/m/d H:i') : 'هنوز صندوق دریافت نشده است.' }}</p>
         @forelse($mailInboxMessages as $message)
             <article class="mt-3 rounded-xl border border-[var(--admin-border)] p-4">
                 <p class="break-all text-sm font-semibold">{{ $message['subject'] ?: 'بدون عنوان' }}</p>
