@@ -75,6 +75,48 @@ class AdminMailSettingsWorkflowTest extends TestCase
     }
 
 
+    public function test_mailbox_connection_sends_a_test_message_and_confirms_it_was_received_over_imap(): void
+    {
+        $this->actingAs(User::factory()->create(['role' => 'admin']));
+
+        $subject = null;
+        $email = 'info@sillashop.com';
+        $mailer = \\Mockery::mock();
+        $mailer->shouldReceive('raw')->once()->withArgs(function (string $body, callable $callback) use (&$subject, $email): bool {
+            $message = \\Mockery::mock();
+            $message->shouldReceive('to')->once()->with($email)->andReturnSelf();
+            $message->shouldReceive('subject')->once()->andReturnUsing(function (string $value) use (&$subject): void {
+                $subject = $value;
+            });
+            $callback($message);
+            return str_contains($body, 'automatic connection test');
+        });
+
+        \\Illuminate\\Support\\Facades\\Mail::shouldReceive('purge')->twice()->with('smtp');
+        \\Illuminate\\Support\\Facades\\Mail::shouldReceive('mailer')->once()->with('smtp')->andReturn($mailer);
+
+        $reader = \\Mockery::mock(ImapInboxReader::class);
+        $reader->shouldReceive('recentMessages')->once()->andReturnUsing(function () use (&$subject, $email): array {
+            return [['from' => $email, 'subject' => $subject, 'date' => now()->toDateTimeString(), 'code' => null]];
+        });
+        $this->app->instance(ImapInboxReader::class, $reader);
+
+        $this->post(route('admin.smtp-settings.connect'), [
+            'email' => $email,
+            'password' => 'Mailbox-Test-Password-2026!',
+        ])->assertRedirect(route('admin.smtp-settings.edit'))
+            ->assertSessionHas('success');
+
+        $settings = SmtpSetting::query()->firstOrFail();
+        $this->assertSame($email, $settings->mailbox_address);
+        $this->assertSame('mail.sillashop.com', $settings->host);
+        $this->assertSame(587, $settings->port);
+        $this->assertSame(993, $settings->imap_port);
+        $this->assertTrue($settings->enabled);
+        $this->assertSame('Mailbox-Test-Password-2026!', $settings->password);
+        $this->assertNotSame($settings->password, DB::table('smtp_settings')->value('password'));
+        $this->assertSame($subject, cache()->get('mail.inbox.latest.0.subject'));
+    }
     public function test_enamad_link_is_generated_from_official_id_and_code_and_rendered_with_uploaded_badge(): void
     {
         $this->actingAs(User::factory()->create(['role' => 'admin']));
