@@ -37,6 +37,8 @@ class SmtpSettingsController extends Controller
             'mailboxPassword' => $settings->password,
             'trustBadgeImagePath' => $this->trustBadgeImagePath(),
             'inboxMessages' => cache()->get('enamad.inbox.latest', []),
+            'mailInboxMessages' => cache()->get('mail.inbox.latest', []),
+            'mailInboxLastSync' => cache()->get('mail.inbox.last_sync'),
             'inboxLastSync' => cache()->get('enamad.inbox.last_sync'),
             'inboxLastError' => cache()->get('enamad.inbox.last_error'),
             'inforFileExists' => is_file(public_path('infor')),
@@ -134,7 +136,7 @@ class SmtpSettingsController extends Controller
         Config::set('mail.from.name', $settings->from_name);
         Mail::purge('smtp');
 
-        $token = (string) \\Illuminate\\Support\\Str::uuid();
+        $token = (string) \Illuminate\Support\Str::uuid();
         $subject = 'Livora mailbox verification '.$token;
 
         try {
@@ -352,6 +354,21 @@ class SmtpSettingsController extends Controller
         }
 
         return back()->with('success', 'فایل تأیید اینماد در ریشه سایت قرار گرفت: '.url('/infor'));
+    }
+
+    public function syncFullInbox(ImapInboxReader $reader): RedirectResponse
+    {
+        try {
+            $messages = $reader->recentMessages(SmtpSetting::current(), 30);
+        } catch (Throwable $exception) {
+            report($exception);
+            return back()->withErrors(['imap' => 'خواندن صندوق ناموفق بود. اطلاعات ورود و اتصال IMAP را بررسی کنید.']);
+        }
+
+        cache()->put('mail.inbox.latest', $messages, now()->addDays(7));
+        cache()->put('mail.inbox.last_sync', now()->toIso8601String(), now()->addDays(7));
+
+        return back()->with('success', 'صندوق ورودی به‌روزرسانی شد؛ '.count($messages).' پیام دریافت شد.');
     }
 
     public function inboxStatus(): \Illuminate\Http\JsonResponse
