@@ -54,6 +54,8 @@ class AdminMailSettingsWorkflowTest extends TestCase
         $this->assertSame('info@sillashop.com', $settings->imap_username);
         $this->assertSame($settings->password, $settings->imap_password);
         $this->assertSame('mail.sillashop.com', $settings->host);
+        $this->assertSame('info', $settings->username);
+        $this->assertSame('info', $settings->imap_username);
         $this->assertSame('mail.sillashop.com', $settings->imap_host);
         $this->assertTrue($settings->enabled);
         $this->assertNotSame($settings->password, DB::table('smtp_settings')->value('password'));
@@ -115,7 +117,7 @@ class AdminMailSettingsWorkflowTest extends TestCase
         $this->assertTrue($settings->enabled);
         $this->assertSame('Mailbox-Test-Password-2026!', $settings->password);
         $this->assertNotSame($settings->password, DB::table('smtp_settings')->value('password'));
-        $this->assertSame($subject, cache()->get('mail.inbox.latest.0.subject'));
+        $this->assertSame($subject, cache()->get('mail.inbox.latest')[0]['subject']);
     }
     public function test_enamad_link_is_generated_from_official_id_and_code_and_rendered_with_uploaded_badge(): void
     {
