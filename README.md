@@ -1,9 +1,15 @@
 # SillaGallery
 
-SillaGallery is a furniture and home-living e-commerce project built with Laravel. Its documented product direction includes catalogue browsing, product details, categories, filtering, cart and wishlist experiences, customer accounts, orders, payment-provider integration, and installment purchasing. Features and payment providers must be verified against the current implementation before being treated as live or production-ready.
+LIVORA is the Laravel codebase behind SillaGallery, a furniture and home-living storefront.
 
-## Dedicated dashboard
-SillaGallery includes its own dedicated administration dashboard for the store's operational workflow. The README describes the product scope; verify each management and payment operation against the current implementation before treating it as production-ready.
+**Live storefront** · [sillashop.com](https://sillashop.com/)
+
+## Technical highlights
+
+- Blade storefront for catalog browsing, product details, search and filtering.
+- Customer accounts, cart, wishlist, checkout and order history.
+- Checkout routes for gateway callbacks and installment requests. Availability depends on the production payment configuration.
+- Dedicated administration for operating the catalog and store.
 
 ## Technology
 - PHP `^8.2`, Laravel `^12.0`
@@ -40,7 +46,7 @@ php artisan test
 ```
 
 ## Production readiness
-See [docs/DEPLOY-SILLASHOP.md](docs/DEPLOY-SILASHOP.md) for the isolated VPS layout, versioned release and rollback procedure, DNS/SSL/CDN setup, and first-release smoke checks. See [docs/PRODUCTION-READINESS.md](docs/PRODUCTION-READINESS.md) for security settings, historical inventory reconciliation, rollback constraints, and the payment-provider release gate.
+See [SillaShop VPS deployment runbook](docs/DEPLOY-SILLASHOP.md) for the isolated VPS layout, versioned release and rollback procedure, DNS/SSL/CDN setup, and first-release smoke checks. See [docs/PRODUCTION-READINESS.md](docs/PRODUCTION-READINESS.md) for security settings, historical inventory reconciliation, rollback constraints, and the payment-provider release gate.
 
 ## Payments and data safety
 Use gateway sandbox credentials for development. Never store secret keys in source control, and never claim that a payment succeeded based only on a browser redirect; payment status must be confirmed by the application's verified gateway flow. Review migrations and seeders before using them with non-disposable data.
